@@ -63,6 +63,7 @@ Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module
   | `MCF_Interact_` | Interactie-hint-systeem (5.6) |
   | `MCF_AAR_` | Debrief-module (5.8) |
   | `MCF_Squad_` | Squad Cohesion/C2-laag (5.10) |
+  | `MCF_Build_` | Field Construction-module — los uitgewerkt in `docs/modules/field-construction.md`, niet in kernroadmap sectie 9 |
 
   Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
 - **Event-contract.** Elk event heeft een vast namespace-patroon (`Module_Actie`, bijv. `Objective_Complete`, `Hostility_ThresholdCrossed`) en een gedocumenteerd payload-schema. Geen enkel event wordt ad-hoc genaamd — nieuwe events worden centraal geregistreerd in de Module Registry, niet losjes verzonnen per module.
