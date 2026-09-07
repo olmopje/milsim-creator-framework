@@ -1,4 +1,4 @@
-# Reforger Milsim Mission Framework — Architectuurplan
+# Milsim Framework (MF) — Architectuurplan
 
 ## 1. Visie
 
@@ -50,7 +50,20 @@ Geen dependency op bestaande third-party frameworks (Scenario Framework, Ci5, GM
 
 Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module ze zelf hoeft te interpreteren of, erger, anders interpreteert dan een andere module.
 
-- **Naamgevingsconventie & prefix.** Alle classes/prefabs krijgen een vaste eigen prefix (bijv. `MSF_`), volgens BI's officiële *Editor Entity Naming Conventions*. Voorkomt botsing met andere mods en maakt de codebase direct herkenbaar als "van dit framework".
+- **Naamgevingsconventie & prefix.** Projectnaam: **Milsim Framework (MF)**. Alle classes/prefabs krijgen de vaste prefix `MF_`, volgens BI's officiële *Editor Entity Naming Conventions* ("vervang `SCR_` door je eigen tag"). Daarbinnen krijgt elke module een eigen sub-namespace, zodat je aan de class-naam meteen ziet welke module verantwoordelijk is:
+
+  | Namespace | Dekt |
+  |---|---|
+  | `MF_Core_` | Event Bus, Object Identity, Module Registry, Tick Manager |
+  | `MF_AI_` | Civiele AI-gedrag (5.3), Ambient Life-gedragsprofielen (5.5), Compliance/ROE-logica (5.7) |
+  | `MF_Obj_` | Objective/POI/Logic Nodes (4.x) |
+  | `MF_Hostility_` | Hostility/Reputatie-manager (5.1) |
+  | `MF_Infra_` | Infrastructuur-netwerk/AI Warning (5.2) |
+  | `MF_Voice_` | Voice Line/Comms (4.4) |
+  | `MF_Interact_` | Interactie-hint-systeem (5.6) |
+  | `MF_AAR_` | Debrief-module (5.8) |
+
+  Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
 - **Event-contract.** Elk event heeft een vast namespace-patroon (`Module_Actie`, bijv. `Objective_Complete`, `Hostility_ThresholdCrossed`) en een gedocumenteerd payload-schema. Geen enkel event wordt ad-hoc genaamd — nieuwe events worden centraal geregistreerd in de Module Registry, niet losjes verzonnen per module.
 - **Authority-beleid.** Alle state-mutaties (objective-status, hostility-waarde, infrastructuur-status, ROE-uitkomst) zijn **server-authoritative**. Clients ontvangen uitsluitend gerepliceerde resultaten via de Replicatie-helper — nooit lokale voorspellingen die later gecorrigeerd moeten worden. Dit geldt voor élke module, zonder uitzondering.
 - **Faction Alias-integratie.** De Core hergebruikt SF's bewezen `SCR_FactionAliasComponent`-patroon in plaats van een eigen factie-abstractie te verzinnen. Elke module die een factie nodig heeft (Hostility, ROE, Objective-condities) verwijst naar een Alias, niet naar een harde Faction Key — zo is een scenario herbruikbaar met andere factie-combinaties zonder herbouw.

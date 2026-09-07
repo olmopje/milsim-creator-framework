@@ -26,11 +26,11 @@ jobs:
             exit 1
           fi
 
-      - name: Check op MSF_-prefix in nieuwe scriptbestanden
+      - name: Check op MF_-prefix in nieuwe scriptbestanden
         run: |
-          for f in $(git diff --name-only origin/main...HEAD -- 'addons/MSF/Scripts/**/*.c' 2>/dev/null); do
+          for f in $(git diff --name-only origin/main...HEAD -- 'addons/MF/Scripts/**/*.c' 2>/dev/null); do
             base=$(basename "$f")
-            if [[ ! "$base" == MSF_* ]]; then
-              echo "::warning::$f volgt niet de MSF_-naamgevingsconventie"
+            if [[ ! "$base" == MF_* ]]; then
+              echo "::warning::$f volgt niet de MF_-naamgevingsconventie"
             fi
           done
