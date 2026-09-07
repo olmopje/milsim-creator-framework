@@ -42,6 +42,32 @@ Los document, zelfde reden als het voertuig-schiet-document: dit raakt wapenstat
 - Uitbreiding van het bestaande scroll-wheel stance-systeem met meer tussenstappen voor hoogte, specifiek gericht op net-over-dekking-mikken
 - Dit is animatie-/character-controller-werk, zelfde technische domein als het voertuig-schiet-document — geen scripting-logica
 
+### 3.4 Detectie-feedback voor de speler — Alert-systeem
+De speler moet kunnen aanvoelen dat hij bijna ontdekt is (en nog kan ontsnappen) zonder dat het een gamey HUD-meter wordt die de immersie breekt — consistent met de "fake it until je het nodig hebt"-filosofie uit het hoofdproject.
+
+**Kernidee: reageer op AI-staatsovergangen, niet op ruwe detectiewaardes.**
+Dit ontkoppelt het systeem volledig van de onzekere interne perceptie-logica uit sectie 3.2 (die nog niet bevestigd is) — je luistert alleen naar *wanneer* de AI van staat wisselt, niet naar *hoe* die beslissing tot stand komt. Drie staten, gebaseerd op het al bestaande Threat State-concept:
+
+| Overgang | Wat de speler waarneemt (diegetisch, geen HUD) |
+|---|---|
+| **Onwetend → Argwanend** | AI-bark ("Wat was dat?"), zichtbare hoofd-/lichaamsdraai naar de richting — subtiel, makkelijk te missen als je niet oplet, precies de bedoeling |
+| **Argwanend → In gevecht** | Onmiskenbaar: geschreeuw, vuur, radiomelding voor versterking (haakt rechtstreeks in op het bestaande QRF-systeem) — het gevecht zelf ís de feedback, geen aparte melding nodig |
+| **In gevecht → Onwetend (verloren contact)** | Aparte "stand-down"-bark/animatie zodra de AI je kwijtraakt — geeft de speler een duidelijk afsluitmoment: "ik ben ontsnapt", zonder een expliciete melding op het scherm |
+
+**Het ontsnappingsvenster:** de tijd tussen Argwanend en In gevecht ís het speelbare moment — breekt de speler line-of-sight of blijft hij stilzitten/kruipen binnen die tijd, dan valt de AI terug naar Onwetend in plaats van te escaleren. Dit is een instelbare tijdswaarde, geen nieuw mechanisme — gewoon een timer op de bestaande staatsovergang.
+
+**Missiemaker-configureerbaar, niet hardcoded (past bij Config-laag-filosofie):**
+- **Puur diegetisch** — alleen in-world barks/animaties, geen enkele UI-toevoeging (hardcore/meest immersief)
+- **Diegetisch + subtiele non-diegetische audio-cue** — een zachte, niet-opdringerige stinger bij Argwanend, geen tekst
+- **Diegetisch + expliciete indicator** — voor units die duidelijkheid boven puurheid verkiezen, of voor nieuwere leden die de systemen nog leren
+
+**Integratie (geen nieuwe Core-onderdelen nodig):**
+- Loopt volledig via de Event Bus, binnen de `MCF_AI_`-namespace uit het hoofdproject
+- Zuiver event-gedreven — kost niets zolang er geen staatsovergang plaatsvindt, sluit direct aan bij de performance-principes
+- De keuze tussen de drie feedback-niveaus is een Config-laag-attribuut per scenario, niet een globale instelling — verschillende missies binnen dezelfde unit kunnen een ander niveau kiezen
+
+**Afhankelijkheid, expliciet benoemd:** dit systeem werkt ongeacht de uitkomst van het onderzoek in sectie 3.2 (stance/camouflage-koppeling) — het reageert op staatsovergangen, niet op de onderliggende detectieformule. Kan dus onafhankelijk gebouwd en getest worden.
+
 ---
 
 ## 4. Wat hier expliciet niet bij hoort (scope-bewaking)
@@ -56,6 +82,7 @@ Los document, zelfde reden als het voertuig-schiet-document: dit raakt wapenstat
 1. **Test eerst, bouw daarna:** meet in Workbench hoe de huidige AI daadwerkelijk reageert op verschillende houding/snelheid-combinaties, voordat er één regel code voor stap 3.2 geschreven wordt
 2. Bouw parallel de subsonic-munitie (3.1) — laagste risico, duidelijkste winst, hangt niet af van de uitkomst van de AI-test
 3. Stance-hoogteregeling (3.3) als losse, onafhankelijke verbetering — kan altijd, ongeacht uitkomst van 1 en 2
+4. **Detectie-feedbacksysteem (3.4) kan meteen parallel starten** — onafhankelijk van 1 t/m 3, omdat het alleen op AI-staatsovergangen reageert, niet op de onderliggende detectiewaarde. Goede kandidaat om als eerste tastbare resultaat te tonen: kost weinig bouwwerk, geeft direct speelbare feedback.
 
 ---
 
@@ -64,3 +91,5 @@ Los document, zelfde reden als het voertuig-schiet-document: dit raakt wapenstat
 - Reageert vanilla Reforger-AI merkbaar op stance/snelheid voor visuele detectie, of is dit systeem nog te onvolwassen om op te bouwen?
 - Is er al een audibleFire-achtige coëfficiënt per munitietype in de huidige game-data aanwezig die hergebruikt kan worden, of moet die volledig nieuw gedefinieerd worden?
 - Welke realistische penalty voor subsonic-munitie past het beste bij milsim-balans zonder frustrerend te worden (bereik? stopping power? beide, afgezwakt)?
+- Is `AI Threat State`/`On Threat State Changed` rechtstreeks bruikbaar zoals SF het exposet, of moet er een eigen wrapper omheen om de drie feedback-niveaus (puur diegetisch / subtiele cue / expliciete indicator) te ondersteunen?
+- Welk feedback-niveau (zie 3.4) is de standaardvoorkeur van de unit — puur diegetisch, of met subtiele cue erbij? Bepaalt de default in de Config-laag.
