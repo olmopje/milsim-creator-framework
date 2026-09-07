@@ -6,7 +6,7 @@ Geen dependency op third-party frameworks (Scenario Framework, Ci5, GME) — wel
 
 ## Status
 
-🚧 Fase 0 — Proof of concept. Nog geen speelbare build.
+🚧 **v0.1.0 — Architectuurbaseline vastgelegd.** Volledig gereviewd, klaar om Fase 0 te implementeren. Nog geen speelbare build.
 
 ## Structuur
 
@@ -20,7 +20,8 @@ addons/MCF/          — de daadwerkelijke mod (laadt in-game)
 
 docs/
   architecture/       — het volledige architectuurplan (leidend document)
-  modules/            — losstaande technische deelprojecten (bijv. voertuig-schieten)
+  modules/            — losstaande technische deelprojecten (bijv. voertuig-schieten, ACE-compatibiliteit)
+  research/           — onderzoek naar community-/mission-maker-klachten dat de roadmap onderbouwt
 
 .github/              — issue templates, CI-workflows
 ```

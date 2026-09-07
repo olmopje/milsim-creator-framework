@@ -55,7 +55,7 @@ Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module
   | Namespace | Dekt |
   |---|---|
   | `MCF_Core_` | Event Bus, Object Identity, Module Registry, Tick Manager |
-  | `MCF_AI_` | Civiele AI-gedrag (5.3), Ambient Life-gedragsprofielen (5.5), Compliance/ROE-logica (5.7) |
+  | `MCF_AI_` | Civiele AI-gedrag (5.3), Ambient Life-gedragsprofielen (5.5), Compliance/ROE-logica (5.7), AI Commando-Watchdog (5.11) |
   | `MCF_Obj_` | Objective/POI/Logic Nodes (4.x) |
   | `MCF_Hostility_` | Hostility/Reputatie-manager (5.1) |
   | `MCF_Infra_` | Infrastructuur-netwerk/AI Warning (5.2) |
@@ -63,11 +63,17 @@ Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module
   | `MCF_Interact_` | Interactie-hint-systeem (5.6) |
   | `MCF_AAR_` | Debrief-module (5.8) |
   | `MCF_Squad_` | Squad Cohesion/C2-laag (5.10) |
-  | `MCF_Build_` | Field Construction-module — los uitgewerkt in `docs/modules/field-construction.md`, niet in kernroadmap sectie 9 |
+  | `MCF_Build_` | Field Construction-module — los uitgewerkt in `docs/modules/field-construction.md`, bewust niet in de gefaseerde roadmap (sectie 9) opgenomen |
   | `MCF_ACE_` | ACE Anvil-compatibiliteitsbrug — los uitgewerkt in `docs/modules/ace-anvil-compatibility.md`, altijd optioneel (soft dependency), per integratiepunt modulair schakelbaar (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`) — **bevestigd actief nodig**, geen speculatief werk |
-  | `MCF_React_` | Scripted AI Reactions — herbruikbare gedragsrecepten-catalogus (5.12), combineert bestaande bouwstenen, geen eigen gedragslogica |
+  | `MCF_React_` | Scripted AI Reactions — herbruikbare gedragsrecepten-catalogus (5.12) + Sequence Recorder (5.13), combineert bestaande bouwstenen, geen eigen gedragslogica |
 
   Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
+- **Event-contract.** Elk event heeft een vast namespace-patroon (`Module_Actie`, bijv. `Objective_Complete`, `Hostility_ThresholdCrossed`) en een gedocumenteerd payload-schema. Geen enkel event wordt ad-hoc genaamd — nieuwe events worden centraal geregistreerd in de Module Registry, niet losjes verzonnen per module.
+- **Authority-beleid.** Alle state-mutaties (objective-status, hostility-waarde, infrastructuur-status, ROE-uitkomst) zijn **server-authoritative**. Clients ontvangen uitsluitend gerepliceerde resultaten via de Replicatie-helper — nooit lokale voorspellingen die later gecorrigeerd moeten worden. Dit geldt voor élke module, zonder uitzondering.
+- **Faction Alias-integratie.** De Core hergebruikt SF's bewezen `SCR_FactionAliasComponent`-patroon in plaats van een eigen factie-abstractie te verzinnen. Elke module die een factie nodig heeft (Hostility, ROE, Objective-condities) verwijst naar een Alias, niet naar een harde Faction Key — zo is een scenario herbruikbaar met andere factie-combinaties zonder herbouw.
+- **GameMode-compatibiliteit.** De Core is **additief**: een los component naast `GameMode_Base`, geen vervanging ervan. Dit garandeert dat de Core naast vanilla Conflict/Combat Ops kan draaien als de unit dat ooit wil, in plaats van het framework te dwingen als exclusief scenario-type.
+- **Validatie-pass bij missie-init.** Bij het starten van een scenario loopt een validatieronde die ontbrekende tag-referenties, verkeerd geconfigureerde condities en module-dependency-conflicten logt — met hetzelfde (W)/(E)-severity-onderscheid als SF's debug-systeem. Een missiemaker-typfout mag nooit stilzwijgend een systeem laten falen.
+- **Event Bus-lifecycle-koppeling.** Listeners worden automatisch uitgeschreven wanneer hun entity wordt vernietigd/despawned — voorkomt dangling listeners en geheugenlekken zonder dat elke module dit zelf hoeft te beheren.
 
 ### 3.2 Test- en stress-testinfrastructuur (verplicht aanhaakpunt, geen los initiatief per module)
 
@@ -84,12 +90,6 @@ Twee aparte doelen, met één centrale registratie zodat niemand zijn eigen ad-h
 - Resultaten (FPS/tick-timing per profiel) loggen naar de Debug Overlay uit sectie 7 — hergebruik van bestaande infrastructuur, geen nieuw rapportagesysteem
 
 **Consequentie voor de checklist:** dit wordt een verplicht onderdeel per nieuwe module vanaf Fase 0, niet een latere toevoeging — zie bijgewerkte `CONTRIBUTING.md`.
-- **Event-contract.** Elk event heeft een vast namespace-patroon (`Module_Actie`, bijv. `Objective_Complete`, `Hostility_ThresholdCrossed`) en een gedocumenteerd payload-schema. Geen enkel event wordt ad-hoc genaamd — nieuwe events worden centraal geregistreerd in de Module Registry, niet losjes verzonnen per module.
-- **Authority-beleid.** Alle state-mutaties (objective-status, hostility-waarde, infrastructuur-status, ROE-uitkomst) zijn **server-authoritative**. Clients ontvangen uitsluitend gerepliceerde resultaten via de Replicatie-helper — nooit lokale voorspellingen die later gecorrigeerd moeten worden. Dit geldt voor élke module, zonder uitzondering.
-- **Faction Alias-integratie.** De Core hergebruikt SF's bewezen `SCR_FactionAliasComponent`-patroon in plaats van een eigen factie-abstractie te verzinnen. Elke module die een factie nodig heeft (Hostility, ROE, Objective-condities) verwijst naar een Alias, niet naar een harde Faction Key — zo is een scenario herbruikbaar met andere factie-combinaties zonder herbouw.
-- **GameMode-compatibiliteit.** De Core is **additief**: een los component naast `GameMode_Base`, geen vervanging ervan. Dit garandeert dat de Core naast vanilla Conflict/Combat Ops kan draaien als de unit dat ooit wil, in plaats van het framework te dwingen als exclusief scenario-type.
-- **Validatie-pass bij missie-init.** Bij het starten van een scenario loopt een validatieronde die ontbrekende tag-referenties, verkeerd geconfigureerde condities en module-dependency-conflicten logt — met hetzelfde (W)/(E)-severity-onderscheid als SF's debug-systeem. Een missiemaker-typfout mag nooit stilzwijgend een systeem laten falen.
-- **Event Bus-lifecycle-koppeling.** Listeners worden automatisch uitgeschreven wanneer hun entity wordt vernietigd/despawned — voorkomt dangling listeners en geheugenlekken zonder dat elke module dit zelf hoeft te beheren.
 
 ---
 
@@ -145,6 +145,8 @@ Dit is de generieke oplossing voor je communicatietoren-idee, en herbruikbaar vo
 
 ### 5.3 Civiele AI-gedrag
 Utility AI/behavior tree die hostility-waarde uitleest en schakelt tussen gedragsprofielen (neutraal → angstig → tippend aan OPFOR → actief verzet). Perception/sensor-hooks i.p.v. simpele proximity-checks.
+
+**Zie ook:** het uitgebreide vier-staten Alert-systeem (Onwetend/Argwanend/Onderzoekend/In gevecht) in `docs/modules/stealth-and-suppression.md` sectie 3.4 — oorspronkelijk uitgewerkt voor stealth-detectie, maar inmiddels de gedeelde staatsmachine waar Compliance/ROE (5.7), AI Commando-Watchdog (5.11), Scripted AI Reactions (5.12) en Sequence Recorder (5.13) allemaal op leunen. Dit woont in een los document vanwege de ontstaansgeschiedenis, niet omdat het stealth-specifiek is — bij een grotere doc-opschoning is dit een kandidaat om hierheen te verplaatsen.
 
 ### 5.4 Waypoint + Animatie-module
 Custom waypoint-subklasse die bij aankomst een specifieke animatie triggert via de CharacterAnimationComponent/animgraph.
@@ -227,7 +229,7 @@ Vroeg in de brainstorm genoemd ("milsim-eenheden zijn dol op debriefs"), maar in
 - **Performance:** puur event-gedreven, geen polling — de goedkoopste module in het hele framework omdat hij nooit iets hoeft te initiëren, alleen te registreren
 
 ### 5.9 Logistiek/Supply — BACKLOG, bewust niet in eerste scope
-Ook vroeg genoemd, maar bewust **niet** in de kernroadmap opgenomen om scope-kruip te voorkomen. Zou leunen op vergelijkbare Area/Dynamic-Despawn-patronen als de rest van het framework (supply-punten als Lifestyle-POI-achtige nodes, konvooien als POI/Observation-ketens), dus technisch geen nieuw patroon — wel een bewuste latere uitbreiding, geen fase-0-t/m-9-verplichting.
+Ook vroeg genoemd, maar bewust **niet** in de kernroadmap opgenomen om scope-kruip te voorkomen. Zou leunen op vergelijkbare Area/Dynamic-Despawn-patronen als de rest van het framework (supply-punten als Lifestyle-POI-achtige nodes, konvooien als POI/Observation-ketens), dus technisch geen nieuw patroon — wel een bewuste latere uitbreiding, geen verplichting binnen de huidige gefaseerde roadmap (sectie 9).
 
 ### 5.10 Squad Cohesion / C2-laag — NIEUW, uit community-onderzoek
 Direct voortgekomen uit `docs/research/mission-maker-pain-points.md`: de meest herhaalde klacht van ervaren milsim-spelers is niet gebrek aan content, maar dat squad-lidmaatschap in vanilla Reforger "geen betekenis heeft" — geen zicht op teamposities, spawn losgekoppeld van squad, geen coördinatie-prikkel.
@@ -264,17 +266,17 @@ Antwoord op de wens naar "makkelijk uitbreidbare AI-acties via een visuele edito
 
 **Scope-beslissing: catalogus van kant-en-klare recepten, geen node-graaf-editor bouwen.** Een eigen drag-and-drop visuele scripting-tool zou in feite een eigen Eden-editor betekenen — een veel groter project dan de rest van dit framework samen, en buiten proportie met de rest van de roadmap. In plaats daarvan: **elk gedrag is een genoemd, herbruikbaar "recept"** dat een missiemaker uit een dropdown kiest (zelfde GM-attribuutpatroon als de rest van het framework, sectie 6) — geen node-graaf nodig om 90% van de waarde te krijgen.
 
-**Wat een "recept" technisch is:** een trigger (meestal een staatsovergang uit het Alert-systeem, sectie 3.4) gekoppeld aan een vaste reeks van reeds bestaande bouwstenen — Waypoint+Animatie (5.4), Voice Line (4.4), bestaande Actions zoals Kill Entity/Add Waypoint. **Geen nieuwe Core-functionaliteit nodig** — een recept is puur configuratie van dingen die al bestaan, wat het echt "makkelijk uitbreidbaar" maakt: nieuwe recepten toevoegen is content maken, geen code schrijven.
+**Wat een "recept" technisch is:** een trigger (meestal een staatsovergang uit het Alert-systeem, zie `docs/modules/stealth-and-suppression.md` sectie 3.4) gekoppeld aan een vaste reeks van reeds bestaande bouwstenen — Waypoint+Animatie (5.4), Voice Line (4.4), bestaande Actions zoals Kill Entity/Add Waypoint. **Geen nieuwe Core-functionaliteit nodig** — een recept is puur configuratie van dingen die al bestaan, wat het echt "makkelijk uitbreidbaar" maakt: nieuwe recepten toevoegen is content maken, geen code schrijven.
 
 **Startcatalogus (voorbeelden uit je eigen vraag, plus enkele veelvoorkomende milsim-tropes):**
 
 | Recept | Trigger | Bouwstenen (allemaal al gepland) |
 |---|---|---|
-| **HVT Vlucht per Voertuig** | Onderzoekend/In gevecht (sectie 3.4) | Waypoint naar dichtstbijzijnde voertuig → Get In-actie → vluchtroute-waypoint |
+| **HVT Vlucht per Voertuig** | Onderzoekend/In gevecht (stealth-and-suppression.md 3.4) | Waypoint naar dichtstbijzijnde voertuig → Get In-actie → vluchtroute-waypoint |
 | **HVT Vlucht per Helikopter** | Idem | Voice Line ("oproep evacuatie") → wachttijd → heli-waypoint → Get In → extractie-waypoint |
 | **Gijzelaar-executie bij Alarm** | In gevecht binnen X seconden na eerste contact | Animatie (dreigen/schieten) → Kill Entity-actie → koppelbaar aan de bestaande hostility-consequenties (5.1) omdat dit zwaar tegen de speler zou moeten wegen als het gebeurt door falend spelersgedrag |
 | **Nepoverdgave** | Speler nadert een "compliant" NPC (hergebruikt de wapen-drop-animatie uit de Compliance/ROE-module, 5.7!) | Wapen-drop-animatie → wachten tot speler dichtbij is → verrassingsaanval. Mooi voorbeeld van hergebruik: dit recept voegt geen nieuwe animatie toe, het combineert een bestaande op een nieuwe manier |
-| **Versterking Oproepen** | Argwanend/Onderzoekend | Voice Line → QRF-systeem triggeren (al bestaand) |
+| **Versterking Oproepen** | Argwanend/Onderzoekend (stealth-and-suppression.md 3.4) | Voice Line → QRF-systeem triggeren (al bestaand) |
 
 **Extensibiliteit in de praktijk:** een nieuw recept toevoegen = een nieuwe rij in de catalogus-config, geen nieuwe class. Iedereen in de unit die de bouwstenen kent (waypoints, animaties, voice lines) kan in principe een nieuw recept samenstellen zonder Enforce Script te schrijven — dat is de daadwerkelijke "makkelijk uitbreidbaar"-belofte, sterker dan een visuele editor zou zijn geweest voor de investering die het zou kosten.
 

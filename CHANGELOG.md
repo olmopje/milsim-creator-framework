@@ -4,6 +4,10 @@ Alle noemenswaardige wijzigingen aan dit project worden hier bijgehouden.
 Formaat gebaseerd op [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
+
+## [0.1.0] - 2026-09-08 — Architectuurbaseline
+Volledig architectuurplan afgerond en gereviewd vóór start van Fase 0-implementatie. Geen code, uitsluitend ontwerp.
+
 ### Toegevoegd
 - Sequence Recorder toegevoegd (5.13): pad-en-cue-opname, nieuw type recept-input binnen MCF_React_
 - Nieuwe module: Scripted AI Reactions-catalogus (5.12), namespace MCF_React_, herbruikbare gedragsrecepten i.p.v. visuele node-editor
@@ -20,3 +24,11 @@ Formaat gebaseerd op [Keep a Changelog](https://keepachangelog.com/).
 - Losstaand deelproject: stealth & suppressie-verbetering (`docs/modules/stealth-and-suppression.md`)
 ### Gewijzigd
 - Projectnaam vastgelegd: Milsim Creator Framework (MCF), prefix `MCF_`
+### Gefixed (documentreview 2026-09-08)
+- Structurele fout: sectie 3.2 stond per ongeluk midden in sectie 3.1's opsomming geknipt
+- Namespace-tabel bijgewerkt: `MCF_AI_` miste 5.11, `MCF_React_` miste 5.13
+- Verouderde "fase-0-t/m-9"-verwijzing gecorrigeerd (roadmap is gegroeid tot Fase 14)
+- Dubbelzinnige "kernroadmap sectie 9"-verwijzing verduidelijkt (verward met Fase 9 in de tabel)
+- Bare "sectie 3.4"-verwijzingen naar het Alert-systeem file-qualified (leeft in `stealth-and-suppression.md`, niet in dit document)
+- Cross-reference toegevoegd vanuit 5.3 naar het Alert-systeem, met notitie dat dit een verplaatsingskandidaat is bij toekomstige opschoning
+- README's structuurschema aangevuld met `docs/research/`
