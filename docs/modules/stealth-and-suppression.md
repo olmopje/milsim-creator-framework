@@ -56,10 +56,14 @@ Dit ontkoppelt het systeem volledig van de onzekere interne perceptie-logica uit
 
 **Het ontsnappingsvenster:** de tijd tussen Argwanend en In gevecht ís het speelbare moment — breekt de speler line-of-sight of blijft hij stilzitten/kruipen binnen die tijd, dan valt de AI terug naar Onwetend in plaats van te escaleren. Dit is een instelbare tijdswaarde, geen nieuw mechanisme — gewoon een timer op de bestaande staatsovergang.
 
-**Missiemaker-configureerbaar, niet hardcoded (past bij Config-laag-filosofie):**
-- **Puur diegetisch** — alleen in-world barks/animaties, geen enkele UI-toevoeging (hardcore/meest immersief)
-- **Diegetisch + subtiele non-diegetische audio-cue** — een zachte, niet-opdringerige stinger bij Argwanend, geen tekst
-- **Diegetisch + expliciete indicator** — voor units die duidelijkheid boven puurheid verkiezen, of voor nieuwere leden die de systemen nog leren
+**Missiemaker-configureerbaar, niet hardcoded (past bij Config-laag-filosofie) — twee lagen, geen vaste standaard:**
+
+Geen enkel niveau is "de" standaard — in plaats daarvan een plafond-en-voorkeur-model:
+
+- **Scenario-plafond (missiemaker, server-side, geldt voor iedereen gelijk):** de missiemaker stelt per scenario het *maximaal toegestane* feedback-niveau in — puur diegetisch, diegetisch+cue, of diegetisch+indicator. Dit is de enige laag die de daadwerkelijke mechaniek raakt (het ontsnappingsvenster/timer blijft altijd server-authoritative en identiek voor iedereen, ongeacht dit plafond — eerlijkheid blijft gewaarborgd).
+- **Persoonlijke voorkeur (speler, client-side, alleen presentatie):** binnen dat plafond kiest elke speler zelf hoeveel hij ziet/hoort — dit raakt alleen de eigen scherm-/audio-weergave, niet de onderliggende AI-logica of wat andere spelers zien. Een speler die liever puur diegetisch speelt kan dat kiezen, ook als de missiemaker een hogere indicator toestaat; een speler kan nooit méér krijgen dan het scenario-plafond.
+
+Dit lost het "instelbaar"-vraagstuk structureel op: de unit hoeft niet één keuze voor iedereen te maken, en toegankelijkheidsvoorkeur (sommige spelers willen meer duidelijkheid) ondermijnt nooit de eerlijkheid tussen spelers, omdat de mechaniek zelf nooit verandert — alleen wat je er zelf van te zien/horen krijgt.
 
 **Integratie (geen nieuwe Core-onderdelen nodig):**
 - Loopt volledig via de Event Bus, binnen de `MCF_AI_`-namespace uit het hoofdproject
@@ -92,4 +96,4 @@ Dit ontkoppelt het systeem volledig van de onzekere interne perceptie-logica uit
 - Is er al een audibleFire-achtige coëfficiënt per munitietype in de huidige game-data aanwezig die hergebruikt kan worden, of moet die volledig nieuw gedefinieerd worden?
 - Welke realistische penalty voor subsonic-munitie past het beste bij milsim-balans zonder frustrerend te worden (bereik? stopping power? beide, afgezwakt)?
 - Is `AI Threat State`/`On Threat State Changed` rechtstreeks bruikbaar zoals SF het exposet, of moet er een eigen wrapper omheen om de drie feedback-niveaus (puur diegetisch / subtiele cue / expliciete indicator) te ondersteunen?
-- Welk feedback-niveau (zie 3.4) is de standaardvoorkeur van de unit — puur diegetisch, of met subtiele cue erbij? Bepaalt de default in de Config-laag.
+- Welk feedback-plafond is een redelijke default voor nieuwe scenario's als de missiemaker niets instelt — of moet dit veld verplicht expliciet gekozen worden bij scenario-setup (aansluitend bij de validatie-pass uit het hoofdproject die nooit stil mag falen)?
