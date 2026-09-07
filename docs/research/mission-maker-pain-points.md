@@ -24,7 +24,9 @@ Dit is exact het "milsim-gevoel" dat door Arma 3-veteranen gemist wordt — niet
 
 ## 4. Bevestigd probleem, maar buiten ons bereik — expliciet benoemd
 
-AI-commandogedrag wordt door de communit én door BI's eigen feedbacktracker (T190910) als een van de grootste frustraties genoemd: AI die niet uit voertuigen stapt op commando, follow-orders die breken. Dit zit op **engine-pathfinding-niveau** — geen scenario-/scriptinglaag kan dit structureel repareren. We nemen dit bewust niet in scope op om geen valse verwachting te wekken; het hoort bij vanilla-engine-kwaliteit, niet bij missiemaker-tooling.
+AI-commandogedrag wordt door de communit én door BI's eigen feedbacktracker (T190910) als een van de grootste frustraties genoemd: AI die niet uit voertuigen stapt op commando, follow-orders die breken. Dit zit op **engine-pathfinding-niveau** — geen scenario-/scriptinglaag kan dit structureel repareren.
+
+**Update: gedeeltelijke mitigatie wél haalbaar, geen structurele fix.** Zie sectie 5.11 in `ARCHITECTURE.md` — een watchdog-patroon dat vastgelopen AI detecteert en corrigeert kan de symptomen merkbaar verminderen zonder de onderliggende pathfinding aan te pakken. Dit blijft een pleister, geen genezing, en wordt ook zo gecommuniceerd naar de unit.
 
 ## 5. Kleine, lage-prioriteit kanttekening
 

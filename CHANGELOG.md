@@ -5,6 +5,7 @@ Formaat gebaseerd op [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 ### Toegevoegd
+- Nieuwe module: AI Commando-Watchdog (5.11), pleister voor bekend engine-niveau AI-commandoprobleem
 - Onderzoeksdocument mission-maker-klachten (`docs/research/mission-maker-pain-points.md`)
 - Nieuwe module: Squad Cohesion/C2-laag (5.10), namespace `MCF_Squad_`
 - Repository-structuur opgezet

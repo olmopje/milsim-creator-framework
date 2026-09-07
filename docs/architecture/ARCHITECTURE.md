@@ -223,6 +223,23 @@ Direct voortgekomen uit `docs/research/mission-maker-pain-points.md`: de meest h
 
 **Scope-grens:** dit repareert geen AI-commandogedrag (zie `docs/research/mission-maker-pain-points.md` sectie 4 — dat is engine-niveau en bewust buiten bereik) — dit lost alleen het *informatie- en coördinatie-gebrek tussen menselijke spelers* op.
 
+### 5.11 AI Commando-Watchdog — pleister, geen structurele fix
+Direct antwoord op de erkende, veelgenoemde klacht uit sectie 4 van het onderzoek — met de beperking vooraf en herhaaldelijk benadrukt: dit **onderdrukt symptomen**, het repareert geen pathfinding-/commandologica die in gesloten C++ zit.
+
+**Patroon:**
+1. **Detectie** — lage-prioriteit Tick Manager-check monitort AI die een "get out"- of follow-commando kreeg; blijft de staat/positie langer dan een instelbare drempel ongewijzigd, markeer als vastgelopen
+2. **Eerste poging: commando herhalen** — vaak genoeg om de AI-state machine te "wekken" zonder ingrijpen. Altijd eerst proberen, goedkoopst en veiligst
+3. **Laatste redmiddel: geforceerde correctie** — alléén als herhalen niet werkt: AI die vastzit in een voertuig wordt naar een **gevalideerde, veilige exit-positie** geplaatst; AI die niet meer volgt krijgt een directe positiecorrectie richting de groep
+
+**Harde eisen, niet optioneel:**
+- **Veilige-positie-validatie verplicht** vóór elke geforceerde teleportatie — voorkomt dat een AI in geometrie/water verschijnt, wat een nieuwe bug zou zijn in plaats van een oplossing
+- **Zorgvuldig getunede drempelwaarde** — te kort en normale, trage AI-activiteit wordt onterecht als "vastgelopen" bestempeld; te lang en de pleister voelt nutteloos traag
+- **Loggen van elke ingreep** (via de validatie-pass/debug-overlay uit sectie 3.1/7) — zodat je kan zien hoe vaak dit daadwerkelijk nodig is, en of de drempel bijgesteld moet worden
+
+**Namespace:** valt onder `MCF_AI_` — het is generiek AI-commandogedrag, niet gebonden aan civiele, Ambient Life- of ROE-specifieke logica.
+
+**Performance:** lage-prioriteit tick (zie sectie 7.8) — dit hoeft niet vaak te checken, vastlopen is per definitie een langzaam-optredend probleem.
+
 ---
 
 ## 6. GM-integratielaag
@@ -272,8 +289,9 @@ Dit raakt letterlijk elke laag hierboven, dus expliciet als eigen sectie:
 | **7** | Compliance/ROE-interactielaag (gunpoint, drop weapon, stand back) + koppeling aan Hostility-manager |
 | **8** | AAR/Debrief-module — aggregeert de Event Bus-geschiedenis van alle voorgaande fases, dus pas zinvol als afsluiter |
 | **9** | Squad Cohesion/C2-laag — losstaand van de rest, kan bij voldoende capaciteit ook eerder parallel opgepakt worden |
-| **10** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
-| **11** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
+| **10** | AI Commando-Watchdog — pas oppakken nadat de basis-AI-modules (Fase 3, 6, 7) draaien, zodat er genoeg echte gebruikssituaties zijn om de drempelwaarde tegen te testen |
+| **11** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
+| **12** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
 
 ---
 
