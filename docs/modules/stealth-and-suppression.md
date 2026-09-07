@@ -46,15 +46,21 @@ Los document, zelfde reden als het voertuig-schiet-document: dit raakt wapenstat
 De speler moet kunnen aanvoelen dat hij bijna ontdekt is (en nog kan ontsnappen) zonder dat het een gamey HUD-meter wordt die de immersie breekt — consistent met de "fake it until je het nodig hebt"-filosofie uit het hoofdproject.
 
 **Kernidee: reageer op AI-staatsovergangen, niet op ruwe detectiewaardes.**
-Dit ontkoppelt het systeem volledig van de onzekere interne perceptie-logica uit sectie 3.2 (die nog niet bevestigd is) — je luistert alleen naar *wanneer* de AI van staat wisselt, niet naar *hoe* die beslissing tot stand komt. Drie staten, gebaseerd op het al bestaande Threat State-concept:
+Dit ontkoppelt het systeem volledig van de onzekere interne perceptie-logica uit sectie 3.2 (die nog niet bevestigd is) — je luistert alleen naar *wanneer* de AI van staat wisselt, niet naar *hoe* die beslissing tot stand komt. **Vier staten** (uitgebreid t.o.v. het oorspronkelijke drie-staten-ontwerp, om het dynamischer te laten voelen — AI die eerst wil dichterbij komen in plaats van direct vol alarm te slaan):
 
-| Overgang | Wat de speler waarneemt (diegetisch, geen HUD) |
-|---|---|
-| **Onwetend → Argwanend** | AI-bark ("Wat was dat?"), zichtbare hoofd-/lichaamsdraai naar de richting — subtiel, makkelijk te missen als je niet oplet, precies de bedoeling |
-| **Argwanend → In gevecht** | Onmiskenbaar: geschreeuw, vuur, radiomelding voor versterking (haakt rechtstreeks in op het bestaande QRF-systeem) — het gevecht zelf ís de feedback, geen aparte melding nodig |
-| **In gevecht → Onwetend (verloren contact)** | Aparte "stand-down"-bark/animatie zodra de AI je kwijtraakt — geeft de speler een duidelijk afsluitmoment: "ik ben ontsnapt", zonder een expliciete melding op het scherm |
+| Overgang | Wat er gebeurt | Wat de speler waarneemt (diegetisch, geen HUD) |
+|---|---|---|
+| **Onwetend → Argwanend** | AI registreert iets ambigus (geluid/glimp), blijft ter plekke | Bark ("Wat was dat?"), hoofd-/lichaamsdraai naar de richting — subtiel, makkelijk te missen |
+| **Argwanend → Onderzoekend** | AI verlaat zijn wacht-/ankerpositie om de bron te onderzoeken — hergebruikt de bestaande **Investigation Distance**-instelling (onderdeel van "Set Max Autonomous Distance") zodat de groep tijdelijk verder van zijn normale patrouillegebied mag afwijken | Zichtbare, voorzichtige beweging richting de laatst bekende locatie — wapen geheven, geen vuur. Dit is het spannendste moment: de speler ziet de AI dichterbij komen zonder zekerheid of hij ontdekt is |
+| **Onderzoekend → In gevecht** | Visueel/geluidscontact bevestigd tijdens het onderzoeken | Onmiskenbaar: geschreeuw, vuur, radiomelding voor versterking (haakt in op het QRF-systeem) |
+| **Onderzoekend → Onwetend (niets gevonden)** | Onderzoekstijd verstrijkt zonder bevestigd contact — AI keert terug naar zijn ankerpositie/patrouille | Aparte "stand-down"-bark/animatie — duidelijk afsluitmoment voor de speler: "ik ben ontsnapt" |
+| **In gevecht → Onwetend (verloren contact)** | AI verliest contact tijdens het gevecht zelf | Zelfde stand-down-signaal als hierboven |
 
-**Het ontsnappingsvenster:** de tijd tussen Argwanend en In gevecht ís het speelbare moment — breekt de speler line-of-sight of blijft hij stilzitten/kruipen binnen die tijd, dan valt de AI terug naar Onwetend in plaats van te escaleren. Dit is een instelbare tijdswaarde, geen nieuw mechanisme — gewoon een timer op de bestaande staatsovergang.
+**Twee aparte ontsnappingsvensters, niet één:**
+- **Tijdens Argwanend** (voor de AI besluit te gaan onderzoeken): blijft de speler stil/uit het zicht, dan valt de AI direct terug naar Onwetend zonder ooit te bewegen — het goedkoopste en meest wenselijke uitkomst
+- **Tijdens Onderzoekend** (de AI is al onderweg): een langer venster, want de AI moet fysiek de afstand afleggen — geeft de speler tijd om zich te verplaatsen of dieper weg te duiken terwijl de AI dichterbij komt. Dit is het stuk dat het "dynamischer" maakt: de speler ziet de dreiging naderen in plaats van een binaire schakelaar
+
+**Belangrijke onzekerheid, zelfde soort als in sectie 3.2:** het is nog niet bevestigd of vanilla Reforger's onderliggende Threat State-enum al native vier granulariteitsniveaus kent, of dat "Onderzoekend" een eigen sub-staat is die wij bovenop de bestaande Argwanend/In-gevecht-staten moeten bouwen met de Investigation Distance-instelling als bewegingsmiddel. **Eerst in Workbench inspecteren welke Threat State-waarden daadwerkelijk bestaan**, niet aannemen dat er al vier stappen native aanwezig zijn.
 
 **Missiemaker-configureerbaar, niet hardcoded (past bij Config-laag-filosofie) — twee lagen, geen vaste standaard:**
 
@@ -67,7 +73,7 @@ Dit lost het "instelbaar"-vraagstuk structureel op: de unit hoeft niet één keu
 
 **Integratie (geen nieuwe Core-onderdelen nodig):**
 - Loopt volledig via de Event Bus, binnen de `MCF_AI_`-namespace uit het hoofdproject
-- Zuiver event-gedreven — kost niets zolang er geen staatsovergang plaatsvindt, sluit direct aan bij de performance-principes
+- Zuiver event-gedreven — kost niets zolang er geen staatsovergang plaatsvindt, sluit direct aan bij de performance-principes. De Onderzoekend-fase kost wél iets extra: de AI-groep beweegt daadwerkelijk, dus dit valt onder de reguliere AI-simulatiekosten, niet onder "gratis event-overhead" — geen misvatting daarover laten bestaan
 - De keuze tussen de drie feedback-niveaus is een Config-laag-attribuut per scenario, niet een globale instelling — verschillende missies binnen dezelfde unit kunnen een ander niveau kiezen
 
 **Afhankelijkheid, expliciet benoemd:** dit systeem werkt ongeacht de uitkomst van het onderzoek in sectie 3.2 (stance/camouflage-koppeling) — het reageert op staatsovergangen, niet op de onderliggende detectieformule. Kan dus onafhankelijk gebouwd en getest worden.
@@ -96,4 +102,6 @@ Dit lost het "instelbaar"-vraagstuk structureel op: de unit hoeft niet één keu
 - Is er al een audibleFire-achtige coëfficiënt per munitietype in de huidige game-data aanwezig die hergebruikt kan worden, of moet die volledig nieuw gedefinieerd worden?
 - Welke realistische penalty voor subsonic-munitie past het beste bij milsim-balans zonder frustrerend te worden (bereik? stopping power? beide, afgezwakt)?
 - Is `AI Threat State`/`On Threat State Changed` rechtstreeks bruikbaar zoals SF het exposet, of moet er een eigen wrapper omheen om de drie feedback-niveaus (puur diegetisch / subtiele cue / expliciete indicator) te ondersteunen?
+- **Nieuw:** kent vanilla Reforger's Threat State-enum al vier granulariteitsniveaus (inclusief een apart "onderzoekend"-stadium), of moet dat als eigen sub-staat bovenop de bestaande staten gebouwd worden met Investigation Distance als bewegingsmiddel? Eerste stap: dit in Workbench opzoeken vóór er één regel state-machine-code geschreven wordt.
+- Hoe lang moet het Onderzoekend-venster duren om "dynamisch en spannend" aan te voelen zonder frustrerend traag te worden — dit is een gevoelswaarde die alleen via speeltests vastgesteld kan worden, niet via een formule.
 - Welk feedback-plafond is een redelijke default voor nieuwe scenario's als de missiemaker niets instelt — of moet dit veld verplicht expliciet gekozen worden bij scenario-setup (aansluitend bij de validatie-pass uit het hoofdproject die nooit stil mag falen)?

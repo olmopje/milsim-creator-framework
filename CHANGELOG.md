@@ -5,6 +5,7 @@ Formaat gebaseerd op [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 ### Toegevoegd
+- Alert-systeem uitgebreid naar vier stadia (Onwetend/Argwanend/Onderzoekend/In gevecht), hergebruikt Investigation Distance-attribuut
 - Losstaand deelproject: ACE Anvil-compatibiliteitsbrug (`docs/modules/ace-anvil-compatibility.md`), namespace `MCF_ACE_`, soft-dependency-patroon
 - Test- en stress-testinfrastructuur (3.2): Autotest Framework-integratie + Stress Profile-registratie, verplicht vanaf Fase 0
 - Losstaand deelproject: Field Construction/FOB-module (`docs/modules/field-construction.md`), namespace `MCF_Build_`
