@@ -1,4 +1,4 @@
-# Milsim Framework (MF) — Arma Reforger
+# Milsim Creator Framework (MCF) — Arma Reforger
 
 Een zelfgebouwd, modulair missie-framework voor Arma Reforger. Geeft missiemakers Eden-achtige narratieve diepte, live bruikbaar in Game Master, gebouwd rond een gedeelde Core en van meet af aan performance-bewust voor grote PvE co-op groepen.
 
@@ -11,7 +11,7 @@ Geen dependency op third-party frameworks (Scenario Framework, Ci5, GME) — wel
 ## Structuur
 
 ```
-addons/MF/          — de daadwerkelijke mod (laadt in-game)
+addons/MCF/          — de daadwerkelijke mod (laadt in-game)
   Prefabs/            — .et prefab-bestanden
   Scripts/Game/Core/  — Event Bus, Object Identity, Module Registry, Tick Manager, etc.
   Scripts/Game/Modules/ — losse modules (Objective, Hostility, Ambient Life, ROE, ...)

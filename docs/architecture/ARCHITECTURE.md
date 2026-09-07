@@ -1,4 +1,4 @@
-# Milsim Framework (MF) — Architectuurplan
+# Milsim Creator Framework (MCF) — Architectuurplan
 
 ## 1. Visie
 
@@ -50,18 +50,18 @@ Geen dependency op bestaande third-party frameworks (Scenario Framework, Ci5, GM
 
 Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module ze zelf hoeft te interpreteren of, erger, anders interpreteert dan een andere module.
 
-- **Naamgevingsconventie & prefix.** Projectnaam: **Milsim Framework (MF)**. Alle classes/prefabs krijgen de vaste prefix `MF_`, volgens BI's officiële *Editor Entity Naming Conventions* ("vervang `SCR_` door je eigen tag"). Daarbinnen krijgt elke module een eigen sub-namespace, zodat je aan de class-naam meteen ziet welke module verantwoordelijk is:
+- **Naamgevingsconventie & prefix.** Projectnaam: **Milsim Creator Framework (MCF)**. Alle classes/prefabs krijgen de vaste prefix `MCF_`, volgens BI's officiële *Editor Entity Naming Conventions* ("vervang `SCR_` door je eigen tag"). Daarbinnen krijgt elke module een eigen sub-namespace, zodat je aan de class-naam meteen ziet welke module verantwoordelijk is:
 
   | Namespace | Dekt |
   |---|---|
-  | `MF_Core_` | Event Bus, Object Identity, Module Registry, Tick Manager |
-  | `MF_AI_` | Civiele AI-gedrag (5.3), Ambient Life-gedragsprofielen (5.5), Compliance/ROE-logica (5.7) |
-  | `MF_Obj_` | Objective/POI/Logic Nodes (4.x) |
-  | `MF_Hostility_` | Hostility/Reputatie-manager (5.1) |
-  | `MF_Infra_` | Infrastructuur-netwerk/AI Warning (5.2) |
-  | `MF_Voice_` | Voice Line/Comms (4.4) |
-  | `MF_Interact_` | Interactie-hint-systeem (5.6) |
-  | `MF_AAR_` | Debrief-module (5.8) |
+  | `MCF_Core_` | Event Bus, Object Identity, Module Registry, Tick Manager |
+  | `MCF_AI_` | Civiele AI-gedrag (5.3), Ambient Life-gedragsprofielen (5.5), Compliance/ROE-logica (5.7) |
+  | `MCF_Obj_` | Objective/POI/Logic Nodes (4.x) |
+  | `MCF_Hostility_` | Hostility/Reputatie-manager (5.1) |
+  | `MCF_Infra_` | Infrastructuur-netwerk/AI Warning (5.2) |
+  | `MCF_Voice_` | Voice Line/Comms (4.4) |
+  | `MCF_Interact_` | Interactie-hint-systeem (5.6) |
+  | `MCF_AAR_` | Debrief-module (5.8) |
 
   Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
 - **Event-contract.** Elk event heeft een vast namespace-patroon (`Module_Actie`, bijv. `Objective_Complete`, `Hostility_ThresholdCrossed`) en een gedocumenteerd payload-schema. Geen enkel event wordt ad-hoc genaamd — nieuwe events worden centraal geregistreerd in de Module Registry, niet losjes verzonnen per module.

@@ -1,4 +1,4 @@
-# Bijdragen aan MF
+# Bijdragen aan MCF
 
 ## Voordat je begint
 
@@ -6,7 +6,7 @@ Lees `docs/architecture/ARCHITECTURE.md` sectie 3.1 (Integratie-contracten) voll
 
 ## Checklist per nieuwe module / PR
 
-- [ ] Alle classes/prefabs gebruiken de `MF_`-prefix
+- [ ] Alle classes/prefabs gebruiken de `MCF_`-prefix
 - [ ] Alle nieuwe events volgen het `Module_Actie`-patroon en zijn gedocumenteerd (payload-schema) in `docs/modules/<modulenaam>.md`
 - [ ] Geen directe module-naar-module-referenties — alles loopt via de Event Bus of Object Identity-tags
 - [ ] State-mutaties zijn server-authoritative; client-kant bevat alleen leeslogica op gerepliceerde waarden
