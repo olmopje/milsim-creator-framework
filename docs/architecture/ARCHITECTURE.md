@@ -65,6 +65,7 @@ Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module
   | `MCF_Squad_` | Squad Cohesion/C2-laag (5.10) |
   | `MCF_Build_` | Field Construction-module — los uitgewerkt in `docs/modules/field-construction.md`, niet in kernroadmap sectie 9 |
   | `MCF_ACE_` | ACE Anvil-compatibiliteitsbrug — los uitgewerkt in `docs/modules/ace-anvil-compatibility.md`, altijd optioneel (soft dependency), per integratiepunt modulair schakelbaar (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`) — **bevestigd actief nodig**, geen speculatief werk |
+  | `MCF_React_` | Scripted AI Reactions — herbruikbare gedragsrecepten-catalogus (5.12), combineert bestaande bouwstenen, geen eigen gedragslogica |
 
   Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
 
@@ -258,6 +259,31 @@ Direct antwoord op de erkende, veelgenoemde klacht uit sectie 4 van het onderzoe
 
 **Performance:** lage-prioriteit tick (zie sectie 7.8) — dit hoeft niet vaak te checken, vastlopen is per definitie een langzaam-optredend probleem.
 
+### 5.12 Scripted AI Reactions — herbruikbare gedragsrecepten-catalogus, NIEUW
+Antwoord op de wens naar "makkelijk uitbreidbare AI-acties via een visuele editor" — met een bewuste scope-keuze die eerlijk wordt uitgelegd voordat we verder gaan.
+
+**Scope-beslissing: catalogus van kant-en-klare recepten, geen node-graaf-editor bouwen.** Een eigen drag-and-drop visuele scripting-tool zou in feite een eigen Eden-editor betekenen — een veel groter project dan de rest van dit framework samen, en buiten proportie met de rest van de roadmap. In plaats daarvan: **elk gedrag is een genoemd, herbruikbaar "recept"** dat een missiemaker uit een dropdown kiest (zelfde GM-attribuutpatroon als de rest van het framework, sectie 6) — geen node-graaf nodig om 90% van de waarde te krijgen.
+
+**Wat een "recept" technisch is:** een trigger (meestal een staatsovergang uit het Alert-systeem, sectie 3.4) gekoppeld aan een vaste reeks van reeds bestaande bouwstenen — Waypoint+Animatie (5.4), Voice Line (4.4), bestaande Actions zoals Kill Entity/Add Waypoint. **Geen nieuwe Core-functionaliteit nodig** — een recept is puur configuratie van dingen die al bestaan, wat het echt "makkelijk uitbreidbaar" maakt: nieuwe recepten toevoegen is content maken, geen code schrijven.
+
+**Startcatalogus (voorbeelden uit je eigen vraag, plus enkele veelvoorkomende milsim-tropes):**
+
+| Recept | Trigger | Bouwstenen (allemaal al gepland) |
+|---|---|---|
+| **HVT Vlucht per Voertuig** | Onderzoekend/In gevecht (sectie 3.4) | Waypoint naar dichtstbijzijnde voertuig → Get In-actie → vluchtroute-waypoint |
+| **HVT Vlucht per Helikopter** | Idem | Voice Line ("oproep evacuatie") → wachttijd → heli-waypoint → Get In → extractie-waypoint |
+| **Gijzelaar-executie bij Alarm** | In gevecht binnen X seconden na eerste contact | Animatie (dreigen/schieten) → Kill Entity-actie → koppelbaar aan de bestaande hostility-consequenties (5.1) omdat dit zwaar tegen de speler zou moeten wegen als het gebeurt door falend spelersgedrag |
+| **Nepoverdgave** | Speler nadert een "compliant" NPC (hergebruikt de wapen-drop-animatie uit de Compliance/ROE-module, 5.7!) | Wapen-drop-animatie → wachten tot speler dichtbij is → verrassingsaanval. Mooi voorbeeld van hergebruik: dit recept voegt geen nieuwe animatie toe, het combineert een bestaande op een nieuwe manier |
+| **Versterking Oproepen** | Argwanend/Onderzoekend | Voice Line → QRF-systeem triggeren (al bestaand) |
+
+**Extensibiliteit in de praktijk:** een nieuw recept toevoegen = een nieuwe rij in de catalogus-config, geen nieuwe class. Iedereen in de unit die de bouwstenen kent (waypoints, animaties, voice lines) kan in principe een nieuw recept samenstellen zonder Enforce Script te schrijven — dat is de daadwerkelijke "makkelijk uitbreidbaar"-belofte, sterker dan een visuele editor zou zijn geweest voor de investering die het zou kosten.
+
+**Eerlijke stretch-optie voor later:** als dit systeem eenmaal staat en de catalogus groeit, zou een simpel Workbench-plugin (zelfde soort als SF's "Game Mode Setup"-plugin) het samenstellen van nieuwe recepten kunnen versimpelen tot een formulier i.p.v. los config-werk. Dat is geen node-graaf-editor, wel een stap richting "visueler" — expliciet als backlog-idee, niet als kernscope.
+
+**Namespace:** `MCF_React_` — nieuw, want dit is een recepten-catalogus die dwars door meerdere bestaande modules heen combineert, geen eigen gedragslogica.
+
+**Performance:** een recept kost exact wat zijn bouwstenen al kosten (een waypoint, een animatie, een voice line) — geen extra overhead bovenop wat al gepland was.
+
 ---
 
 ## 6. GM-integratielaag
@@ -308,8 +334,9 @@ Dit raakt letterlijk elke laag hierboven, dus expliciet als eigen sectie:
 | **8** | AAR/Debrief-module — aggregeert de Event Bus-geschiedenis van alle voorgaande fases, dus pas zinvol als afsluiter |
 | **9** | Squad Cohesion/C2-laag — losstaand van de rest, kan bij voldoende capaciteit ook eerder parallel opgepakt worden |
 | **10** | AI Commando-Watchdog — pas oppakken nadat de basis-AI-modules (Fase 3, 6, 7) draaien, zodat er genoeg echte gebruikssituaties zijn om de drempelwaarde tegen te testen |
-| **11** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
-| **12** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
+| **11** | Scripted AI Reactions-catalogus — pas zinvol na Fase 3-7 (Hostility, Waypoint+Animatie, Voice Line, Compliance/ROE), want elk recept hergebruikt die bouwstenen |
+| **12** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
+| **13** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
 
 ---
 

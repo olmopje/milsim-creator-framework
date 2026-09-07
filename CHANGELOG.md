@@ -5,6 +5,7 @@ Formaat gebaseerd op [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 ### Toegevoegd
+- Nieuwe module: Scripted AI Reactions-catalogus (5.12), namespace MCF_React_, herbruikbare gedragsrecepten i.p.v. visuele node-editor
 - Alert-systeem uitgebreid naar vier stadia (Onwetend/Argwanend/Onderzoekend/In gevecht), hergebruikt Investigation Distance-attribuut
 - Losstaand deelproject: ACE Anvil-compatibiliteitsbrug (`docs/modules/ace-anvil-compatibility.md`), namespace `MCF_ACE_`, soft-dependency-patroon
 - Test- en stress-testinfrastructuur (3.2): Autotest Framework-integratie + Stress Profile-registratie, verplicht vanaf Fase 0
