@@ -284,6 +284,26 @@ Antwoord op de wens naar "makkelijk uitbreidbare AI-acties via een visuele edito
 
 **Performance:** een recept kost exact wat zijn bouwstenen al kosten (een waypoint, een animatie, een voice line) — geen extra overhead bovenop wat al gepland was.
 
+### 5.13 Sequence Recorder — pad-en-cue-opname voor mini-scripted scenario's, NIEUW
+Directe uitbreiding op 5.12: een **nieuw type recept-input** naast handmatig samengestelde recepten. In plaats van waypoints en animaties één voor één te kiezen, speelt de missiemaker de scène zelf voor en neemt het systeem op wat er gebeurde.
+
+**Belangrijk onderscheid, eerst vastgelegd zodat de verwachting klopt:**
+- **Dit is geen motion-capture.** Wat wordt opgenomen is *positie/richting over tijd* plus *momenten waarop een bestaande actie/animatie werd getriggerd* (zitten, interactie, instappen, wapen heffen) — geen nieuwe skeletanimatie.
+- Een compleet nieuw gebaar dat nog niet bestaat, vereist Reforger's eigen Animation Editor en een animator — een ander vakgebied dan missiescripting, niet iets wat dit systeem kan vervangen.
+
+**Hoe het werkt:**
+1. **Opnemen** — een speler (typisch de missiemaker zelf, tijdens het bouwen) loopt/handelt de gewenste routine, terwijl een Recorder op vaste interval positie+rotatie vastlegt en elke keer dat een bestaande actie/animatie wordt aangeroepen een tijdgestempelde "cue" toevoegt
+2. **Opslaan** — het resultaat is een **Sequence Asset**: in essentie een fijnmazige waypoint-keten plus cue-events, opgeslagen als data — geen nieuw animatiebestand
+3. **Afspelen** — toegewezen aan een AI-personage via de Scripted AI Reactions-catalogus (5.12): de AI volgt het opgenomen pad met zijn normale bewegingsanimaties, en triggert dezelfde cues op hetzelfde relatieve moment. De AI "beweegt als zichzelf", maar volgt jouw geregisseerde route en timing
+
+**Waarom dit mini-scripted scenario's binnen een groter geheel mogelijk maakt:** een Sequence Asset gecombineerd met een klein clustertje Objective-/Logic-nodes (4.1/4.3) vormt een zelfstandige "vignette" — bijv. een complete checkpoint-routine of een hinderlaag-opstelling — die als herbruikbare eenheid in elke grotere missie gedropt kan worden. Dit is geen nieuw concept naast de bestaande node-hiërarchie, het is die hiërarchie gewoon toegepast op een kleinere schaal, precies zoals Area→Layer→Slot dat al ondersteunt.
+
+**Namespace:** valt onder `MCF_React_` — een Sequence Asset is technisch gewoon een nieuw type recept-input, geen apart systeem.
+
+**Open vragen om vroeg te beantwoorden:**
+- Hoe fijnmazig moet de opname-interval zijn voor een vloeiend resultaat zonder de Sequence Asset onnodig groot te maken — dit is een praktische afweging die alleen via testen in Workbench vastgesteld kan worden
+- Reageert de afspelende AI natuurlijk op onverwachte obstakels tijdens het volgen van een opgenomen pad (bijv. een speler die per ongeluk in de weg staat), of loopt hij star het pad af ongeacht omstandigheden? Bepaalt of er een fallback-gedrag nodig is bovenop de letterlijke afspeellogica
+
 ---
 
 ## 6. GM-integratielaag
@@ -335,8 +355,9 @@ Dit raakt letterlijk elke laag hierboven, dus expliciet als eigen sectie:
 | **9** | Squad Cohesion/C2-laag — losstaand van de rest, kan bij voldoende capaciteit ook eerder parallel opgepakt worden |
 | **10** | AI Commando-Watchdog — pas oppakken nadat de basis-AI-modules (Fase 3, 6, 7) draaien, zodat er genoeg echte gebruikssituaties zijn om de drempelwaarde tegen te testen |
 | **11** | Scripted AI Reactions-catalogus — pas zinvol na Fase 3-7 (Hostility, Waypoint+Animatie, Voice Line, Compliance/ROE), want elk recept hergebruikt die bouwstenen |
-| **12** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
-| **13** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
+| **12** | Sequence Recorder — bouwt direct op Fase 11, want een opname is technisch een nieuw type recept-input |
+| **13** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
+| **14** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
 
 ---
 
