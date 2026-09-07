@@ -15,13 +15,17 @@ Los document — dit gaat over interoperabiliteit met een extern, experimenteel 
 
 ---
 
-## 2. Ontwerpprincipe: soft dependency, geen harde vereiste
+## 2. Ontwerpprincipe: soft dependency, geen harde vereiste — en modulair per integratiepunt
+
+**Bevestigd: de unit gebruikt ACE Medical al actief.** Dit is dus geen speculatief toekomstwerk meer — de brug moet vanaf de eerste implementatie betrouwbaar zijn, niet "er ooit bij verzinnen".
 
 MCF moet **volledig blijven werken zonder ACE Anvil**. Niet elk unit-lid hoeft het te draaien, en het framework mag nooit crashen of degraderen als het ontbreekt. Bij aanwezigheid van ACE Anvil breidt MCF zijn gedrag uit; bij afwezigheid valt het simpelweg terug op eigen logica.
 
-**Praktisch:** een runtime-check bij initialisatie (bestaat de `ACE_Core`-klasse/GUID?) bepaalt of de bridge-laag actief wordt. Dit is hetzelfde soort "optional dependency"-patroon dat CBA in Arma 3 decennialang succesvol hanteerde voor mod-interoperabiliteit.
+**Modulair betekent hier: elk integratiepunt apart schakelbaar, niet één grote aan/uit-knop.** De vier integratiepunten in sectie 3 (Compliance/ROE, AAR, Interactie-hints, Carrying) krijgen elk hun eigen Config-laag-attribuut. Een missiemaker kan bijvoorbeeld wél de Compliance/ROE-medische-check willen (3.1), maar de AAR-medische-verrijking (3.2) uitschakelen omdat die debriefs te lang maakt — dat moet zonder gevolgen voor de andere drie mogelijk zijn. Dit voorkomt dat een toekomstige ACE-breaking-change meteen de hele brug onbruikbaar maakt in plaats van alleen het geraakte integratiepunt.
 
-**Namespace:** `MCF_ACE_` — alle ACE-aanrakende code geïsoleerd in één namespace. Als ACE Anvil's API breekt bij een update, is de schade beperkt tot dit ene mapje, niet verspreid door de hele codebase.
+**Praktisch:** een runtime-check bij initialisatie (bestaat de `ACE_Core`-klasse/GUID?) bepaalt of de bridge-laag ooit actief kán worden; de vier sub-toggles bepalen vervolgens welke integratiepunten daadwerkelijk draaien. Dit is hetzelfde soort "optional dependency"-patroon dat CBA in Arma 3 decennialang succesvol hanteerde voor mod-interoperabiliteit.
+
+**Namespace:** `MCF_ACE_` — alle ACE-aanrakende code geïsoleerd in één namespace, met elk integratiepunt als eigen submodule daarbinnen (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`). Als ACE Anvil's API breekt bij een update, is de schade beperkt tot één submodule, niet de hele brug.
 
 ---
 
@@ -52,4 +56,4 @@ ACE's "Carrying"-systeem (incapacitated units dragen) overlapt conceptueel met e
 
 - Is er een stabiele, gedocumenteerde manier om runtime te detecteren of `ACE_Core` geladen is, of moet dit met een fragiele class-existence-check (die bij een ACE-herstructurering kan breken)?
 - Hoe stabiel is ACE Anvil's `UserAction`-ID-toewijzing tussen versies — is er kans op stille breaking changes bij een ACE-update die onze `MCF_ACE_`-brug ongemerkt laat falen? Zo ja: is een periodieke compatibiliteitstest (gekoppeld aan de Autotest-infrastructuur uit 3.2) verstandig, draaiend telkens als de unit ACE Anvil update?
-- Speelt de unit daadwerkelijk met ACE Medical, of is dit voorbereidend werk voor een mogelijke toekomstige keuze? Bepaalt of Fase-inplanning nu al zinvol is of beter wacht tot de keuze vaststaat.
+- **Bevestigd:** de unit gebruikt ACE Medical al actief, brug-ontwikkeling is dus niet-speculatief en verdient prioriteit zodra Compliance/ROE (5.7) en AAR (5.8) uit het hoofdproject bestaan — dit is de blokkerende afhankelijkheid, niet de ACE-kant.
