@@ -64,6 +64,7 @@ Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module
   | `MCF_AAR_` | Debrief-module (5.8) |
   | `MCF_Squad_` | Squad Cohesion/C2-laag (5.10) |
   | `MCF_Build_` | Field Construction-module — los uitgewerkt in `docs/modules/field-construction.md`, niet in kernroadmap sectie 9 |
+  | `MCF_ACE_` | ACE Anvil-compatibiliteitsbrug — los uitgewerkt in `docs/modules/ace-anvil-compatibility.md`, altijd optioneel (soft dependency) |
 
   Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
 
