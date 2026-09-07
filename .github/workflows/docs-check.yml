@@ -1,0 +1,36 @@
+name: Docs & structuur-check
+
+# Let op: dit valideert GEEN Enforce Script-compilatie. Dat vereist een
+# volledige Arma Reforger Tools/Workbench-omgeving, die niet zomaar op
+# een standaard GitHub Actions-runner beschikbaar is. Deze workflow
+# controleert alleen wat zonder die omgeving realistisch te automatiseren is.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  markdown-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: 'docs/**/*.md README.md CONTRIBUTING.md CHANGELOG.md'
+
+      - name: Check op verboden patronen (harde Faction Key i.p.v. Alias)
+        run: |
+          if grep -rn "GetFaction(\"US\")\|GetFaction(\"USSR\")" addons/ 2>/dev/null; then
+            echo "::error::Harde Faction Key gevonden — gebruik Faction Alias (zie ARCHITECTURE.md 3.1)"
+            exit 1
+          fi
+
+      - name: Check op MSF_-prefix in nieuwe scriptbestanden
+        run: |
+          for f in $(git diff --name-only origin/main...HEAD -- 'addons/MSF/Scripts/**/*.c' 2>/dev/null); do
+            base=$(basename "$f")
+            if [[ ! "$base" == MSF_* ]]; then
+              echo "::warning::$f volgt niet de MSF_-naamgevingsconventie"
+            fi
+          done

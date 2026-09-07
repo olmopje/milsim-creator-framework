@@ -1,0 +1,16 @@
+# Workbench/Enfusion build- en cache-artefacten
+*.bin
+*.c.bak
+/cache/
+/build/
+/.workbench/
+
+# OS/editor ruis
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Lokale configuratie die per contributor verschilt
+config.local.json
