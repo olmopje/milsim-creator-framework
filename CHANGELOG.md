@@ -5,6 +5,8 @@ Formaat gebaseerd op [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 ### Toegevoegd
+- Onderzoeksdocument mission-maker-klachten (`docs/research/mission-maker-pain-points.md`)
+- Nieuwe module: Squad Cohesion/C2-laag (5.10), namespace `MCF_Squad_`
 - Repository-structuur opgezet
 - Architectuurplan (`docs/architecture/ARCHITECTURE.md`)
 - Losstaand deelproject: voertuig-schieten als passagier (`docs/modules/vehicle-shooting.md`)

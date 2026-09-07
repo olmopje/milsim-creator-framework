@@ -62,6 +62,7 @@ Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module
   | `MCF_Voice_` | Voice Line/Comms (4.4) |
   | `MCF_Interact_` | Interactie-hint-systeem (5.6) |
   | `MCF_AAR_` | Debrief-module (5.8) |
+  | `MCF_Squad_` | Squad Cohesion/C2-laag (5.10) |
 
   Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
 - **Event-contract.** Elk event heeft een vast namespace-patroon (`Module_Actie`, bijv. `Objective_Complete`, `Hostility_ThresholdCrossed`) en een gedocumenteerd payload-schema. Geen enkel event wordt ad-hoc genaamd — nieuwe events worden centraal geregistreerd in de Module Registry, niet losjes verzonnen per module.
@@ -209,6 +210,19 @@ Vroeg in de brainstorm genoemd ("milsim-eenheden zijn dol op debriefs"), maar in
 ### 5.9 Logistiek/Supply — BACKLOG, bewust niet in eerste scope
 Ook vroeg genoemd, maar bewust **niet** in de kernroadmap opgenomen om scope-kruip te voorkomen. Zou leunen op vergelijkbare Area/Dynamic-Despawn-patronen als de rest van het framework (supply-punten als Lifestyle-POI-achtige nodes, konvooien als POI/Observation-ketens), dus technisch geen nieuw patroon — wel een bewuste latere uitbreiding, geen fase-0-t/m-9-verplichting.
 
+### 5.10 Squad Cohesion / C2-laag — NIEUW, uit community-onderzoek
+Direct voortgekomen uit `docs/research/mission-maker-pain-points.md`: de meest herhaalde klacht van ervaren milsim-spelers is niet gebrek aan content, maar dat squad-lidmaatschap in vanilla Reforger "geen betekenis heeft" — geen zicht op teamposities, spawn losgekoppeld van squad, geen coördinatie-prikkel.
+
+- **Squad-positie-overzicht voor de leider**: een lichte, opt-in kaartlaag die alleen squadleden aan elkaar toont (nooit het hele leger) — puur informatief, geen nieuwe AI-logica
+- **Muster-gate (optioneel, missiemaker-instelbaar)**: een Objective-node (hergebruikt sectie 4.1) kan als conditie eisen dat een squad fysiek bij elkaar is voordat een volgend narratief stuk vrijgeeft — verplicht coördinatie zonder een hard "je mag niet spawnen"-slot te forceren
+- **Radio-respawn-zichtbaarheid**: een simpele UI-hint die het bestaande maar onbekende radio-respawn-mechanisme zichtbaar maakt, zodat squads het daadwerkelijk gebruiken
+
+**Namespace:** `MCF_Squad_` — nieuw, want dit is spelerscoördinatie, geen AI-gedrag (dus bewust niet onder `MCF_AI_`) en geen verhalende node (dus niet onder `MCF_Obj_`).
+
+**Performance:** puur informatief/event-gedreven (kaartlaag update alleen bij positieverandering van squadleden), geen polling-overhead.
+
+**Scope-grens:** dit repareert geen AI-commandogedrag (zie `docs/research/mission-maker-pain-points.md` sectie 4 — dat is engine-niveau en bewust buiten bereik) — dit lost alleen het *informatie- en coördinatie-gebrek tussen menselijke spelers* op.
+
 ---
 
 ## 6. GM-integratielaag
@@ -257,8 +271,9 @@ Dit raakt letterlijk elke laag hierboven, dus expliciet als eigen sectie:
 | **6** | Ambient Life/Pattern-of-Life-module (Lifestyle-POI's, actor-archetypes, fake conversations) + interactie-hint-systeem (tiers, pointer-sjablonen) — bouwt direct op Fase 5 |
 | **7** | Compliance/ROE-interactielaag (gunpoint, drop weapon, stand back) + koppeling aan Hostility-manager |
 | **8** | AAR/Debrief-module — aggregeert de Event Bus-geschiedenis van alle voorgaande fases, dus pas zinvol als afsluiter |
-| **9** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
-| **10** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
+| **9** | Squad Cohesion/C2-laag — losstaand van de rest, kan bij voldoende capaciteit ook eerder parallel opgepakt worden |
+| **10** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
+| **11** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
 
 ---
 
