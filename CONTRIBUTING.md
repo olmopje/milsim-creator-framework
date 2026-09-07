@@ -15,6 +15,8 @@ Lees `docs/architecture/ARCHITECTURE.md` sectie 3.1 (Integratie-contracten) voll
 - [ ] Teksten staan in de StringTable, niet hardcoded
 - [ ] Event Bus-listeners worden opgeruimd bij entity-destructie (geen dangling listeners)
 - [ ] Validatie-pass logt (W)/(E)-meldingen bij foutieve configuratie, faalt niet stil
+- [ ] Module levert een Autotest-suite (`SCR_AutotestSuiteBase`), geregistreerd bij de Module Registry
+- [ ] Indien de module iets herhaaldelijk spawnt/simuleert: een Stress Profile geregistreerd (zie `ARCHITECTURE.md` 3.2) — geen uitzondering "doen we later"
 
 ## Commit- en branchconventie
 

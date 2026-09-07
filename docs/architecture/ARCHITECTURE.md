@@ -66,6 +66,22 @@ Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module
   | `MCF_Build_` | Field Construction-module — los uitgewerkt in `docs/modules/field-construction.md`, niet in kernroadmap sectie 9 |
 
   Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
+
+### 3.2 Test- en stress-testinfrastructuur (verplicht aanhaakpunt, geen los initiatief per module)
+
+Twee aparte doelen, met één centrale registratie zodat niemand zijn eigen ad-hoc testscript hoeft te verzinnen:
+
+**Functionele tests — bouwt op Bohemia's officiële Autotest Framework**
+- Elke module levert een test-suite die overerft van `SCR_AutotestSuiteBase`, draaiend in een dedicated testwereld (BI's `MpTest`-patroon, eventueel een eigen MCF-testwereld)
+- Test-suites worden geregistreerd bij de Module Registry, samen met de module zelf — geen los, ongedocumenteerd testscript ergens in een submap
+- **Realistische grens:** dit draait via Workbench, niet via een simpele GitHub Actions-runner (zie de CI-beperking uit `CONTRIBUTING.md`) — het automatiseert het "test in Workbench"-stap uit onze workflow, het vervangt die stap niet
+
+**Stress-tests — eigen laag, geïnspireerd op een bestaand community-patroon**
+- Elke module kan optioneel een **Stress Profile** registreren: een simpele receptuur (hoeveel instanties van zichzelf spawnen, met welke intensiteit, hoe lang) — bijv. Ambient Life registreert "spawn 150 NPC's over 5 dorpen", Infrastructuur-netwerk registreert "activeer 20 graafnodes met wisselende status"
+- **Eén centrale Stress Test Controller** (GM-plaatsbare entity, zelfde patroon als andere MCF-nodes) kan losse profielen of een combinatie ervan afvuren — zo simuleer je het "40+ spelers + druk bevolkt dorp"-scenario uit de roadmap met echte cijfers in plaats van giswerk
+- Resultaten (FPS/tick-timing per profiel) loggen naar de Debug Overlay uit sectie 7 — hergebruik van bestaande infrastructuur, geen nieuw rapportagesysteem
+
+**Consequentie voor de checklist:** dit wordt een verplicht onderdeel per nieuwe module vanaf Fase 0, niet een latere toevoeging — zie bijgewerkte `CONTRIBUTING.md`.
 - **Event-contract.** Elk event heeft een vast namespace-patroon (`Module_Actie`, bijv. `Objective_Complete`, `Hostility_ThresholdCrossed`) en een gedocumenteerd payload-schema. Geen enkel event wordt ad-hoc genaamd — nieuwe events worden centraal geregistreerd in de Module Registry, niet losjes verzonnen per module.
 - **Authority-beleid.** Alle state-mutaties (objective-status, hostility-waarde, infrastructuur-status, ROE-uitkomst) zijn **server-authoritative**. Clients ontvangen uitsluitend gerepliceerde resultaten via de Replicatie-helper — nooit lokale voorspellingen die later gecorrigeerd moeten worden. Dit geldt voor élke module, zonder uitzondering.
 - **Faction Alias-integratie.** De Core hergebruikt SF's bewezen `SCR_FactionAliasComponent`-patroon in plaats van een eigen factie-abstractie te verzinnen. Elke module die een factie nodig heeft (Hostility, ROE, Objective-condities) verwijst naar een Alias, niet naar een harde Faction Key — zo is een scenario herbruikbaar met andere factie-combinaties zonder herbouw.
@@ -280,7 +296,7 @@ Dit raakt letterlijk elke laag hierboven, dus expliciet als eigen sectie:
 
 | Fase | Doel |
 |---|---|
-| **0 — Proof of concept** | Eén Trigger Zone-entity: GM-plaatsbaar, live attributen, volledige save/load-cyclus getest, **plus** het event-naamgevingscontract, authority-beleid en validatie-pass uit sectie 3.1 vanaf het begin toegepast — dit zijn geen latere toevoegingen maar fundament |
+| **0 — Proof of concept** | Eén Trigger Zone-entity: GM-plaatsbaar, live attributen, volledige save/load-cyclus getest, **plus** het event-naamgevingscontract, authority-beleid, validatie-pass én de Test-/Stress-registratie uit sectie 3.1-3.2 vanaf het begin toegepast — dit zijn geen latere toevoegingen maar fundament |
 | **1** | Objective Node volledig (titel, map-visibility, conditie-slot, on-complete/on-fail events, intel-gate) |
 | **2** | POI/Observation Node + Logic Nodes, Event Bus-koppeling tussen beide |
 | **3** | Hostility/Reputatie-manager + civiele gedragshaak + Faction Alias-integratie |

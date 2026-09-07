@@ -5,6 +5,7 @@ Formaat gebaseerd op [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 ### Toegevoegd
+- Test- en stress-testinfrastructuur (3.2): Autotest Framework-integratie + Stress Profile-registratie, verplicht vanaf Fase 0
 - Losstaand deelproject: Field Construction/FOB-module (`docs/modules/field-construction.md`), namespace `MCF_Build_`
 - Nieuwe module: AI Commando-Watchdog (5.11), pleister voor bekend engine-niveau AI-commandoprobleem
 - Onderzoeksdocument mission-maker-klachten (`docs/research/mission-maker-pain-points.md`)

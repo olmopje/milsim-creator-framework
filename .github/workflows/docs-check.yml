@@ -1,9 +1,9 @@
 name: Docs & structuur-check
 
-# Let op: dit valideert GEEN Enforce Script-compilatie. Dat vereist een
-# volledige Arma Reforger Tools/Workbench-omgeving, die niet zomaar op
-# een standaard GitHub Actions-runner beschikbaar is. Deze workflow
-# controleert alleen wat zonder die omgeving realistisch te automatiseren is.
+# Let op: dit valideert GEEN Enforce Script-compilatie en draait GEEN
+# Autotest-suites of Stress Profiles — dat vereist Workbench, zie
+# ARCHITECTURE.md sectie 3.2. Deze workflow controleert alleen wat zonder
+# die omgeving realistisch te automatiseren is.
 
 on:
   pull_request:
