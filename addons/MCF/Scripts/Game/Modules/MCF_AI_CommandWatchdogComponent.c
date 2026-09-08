@@ -2,16 +2,18 @@
 //! (e.g. not exiting a vehicle, follow order breaking), not a structural
 //! fix. Detects an entity that hasn't moved for m_fStuckThresholdSeconds,
 //! publishes a retry request first, and only after a repeat failure
-//! publishes a forced-correction request.
+//! either force-corrects to the nearest mission-maker-placed
+//! MCF_AI_SafeFallbackPointComponent (if one exists) or publishes a
+//! forced-correction-requested event for something else to handle.
 //!
 //! Self-drives via MCF_Core_TickCritical -- requires an
 //! MCF_Core_GameLoopComponent + MCF_Core_TickManagerComponent to exist
 //! somewhere in the scenario for that event to actually fire.
 //!
-//! Safe-position validation is NOT implemented. ApplyForcedCorrection()
-//! trusts the position it is given; the caller is responsible for
-//! confirming it is not inside geometry/water (e.g. via a navmesh query)
-//! before calling. This is an explicit, documented gap, not an oversight.
+//! Using registered fallback points instead of a geometry/navmesh query
+//! is a deliberate choice: we could not confirm such a query API without
+//! guessing, so the mission maker places known-safe points near problem
+//! spots instead.
 
 [ComponentEditorProps(category: "MCF/AI", description: "Detects a stuck entity and requests a retry, then a forced correction.")]
 class MCF_AI_CommandWatchdogComponentClass : ScriptComponentClass
@@ -61,7 +63,7 @@ class MCF_AI_CommandWatchdogComponent : ScriptComponent
 
 	//! Compares current position against the last recorded one; if
 	//! unmoved past the threshold, publishes a retry request first, then
-	//! a forced-correction request if it is still stuck on the next
+	//! attempts a forced correction if it is still stuck on the next
 	//! check after that. Called automatically via MCF_Core_TickCritical,
 	//! but can also be called directly if needed.
 	void CheckStuck(IEntity owner)
@@ -91,11 +93,25 @@ class MCF_AI_CommandWatchdogComponent : ScriptComponent
 			return;
 		}
 
+		TryForceCorrectionToFallbackPoint(owner);
+	}
+
+	//! Looks up the nearest registered MCF_AI_SafeFallbackPointComponent
+	//! and moves owner there if one exists. Publishes
+	//! "MCF_AI_CommandForceCorrectionRequested" either way, so something
+	//! else can react (e.g. log that no fallback point was available).
+	protected void TryForceCorrectionToFallbackPoint(IEntity owner)
+	{
+		IEntity fallback = MCF_AI_FallbackPointRegistry.GetInstance().FindNearest(owner.GetOrigin());
+		if (fallback)
+			ApplyForcedCorrection(owner, fallback.GetOrigin());
+
 		MCF_Core_EventManager.GetInstance().Publish("MCF_AI_CommandForceCorrectionRequested", this);
 	}
 
-	//! Moves owner to safePosition, which MUST already be validated safe
-	//! by the caller -- see file header. Resets stuck tracking.
+	//! Moves owner to safePosition and resets stuck tracking. Exposed
+	//! directly in case a caller has its own way of picking a safe
+	//! position instead of using the fallback point registry.
 	void ApplyForcedCorrection(IEntity owner, vector safePosition)
 	{
 		owner.SetOrigin(safePosition);
