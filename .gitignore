@@ -1,6 +1,7 @@
 # Workbench/Enfusion build- en cache-artefacten
 *.bin
 *.c.bak
+*.rdb
 /cache/
 /build/
 /.workbench/
