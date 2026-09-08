@@ -9,6 +9,7 @@ Formaat gebaseerd op [Keep a Changelog](https://keepachangelog.com/).
 Volledig architectuurplan afgerond en gereviewd vóór start van Fase 0-implementatie. Geen code, uitsluitend ontwerp.
 
 ### Toegevoegd
+- Player Controller: iteratieve testmethode met drie profielen i.p.v. vast eindresultaat vastgelegd
 - Losstaand deelproject: Player Controller-verbetering (`docs/modules/player-controller.md`) — bewegingsresponsiviteit, turn-speed-curve, ADS-inputtiming
 - Sequence Recorder toegevoegd (5.13): pad-en-cue-opname, nieuw type recept-input binnen MCF_React_
 - Nieuwe module: Scripted AI Reactions-catalogus (5.12), namespace MCF_React_, herbruikbare gedragsrecepten i.p.v. visuele node-editor

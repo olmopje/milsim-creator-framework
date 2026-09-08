@@ -47,11 +47,16 @@ Dit is geen waarde-tweak maar een **input-handling-probleem**: de klik om te ric
 
 ---
 
-## 6. Voorgestelde eerste stap
+## 6. Voorgestelde eerste stap — iteratief, geen vast eindprofiel
 
-1. **Sectie 2 eerst** — laagste risico, bewezen moddable, directe speelervaring-winst. Vind de exacte parameters die Arcade Movement aanpast (niet de mod zelf gebruiken, wel als kaart om te weten waar te zoeken in Workbench) en stel een eigen, mildere afstelling samen
-2. **Sectie 3 los onderzoeken** — andere parameter-familie, niet aannemen dat het met sectie 2 meekomt
-3. **Sectie 4 pas als losstaand, groter vervolgtraject** — erken vooraf dat dit meer tijd kost dan de eerste twee
+**Beslissing:** de unit wil niet vooraf kiezen tussen "licht minder clunky" en "richting arcade" — dit wordt uitgetest, niet in één keer vastgelegd. Dat verandert de aanpak: bouw de parameters zo dat ze **makkelijk herhaaldelijk bij te stellen zijn**, niet als losse harde waarden die je telkens moet opzoeken en handmatig aanpassen.
+
+**Praktische invulling:**
+1. **Sectie 2 eerst, met drie testprofielen i.p.v. één getal** — bijv. "Profiel A: 25% responsiever dan vanilla", "Profiel B: 50%", "Profiel C: 75% (dicht bij Arcade Movement)". Laat meerdere unit-leden alle drie proberen, niet alleen degene die het bouwt — persoonlijke voorkeur van één persoon is geen goede maatstaf voor een hele unit
+2. **Verzamel feedback gestructureerd**, niet los "voelt goed/slecht" — vraag specifiek: voelt het nog "zwaar" genoeg tijdens een lange patrol? Mist iemand het sukkelgevoel bij vermoeidheid? Voelt het responsief genoeg tijdens CQB?
+3. **Sectie 3 los onderzoeken** — andere parameter-familie, niet aannemen dat het met sectie 2 meekomt
+4. **Sectie 4 pas als losstaand, groter vervolgtraject** — erken vooraf dat dit meer tijd kost dan de eerste twee
+5. **Leg de gekozen waarde vast in de Config-laag-filosofie van het hoofdproject** (instelbaar, niet hardcoded) zodra er een voorkeur is — zo kan de unit later alsnog bijstellen zonder opnieuw in code te hoeven duiken, mocht de smaak na een paar maanden spelen veranderen
 
 ---
 
@@ -60,4 +65,4 @@ Dit is geen waarde-tweak maar een **input-handling-probleem**: de klik om te ric
 - Welke exacte config-parameters raakt Arcade Movement — zijn die direct in Workbench's Resource Browser te vinden op het karakter-prefab, of zit dat dieper?
 - Is de turn-speed-curve (sectie 3) een losse camera-configuratie of gekoppeld aan dezelfde plek als de bewegingsparameters?
 - Is `CharacterCommandHandlerComponent` vanuit script voldoende toegankelijk om een ADS-inputbuffer (sectie 4) te bouwen, of zit de bob-animatie-timing dieper in gesloten C++?
-- Welke afstelling van "responsiever maar niet arcade" voelt goed voor de unit — dit is een gevoelswaarde die alleen via speeltests met meerdere leden vastgesteld kan worden, niet via een formule
+- **Beslist:** afstelling wordt iteratief uitgetest met meerdere profielen (zie sectie 6), geen vaste keuze vooraf — de vraag is nu praktisch: hoeveel testprofielen zijn haalbaar zonder de unit met te veel losse builds te belasten, en wie coördineert het verzamelen van feedback?
