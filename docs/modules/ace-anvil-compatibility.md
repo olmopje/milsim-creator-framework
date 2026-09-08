@@ -1,59 +1,59 @@
-# ACE Anvil-compatibiliteit
+# ACE Anvil compatibility
 
-Los document — dit gaat over interoperabiliteit met een extern, experimenteel project (ACE Anvil), niet over een eigen module. Behandel dit als een **grens/brug**, niet als onderdeel van de Core.
-
----
-
-## 1. Wat ACE Anvil is (bijgewerkte informatie)
-
-- Open-source realisme-mod voor Arma Reforger door het ACE-team (GPLv2), actief onderhouden
-- Modulair: 16+ losse addons (Medical, Backblast, Carrying, etc.), elk met eigen GUID, allemaal afhankelijk van `ACE_Core`
-- Gebruikt Enfusion's native replicatiesysteem met **hetzelfde server-authoritative patroon** dat wij al vastgelegd hebben in `ARCHITECTURE.md` sectie 3.1 (client valideert → RPC-verzoek → server beslist → state repliceert) — goed teken voor compatibiliteit op architectuurniveau
-- Eigen persistentie via `ACE_EditorStruct` (JSON-gebaseerd), losstaand van onze `SCR_EditableEntityComponent`-serialisatie — verschillend datadomein, geen directe conflictbron
-
-**Expliciete waarschuwing, rechtstreeks uit hun eigen documentatie:** ACE Anvil noemt zichzelf een experimenteel testplatform. Hun eigen README stelt dat feature-pariteit met ACE3 waarschijnlijk niet gehaald wordt vóór het team overstapt naar Arma 4. **Conclusie: hun API kan nog wijzigen. Bouw dun en geïsoleerd, nooit diep verweven.**
+Standalone document — this is about interoperability with an external, experimental project (ACE Anvil), not about a module of our own. Treat this as a **boundary/bridge**, not part of the Core.
 
 ---
 
-## 2. Ontwerpprincipe: soft dependency, geen harde vereiste — en modulair per integratiepunt
+## 1. What ACE Anvil is (updated information)
 
-**Bevestigd: de unit gebruikt ACE Medical al actief.** Dit is dus geen speculatief toekomstwerk meer — de brug moet vanaf de eerste implementatie betrouwbaar zijn, niet "er ooit bij verzinnen".
+- Open-source realism mod for Arma Reforger by the ACE team (GPLv2), actively maintained
+- Modular: 16+ separate addons (Medical, Backblast, Carrying, etc.), each with its own GUID, all depending on `ACE_Core`
+- Uses Enfusion's native replication system with **the same server-authoritative pattern** we already defined in `ARCHITECTURE.md` section 3.1 (client validates → RPC request → server decides → state replicates) — a good sign for compatibility at the architecture level
+- Its own persistence via `ACE_EditorStruct` (JSON-based), separate from our `SCR_EditableEntityComponent` serialization — different data domain, no direct source of conflict
 
-MCF moet **volledig blijven werken zonder ACE Anvil**. Niet elk unit-lid hoeft het te draaien, en het framework mag nooit crashen of degraderen als het ontbreekt. Bij aanwezigheid van ACE Anvil breidt MCF zijn gedrag uit; bij afwezigheid valt het simpelweg terug op eigen logica.
-
-**Modulair betekent hier: elk integratiepunt apart schakelbaar, niet één grote aan/uit-knop.** De vier integratiepunten in sectie 3 (Compliance/ROE, AAR, Interactie-hints, Carrying) krijgen elk hun eigen Config-laag-attribuut. Een missiemaker kan bijvoorbeeld wél de Compliance/ROE-medische-check willen (3.1), maar de AAR-medische-verrijking (3.2) uitschakelen omdat die debriefs te lang maakt — dat moet zonder gevolgen voor de andere drie mogelijk zijn. Dit voorkomt dat een toekomstige ACE-breaking-change meteen de hele brug onbruikbaar maakt in plaats van alleen het geraakte integratiepunt.
-
-**Praktisch:** een runtime-check bij initialisatie (bestaat de `ACE_Core`-klasse/GUID?) bepaalt of de bridge-laag ooit actief kán worden; de vier sub-toggles bepalen vervolgens welke integratiepunten daadwerkelijk draaien. Dit is hetzelfde soort "optional dependency"-patroon dat CBA in Arma 3 decennialang succesvol hanteerde voor mod-interoperabiliteit.
-
-**Namespace:** `MCF_ACE_` — alle ACE-aanrakende code geïsoleerd in één namespace, met elk integratiepunt als eigen submodule daarbinnen (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`). Als ACE Anvil's API breekt bij een update, is de schade beperkt tot één submodule, niet de hele brug.
+**Explicit warning, straight from their own documentation:** ACE Anvil calls itself an experimental test platform. Their own README states that feature parity with ACE3 will likely not be reached before the team moves on to Arma 4. **Conclusion: their API can still change. Build thin and isolated, never deeply intertwined.**
 
 ---
 
-## 3. Concrete integratiepunten (waar onze modules ACE-bewust moeten zijn)
+## 2. Design principle: soft dependency, no hard requirement — and modular per integration point
 
-### 3.1 Compliance/ROE-laag (hoofddocument 5.7) ↔ ACE Medical
-Onze "drop your weapon"/"stand back"-acties moeten **niet** geactiveerd kunnen worden op een doelwit dat via ACE Medical al bewusteloos/incapacitated is — dat is geen zinvolle nalevingsactie meer. Check: is ACE Medical actief, vraag dan zijn bewustzijnsstatus op vóór de UserAction zichtbaar wordt; zonder ACE Medical valt dit terug op de vanilla damage-state.
+**Confirmed: the unit already actively uses ACE Medical.** So this is no longer speculative future work — the bridge needs to be reliable from the first implementation, not "figure it out someday".
 
-### 3.2 AAR/Debrief-module (5.8) ↔ ACE Medical
-Optionele verrijking, geen vereiste: als ACE Medical draait, kan de debrief ook medische gebeurtenissen meenemen (wie raakte gewond, wie werd behandeld) voor een rijkere sessie-samenvatting. Puur additief — de AAR-module werkt identiek zonder ACE.
+MCF must **keep working fully without ACE Anvil**. Not every unit member has to run it, and the framework must never crash or degrade if it's absent. When ACE Anvil is present, MCF extends its behavior; when absent, it simply falls back to its own logic.
 
-### 3.3 Interactie-hint-systeem (5.6) & Compliance-laag (5.7) ↔ ACE's interactiesysteem
-ACE Anvil voegt eigen `UserAction`-gebaseerde interacties toe (bijv. op onbewuste patiënten). Risico: **ID-botsingen** op dezelfde entiteiten als beide systemen tegelijk actief zijn. Vereist: expliciete controle bij Fase 0-achtige integratietest dat onze UserAction-ID's nooit overlappen met ACE's — geen aanname, echt testen met beide mods tegelijk geladen.
+**Modular here means: every integration point independently toggleable, not one big on/off switch.** The four integration points in section 3 (Compliance/ROE, AAR, Interaction hints, Carrying) each get their own Config-Layer attribute. A mission maker might, for example, want the Compliance/ROE medical check (3.1) but disable the AAR medical enrichment (3.2) because it makes debriefs too long — that must be possible without affecting the other three. This prevents a future ACE breaking change from immediately making the whole bridge unusable instead of just the affected integration point.
 
-### 3.4 Carrying-component ↔ Compliance-laag (5.7)
-ACE's "Carrying"-systeem (incapacitated units dragen) overlapt conceptueel met een gearresteerde/compliant NPC uit onze ROE-module. Geen directe technische botsing verwacht, maar wel iets om samen te testen: kan een via onze module "hands up"-gezette NPC ook door ACE's carry-actie opgepakt worden, en is dat gewenst gedrag?
+**Practical:** a runtime check at initialization (does the `ACE_Core` class/GUID exist?) determines whether the bridge layer can ever become active; the four sub-toggles then determine which integration points actually run. This is the same kind of "optional dependency" pattern that CBA in Arma 3 used successfully for decades for mod interoperability.
+
+**Namespace:** `MCF_ACE_` — all ACE-touching code isolated in one namespace, with every integration point as its own sub-module within it (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`). If ACE Anvil's API breaks on an update, the damage is limited to one sub-module, not the whole bridge.
 
 ---
 
-## 4. Wat hier expliciet niet bij hoort
+## 3. Concrete integration points (where our modules need to be ACE-aware)
 
-- Geen eigen medisch systeem bouwen dat ACE Medical dupliceert — als de unit ACE Medical wil, gebruik die; wij bouwen alleen de brug
-- Geen harde dependency in `.gproj` — ACE Anvil blijft altijd optioneel voor de eindgebruiker
+### 3.1 Compliance/ROE layer (main document 5.7) ↔ ACE Medical
+Our "drop your weapon"/"stand back" actions must **not** be triggerable on a target that's already unconscious/incapacitated via ACE Medical — that's no longer a meaningful compliance action. Check: if ACE Medical is active, query its consciousness status before the UserAction becomes visible; without ACE Medical this falls back to the vanilla damage state.
+
+### 3.2 AAR/Debrief module (5.8) ↔ ACE Medical
+Optional enrichment, not a requirement: if ACE Medical is running, the debrief can also include medical events (who got wounded, who was treated) for a richer session summary. Purely additive — the AAR module works identically without ACE.
+
+### 3.3 Interaction hint system (5.6) & Compliance layer (5.7) ↔ ACE's interaction system
+ACE Anvil adds its own `UserAction`-based interactions (e.g. on unconscious patients). Risk: **ID collisions** on the same entities if both systems are active at once. Required: explicit verification during a Phase-0-like integration test that our UserAction IDs never overlap with ACE's — no assumption, actually test with both mods loaded at once.
+
+### 3.4 Carrying component ↔ Compliance layer (5.7)
+ACE's "Carrying" system (carrying incapacitated units) conceptually overlaps with an arrested/compliant NPC from our ROE module. No direct technical clash expected, but something to test together: can an NPC put into "hands up" state by our module also be picked up by ACE's carry action, and is that the desired behavior?
 
 ---
 
-## 5. Open vragen om vroeg te beantwoorden
+## 4. What is explicitly out of scope here
 
-- Is er een stabiele, gedocumenteerde manier om runtime te detecteren of `ACE_Core` geladen is, of moet dit met een fragiele class-existence-check (die bij een ACE-herstructurering kan breken)?
-- Hoe stabiel is ACE Anvil's `UserAction`-ID-toewijzing tussen versies — is er kans op stille breaking changes bij een ACE-update die onze `MCF_ACE_`-brug ongemerkt laat falen? Zo ja: is een periodieke compatibiliteitstest (gekoppeld aan de Autotest-infrastructuur uit 3.2) verstandig, draaiend telkens als de unit ACE Anvil update?
-- **Bevestigd:** de unit gebruikt ACE Medical al actief, brug-ontwikkeling is dus niet-speculatief en verdient prioriteit zodra Compliance/ROE (5.7) en AAR (5.8) uit het hoofdproject bestaan — dit is de blokkerende afhankelijkheid, niet de ACE-kant.
+- No building a custom medical system that duplicates ACE Medical — if the unit wants ACE Medical, use it; we only build the bridge
+- No hard dependency in `.gproj` — ACE Anvil always stays optional for the end user
+
+---
+
+## 5. Open questions to answer early
+
+- Is there a stable, documented way to detect at runtime whether `ACE_Core` is loaded, or does this require a fragile class-existence check (which could break on an ACE restructuring)?
+- How stable is ACE Anvil's `UserAction` ID assignment between versions — is there a risk of silent breaking changes on an ACE update that lets our `MCF_ACE_` bridge fail unnoticed? If so: is a periodic compatibility test (tied to the Autotest infrastructure from 3.2) advisable, running whenever the unit updates ACE Anvil?
+- **Confirmed:** the unit already actively uses ACE Medical, so bridge development is non-speculative and deserves priority once Compliance/ROE (5.7) and AAR (5.8) from the main project exist — that's the blocking dependency, not the ACE side.
