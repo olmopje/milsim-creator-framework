@@ -7,5 +7,7 @@ GenericEntity {
    m_EditableEntityFlags "PLACEABLE"
    m_sDisplayName "MCF Trigger Zone (Phase 0)"
   }
+  RplComponent "{39A7C5F59B6CF001}" {
+  }
  }
 }

@@ -7,5 +7,7 @@ GenericEntity {
    m_EditableEntityFlags "PLACEABLE"
    m_sDisplayName "MCF Observation Node"
   }
+  RplComponent "{B5F266B9FD450004}" {
+  }
  }
 }
