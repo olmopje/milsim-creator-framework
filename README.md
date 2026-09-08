@@ -6,7 +6,7 @@ No dependency on third-party frameworks (Scenario Framework, Ci5, GME) — infor
 
 ## Status
 
-🚧 **Phase 0 in progress.** Architecture baseline locked at v0.1.0. Core foundation (Event Bus, Tag Registry, Object Identity Component) is written and confirmed compiling in Workbench. See [`docs/architecture/PHASE0_PROGRESS.md`](docs/architecture/PHASE0_PROGRESS.md) for exact status and environment notes. No playable build yet.
+🚧 **Full roadmap implemented (Phases 0-14), first working version.** All planned modules exist and are confirmed compiling in Workbench -- crude but functional, not polished. See [`docs/architecture/PROJECT_STATUS.md`](docs/architecture/PROJECT_STATUS.md) for exact status, known gaps, and environment notes. See [`docs/guides/MISSION_MAKER_GUIDE.md`](docs/guides/MISSION_MAKER_GUIDE.md) for a plain-language reference to every placeable node. No polished/tested-in-a-full-session build yet.
 
 ## Structure
 

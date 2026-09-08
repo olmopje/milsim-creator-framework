@@ -15,7 +15,12 @@ A narrative task. Give it a title and description. Toggle "Visible on Map" to sh
 The simplest building block: fires a named event when triggered. Use it as a generic "something happened here" marker that other nodes react to.
 
 ## Logic Node (`MCF_Obj_Logic`)
-Combines multiple events into one outcome. Set Mode to "OR" (fires as soon as any listed input event happens) or "COUNTER" (fires after a set number of input events, from any of the listed ones, have happened in total). Useful for "any of these 3 things ends the mission" or "clear 5 checkpoints before the convoy leaves."
+Combines multiple events into one outcome. Set Mode to:
+- **"OR"** -- fires as soon as any listed input event happens
+- **"COUNTER"** -- fires after a set number of input events, from any of the listed ones, have happened in total
+- **"AND"** -- fires once every one of up to 4 fixed input slots (`And Input 1-4`, leave unused ones empty) has happened at least once
+
+Useful for "any of these 3 things ends the mission" (OR), "clear 5 checkpoints before the convoy leaves" (COUNTER), or "only proceed once both the bridge is down AND the radio tower is destroyed" (AND).
 
 ## Observation Node (`MCF_Obj_Observation`)
 A point of interest that reports when something happens there. Feed several of these into one Logic Node (OR mode) to build a "watch all these locations, react to whichever gets used first" setup.
@@ -23,16 +28,19 @@ A point of interest that reports when something happens there. Feed several of t
 ---
 
 ## Hostility (background system, not a node you place)
-Tracks a 0-100 tension value per area. Other systems (Civilian Behavior, Compliance) read it. There's no placeable "Hostility node" yet -- raising/lowering it currently has to be triggered from another system.
+Tracks a 0-100 tension value per area. Other systems (Civilian Behavior, Compliance) read it. There's no placeable "Hostility node" yet -- raising/lowering it currently has to be triggered from another system. Decay toward 0 over time can be turned on with `StartAutoDecay(ratePerSecond)` -- off by default, and needs a Tick Manager + Game Loop in the scenario to actually run once enabled.
 
 ## Civilian Behavior Hook (`MCF_AI_CivilianBehaviorHookComponent`)
 Put this on a civilian. Give it an Area Key matching the area you want it to react to. It reports "neutral," "fearful," or "hostile" based on that area's current tension -- but does not yet actually change the civilian's animation or behavior on its own. Something has to read this and act on it.
 
 ## Compliance (`MCF_AI_ComplianceComponent`)
-Put this on an NPC you want players to be able to force compliant at gunpoint. Toggle "Armed" for a "drop weapon" NPC vs an unarmed "stand back" one. Set the base chance they comply. **Important:** this component doesn't detect the player aiming at them -- something else needs to call `AttemptCompliance()` when a player actually points a weapon at close range. If you mark the attempt "unjustified" (e.g. forcing an unarmed, non-threatening civilian to comply), it automatically dings the area's Hostility.
+Put this on an NPC you want players to be able to force compliant at gunpoint. Toggle "Armed" for a "drop weapon" NPC vs an unarmed "stand back" one. Set the base chance they comply, plus the max distance/aim-angle for `IsBeingAimedAt()` to count a player as aiming at this NPC (a distance+angle approximation, not a true line-of-sight check -- it won't detect a wall between player and NPC). Something still needs to call `IsBeingAimedAt()` then `AttemptCompliance()` when a player presses the interact key. If you mark the attempt "unjustified" (e.g. forcing an unarmed, non-threatening civilian to comply), it automatically dings the area's Hostility.
 
 ## AI Command Watchdog (`MCF_AI_CommandWatchdogComponent`)
-A patch for AI that gets stuck (won't exit a vehicle, stops following). It detects "hasn't moved in X seconds" and asks for a retry, then a forced correction if that doesn't work. It does **not** validate that the forced position is safe -- whatever triggers the correction must supply a location that's already been checked.
+A patch for AI that gets stuck (won't exit a vehicle, stops following). Runs automatically once placed (as long as one Tick Manager + Game Loop exist in the scenario, see below) -- detects "hasn't moved in X seconds," asks for a retry, then force-corrects to the nearest **Safe Fallback Point** (see next entry) if that doesn't work.
+
+## Safe Fallback Point (`MCF_AI_SafeFallbackPointComponent`)
+Place one of these near a spot known to be safe for AI to stand -- e.g. right next to a vehicle door where AI tends to get stuck. The Command Watchdog automatically picks the nearest one when it needs to force-correct. Place a few of these around your mission wherever AI commonly gets stuck; the Watchdog does nothing special if none exist nearby.
 
 ---
 
@@ -62,7 +70,7 @@ The easiest way to chain a few things together without any scripting. Set a trig
 Example: an HVT-flees-by-vehicle recipe might be triggered by `"Suspicious"` and have steps `PLAY_TEXT_LINE:Get to the car!` then `PUBLISH_EVENT:HVT_FleeStarted`.
 
 ## Sequence Recorder / Playback (`MCF_React_SequenceRecorderComponent` / `...PlaybackComponent`)
-Records a path and a list of timed cues (using the same `TYPE:value` steps as Recipes), so you can act out a small scene once and reuse it. Recording and advancing playback both need to be driven manually right now (call `RecordSample`/`RecordCue` while recording, `Advance` during playback) -- there's no automatic hookup to an AI walking around yet.
+Records a path and a list of timed cues (using the same `TYPE:value` steps as Recipes), so you can act out a small scene once and reuse it. Recording still needs to be driven manually (call `RecordSample`/`RecordCue` while recording) -- but playback now runs itself automatically once you call `LoadSequence()`, firing cues at the right moment on its own.
 
 ---
 
@@ -75,5 +83,5 @@ Everything here is off by default -- you choose what to turn on:
 ## Budget Config (`MCF_Core_BudgetConfigComponent`)
 Set limits like `AIGroup:20` to cap how many of a category can be active at once, so a scenario doesn't accidentally overload the server. Anything that wants to respect a budget has to call into it -- this component only sets the limit, it doesn't enforce it by itself yet.
 
-## Tick Manager (`MCF_Core_TickManagerComponent`)
-Place exactly one of these per scenario. It's the "heartbeat" other systems can listen to instead of checking things every single frame. Set how often the critical and cosmetic ticks fire. Needs to be driven manually for now (call `Update()` with elapsed time) -- there's no automatic per-frame hookup yet.
+## Tick Manager (`MCF_Core_TickManagerComponent`) + Game Loop (`MCF_Core_GameLoopComponent`)
+Place exactly one of **each** per scenario, on the same entity. Together they're the "heartbeat" other systems listen to instead of checking things every single frame -- and they now run themselves automatically (Game Loop drives the Tick Manager every frame). Set how often the critical and cosmetic ticks fire on the Tick Manager. Several other components (the Command Watchdog, Hostility decay, Sequence Playback) depend on this pair existing somewhere in your scenario to actually run.
