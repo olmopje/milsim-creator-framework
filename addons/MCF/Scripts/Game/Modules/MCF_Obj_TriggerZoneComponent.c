@@ -19,6 +19,11 @@ class MCF_Obj_TriggerZoneComponent : ScriptComponent
 
 	protected bool m_bHasTriggered;
 
+	override void EOnInit(IEntity owner)
+	{
+		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher(m_sEventName);
+	}
+
 	//! Publishes m_sEventName on the Event Bus so any module can react
 	//! without a hard reference to this entity.
 	void Activate()

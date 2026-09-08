@@ -43,7 +43,11 @@ class MCF_Obj_ObjectiveComponent : ScriptComponent
 		{
 			m_UnlockInvoker = MCF_Core_EventManager.GetInstance().GetInvoker(m_sIntelGateEvent);
 			m_UnlockInvoker.Insert(OnIntelGateEvent);
+			MCF_Core_ValidationRegistry.GetInstance().RegisterConsumer(m_sIntelGateEvent, string.Format("MCF_Obj_ObjectiveComponent on '%1' (intel gate)", m_sTitle));
 		}
+
+		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher("Objective_Complete");
+		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher("Objective_Fail");
 	}
 
 	override void OnDelete(IEntity owner)

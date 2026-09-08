@@ -38,11 +38,16 @@ class MCF_Obj_LogicComponent : ScriptComponent
 
 	override void EOnInit(IEntity owner)
 	{
+		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher(m_sOutputEvent);
+
 		if (!m_aInputEvents)
 			return;
 
 		foreach (string eventName : m_aInputEvents)
+		{
 			MCF_Core_EventManager.GetInstance().GetInvoker(eventName).Insert(OnInputFired);
+			MCF_Core_ValidationRegistry.GetInstance().RegisterConsumer(eventName, string.Format("MCF_Obj_LogicComponent (output '%1', input event)", m_sOutputEvent));
+		}
 	}
 
 	override void OnDelete(IEntity owner)

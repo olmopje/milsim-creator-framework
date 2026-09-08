@@ -15,6 +15,11 @@ class MCF_Obj_ObservationNode : ScriptComponent
 
 	protected int m_iReportCount;
 
+	override void EOnInit(IEntity owner)
+	{
+		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher(m_sReportEvent);
+	}
+
 	//! Publishes m_sReportEvent with this node as payload, so the listener
 	//! can identify which POI reported (e.g. via its MCF_Core_ObjectIdentityComponent tag).
 	void Report()
