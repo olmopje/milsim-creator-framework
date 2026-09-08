@@ -34,3 +34,7 @@ Volledig architectuurplan afgerond en gereviewd vóór start van Fase 0-implemen
 - Bare "sectie 3.4"-verwijzingen naar het Alert-systeem file-qualified (leeft in `stealth-and-suppression.md`, niet in dit document)
 - Cross-reference toegevoegd vanuit 5.3 naar het Alert-systeem, met notitie dat dit een verplaatsingskandidaat is bij toekomstige opschoning
 - README's structuurschema aangevuld met `docs/research/`
+
+### Deferred
+- Existing Dutch documentation (ARCHITECTURE.md, docs/modules/*, docs/research/*) not yet translated to English -- deferred, not blocking Phase 0. All NEW code, comments, and documentation from this point forward are in English.
+
