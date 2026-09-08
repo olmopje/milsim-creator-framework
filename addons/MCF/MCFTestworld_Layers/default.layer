@@ -4,6 +4,9 @@ GenericWorldEntity world {
  boundMaxs 100 20 100
  blockSize 100 1500 100
 }
-GenericEntity MCF_TestTriggerZone : "{39A7C5F59B6CF78B}Prefabs/MCF_Obj_TriggerZone.et" {
+GenericEntity MCF_TestTriggerZone : "{D3F53DABF6767388}Prefabs/MCF_Obj_TriggerZone.et" {
+ coords 0 0 0
+}
+GenericEntity MCF_TestObjective : "{EE2F97C40CD99F15}Prefabs/MCF_Obj_Objective.et" {
  coords 0 0 0
 }

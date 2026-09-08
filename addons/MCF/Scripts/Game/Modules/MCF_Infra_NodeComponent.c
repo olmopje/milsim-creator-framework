@@ -27,13 +27,13 @@ class MCF_Infra_NodeComponent : ScriptComponent
 	protected ref array<string> m_aDependsOnTags;
 
 	protected bool m_bSelfActive;
-	protected bool m_bActive;
+	protected bool m_bNodeActive;
 	protected ref map<string, bool> m_mDependencyActive;
 
 	override void EOnInit(IEntity owner)
 	{
 		m_bSelfActive = true;
-		m_bActive = true;
+		m_bNodeActive = true;
 		m_mDependencyActive = new map<string, bool>();
 
 		if (m_aDependsOnTags)
@@ -61,7 +61,7 @@ class MCF_Infra_NodeComponent : ScriptComponent
 		if (!m_mDependencyActive.Contains(senderTag))
 			return;
 
-		m_mDependencyActive.Set(senderTag, sender.IsActive());
+		m_mDependencyActive.Set(senderTag, sender.IsNodeActive());
 		RecomputeActive();
 	}
 
@@ -78,10 +78,10 @@ class MCF_Infra_NodeComponent : ScriptComponent
 		}
 
 		bool newActive = m_bSelfActive && dependenciesOk;
-		if (newActive == m_bActive)
+		if (newActive == m_bNodeActive)
 			return;
 
-		m_bActive = newActive;
+		m_bNodeActive = newActive;
 		MCF_Core_EventManager.GetInstance().Publish("MCF_Infra_NodeStatusChanged", this);
 	}
 
@@ -107,9 +107,9 @@ class MCF_Infra_NodeComponent : ScriptComponent
 		RecomputeActive();
 	}
 
-	bool IsActive()
+	bool IsNodeActive()
 	{
-		return m_bActive;
+		return m_bNodeActive;
 	}
 
 	string GetOwnTag()
