@@ -14,6 +14,15 @@ A narrative task. Give it a title and description. Toggle "Visible on Map" to sh
 ## Trigger Zone (`MCF_Obj_TriggerZone`)
 The simplest building block: fires a named event when triggered. Use it as a generic "something happened here" marker that other nodes react to.
 
+## Proximity Trigger (`MCF_Obj_ProximityTriggerComponent`)
+Fires when a watched entity (e.g. a player) comes within a set radius. You have to tell it which entities to watch (`RegisterWatchedEntity()`) -- there's no automatic "watch all players" yet. Good for "civilian notices the squad approaching," "ambush triggers when players get close," etc.
+
+## Cone Detection Trigger (`MCF_Obj_ConeDetectionTriggerComponent`)
+Like Proximity, but also checks whether the watched entity is within a forward-facing cone (set the half-angle). This is our stand-in for a line-of-sight trigger -- **it is not true line of sight**, it can't tell if a wall is in the way, it only checks distance and direction. Good enough for "the sentry is facing roughly your direction," not reliable for "the sentry can actually see you through the window."
+
+## Alarm Trigger (`MCF_Obj_AlarmTriggerComponent`)
+A simple relay: listens for one event and republishes it under a clearer name. Useful for chaining -- e.g. have a Proximity Trigger feed into an Alarm named "VillageAlerted" that several other nodes listen to, instead of every downstream node needing to know the Proximity Trigger's raw event name.
+
 ## Logic Node (`MCF_Obj_Logic`)
 Combines multiple events into one outcome. Set Mode to:
 - **"OR"** -- fires as soon as any listed input event happens
