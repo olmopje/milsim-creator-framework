@@ -1,41 +1,41 @@
-# Onderzoek: pijnpunten van Arma 3-missiemakers/units bij de overstap naar Reforger
+# Research: pain points of Arma 3 mission makers/units when moving to Reforger
 
-Bronnen: Steam-discussies, Bohemia-forums, BI-feedbacktracker, ACE3-GitHub. Kwalitatief, geen enquête — bedoeld om onze prioriteiten te toetsen, niet als harde data.
+Sources: Steam discussions, Bohemia forums, BI feedback tracker, ACE3 GitHub. Qualitative, not a survey — meant to validate our priorities, not as hard data.
 
-## 1. Bevestigd: het project speelt in op de #1 klacht
+## 1. Confirmed: the project addresses the #1 complaint
 
-Vrijwel elke discussie over "waarom is Reforger's mission-making slechter" komt uit bij hetzelfde punt: geen in-game editor zoals Eden. Bohemia zelf (developer Nillers, officiële reactie): *"We know many people are missing the in-game Eden Editor. It's a complex thing we intend to fully focus on our way to Arma 4."* — dus bevestigd: geen plannen voor Reforger zelf.
+Virtually every discussion about "why is Reforger's mission-making worse" arrives at the same point: no in-game editor like Eden. Bohemia itself (developer Nillers, official response): *"We know many people are missing the in-game Eden Editor. It's a complex thing we intend to fully focus on our way to Arma 4."* — so confirmed: no plans for Reforger itself.
 
-**Consequentie:** ons hele project (live GM-plaatsbare, missiemaker-vriendelijke logica) valt precies in het gat dat Bohemia zelf erkent en niet gaat vullen vóór Arma 4.
+**Consequence:** our whole project (live GM-placeable, mission-maker-friendly logic) falls exactly into the gap that Bohemia itself acknowledges and won't fill before Arma 4.
 
-## 2. Waarschuwingssignaal: ACE3 weigerde Reforger-support
+## 2. Warning signal: ACE3 declined Reforger support
 
-Uit de officiële ACE3 GitHub-discussie: *"Due to severe limitations of the Enfusion engine and its scripting language, the lack of an in-game editor and most importantly an active playerbase we currently aren't working on bringing ACE to Arma Reforger."*
+From the official ACE3 GitHub discussion: *"Due to severe limitations of the Enfusion engine and its scripting language, the lack of an in-game editor and most importantly an active playerbase we currently aren't working on bringing ACE to Arma Reforger."*
 
-Geen specificatie van wélke limitaties. Onze scope is aanzienlijk kleiner dan een volledig medisch/ballistisch systeem zoals ACE, dus dit is geen directe blocker — wel een signaal om alert te blijven op onverwachte scripting-grenzen tijdens Fase 0-testen, in lijn met de "test eerst, bouw daarna"-houding die we al hanteren bij de stealth-module.
+No specification of which limitations. Our scope is considerably smaller than a full medical/ballistic system like ACE, so this isn't a direct blocker — but it is a signal to stay alert for unexpected scripting limits during Phase 0 testing, in line with the "test first, build second" attitude we already apply to the stealth module.
 
-## 3. Nieuwe module-kans: Squad Cohesion / C2-laag
+## 3. New module opportunity: Squad Cohesion / C2 layer
 
-De meest specifieke en herhaalde klacht van ervaren spelers, niet over bugs maar over ontwerp:
+The most specific and repeated complaint from experienced players, not about bugs but about design:
 - *"Even if you're a member of a given team, you can spawn anywhere you like, you have no idea where the rest of the team is... the team leader similarly has absolutely no idea where any of his team members are."*
 - *"Being part of a squad ATM has no meaning, besides using the radio respawn, which most people don't even know is a mechanic at all."*
 
-Dit is exact het "milsim-gevoel" dat door Arma 3-veteranen gemist wordt — niet gebrek aan content, maar gebrek aan **gedwongen/betekenisvolle coördinatie**. Zie sectie 5.10 in `ARCHITECTURE.md` voor de uitwerking als nieuwe module.
+This is exactly the "milsim feeling" that Arma 3 veterans miss — not a lack of content, but a lack of **forced/meaningful coordination**. See section 5.10 in `ARCHITECTURE.md` for the write-up as a new module.
 
-## 4. Bevestigd probleem, maar buiten ons bereik — expliciet benoemd
+## 4. Confirmed problem, but out of our reach — explicitly stated
 
-AI-commandogedrag wordt door de communit én door BI's eigen feedbacktracker (T190910) als een van de grootste frustraties genoemd: AI die niet uit voertuigen stapt op commando, follow-orders die breken. Dit zit op **engine-pathfinding-niveau** — geen scenario-/scriptinglaag kan dit structureel repareren.
+AI command behavior is named by the community and by BI's own feedback tracker (T190910) as one of the biggest frustrations: AI that doesn't exit vehicles on command, follow orders that break. This sits at the **engine-pathfinding level** — no scenario/scripting layer can structurally fix this.
 
-**Update: gedeeltelijke mitigatie wél haalbaar, geen structurele fix.** Zie sectie 5.11 in `ARCHITECTURE.md` — een watchdog-patroon dat vastgelopen AI detecteert en corrigeert kan de symptomen merkbaar verminderen zonder de onderliggende pathfinding aan te pakken. Dit blijft een pleister, geen genezing, en wordt ook zo gecommuniceerd naar de unit.
+**Update: partial mitigation is feasible, no structural fix.** See section 5.11 in `ARCHITECTURE.md` — a watchdog pattern that detects and corrects stuck AI can noticeably reduce the symptoms without addressing the underlying pathfinding. This remains a patch, not a cure, and is communicated to the unit as such.
 
-## 5. Kleine, lage-prioriteit kanttekening
+## 5. Small, low-priority note
 
-Geen mogelijkheid om AI-teamleden te rekruteren in Conflict/Combat Ops (alleen via Game Master-toegewezen squads) — een kleine QoL-toevoeging (bijv. een "recruit at base"-actie), maar dit wijzigt basisgameplay-systemen eerder dan missielogica. Genoteerd als mogelijke toekomstige losse kleine toevoeging, niet als kernmodule.
+No ability to recruit AI teammates in Conflict/Combat Ops (only via Game-Master-assigned squads) — a small QoL addition (e.g. a "recruit at base" action), but this changes base gameplay systems rather than mission logic. Noted as a possible future standalone small addition, not a core module.
 
-## 6. Al gedekt, ter bevestiging
+## 6. Already covered, for confirmation
 
-De wens naar meerdere save-states in Game Master (2022-forumklacht: *"if it WOULD have multiple save games, you could at least use it like a sort of..."*) wordt al rechtstreeks geadresseerd door onze Save/Load-architectuur (sectie 8, hoofddocument).
+The wish for multiple save states in Game Master (2022 forum complaint: *"if it WOULD have multiple save games, you could at least use it like a sort of..."*) is already directly addressed by our Save/Load architecture (section 8, main document).
 
-## 7. Buiten scope, geen mod-oplossing
+## 7. Out of scope, no mod solution
 
-Crossplay-toxiciteit/teamkilling door consolespelers is een communitymanagement-/matchmaking-vraagstuk, geen missie-scriptingprobleem. Niet opgenomen.
+Crossplay toxicity/team-killing by console players is a community-management/matchmaking issue, not a mission-scripting problem. Not included.
