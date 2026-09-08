@@ -1,0 +1,13 @@
+GenericEntity {
+ ID "8A24F93EA862750C"
+ components {
+  MCF_Obj_ProximityTriggerComponent "{DD145B75DF0EDD51}" {
+  }
+  SCR_EditableEntityComponent "{51D0B5C71CA36324}" {
+   m_EditableEntityFlags "PLACEABLE"
+   m_sDisplayName "MCF Proximity Trigger"
+  }
+  RplComponent "{8A24F93EA8627001}" {
+  }
+ }
+}

@@ -1,0 +1,13 @@
+GenericEntity {
+ ID "152F65EF13B76096"
+ components {
+  MCF_Voice_TextLineComponent "{A15173E89394C918}" {
+  }
+  SCR_EditableEntityComponent "{F2DBBBBCF2B824B1}" {
+   m_EditableEntityFlags "PLACEABLE"
+   m_sDisplayName "MCF Text Line"
+  }
+  RplComponent "{152F65EF13B71001}" {
+  }
+ }
+}
