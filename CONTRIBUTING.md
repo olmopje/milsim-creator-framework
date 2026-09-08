@@ -1,37 +1,37 @@
-# Bijdragen aan MCF
+# Contributing to MCF
 
 ## Language
 
-All code, comments, commit messages, and new documentation are written in English. Existing Dutch design documents are being translated incrementally (not a blocker for Phase 0 work).
+All code, comments, commit messages, and documentation are written in English.
 
-## Voordat je begint
+## Before you start
 
-Lees `docs/architecture/ARCHITECTURE.md` sectie 3.1 (Integratie-contracten) volledig. Dit is geen stijlgids maar een harde eis — een module die deze regels breekt wordt niet gemerged, ongeacht hoe goed hij verder werkt.
+Read `docs/architecture/ARCHITECTURE.md` section 3.1 (Integration Contracts) in full. This is not a style guide but a hard requirement — a module that breaks these rules will not be merged, no matter how well it otherwise works.
 
-## Checklist per nieuwe module / PR
+## Checklist per new module / PR
 
-- [ ] Alle classes/prefabs gebruiken de `MCF_`-prefix
-- [ ] Alle nieuwe events volgen het `Module_Actie`-patroon en zijn gedocumenteerd (payload-schema) in `docs/modules/<modulenaam>.md`
-- [ ] Geen directe module-naar-module-referenties — alles loopt via de Event Bus of Object Identity-tags
-- [ ] State-mutaties zijn server-authoritative; client-kant bevat alleen leeslogica op gerepliceerde waarden
-- [ ] Factie-referenties gaan via Faction Alias, nooit via een harde Faction Key
-- [ ] Nieuwe UserActions/attributen zijn getest in Game Master, niet alleen in Workbench-preview
-- [ ] Teksten staan in de StringTable, niet hardcoded
-- [ ] Event Bus-listeners worden opgeruimd bij entity-destructie (geen dangling listeners)
-- [ ] Validatie-pass logt (W)/(E)-meldingen bij foutieve configuratie, faalt niet stil
-- [ ] Module levert een Autotest-suite (`SCR_AutotestSuiteBase`), geregistreerd bij de Module Registry
-- [ ] Indien de module iets herhaaldelijk spawnt/simuleert: een Stress Profile geregistreerd (zie `ARCHITECTURE.md` 3.2) — geen uitzondering "doen we later"
+- [ ] All classes/prefabs use the `MCF_` prefix
+- [ ] All new events follow the `Module_Action` pattern and are documented (payload schema) in `docs/modules/<module-name>.md`
+- [ ] No direct module-to-module references — everything goes through the Event Bus or Object Identity tags
+- [ ] State mutations are server-authoritative; client side contains only read logic on replicated values
+- [ ] Faction references go through Faction Alias, never a hard Faction Key
+- [ ] New UserActions/attributes are tested in Game Master, not only in Workbench preview
+- [ ] Text lives in the StringTable, not hardcoded
+- [ ] Event Bus listeners are cleaned up on entity destruction (no dangling listeners)
+- [ ] Validation pass logs (W)/(E) messages on misconfiguration, never fails silently
+- [ ] Module ships an Autotest suite (`SCR_AutotestSuiteBase`), registered with the Module Registry
+- [ ] If the module repeatedly spawns/simulates something: a Stress Profile is registered (see `ARCHITECTURE.md` 3.2) — no "we'll do that later" exception
 
-## Commit- en branchconventie
+## Commit and branch conventions
 
-- Branches: `module/<naam>` voor nieuwe modules, `fix/<omschrijving>` voor bugfixes, `docs/<omschrijving>` voor documentatie
-- Commits: korte imperatieve titel (`Voeg Hostility-decay toe`, niet `Hostility toegevoegd`)
-- Eén module per PR — geen gecombineerde "diverse fixes"-PR's, dat maakt reviewen tegen het integratie-contract onmogelijk
+- Branches: `module/<name>` for new modules, `fix/<description>` for bugfixes, `docs/<description>` for documentation
+- Commits: short imperative title (`Add Hostility decay`, not `Hostility added`)
+- One module per PR — no combined "various fixes" PRs, that makes reviewing against the integration contract impossible
 
-## Testen
+## Testing
 
-Automatische compile-validatie via CI is beperkt mogelijk zonder een volledige Workbench-omgeving (zie `.github/workflows/`). Test daarom altijd lokaal in Workbench + een Game Master-sessie met minimaal 2 spelers voordat je een PR opent, zeker voor replicatie-gevoelige wijzigingen.
+Automated compile validation via CI is limited without a full Workbench environment (see `.github/workflows/`). Always test locally in Workbench + a Game Master session with at least 2 players before opening a PR, especially for replication-sensitive changes.
 
-## Releases / verspreiden
+## Releases / distribution
 
-Nieuwe versies worden getagd (`vX.Y.Z`) op `main` nadat de Fase-doelen uit `ARCHITECTURE.md` sectie 9 voor die versie zijn gehaald. Zie `CHANGELOG.md`.
+New versions are tagged (`vX.Y.Z`) on `main` once the phase goals from `ARCHITECTURE.md` section 9 for that version have been met. See `CHANGELOG.md`.

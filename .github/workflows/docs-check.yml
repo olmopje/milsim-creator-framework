@@ -1,9 +1,9 @@
-name: Docs & structuur-check
+name: Docs & structure check
 
-# Let op: dit valideert GEEN Enforce Script-compilatie en draait GEEN
-# Autotest-suites of Stress Profiles — dat vereist Workbench, zie
-# ARCHITECTURE.md sectie 3.2. Deze workflow controleert alleen wat zonder
-# die omgeving realistisch te automatiseren is.
+# Note: this does NOT validate Enforce Script compilation and does NOT run
+# Autotest suites or Stress Profiles — that requires Workbench, see
+# ARCHITECTURE.md section 3.2. This workflow only checks what's realistically
+# automatable without that environment.
 
 on:
   pull_request:
@@ -19,18 +19,18 @@ jobs:
         with:
           globs: 'docs/**/*.md README.md CONTRIBUTING.md CHANGELOG.md'
 
-      - name: Check op verboden patronen (harde Faction Key i.p.v. Alias)
+      - name: Check for forbidden patterns (hard Faction Key instead of Alias)
         run: |
           if grep -rn "GetFaction(\"US\")\|GetFaction(\"USSR\")" addons/ 2>/dev/null; then
-            echo "::error::Harde Faction Key gevonden — gebruik Faction Alias (zie ARCHITECTURE.md 3.1)"
+            echo "::error::Hard Faction Key found — use Faction Alias (see ARCHITECTURE.md 3.1)"
             exit 1
           fi
 
-      - name: Check op MCF_-prefix in nieuwe scriptbestanden
+      - name: Check MCF_ prefix on new script files
         run: |
           for f in $(git diff --name-only origin/main...HEAD -- 'addons/MCF/Scripts/**/*.c' 2>/dev/null); do
             base=$(basename "$f")
             if [[ ! "$base" == MCF_* ]]; then
-              echo "::warning::$f volgt niet de MCF_-naamgevingsconventie"
+              echo "::warning::$f does not follow the MCF_ naming convention"
             fi
           done

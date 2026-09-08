@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Meld een probleem in een bestaande module
+about: Report a problem in an existing module
 title: "[BUG] "
 labels: bug
 ---
@@ -8,16 +8,16 @@ labels: bug
 **Module**
 
 
-**Wat verwachtte je?**
+**What did you expect?**
 
 
-**Wat gebeurde er?**
+**What happened?**
 
 
-**Reproduceerbaar in Workbench, Game Master, of alleen live server?**
+**Reproducible in Workbench, Game Master, or only on a live server?**
 
 
-**Aantal spelers/AI toen het optrad** (relevant i.v.m. performance-gerelateerde bugs)
+**Number of players/AI when it occurred** (relevant for performance-related bugs)
 
 
-**Logmeldingen (W)/(E), indien aanwezig**
+**Log messages (W)/(E), if any**

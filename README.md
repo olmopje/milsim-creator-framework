@@ -1,40 +1,40 @@
 # Milsim Creator Framework (MCF) — Arma Reforger
 
-Een zelfgebouwd, modulair missie-framework voor Arma Reforger. Geeft missiemakers Eden-achtige narratieve diepte, live bruikbaar in Game Master, gebouwd rond een gedeelde Core en van meet af aan performance-bewust voor grote PvE co-op groepen.
+A self-built, modular mission framework for Arma Reforger. Gives mission makers Eden-like narrative depth, usable live in Game Master, built around a shared Core and performance-conscious from the start for large PvE co-op groups.
 
-Geen dependency op third-party frameworks (Scenario Framework, Ci5, GME) — wel geïnformeerd door hun ontwerp. Zie [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) voor de volledige onderbouwing.
+No dependency on third-party frameworks (Scenario Framework, Ci5, GME) — informed by their design, but built independently. See [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) for the full rationale.
 
 ## Status
 
-🚧 **v0.1.0 — Architectuurbaseline vastgelegd.** Volledig gereviewd, klaar om Fase 0 te implementeren. Nog geen speelbare build.
+🚧 **Phase 0 in progress.** Architecture baseline locked at v0.1.0. Core foundation (Event Bus, Tag Registry, Object Identity Component) is written and confirmed compiling in Workbench. See [`docs/architecture/PHASE0_PROGRESS.md`](docs/architecture/PHASE0_PROGRESS.md) for exact status and environment notes. No playable build yet.
 
-## Structuur
+## Structure
 
 ```
-addons/MCF/          — de daadwerkelijke mod (laadt in-game)
-  Prefabs/            — .et prefab-bestanden
+addons/MCF/          — the actual mod (loads in-game)
+  Prefabs/            — .et prefab files
   Scripts/Game/Core/  — Event Bus, Object Identity, Module Registry, Tick Manager, etc.
-  Scripts/Game/Modules/ — losse modules (Objective, Hostility, Ambient Life, ROE, ...)
-  Configs/            — .conf-bestanden, StringTables
-  UI/                 — GM-attribuutlayouts
+  Scripts/Game/Modules/ — individual modules (Objective, Hostility, Ambient Life, ROE, ...)
+  Configs/            — .conf files, StringTables
+  UI/                 — GM attribute layouts
 
 docs/
-  architecture/       — het volledige architectuurplan (leidend document)
-  modules/            — losstaande technische deelprojecten (bijv. voertuig-schieten, ACE-compatibiliteit)
-  research/           — onderzoek naar community-/mission-maker-klachten dat de roadmap onderbouwt
+  architecture/       — the full architecture plan (leading document)
+  modules/            — standalone technical sub-projects (e.g. vehicle shooting, ACE compatibility)
+  research/           — research into community/mission-maker complaints that informs the roadmap
 
-.github/              — issue templates, CI-workflows
+.github/              — issue templates, CI workflows
 ```
 
-## Vereisten
+## Requirements
 
-- Arma Reforger Tools (Steam) — voor Workbench, prefab-bewerking en lokaal testen
+- Arma Reforger Tools (Steam) — for Workbench, prefab editing, and local testing
 - Git
 
-## Bijdragen
+## Contributing
 
-Zie [`CONTRIBUTING.md`](CONTRIBUTING.md) voor naamgevingsconventies, event-contract-regels en de PR-workflow. **Lees dit voordat je een module toevoegt** — het integratie-contract in `ARCHITECTURE.md` sectie 3.1 is niet optioneel.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for naming conventions, event-contract rules, and the PR workflow. **Read this before adding a module** — the integration contract in `ARCHITECTURE.md` section 3.1 is not optional.
 
-## Licentie
+## License
 
-Arma Public License (APL) — zie [`LICENSE.md`](LICENSE.md).
+Arma Public License (APL) — see [`LICENSE.md`](LICENSE.md).

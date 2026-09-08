@@ -1,20 +1,20 @@
 ---
-name: Module-voorstel
-about: Stel een nieuwe module of uitbreiding voor
+name: Module proposal
+about: Propose a new module or extension
 title: "[MODULE] "
 labels: proposal
 ---
 
-**Doel van de module**
+**Module goal**
 
 
-**Welke bestaande Core-primitieven hergebruikt hij?** (Event Bus / Object Identity / Tick Manager / Faction Alias / ...)
+**Which existing Core primitives does it reuse?** (Event Bus / Object Identity / Tick Manager / Faction Alias / ...)
 
 
-**Nieuwe events die deze module introduceert** (namespace: `Module_Actie`, payload)
+**New events this module introduces** (namespace: `Module_Action`, payload)
 
 
-**Performance-impact** (event-driven of periodiek? zo ja, welke tick-prioriteit?)
+**Performance impact** (event-driven or periodic? if periodic, which tick priority?)
 
 
-**Raakt dit sectie 3.1 (integratie-contract) op een manier die extra review nodig heeft?**
+**Does this touch section 3.1 (integration contract) in a way that needs extra review?**
