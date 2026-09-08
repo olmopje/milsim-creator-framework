@@ -10,23 +10,16 @@
 //!
 //! Step execution is sequential and immediate (no waiting between steps
 //! yet) -- delays between steps (e.g. "wait for evacuation") are a
-//! follow-up once a Tick Manager exists to schedule them.
-
-enum EMCF_ReactionStepType
-{
-	PUBLISH_EVENT,
-	PLAY_TEXT_LINE,
-	REQUEST_ANIMATION
-}
+//! follow-up once a Tick Manager exists to schedule them. Step encoding
+//! and execution live in MCF_React_StepRunner, shared with
+//! MCF_React_SequencePlaybackComponent.
 
 class MCF_React_Step
 {
-	EMCF_ReactionStepType m_eType;
-	string m_sValue; // event name, text line, or animation name depending on m_eType
+	string m_sValue;
 
-	void MCF_React_Step(EMCF_ReactionStepType type, string value)
+	void MCF_React_Step(string value)
 	{
-		m_eType = type;
 		m_sValue = value;
 	}
 }
@@ -74,24 +67,6 @@ class MCF_React_RecipeComponent : ScriptComponent
 			return;
 
 		foreach (string rawStep : m_aSteps)
-			RunStep(rawStep);
-	}
-
-	protected void RunStep(string rawStep)
-	{
-		array<string> parts = new array<string>();
-		rawStep.Split(":", parts, false);
-		if (parts.Count() < 2)
-			return;
-
-		string typeStr = parts[0];
-		string value = parts[1];
-
-		if (typeStr == "PUBLISH_EVENT")
-			MCF_Core_EventManager.GetInstance().Publish(value, this);
-		else if (typeStr == "PLAY_TEXT_LINE")
-			MCF_Voice_LineQueueManager.GetInstance().Enqueue(value, 0);
-		else if (typeStr == "REQUEST_ANIMATION")
-			MCF_Core_EventManager.GetInstance().Publish("MCF_AI_WaypointAnimationRequested", this);
+			MCF_React_StepRunner.RunStep(rawStep);
 	}
 }
