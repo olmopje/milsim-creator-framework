@@ -10,7 +10,8 @@ Every phase in the roadmap has a working, confirmed-compiling implementation. Se
 - `MCF_Core_TickManagerComponent`, via `MCF_Core_GameLoopComponent`'s `EOnFrame`
 - `MCF_AI_CommandWatchdogComponent`, via `MCF_Core_TickCritical`
 - `MCF_Hostility_Manager` decay, via `MCF_Core_TickCosmetic` (once `StartAutoDecay()` is called)
-- `MCF_React_SequencePlaybackComponent`, via its own `EOnFrame`
+- `MCF_React_SequencePlaybackComponent`, via its own `EOnFrame` -- and it now actually relocates its owner along the recorded path, not just exposes position data
+- `MCF_AI_SimpleMoverComponent`, via its own `EOnFrame` while `MoveTo()` is active
 
 **What still needs a manual driver:**
 - `MCF_React_SequenceRecorderComponent.RecordSample()`/`RecordCue()` (recording is an authoring-time action, not live gameplay -- lower priority than the pieces above)
@@ -28,11 +29,12 @@ Every phase in the roadmap has a working, confirmed-compiling implementation. Se
 
 ## Deliberately unsolved, by design (not oversights)
 
-- **No raycast/navmesh API was ever confirmed.** Rather than guess, two workarounds were built instead:
+- **No raycast/navmesh/pathfinding/animation API was ever confirmed.** Rather than guess, self-built workarounds were built instead of the missing pieces we could reasonably approximate:
   - `MCF_AI_ComplianceComponent.IsBeingAimedAt()` -- distance + angle approximation, not true line-of-sight
   - `MCF_AI_FallbackPointRegistry` -- mission-maker-placed safe points instead of a geometry query
+  - `MCF_AI_SimpleMoverComponent` -- straight-line movement via `SetOrigin()` each frame, not real pathfinding; used by Sequence Playback and Ambient Actor so things actually move now instead of just publishing an event
 - **AND logic** (`MCF_Obj_LogicComponent`) is capped at 4 fixed input slots, not an arbitrary list -- Enforce Script has no closures to generate per-input callbacks dynamically.
-- **Animation/movement execution is not wired up** for `MCF_AI_WaypointAnimationComponent`, `MCF_AI_AmbientActorComponent`, or Sequence Playback's position data -- all of these publish/expose what *should* happen; nothing yet makes a character actually walk or play the animation. This is the single biggest remaining category of "event fires but nothing visibly happens" gaps.
+- **Animation is still not wired up anywhere** (`MCF_AI_WaypointAnimationComponent` still only publishes a "this animation was requested" event) -- no confirmed API exists for actually playing a skeletal animation from script, and unlike movement, there was no safe self-built approximation to substitute. This is the one part of the original "nothing visibly happens" gap that remains fully open.
 - **No GameMode component exists yet.** Several managers (`MCF_AAR_DebriefManager.StartListening()`, `MCF_Hostility_Manager.StartAutoDecay()`) are designed to be kicked off from a game mode's `OnGameStart()`, but nothing currently calls them automatically at mission start.
 
 ## Reload/compile-check workflow reminder

@@ -48,7 +48,10 @@ Place one of these near a spot known to be safe for AI to stand -- e.g. right ne
 A location with a role ("Shop," "Well," etc.) and a limited number of slots. Ambient Actors try to occupy it. Doesn't do anything visual by itself -- it's the "parking spot," not the person parked there.
 
 ## Ambient Actor (`MCF_AI_AmbientActorComponent`)
-Give it a list of Lifestyle POI tags to cycle between and a free-text archetype label ("Shopkeeper," "Customer," anything you like). It tracks which POI it should currently be heading to. Actually walking there and playing an animation isn't wired up yet.
+Give it a list of Lifestyle POI tags to cycle between and a free-text archetype label ("Shopkeeper," "Customer," anything you like). Add a Simple Mover component (see below) to the same entity and it will actually walk there (in a straight line, not around obstacles) each time you advance it to the next POI.
+
+## Simple Mover (`MCF_AI_SimpleMoverComponent`)
+Moves the entity toward a target position in a straight line at a fixed speed -- our own stand-in for AI pathfinding, since no pathfinding API was confirmed. Put it on the same entity as an Ambient Actor or anything else that needs to walk somewhere. It won't go around obstacles, so keep target positions in open, simple terrain for now.
 
 ## Interaction Hint (`MCF_Interact_HintComponent`)
 Put this on an NPC players can talk to. Fill in a few generic lines. Optionally set a "Pointer Chance" above 0 to sometimes give a more useful hint instead (fill in the template and target name) -- there's a cooldown so players can't just spam-click for a hit.
@@ -70,7 +73,7 @@ The easiest way to chain a few things together without any scripting. Set a trig
 Example: an HVT-flees-by-vehicle recipe might be triggered by `"Suspicious"` and have steps `PLAY_TEXT_LINE:Get to the car!` then `PUBLISH_EVENT:HVT_FleeStarted`.
 
 ## Sequence Recorder / Playback (`MCF_React_SequenceRecorderComponent` / `...PlaybackComponent`)
-Records a path and a list of timed cues (using the same `TYPE:value` steps as Recipes), so you can act out a small scene once and reuse it. Recording still needs to be driven manually (call `RecordSample`/`RecordCue` while recording) -- but playback now runs itself automatically once you call `LoadSequence()`, firing cues at the right moment on its own.
+Records a path and a list of timed cues (using the same `TYPE:value` steps as Recipes), so you can act out a small scene once and reuse it. Recording still needs to be driven manually (call `RecordSample`/`RecordCue` while recording) -- but playback now runs itself automatically once you call `LoadSequence()`, and it actually moves the entity along the recorded path (straight-line between samples, not a real walk animation) while firing cues at the right moment.
 
 ---
 
