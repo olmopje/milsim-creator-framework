@@ -1,0 +1,14 @@
+GameProject {
+ ID "MCF"
+ GUID "E961D7B19374989E"
+ TITLE "MCF"
+ Dependencies {
+  "58D0FB3206B6F859"
+ }
+ Configurations {
+  GameProjectConfig PC {
+  }
+  GameProjectConfig HEADLESS {
+  }
+ }
+}
