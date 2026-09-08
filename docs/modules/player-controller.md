@@ -1,68 +1,68 @@
-# Player Controller-verbetering — technisch deelproject
+# Player Controller improvement — technical sub-project
 
-Los document, zelfde reden als de andere technische deelprojecten: dit raakt character-controller/input/camera, niet de missie-scriptinglaag van het hoofdframework.
-
----
-
-## 1. Uitgangssituatie — drie aparte klachten, drie aparte oorzaken
-
-Niet één probleem, en dus niet één fix:
-
-1. **Bewegingsresponsiviteit** (acceleratie/afremming voelt traag) — een **waarde-tweak**, bewezen moddable
-2. **Muis-turn-speed-curve** (snel flicken draait nauwelijks, gematigd bewegen draait snel) — een **curve/smoothing-instelling**, apart probleem van #1
-3. **ADS-inputtiming** (klik om te richten wordt gemist tijdens de bob-animatie) — een **input-buffering-probleem**, fundamenteel anders van aard dan de eerste twee
+Standalone document, same reason as the other technical sub-projects: this touches the character controller/input/camera, not the mission-scripting layer of the main framework.
 
 ---
 
-## 2. Bewijs dat #1 moddable is
+## 1. Starting situation — three separate complaints, three separate causes
 
-De workshop-mod **"Arcade Movement"** doet al precies dit: 2x responsievere acceleratie/stopsnelheid, verwijdert de turn-speed-reductiefactor, versnelt sluipmodus, onbeperkte stamina. Dit bewijst dat deze parameters blootgesteld en aanpasbaar zijn.
+Not one problem, and therefore not one fix:
 
-**Bewuste keuze: niet op deze mod bouwen, wel dezelfde onderliggende parameters gebruiken.** Zelfde overweging als eerder bij Scenario Framework/GME/Ci5 — onbekende onderhoudsstatus, en "arcade" gaat waarschijnlijk verder dan wat een milsim-unit wil (onbeperkte stamina bijvoorbeeld ondermijnt tactische vermoeidheid als spelconcept). Doel: **dezelfde knoppen vinden, een eigen, subtielere afstelling kiezen** — responsiever zonder de tactische zwaarte te verliezen die milsim juist waardeert.
-
----
-
-## 3. Muis-turn-speed-curve — apart probleem, aparte aanpak
-
-Community-rapportage: bij een snelle muis-flick draait het personage nauwelijks, bij gematigde constante beweging juist soepel — wijst op een **curve/clamping-probleem**, niet gewoon een sensitivity-schaal (spelers melden dat zelfs 200% sensitivity het onderliggende gedrag niet oplost, wat bevestigt dat het geen simpele schaalfactor is). Dit moet apart geïdentificeerd worden van de bewegingsacceleratie-parameters uit sectie 2 — waarschijnlijk een aparte curve-configuratie voor camera-/aim-turn-rate.
-
-**Eerste stap:** in Workbench de camera-/inputconfiguratie doorzoeken op een curve- of clamp-waarde voor turn-rate, los van de wandel/rensnelheid-parameters.
+1. **Movement responsiveness** (acceleration/deceleration feels sluggish) — a **value tweak**, proven moddable
+2. **Mouse turn-speed curve** (fast flicks barely turn, moderate movement turns fast) — a **curve/smoothing setting**, a separate problem from #1
+3. **ADS input timing** (the click to aim is missed during the raise-weapon bob animation) — an **input-buffering problem**, fundamentally different in nature from the first two
 
 ---
 
-## 4. ADS-inputtiming — fundamenteel ander soort probleem
+## 2. Proof that #1 is moddable
 
-Dit is geen waarde-tweak maar een **input-handling-probleem**: de klik om te richten wordt genegeerd als hij precies tijdens de bob-animatie van het wapen-omhoog-brengen valt, in plaats van onthouden en alsnog uitgevoerd te worden zodra de animatie het toelaat.
+The workshop mod **"Arcade Movement"** already does exactly this: 2x more responsive acceleration/stopping speed, removes the turn-speed-reduction factor, speeds up sneak mode, unlimited stamina. This proves these parameters are exposed and adjustable.
 
-**Mogelijk aanknopingspunt:** eerdere engine-updates voegden `CharacterCommandHandlerComponent.IsItemActionLoopTag` en `FinishItemUse()` toe voor continue context-acties (herladen, repareren) — dit suggereert dat er al scriptbare hooks in de command-handler zitten voor dit soort timing-problemen. **Nog niet bevestigd of dit specifieke ADS-inputprobleem via dezelfde hooks oplosbaar is** — vereist directe inspectie in Workbench, niet aannemen.
-
-**Realistische inschatting:** dit is aanzienlijk meer werk dan sectie 2/3, want het raakt een state-machine/timing-probleem in plaats van een blootgestelde waarde. Een "input-buffer" bouwen (onthoud de ADS-intentie, voer hem uit zodra de animatiestaat het toelaat) is het juiste patroon, maar vereist eerst te bevestigen dat de command-handler dat toelaat vanuit script.
+**Deliberate choice: don't build on this mod, but use the same underlying parameters.** Same consideration as earlier with Scenario Framework/GME/Ci5 — unknown maintenance status, and "arcade" probably goes further than what a milsim unit wants (unlimited stamina, for example, undermines tactical fatigue as a game concept). Goal: **find the same knobs, choose our own, subtler tuning** — more responsive without losing the tactical weight that milsim specifically values.
 
 ---
 
-## 5. Wat hier expliciet niet bij hoort
+## 3. Mouse turn-speed curve — separate problem, separate approach
 
-- Geen totale controller-vervanging of eigen inputsysteem — te riskant, te veel kans op het introduceren van nieuwe bugs in iets dat elke speler continu raakt
-- Head-bob/camera-smoothing (los gemelde klacht, "nausea" bij oneffen terrein) — apart, kleiner onderwerp, pas oppakken als sectie 2-4 stabiel zijn
+Community reports: with a fast mouse flick the character barely turns, with moderate constant movement it turns smoothly — points to a **curve/clamping problem**, not just a sensitivity scale (players report that even 200% sensitivity doesn't fix the underlying behavior, which confirms it's not a simple scale factor). This needs to be identified separately from the movement-acceleration parameters in section 2 — likely a separate curve configuration for camera/aim turn rate.
 
----
-
-## 6. Voorgestelde eerste stap — iteratief, geen vast eindprofiel
-
-**Beslissing:** de unit wil niet vooraf kiezen tussen "licht minder clunky" en "richting arcade" — dit wordt uitgetest, niet in één keer vastgelegd. Dat verandert de aanpak: bouw de parameters zo dat ze **makkelijk herhaaldelijk bij te stellen zijn**, niet als losse harde waarden die je telkens moet opzoeken en handmatig aanpassen.
-
-**Praktische invulling:**
-1. **Sectie 2 eerst, met drie testprofielen i.p.v. één getal** — bijv. "Profiel A: 25% responsiever dan vanilla", "Profiel B: 50%", "Profiel C: 75% (dicht bij Arcade Movement)". Laat meerdere unit-leden alle drie proberen, niet alleen degene die het bouwt — persoonlijke voorkeur van één persoon is geen goede maatstaf voor een hele unit
-2. **Verzamel feedback gestructureerd**, niet los "voelt goed/slecht" — vraag specifiek: voelt het nog "zwaar" genoeg tijdens een lange patrol? Mist iemand het sukkelgevoel bij vermoeidheid? Voelt het responsief genoeg tijdens CQB?
-3. **Sectie 3 los onderzoeken** — andere parameter-familie, niet aannemen dat het met sectie 2 meekomt
-4. **Sectie 4 pas als losstaand, groter vervolgtraject** — erken vooraf dat dit meer tijd kost dan de eerste twee
-5. **Leg de gekozen waarde vast in de Config-laag-filosofie van het hoofdproject** (instelbaar, niet hardcoded) zodra er een voorkeur is — zo kan de unit later alsnog bijstellen zonder opnieuw in code te hoeven duiken, mocht de smaak na een paar maanden spelen veranderen
+**First step:** search the camera/input configuration in Workbench for a curve or clamp value for turn rate, separate from the walk/run-speed parameters.
 
 ---
 
-## 7. Open vragen om vroeg te beantwoorden
+## 4. ADS input timing — a fundamentally different kind of problem
 
-- Welke exacte config-parameters raakt Arcade Movement — zijn die direct in Workbench's Resource Browser te vinden op het karakter-prefab, of zit dat dieper?
-- Is de turn-speed-curve (sectie 3) een losse camera-configuratie of gekoppeld aan dezelfde plek als de bewegingsparameters?
-- Is `CharacterCommandHandlerComponent` vanuit script voldoende toegankelijk om een ADS-inputbuffer (sectie 4) te bouwen, of zit de bob-animatie-timing dieper in gesloten C++?
-- **Beslist:** afstelling wordt iteratief uitgetest met meerdere profielen (zie sectie 6), geen vaste keuze vooraf — de vraag is nu praktisch: hoeveel testprofielen zijn haalbaar zonder de unit met te veel losse builds te belasten, en wie coördineert het verzamelen van feedback?
+This is not a value tweak but an **input-handling problem**: the click to aim is ignored if it happens exactly during the weapon-raise bob animation, instead of being remembered and still executed once the animation allows it.
+
+**Possible anchor point:** earlier engine updates added `CharacterCommandHandlerComponent.IsItemActionLoopTag` and `FinishItemUse()` for continuous context actions (reloading, repairing) — this suggests there are already scriptable hooks in the command handler for this kind of timing problem. **Not yet confirmed whether this specific ADS input problem is solvable via the same hooks** — requires direct inspection in Workbench, don't assume.
+
+**Realistic estimate:** this is considerably more work than section 2/3, since it touches a state-machine/timing problem instead of an exposed value. Building an "input buffer" (remember the ADS intent, execute it once the animation state allows) is the right pattern, but requires first confirming the command handler allows that from script.
+
+---
+
+## 5. What is explicitly out of scope here
+
+- No full controller replacement or custom input system — too risky, too much chance of introducing new bugs in something every player constantly touches
+- Head-bob/camera smoothing (separately reported complaint, "nausea" on uneven terrain) — a separate, smaller topic, only take on once sections 2-4 are stable
+
+---
+
+## 6. Proposed first step — iterative, no fixed end profile
+
+**Decision:** the unit doesn't want to choose in advance between "slightly less clunky" and "toward arcade" — this gets play-tested, not locked in at once. This changes the approach: build the parameters so they're **easy to adjust repeatedly**, not as separate hard values you have to look up and manually adjust every time.
+
+**Practical implementation:**
+1. **Section 2 first, with three test profiles instead of one number** — e.g. "Profile A: 25% more responsive than vanilla", "Profile B: 50%", "Profile C: 75% (close to Arcade Movement)". Have multiple unit members try all three, not just whoever builds it — one person's personal preference is not a good measure for a whole unit
+2. **Gather feedback in a structured way**, not just loose "feels good/bad" — ask specifically: does it still feel "heavy" enough during a long patrol? Does anyone miss the sluggish feeling from fatigue? Does it feel responsive enough during CQB?
+3. **Investigate section 3 separately** — a different parameter family, don't assume it comes along with section 2
+4. **Section 4 only as a standalone, bigger follow-up track** — acknowledge up front that this costs more time than the first two
+5. **Lock the chosen value into the main project's Config-Layer philosophy** (configurable, not hardcoded) once there's a preference — so the unit can still adjust later without having to dive back into code, should taste change after a few months of playing
+
+---
+
+## 7. Open questions to answer early
+
+- Which exact config parameters does Arcade Movement touch — are they directly findable in Workbench's Resource Browser on the character prefab, or is that deeper?
+- Is the turn-speed curve (section 3) a separate camera configuration, or tied to the same place as the movement parameters?
+- Is `CharacterCommandHandlerComponent` sufficiently accessible from script to build an ADS input buffer (section 4), or does the bob-animation timing sit deeper in closed C++?
+- **Decided:** tuning gets iteratively play-tested with multiple profiles (see section 6), no fixed choice up front — the question is now practical: how many test profiles are feasible without burdening the unit with too many separate builds, and who coordinates gathering feedback?
