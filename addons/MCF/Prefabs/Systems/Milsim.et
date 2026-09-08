@@ -1,18 +1,11 @@
 GenericEntity : "{1B76F75A3175E85C}Prefabs/MP/Modes/Plain/GameMode_Plain.et" {
  ID "11E9F79B11B9117E"
  components {
-  SCR_BaseGameMode "{F50994DC4DBD31C7}" {
-  }
-  SCR_RespawnSystemComponent "{0429CD6422B52A60}" {
-  }
   MCF_Core_GameModeComponent "{AAB694912D64465A}" {
   }
   MCF_Core_TickManagerComponent "{A8388B02FE65A95F}" {
   }
   MCF_Core_GameLoopComponent "{7C8F0BC5C76548F3}" {
-  }
-  SCR_EditableEntityComponent "{3C4FFF147F5FBBED}" {
-   m_sDisplayName "Milsim"
   }
  }
 }
