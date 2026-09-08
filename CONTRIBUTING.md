@@ -1,5 +1,9 @@
 # Bijdragen aan MCF
 
+## Language
+
+All code, comments, commit messages, and new documentation are written in English. Existing Dutch design documents are being translated incrementally (not a blocker for Phase 0 work).
+
 ## Voordat je begint
 
 Lees `docs/architecture/ARCHITECTURE.md` sectie 3.1 (Integratie-contracten) volledig. Dit is geen stijlgids maar een harde eis — een module die deze regels breekt wordt niet gemerged, ongeacht hoe goed hij verder werkt.
