@@ -27,14 +27,20 @@ Every phase in the roadmap has a working, confirmed-compiling implementation. Se
 - `FindComponent()`, `Cast()`
 - `SCR_EditableEntityComponent` requires a `RplComponent` with its own GUID to avoid a "missing RplComponent" error on placeable prefabs
 
+## Confirmed native systems found via research (not yet integrated)
+
+- **`SCR_AIGroup.AddWaypoint(waypoint)`** -- the real way vanilla AI groups move, confirmed via actual base-game source (`SCR_AmbientPatrolSpawnPointComponent.c`). Our `MCF_AI_SimpleMoverComponent` predates this discovery and is a straight-line `SetOrigin()` fallback for entities that are **not** in a real `SCR_AIGroup` (e.g. a standalone civilian) -- for anything with a proper AI group, use native waypoints instead of our mover.
+- **`SCR_AIAnimationWaypoint`** -- a native `SCR_AIWaypoint` subclass specifically for triggering an animation on arrival, confirmed to exist alongside `SCR_DefendWaypoint`, `SCR_SuppressWaypoint`, etc. This is the correct tool for "AI plays an animation here", not something we need to build ourselves. `MCF_AI_WaypointAnimationComponent` remains the event-only fallback for entities outside an AI group.
+- A speculative guess at `CharacterControllerComponent.PlayGesture()`/`CanPlayGesture()` for directly triggering a gesture from script did **not** compile ("Undefined function") -- reverted rather than guessed further. `CharacterControllerComponent`, `CharacterAnimationComponent`, and `AITaskPlayGesture` are all confirmed to exist and gestures are a real, working system in the base game (used in the training mission), but the exact current script-callable entry point was not found through available research tools. Next lead, if picked up again: check the Script Editor's live autocomplete on `GetAnimationComponent()`, or look at how `AITaskPlayGesture` (an `AITaskScripted`-style node) is wired into a behavior tree in the Behavior Editor -- that's a Workbench GUI task, not pure script.
+
 ## Deliberately unsolved, by design (not oversights)
 
-- **No raycast/navmesh/pathfinding/animation API was ever confirmed.** Rather than guess, self-built workarounds were built instead of the missing pieces we could reasonably approximate:
+- **No raycast/navmesh API was ever confirmed.** Rather than guess, self-built workarounds were built instead of the missing pieces we could reasonably approximate:
   - `MCF_AI_ComplianceComponent.IsBeingAimedAt()` -- distance + angle approximation, not true line-of-sight
   - `MCF_AI_FallbackPointRegistry` -- mission-maker-placed safe points instead of a geometry query
-  - `MCF_AI_SimpleMoverComponent` -- straight-line movement via `SetOrigin()` each frame, not real pathfinding; used by Sequence Playback and Ambient Actor so things actually move now instead of just publishing an event
+  - `MCF_AI_SimpleMoverComponent` -- straight-line movement via `SetOrigin()` each frame, not real pathfinding; used by Sequence Playback and Ambient Actor so things actually move now instead of just publishing an event. **Superseded by native `SCR_AIGroup` waypoints for anything with a real AI group** -- see above.
 - **AND logic** (`MCF_Obj_LogicComponent`) is capped at 4 fixed input slots, not an arbitrary list -- Enforce Script has no closures to generate per-input callbacks dynamically.
-- **Animation is still not wired up anywhere** (`MCF_AI_WaypointAnimationComponent` still only publishes a "this animation was requested" event) -- no confirmed API exists for actually playing a skeletal animation from script, and unlike movement, there was no safe self-built approximation to substitute. This is the one part of the original "nothing visibly happens" gap that remains fully open.
+- **Animation is still not wired up from our own components** (`MCF_AI_WaypointAnimationComponent` still only publishes a "this animation was requested" event) -- see the native `SCR_AIAnimationWaypoint` note above for the actual path forward with real AI groups.
 - **No GameMode component exists yet.** Several managers (`MCF_AAR_DebriefManager.StartListening()`, `MCF_Hostility_Manager.StartAutoDecay()`) are designed to be kicked off from a game mode's `OnGameStart()`, but nothing currently calls them automatically at mission start.
 
 ## Reload/compile-check workflow reminder

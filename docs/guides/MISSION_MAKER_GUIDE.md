@@ -48,7 +48,7 @@ Place one of these near a spot known to be safe for AI to stand -- e.g. right ne
 A location with a role ("Shop," "Well," etc.) and a limited number of slots. Ambient Actors try to occupy it. Doesn't do anything visual by itself -- it's the "parking spot," not the person parked there.
 
 ## Ambient Actor (`MCF_AI_AmbientActorComponent`)
-Give it a list of Lifestyle POI tags to cycle between and a free-text archetype label ("Shopkeeper," "Customer," anything you like). Add a Simple Mover component (see below) to the same entity and it will actually walk there (in a straight line, not around obstacles) each time you advance it to the next POI.
+Give it a list of Lifestyle POI tags to cycle between and a free-text archetype label ("Shopkeeper," "Customer," anything you like). Add a Simple Mover component (see below) to the same entity and it will actually walk there (in a straight line, not around obstacles) each time you advance it to the next POI. If this actor has a real AI group, consider using native `SCR_AIGroup.AddWaypoint()` waypoints instead for proper pathfinding.
 
 ## Simple Mover (`MCF_AI_SimpleMoverComponent`)
 Moves the entity toward a target position in a straight line at a fixed speed -- our own stand-in for AI pathfinding, since no pathfinding API was confirmed. Put it on the same entity as an Ambient Actor or anything else that needs to walk somewhere. It won't go around obstacles, so keep target positions in open, simple terrain for now.
@@ -57,7 +57,9 @@ Moves the entity toward a target position in a straight line at a fixed speed --
 Put this on an NPC players can talk to. Fill in a few generic lines. Optionally set a "Pointer Chance" above 0 to sometimes give a more useful hint instead (fill in the template and target name) -- there's a cooldown so players can't just spam-click for a hit.
 
 ## Waypoint Animation (`MCF_AI_WaypointAnimationComponent`)
-Marks that an animation should play on arrival. Publishes an event saying which animation was requested -- actually playing it on a character isn't wired up yet.
+Marks that an animation should play on arrival. Publishes an event saying which animation was requested -- actually playing it isn't wired up here.
+
+**For a real AI group, use Arma Reforger's own `SCR_AIAnimationWaypoint` instead of this component** -- it's a native waypoint type built exactly for "play this animation when the AI arrives here," the same system vanilla patrols use. This MCF component is only meant as a lightweight fallback for entities that aren't part of a proper AI group (e.g. a standalone civilian).
 
 ---
 
