@@ -8,8 +8,12 @@
 //! so civilian behavior hooks and Objective intel gates can react via the
 //! Event Bus instead of polling.
 //!
-//! Decay is a manually-called method for now (ApplyDecay), since there is
-//! no Tick Manager yet to call it automatically on an interval.
+//! Decay auto-drives via MCF_Core_TickCosmetic (decay doesn't need to be
+//! frequent, so it uses the cosmetic tier rather than critical) -- requires
+//! an MCF_Core_GameLoopComponent + MCF_Core_TickManagerComponent to exist
+//! somewhere in the scenario for that event to actually fire. Call
+//! StartAutoDecay() once to enable it; it is off by default so a scenario
+//! that wants a fixed hostility value isn't forced to decay it.
 
 class MCF_Hostility_Manager
 {
@@ -17,6 +21,9 @@ class MCF_Hostility_Manager
 
 	protected ref map<string, float> m_mHostilityByArea;
 	protected string m_sLastChangedArea;
+	protected float m_fDecayRatePerSecond;
+	protected bool m_bAutoDecayEnabled;
+	protected float m_fLastTickWorldTime;
 
 	void MCF_Hostility_Manager()
 	{
@@ -50,9 +57,32 @@ class MCF_Hostility_Manager
 		MCF_Core_EventManager.GetInstance().Publish("Hostility_Changed", this);
 	}
 
+	//! Enables automatic decay at ratePerSecond, driven by
+	//! MCF_Core_TickCosmetic. Call once, e.g. from a future game mode's
+	//! OnGameStart. Off by default.
+	void StartAutoDecay(float ratePerSecond)
+	{
+		m_fDecayRatePerSecond = ratePerSecond;
+
+		if (m_bAutoDecayEnabled)
+			return;
+
+		m_bAutoDecayEnabled = true;
+		m_fLastTickWorldTime = GetGame().GetWorld().GetWorldTime();
+		MCF_Core_EventManager.GetInstance().GetInvoker("MCF_Core_TickCosmetic").Insert(OnTickCosmetic);
+	}
+
+	protected void OnTickCosmetic(Managed payload)
+	{
+		float now = GetGame().GetWorld().GetWorldTime();
+		float deltaTime = now - m_fLastTickWorldTime;
+		m_fLastTickWorldTime = now;
+		ApplyDecay(deltaTime, m_fDecayRatePerSecond);
+	}
+
 	//! Reduces every tracked area's hostility toward 0 by
-	//! ratePerSecond * deltaTime. Call periodically -- no automatic tick
-	//! yet, see file header.
+	//! ratePerSecond * deltaTime. Called automatically once
+	//! StartAutoDecay() has been enabled, but can also be called directly.
 	void ApplyDecay(float deltaTime, float ratePerSecond)
 	{
 		float amount = ratePerSecond * deltaTime;
