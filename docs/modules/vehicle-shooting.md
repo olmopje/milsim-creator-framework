@@ -1,70 +1,70 @@
-# Schieten vanuit voertuig als passagier — technisch deelproject
+# Shooting from a vehicle as a passenger — technical sub-project
 
-Los document, bewust losgekoppeld van het narratieve missie-framework (`reforger-milsim-framework-blueprint.md`). Dit raakt character-animatie en het compartment-systeem, niet de Core/Event Bus-architectuur.
-
----
-
-## 1. Uitgangssituatie
-
-- **Niet vanilla**, en door Bohemia (Klamacz) expliciet niet gepland — mede omdat community-mods het al proberen op te lossen.
-- Bestaande opties zijn risicovol om op te bouwen:
-  - **DRIVE-BY** — bekendste mod, maar ontwikkelaar is niet transparant/onderhoudt niet actief. Veel servers draaien hem daarom bewust niet.
-  - Een **nieuwere mod** dook op medio 2026 (via een showcase-video) — onbevestigde kwaliteit/onderhoudsstatus, nog niet grondig te beoordelen.
-- Conclusie: zelfstandig bouwen is de veiligste keuze, consistent met je eerdere voorkeur om niet op mogelijk-buggy dependencies te leunen.
+Standalone document, deliberately decoupled from the narrative mission framework (`ARCHITECTURE.md`). This touches character animation and the compartment system, not the Core/Event Bus architecture.
 
 ---
 
-## 2. Waarom dit een ander technisch domein is dan je missie-framework
+## 1. Starting situation
 
-Je Core/Event Bus/Objective-systeem draait op **scenario-logica**: events, condities, state-management. Dit hier draait op:
-- **Character-animatie** (vuurposes per zithouding, blending tijdens voertuigbeweging)
-- **Compartment-systeem** (welke stoel laat welk gedrag toe)
-- **Hit-detectie vanuit een niet-standaard positie** (raycasts vanuit een zittende pose, door voertuiggeometrie heen)
-- **Camera-gedrag** (ADS vanuit een raam voelt anders dan ADS te voet)
-
-Dit hoort dus **niet thuis in je Core** — het is een losstaand gameplay-systeem, met hooguit een simpele aan/uit-toggle in je Config-laag zodat missiemakers kunnen kiezen of een scenario ermee rekening houdt (bijv. ambushes op konvooien minder eenzijdig maken).
+- **Not vanilla**, and explicitly not planned by Bohemia (Klamacz) — partly because community mods are already trying to solve it.
+- Existing options are risky to build on:
+  - **DRIVE-BY** — the best-known mod, but the developer is not transparent/does not actively maintain it. Many servers deliberately don't run it for that reason.
+  - A **newer mod** surfaced mid-2026 (via a showcase video) — unconfirmed quality/maintenance status, not yet thoroughly assessable.
+- Conclusion: building it independently is the safest choice, consistent with your earlier preference not to lean on potentially buggy dependencies.
 
 ---
 
-## 3. Relevante bestaande bouwstenen (officieel, niet third-party)
+## 2. Why this is a different technical domain than your mission framework
 
-| Component | Relevantie |
+Your Core/Event Bus/Objective system runs on **scenario logic**: events, conditions, state management. This one runs on:
+- **Character animation** (fire poses per seated posture, blending during vehicle movement)
+- **Compartment system** (which seat allows which behavior)
+- **Hit detection from a non-standard position** (raycasts from a seated pose, through vehicle geometry)
+- **Camera behavior** (ADS from a window feels different from ADS on foot)
+
+So this does **not belong in your Core** — it's a standalone gameplay system, at most with a simple on/off toggle in your Config Layer so mission makers can choose whether a scenario accounts for it (e.g. making convoy ambushes less one-sided).
+
+---
+
+## 3. Relevant existing building blocks (official, not third-party)
+
+| Component | Relevance |
 |---|---|
-| **`BaseCompartmentManagerComponent`** | Definieert alle zit-slots van een voertuig (PilotCompartment, CargoCompartment, etc.) — hier registreer je welke stoelen "vuur-capabel" worden |
-| **`BaseCompartmentSlot`** | Individuele stoel-definitie: bezetting, area-matching voor stoelwissels, exit-alignering |
-| **`CompartmentAccessComponent`** | **Belangrijke vondst:** heeft al een methode die teruggeeft *"of we in een compartment zitten met ADS ingeschakeld"* — dit concept (ADS-vanuit-compartment) bestaat dus al in de engine, vermoedelijk gebruikt voor bestaande turret-gunner-posities. Dit is een sterk aanknopingspunt: je bouwt mogelijk een **uitbreiding** van een bestaand mechanisme, geen compleet nieuw systeem. |
-| **Weapon Animation-pipeline (Workbench)** | Officiële BI-tutorial + voorbeeldproject (`SampleMod_AnimationWorkshop` op Bohemia's GitHub) voor het bouwen van eigen wapen-/houding-animaties — het juiste startpunt voor de vuurpose-animaties zelf |
-| **Get Out/Door Info-systeem** | Recente engine-updates voegden fijnmazige controle toe over uitstap-animaties per deur/stoel — relevant als je wil dat spelers ook *tijdens* het schieten nog soepel kunnen uitstappen |
+| **`BaseCompartmentManagerComponent`** | Defines all seat slots of a vehicle (PilotCompartment, CargoCompartment, etc.) — this is where you register which seats become "fire-capable" |
+| **`BaseCompartmentSlot`** | Individual seat definition: occupancy, area matching for seat swaps, exit alignment |
+| **`CompartmentAccessComponent`** | **Important find:** already has a method that returns *"whether we're in a compartment with ADS enabled"* — this concept (ADS-from-compartment) already exists in the engine, presumably used for existing turret-gunner positions. This is a strong anchor point: you may be building an **extension** of an existing mechanism, not a completely new system. |
+| **Weapon Animation pipeline (Workbench)** | Official BI tutorial + sample project (`SampleMod_AnimationWorkshop` on Bohemia's GitHub) for building your own weapon/posture animations — the right starting point for the fire-pose animations themselves |
+| **Get Out/Door Info system** | Recent engine updates added fine-grained control over exit animations per door/seat — relevant if you want players to still be able to smoothly exit *while* shooting |
 
 ---
 
-## 4. Realistische scope-inschatting
+## 4. Realistic scope estimate
 
-**Wat waarschijnlijk haalbaar is met redelijke inspanning:**
-- Vuren vanuit **open posities** (laadbak van een pick-up/technical, open Ural-bak) — geen raamgeometrie waar doorheen geraycast moet worden, dus het dichtst bij het bestaande turret-ADS-concept
-- Eén pilot-voertuig volledig werkend krijgen vóór je opschaalt naar de rest van je wagenpark
+**What's probably feasible with reasonable effort:**
+- Firing from **open positions** (pick-up truck/technical bed, open Ural bed) — no window geometry to raycast through, so closest to the existing turret-ADS concept
+- Getting one pilot vehicle fully working before scaling up to the rest of your vehicle roster
 
-**Wat aanzienlijk meer werk is:**
-- Vuren **door een raam** in een gesloten voertuig (Humvee, UAZ) — vereist per voertuigmodel controleren of de animatie niet door de deur/het portier clipt, en preciezere hit-detectie
-- **Content schaalt met elk voertuigtype** — elke unieke voertuiggeometrie heeft mogelijk eigen aanpassingen nodig aan vuurhoek/animatie-clipping. Dit is geen eenmalige bouwkost maar een terugkerende contentkost per voertuig dat je wil ondersteunen.
+**What's considerably more work:**
+- Firing **through a window** in a closed vehicle (Humvee, UAZ) — requires checking per vehicle model whether the animation doesn't clip through the door/window, plus more precise hit detection
+- **Content scales with every vehicle type** — every unique vehicle geometry may need its own adjustments to fire angle/animation clipping. This is not a one-time build cost but a recurring content cost per vehicle you want to support.
 
-**Balans-overweging (expliciet genoemd in de communitydiscussie):** Bohemia's terughoudendheid komt deels voort uit een balansvraag — te makkelijk vanuit een voertuig kunnen vuren ondermijnt het risico van transport. Iets om zelf bewust in te plannen: een cooldown, precisie-penalty, of beperkte vuurhoek vanuit de stoel, in plaats van vuren zonder nadeel toe te staan.
-
----
-
-## 5. Voorgestelde eerste stap
-
-Een kleine proof-of-concept, net als bij het missie-framework:
-
-1. Kies **één open-laadbak-voertuig** als pilot (minst complexe animatie-casus)
-2. Onderzoek hoe de bestaande ADS-in-compartment-vlag voor turret-posities precies werkt (`CompartmentAccessComponent`) — kopieer dat patroon in plaats van vanaf nul te bouwen
-3. Bouw één vuurpose-animatie via de officiële Weapon Animation-tutorial/sample-project
-4. Test hit-detectie en netwerk-gedrag met 2+ spelers voordat je opschaalt naar meer voertuigen
+**Balance consideration (explicitly mentioned in the community discussion):** Bohemia's reluctance partly stems from a balance question — being able to fire too easily from a vehicle undermines the risk of transport. Something to deliberately plan for yourself: a cooldown, an accuracy penalty, or a limited fire angle from the seat, instead of allowing firing with no downside.
 
 ---
 
-## 6. Open vragen om vroeg te beantwoorden
+## 5. Proposed first step
 
-- Werkt de bestaande ADS-in-compartment-vlag ook op reguliere passagiersstoelen, of is die hard gekoppeld aan turret-specifieke logica?
-- Hoeveel animatie-aanpassing per voertuigmodel is nodig om clipping te voorkomen — is dit vooraf in te schatten of alleen per voertuig te testen?
-- Welke balans-maatregel (cooldown/precisie-penalty/vuurhoek-beperking) past het beste bij jullie milsim-stijl, gezien de balanszorgen die Bohemia zelf noemt?
+A small proof of concept, same as with the mission framework:
+
+1. Pick **one open-bed vehicle** as the pilot (least complex animation case)
+2. Investigate exactly how the existing ADS-in-compartment flag for turret positions works (`CompartmentAccessComponent`) — copy that pattern instead of building from scratch
+3. Build one fire-pose animation via the official Weapon Animation tutorial/sample project
+4. Test hit detection and network behavior with 2+ players before scaling up to more vehicles
+
+---
+
+## 6. Open questions to answer early
+
+- Does the existing ADS-in-compartment flag also work on regular passenger seats, or is it hard-tied to turret-specific logic?
+- How much animation adjustment per vehicle model is needed to prevent clipping — can this be estimated in advance, or only tested per vehicle?
+- Which balance measure (cooldown/accuracy penalty/fire-angle limit) fits your milsim style best, given the balance concerns Bohemia itself raises?
