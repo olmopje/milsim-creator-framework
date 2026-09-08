@@ -90,3 +90,9 @@ Set limits like `AIGroup:20` to cap how many of a category can be active at once
 
 ## Tick Manager (`MCF_Core_TickManagerComponent`) + Game Loop (`MCF_Core_GameLoopComponent`)
 Place exactly one of **each** per scenario, on the same entity. Together they're the "heartbeat" other systems listen to instead of checking things every single frame -- and they now run themselves automatically (Game Loop drives the Tick Manager every frame). Set how often the critical and cosmetic ticks fire on the Tick Manager. Several other components (the Command Watchdog, Hostility decay, Sequence Playback) depend on this pair existing somewhere in your scenario to actually run.
+
+## Game Mode Starter (`MCF_Core_GameModeComponent`)
+Add this to your GameMode entity to have MCF start itself automatically at mission start instead of needing a manual kickoff. Toggle whether the AAR/Debrief manager starts listening, and whether Hostility decay is enabled (with its rate).
+
+## Native AI Waypoint Bridge (`MCF_AI_EventToWaypointComponent`)
+For sending a **real** AI group somewhere using Arma Reforger's own waypoint system (which does proper pathfinding, unlike our Simple Mover). Tag your `SCR_AIGroup` entity and an existing native `AIWaypoint` entity (e.g. a placed `SCR_AIAnimationWaypoint` for "walk here and play this animation") with an Object Identity tag each, then reference those two tags here plus a trigger event. When the event fires, the tagged waypoint gets added to the tagged group -- the same thing that happens when vanilla AI patrols move.

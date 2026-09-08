@@ -12,6 +12,7 @@ Every phase in the roadmap has a working, confirmed-compiling implementation. Se
 - `MCF_Hostility_Manager` decay, via `MCF_Core_TickCosmetic` (once `StartAutoDecay()` is called)
 - `MCF_React_SequencePlaybackComponent`, via its own `EOnFrame` -- and it now actually relocates its owner along the recorded path, not just exposes position data
 - `MCF_AI_SimpleMoverComponent`, via its own `EOnFrame` while `MoveTo()` is active
+- `MCF_AAR_DebriefManager` and `MCF_Hostility_Manager` decay can now both be started automatically at mission start by adding `MCF_Core_GameModeComponent` to the GameMode entity, instead of needing a manual kickoff call from somewhere
 
 **What still needs a manual driver:**
 - `MCF_React_SequenceRecorderComponent.RecordSample()`/`RecordCue()` (recording is an authoring-time action, not live gameplay -- lower priority than the pieces above)
@@ -41,7 +42,6 @@ Every phase in the roadmap has a working, confirmed-compiling implementation. Se
   - `MCF_AI_SimpleMoverComponent` -- straight-line movement via `SetOrigin()` each frame, not real pathfinding; used by Sequence Playback and Ambient Actor so things actually move now instead of just publishing an event. **Superseded by native `SCR_AIGroup` waypoints for anything with a real AI group** -- see above.
 - **AND logic** (`MCF_Obj_LogicComponent`) is capped at 4 fixed input slots, not an arbitrary list -- Enforce Script has no closures to generate per-input callbacks dynamically.
 - **Animation is still not wired up from our own components** (`MCF_AI_WaypointAnimationComponent` still only publishes a "this animation was requested" event) -- see the native `SCR_AIAnimationWaypoint` note above for the actual path forward with real AI groups.
-- **No GameMode component exists yet.** Several managers (`MCF_AAR_DebriefManager.StartListening()`, `MCF_Hostility_Manager.StartAutoDecay()`) are designed to be kicked off from a game mode's `OnGameStart()`, but nothing currently calls them automatically at mission start.
 
 ## Reload/compile-check workflow reminder
 
