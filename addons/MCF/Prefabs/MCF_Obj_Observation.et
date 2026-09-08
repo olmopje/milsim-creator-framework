@@ -1,0 +1,11 @@
+GenericEntity {
+ ID "B5F266B9FD4501CE"
+ components {
+  MCF_Obj_ObservationNode "{EAE89DC71E3B6957}" {
+  }
+  SCR_EditableEntityComponent "{693AB6C198293918}" {
+   m_EditableEntityFlags "PLACEABLE"
+   m_sDisplayName "MCF Observation Node"
+  }
+ }
+}

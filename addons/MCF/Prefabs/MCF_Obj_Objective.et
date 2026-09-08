@@ -1,0 +1,11 @@
+GenericEntity {
+ ID "EE2F97C40CD99F15"
+ components {
+  MCF_Obj_ObjectiveComponent "{88E652F1B323BF59}" {
+  }
+  SCR_EditableEntityComponent "{4F6667EC6F5FD79F}" {
+   m_EditableEntityFlags "PLACEABLE"
+   m_sDisplayName "MCF Objective Node"
+  }
+ }
+}
