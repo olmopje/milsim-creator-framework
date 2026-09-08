@@ -15,7 +15,7 @@ A narrative task. Give it a title and description. Toggle "Visible on Map" to sh
 The simplest building block: fires a named event when triggered. Use it as a generic "something happened here" marker that other nodes react to.
 
 ## Proximity Trigger (`MCF_Obj_ProximityTriggerComponent`)
-Fires when a watched entity (e.g. a player) comes within a set radius. You have to tell it which entities to watch (`RegisterWatchedEntity()`) -- there's no automatic "watch all players" yet. Good for "civilian notices the squad approaching," "ambush triggers when players get close," etc.
+Fires when a watched entity (e.g. a player) comes within a set radius. Every newly spawned player/AI is now registered automatically -- you don't need to wire this up by hand. Good for "civilian notices the squad approaching," "ambush triggers when players get close," etc.
 
 ## Cone Detection Trigger (`MCF_Obj_ConeDetectionTriggerComponent`)
 Like Proximity, but also checks whether the watched entity is within a forward-facing cone (set the half-angle). This is our stand-in for a line-of-sight trigger -- **it is not true line of sight**, it can't tell if a wall is in the way, it only checks distance and direction. Good enough for "the sentry is facing roughly your direction," not reliable for "the sentry can actually see you through the window."
@@ -24,7 +24,7 @@ Like Proximity, but also checks whether the watched entity is within a forward-f
 A simple relay: listens for one event and republishes it under a clearer name. Useful for chaining -- e.g. have a Proximity Trigger feed into an Alarm named "VillageAlerted" that several other nodes listen to, instead of every downstream node needing to know the Proximity Trigger's raw event name.
 
 ## Spotted By Player (`MCF_Obj_SpottedByPlayerComponent`)
-Put this on an NPC or object that a scripted moment depends on players actually having seen -- e.g. don't let an ambush "count" as sprung, or don't mark intel as delivered, until someone actually looked at it. Register which player-controlled entities count as potential spotters (`RegisterWatcher()`), set a range and view angle (wider than a weapon-aim cone -- this is "did you glance that way," not "are you aiming at it"), and it fires once any registered watcher has this entity in range and in view. Same honest limitation as the other cone-based triggers: it can't tell if a wall is blocking the view.
+Put this on an NPC or object that a scripted moment depends on players actually having seen -- e.g. don't let an ambush "count" as sprung, or don't mark intel as delivered, until someone actually looked at it. Every newly spawned player/AI is registered automatically as a potential spotter. Set a range and view angle (wider than a weapon-aim cone -- this is "did you glance that way," not "are you aiming at it"), and it fires once any watcher has this entity in range and in view. Same honest limitation as the other cone-based triggers: it can't tell if a wall is blocking the view.
 
 ## Logic Node (`MCF_Obj_Logic`)
 Combines multiple events into one outcome. Set Mode to:
@@ -66,7 +66,7 @@ Give it a list of Lifestyle POI tags to cycle between and a free-text archetype 
 Moves the entity toward a target position in a straight line at a fixed speed -- our own stand-in for AI pathfinding, since no pathfinding API was confirmed. Put it on the same entity as an Ambient Actor or anything else that needs to walk somewhere. It won't go around obstacles, so keep target positions in open, simple terrain for now.
 
 ## Interaction Hint (`MCF_Interact_HintComponent`)
-Put this on an NPC players can talk to. Fill in a few generic lines. Optionally set a "Pointer Chance" above 0 to sometimes give a more useful hint instead (fill in the template and target name) -- there's a cooldown so players can't just spam-click for a hit.
+Put this on an NPC players can talk to. Fill in a few generic lines. Optionally set a "Pointer Chance" above 0 to sometimes give a more useful hint instead (fill in the template and target name) -- there's a cooldown so players can't just spam-click for a hit. **To let players actually trigger it in-game, add an `MCF_Interact_TalkAction` UserAction** to the same entity -- that's what shows the "Talk" prompt and calls `Interact()` when a player presses the interact key near the NPC.
 
 ## Waypoint Animation (`MCF_AI_WaypointAnimationComponent`)
 Marks that an animation should play on arrival. Publishes an event saying which animation was requested -- actually playing it isn't wired up here.

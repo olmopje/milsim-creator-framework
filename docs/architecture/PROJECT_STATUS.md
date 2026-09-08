@@ -13,6 +13,8 @@ Every phase in the roadmap has a working, confirmed-compiling implementation. Se
 - `MCF_React_SequencePlaybackComponent`, via its own `EOnFrame` -- and it now actually relocates its owner along the recorded path, not just exposes position data
 - `MCF_AI_SimpleMoverComponent`, via its own `EOnFrame` while `MoveTo()` is active
 - `MCF_AAR_DebriefManager` and `MCF_Hostility_Manager` decay can now both be started automatically at mission start by adding `MCF_Core_GameModeComponent` to the GameMode entity, instead of needing a manual kickoff call from somewhere
+- `MCF_Obj_ProximityTriggerComponent` and `MCF_Obj_SpottedByPlayerComponent` auto-register every newly spawned controllable entity as a watcher, via `MCF_Core_AutoWatcherRegistry` + `MCF_Core_GameModeComponent.OnControllableSpawned()` -- no more manual `RegisterWatchedEntity()`/`RegisterWatcher()` calls needed for the common case. Note: this fires for AI-controlled entities too, not confirmed player-only.
+- `MCF_Interact_HintComponent` now has a real player-facing trigger: `MCF_Interact_TalkAction`, a `ScriptedUserAction` that shows a "Talk" prompt and calls `Interact()` -- this was the missing link between a placed NPC and an actual player pressing a button.
 
 **What still needs a manual driver:**
 - `MCF_React_SequenceRecorderComponent.RecordSample()`/`RecordCue()` (recording is an authoring-time action, not live gameplay -- lower priority than the pieces above)
