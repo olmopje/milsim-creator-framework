@@ -23,6 +23,9 @@ Like Proximity, but also checks whether the watched entity is within a forward-f
 ## Alarm Trigger (`MCF_Obj_AlarmTriggerComponent`)
 A simple relay: listens for one event and republishes it under a clearer name. Useful for chaining -- e.g. have a Proximity Trigger feed into an Alarm named "VillageAlerted" that several other nodes listen to, instead of every downstream node needing to know the Proximity Trigger's raw event name.
 
+## Spotted By Player (`MCF_Obj_SpottedByPlayerComponent`)
+Put this on an NPC or object that a scripted moment depends on players actually having seen -- e.g. don't let an ambush "count" as sprung, or don't mark intel as delivered, until someone actually looked at it. Register which player-controlled entities count as potential spotters (`RegisterWatcher()`), set a range and view angle (wider than a weapon-aim cone -- this is "did you glance that way," not "are you aiming at it"), and it fires once any registered watcher has this entity in range and in view. Same honest limitation as the other cone-based triggers: it can't tell if a wall is blocking the view.
+
 ## Logic Node (`MCF_Obj_Logic`)
 Combines multiple events into one outcome. Set Mode to:
 - **"OR"** -- fires as soon as any listed input event happens
