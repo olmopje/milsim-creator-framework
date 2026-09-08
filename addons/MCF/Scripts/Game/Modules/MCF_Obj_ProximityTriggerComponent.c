@@ -2,11 +2,11 @@
 //! m_sTriggeredEvent when any registered entity comes within m_fRadius of
 //! this trigger's position. Self-drives via MCF_Core_TickCritical.
 //!
-//! Entities to watch must be registered manually via RegisterWatchedEntity()
-//! -- there is no "get all entities in radius" query confirmed, so this
-//! checks a known list rather than scanning the world. For watching
-//! players specifically, register each player's controlled entity as they
-//! join (not yet automated -- a future GameMode hook could do this).
+//! Entities to watch can be registered manually via RegisterWatchedEntity(),
+//! or automatically -- this component registers itself with
+//! MCF_Core_AutoWatcherRegistry, which MCF_Core_GameModeComponent uses to
+//! auto-add every newly spawned controllable entity (see that file for
+//! the "not player-only yet" caveat).
 
 [ComponentEditorProps(category: "MCF/Objective", description: "Fires an event when a registered entity comes within range.")]
 class MCF_Obj_ProximityTriggerComponentClass : ScriptComponentClass
@@ -40,12 +40,16 @@ class MCF_Obj_ProximityTriggerComponent : ScriptComponent
 
 		m_TickInvoker = MCF_Core_EventManager.GetInstance().GetInvoker("MCF_Core_TickCritical");
 		m_TickInvoker.Insert(OnTickCritical);
+
+		MCF_Core_AutoWatcherRegistry.GetInstance().RegisterProximityTrigger(this);
 	}
 
 	override void OnDelete(IEntity owner)
 	{
 		if (m_TickInvoker)
 			m_TickInvoker.Remove(OnTickCritical);
+
+		MCF_Core_AutoWatcherRegistry.GetInstance().UnregisterProximityTrigger(this);
 	}
 
 	//! Adds entity to the list this trigger checks against each tick.
