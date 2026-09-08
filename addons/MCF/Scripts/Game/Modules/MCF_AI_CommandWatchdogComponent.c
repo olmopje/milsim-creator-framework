@@ -4,8 +4,9 @@
 //! publishes a retry request first, and only after a repeat failure
 //! publishes a forced-correction request.
 //!
-//! CheckStuck() must be called periodically -- there is no Tick Manager
-//! yet, so nothing calls it automatically.
+//! Self-drives via MCF_Core_TickCritical -- requires an
+//! MCF_Core_GameLoopComponent + MCF_Core_TickManagerComponent to exist
+//! somewhere in the scenario for that event to actually fire.
 //!
 //! Safe-position validation is NOT implemented. ApplyForcedCorrection()
 //! trusts the position it is given; the caller is responsible for
@@ -29,20 +30,40 @@ class MCF_AI_CommandWatchdogComponent : ScriptComponent
 	protected float m_fLastMovedTime;
 	protected bool m_bRetried;
 	protected int m_iInterventionCount;
+	protected IEntity m_Owner;
+	protected ScriptInvoker m_TickInvoker;
 
 	override void EOnInit(IEntity owner)
 	{
+		m_Owner = owner;
 		m_vLastPosition = owner.GetOrigin();
 		m_fLastMovedTime = GetGame().GetWorld().GetWorldTime();
 
 		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher("MCF_AI_CommandRetryRequested");
 		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher("MCF_AI_CommandForceCorrectionRequested");
+
+		m_TickInvoker = MCF_Core_EventManager.GetInstance().GetInvoker("MCF_Core_TickCritical");
+		m_TickInvoker.Insert(OnTickCritical);
+		MCF_Core_ValidationRegistry.GetInstance().RegisterConsumer("MCF_Core_TickCritical", "MCF_AI_CommandWatchdogComponent (auto-check)");
 	}
 
-	//! Call periodically for the owning entity. Compares current position
-	//! against the last recorded one; if unmoved past the threshold,
-	//! publishes a retry request first, then a forced-correction request
-	//! if it is still stuck on the next call after that.
+	override void OnDelete(IEntity owner)
+	{
+		if (m_TickInvoker)
+			m_TickInvoker.Remove(OnTickCritical);
+	}
+
+	protected void OnTickCritical(Managed payload)
+	{
+		if (m_Owner)
+			CheckStuck(m_Owner);
+	}
+
+	//! Compares current position against the last recorded one; if
+	//! unmoved past the threshold, publishes a retry request first, then
+	//! a forced-correction request if it is still stuck on the next
+	//! check after that. Called automatically via MCF_Core_TickCritical,
+	//! but can also be called directly if needed.
 	void CheckStuck(IEntity owner)
 	{
 		vector current = owner.GetOrigin();

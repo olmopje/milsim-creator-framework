@@ -1,8 +1,10 @@
 //! Sequence Playback (ARCHITECTURE.md 5.13) -- plays back samples and
-//! cues recorded by MCF_React_SequenceRecorderComponent. Actually moving
-//! an AI along the recorded path is not wired up here -- GetPositionAtTime()
-//! only returns the recorded position for something else (a movement
-//! driver, not yet built) to read. Cue firing IS wired up, reusing
+//! cues recorded by MCF_React_SequenceRecorderComponent. Advances itself
+//! every frame via EOnFrame while playing (frame-accurate, not tied to
+//! the coarser Tick Manager intervals). Actually moving an AI along the
+//! recorded path is not wired up here -- GetCurrentPosition() only
+//! returns the recorded position for something else (a movement driver,
+//! not yet built) to read. Cue firing IS wired up, reusing
 //! MCF_React_StepRunner (the same execution used by Recipe steps).
 
 [ComponentEditorProps(category: "MCF/React", description: "Plays back a recorded sequence's cues; exposes positions for a movement driver to read.")]
@@ -18,6 +20,12 @@ class MCF_React_SequencePlaybackComponent : ScriptComponent
 	protected float m_fPlaybackTime;
 	protected bool m_bPlaying;
 
+	override void EOnFrame(IEntity owner, float timeSlice)
+	{
+		if (m_bPlaying)
+			Advance(timeSlice);
+	}
+
 	//! Loads a recorded sequence and starts playback from time 0.
 	void LoadSequence(array<ref MCF_React_SequenceSample> samples, array<ref MCF_React_SequenceCue> cues)
 	{
@@ -26,10 +34,12 @@ class MCF_React_SequencePlaybackComponent : ScriptComponent
 		m_iNextCueIndex = 0;
 		m_fPlaybackTime = 0;
 		m_bPlaying = true;
+		SetEventMask(GetOwner(), EntityEvent.FRAME);
 	}
 
-	//! Call periodically with elapsed time since the last call. Advances
-	//! playback time and fires any cues whose timestamp has been reached.
+	//! Advances playback time and fires any cues whose timestamp has been
+	//! reached. Called automatically every frame while playing (see
+	//! EOnFrame), but can also be called directly if needed.
 	void Advance(float deltaTime)
 	{
 		if (!m_bPlaying || !m_aCues)
