@@ -1,370 +1,370 @@
-# Milsim Creator Framework (MCF) — Architectuurplan
+# Milsim Creator Framework (MCF) — Architecture Plan
 
-## 1. Visie
+## 1. Vision
 
-Een zelfgebouwd, modulair framework voor Arma Reforger dat missiemakers Eden-achtige narratieve diepte geeft — live bruikbaar in Game Master, opgebouwd rond een gedeelde Core, en van meet af aan geschikt voor grote PvE co-op groepen zonder performance-verval.
+A self-built, modular framework for Arma Reforger that gives mission makers Eden-like narrative depth — usable live in Game Master, built around a shared Core, and suitable from the start for large PvE co-op groups without performance degradation.
 
-Geen dependency op bestaande third-party frameworks (Scenario Framework, Ci5, GME) — wel geïnformeerd door hun ontwerp.
+No dependency on existing third-party frameworks (Scenario Framework, Ci5, GME) — informed by their design, but built independently.
 
 ---
 
-## 2. Architectuur — lagenoverzicht
+## 2. Architecture — layer overview
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  GM-INTEGRATIELAAG                               │
-│  (SCR_EditableEntityComponent, live attributen)  │
+│  GM INTEGRATION LAYER                            │
+│  (SCR_EditableEntityComponent, live attributes)  │
 ├─────────────────────────────────────────────────┤
 │  CORE                                            │
 │  Event Bus · Object Identity · Module Registry   │
-│  Config-laag · Replicatie-helper · Tick Manager  │
+│  Config Layer · Replication Helper · Tick Manager│
 ├─────────────────────────────────────────────────┤
-│  NARRATIEVE LAAG          │  WERELD-SYSTEMEN     │
-│  Objective Nodes          │  Hostility/Reputatie │
-│  POI/Observation Nodes    │  Infrastructuur-net  │
-│  Logic Nodes (AND/OR/CNT) │  Civiele AI-gedrag   │
-│  Voice Line / Comms       │  Waypoint+Animatie   │
+│  NARRATIVE LAYER          │  WORLD SYSTEMS       │
+│  Objective Nodes          │  Hostility/Reputation │
+│  POI/Observation Nodes    │  Infrastructure Net   │
+│  Logic Nodes (AND/OR/CNT) │  Civilian AI Behavior │
+│  Voice Line / Comms       │  Waypoint+Animation   │
 ├─────────────────────────────────────────────────┤
-│  PERSISTENTIE                                    │
-│  Save/Load (native serialisatie + module-state)  │
+│  PERSISTENCE                                     │
+│  Save/Load (native serialization + module state) │
 ├─────────────────────────────────────────────────┤
-│  PERFORMANCE-LAAG (doorsnijdt alle bovenstaande) │
-│  Dynamic spawn/despawn · Throttling · Budgetten  │
+│  PERFORMANCE LAYER (cuts across everything above)│
+│  Dynamic spawn/despawn · Throttling · Budgets    │
 └─────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Core — de fundering
+## 3. Core — the foundation
 
-| Component | Functie |
+| Component | Function |
 |---|---|
-| **Event Bus** | Centraal pub/sub-systeem. Modules communiceren nooit direct — altijd via events. Voorkomt tight coupling. |
-| **Object Identity** | Generiek component op elke relevante entity met een uniek tag/naam-veld. Modules vinden elkaar via tags, niet via harde references. |
-| **Module Registry** | Elke module meldt zich aan met versie + dependencies. Bepaalt load-order, checkt compatibiliteit. |
-| **Config-laag** | Eén centrale resource per scenario: welke modules actief zijn, met welke instellingen. Missiemaker hoeft nooit code te raken. |
-| **Replicatie-helper** | Wrapper om RplComponent/RPC-boilerplate — modules hoeven netcode niet zelf te herimplementeren. |
-| **Tick Manager** | Eén centrale update-loop i.p.v. losse `EOnFrame` per entity — cruciaal voor performance (zie sectie 7). |
+| **Event Bus** | Central pub/sub system. Modules never communicate directly — always via events. Prevents tight coupling. |
+| **Object Identity** | Generic component on any relevant entity with a unique tag/name field. Modules find each other via tags, not hard references. |
+| **Module Registry** | Every module registers itself with version + dependencies. Determines load order, checks compatibility. |
+| **Config Layer** | One central resource per scenario: which modules are active, with which settings. The mission maker never has to touch code. |
+| **Replication Helper** | Wrapper around RplComponent/RPC boilerplate — modules don't have to reimplement netcode themselves. |
+| **Tick Manager** | One central update loop instead of separate per-entity `EOnFrame` — critical for performance (see section 7). |
 
-### 3.1 Integratie-contracten (hoogste standaard — expliciet vastgelegd, niet impliciet verondersteld)
+### 3.1 Integration contracts (highest standard — explicitly defined, never implicitly assumed)
 
-Dit zijn regels die **eenmalig op Core-niveau** gelden, zodat geen enkele module ze zelf hoeft te interpreteren of, erger, anders interpreteert dan een andere module.
+These are rules that apply **once, at the Core level**, so no module has to interpret them itself or, worse, interpret them differently from another module.
 
-- **Naamgevingsconventie & prefix.** Projectnaam: **Milsim Creator Framework (MCF)**. Alle classes/prefabs krijgen de vaste prefix `MCF_`, volgens BI's officiële *Editor Entity Naming Conventions* ("vervang `SCR_` door je eigen tag"). Daarbinnen krijgt elke module een eigen sub-namespace, zodat je aan de class-naam meteen ziet welke module verantwoordelijk is:
+- **Naming convention & prefix.** Project name: **Milsim Creator Framework (MCF)**. All classes/prefabs get the fixed prefix `MCF_`, per BI's official *Editor Entity Naming Conventions* ("replace `SCR_` with your own tag"). Within that, every module gets its own sub-namespace, so the class name immediately shows which module is responsible:
 
-  | Namespace | Dekt |
+  | Namespace | Covers |
   |---|---|
   | `MCF_Core_` | Event Bus, Object Identity, Module Registry, Tick Manager |
-  | `MCF_AI_` | Civiele AI-gedrag (5.3), Ambient Life-gedragsprofielen (5.5), Compliance/ROE-logica (5.7), AI Commando-Watchdog (5.11) |
+  | `MCF_AI_` | Civilian AI behavior (5.3), Ambient Life behavior profiles (5.5), Compliance/ROE logic (5.7), AI Command Watchdog (5.11) |
   | `MCF_Obj_` | Objective/POI/Logic Nodes (4.x) |
-  | `MCF_Hostility_` | Hostility/Reputatie-manager (5.1) |
-  | `MCF_Infra_` | Infrastructuur-netwerk/AI Warning (5.2) |
+  | `MCF_Hostility_` | Hostility/Reputation manager (5.1) |
+  | `MCF_Infra_` | Infrastructure network/AI Warning (5.2) |
   | `MCF_Voice_` | Voice Line/Comms (4.4) |
-  | `MCF_Interact_` | Interactie-hint-systeem (5.6) |
-  | `MCF_AAR_` | Debrief-module (5.8) |
-  | `MCF_Squad_` | Squad Cohesion/C2-laag (5.10) |
-  | `MCF_Build_` | Field Construction-module — los uitgewerkt in `docs/modules/field-construction.md`, bewust niet in de gefaseerde roadmap (sectie 9) opgenomen |
-  | `MCF_ACE_` | ACE Anvil-compatibiliteitsbrug — los uitgewerkt in `docs/modules/ace-anvil-compatibility.md`, altijd optioneel (soft dependency), per integratiepunt modulair schakelbaar (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`) — **bevestigd actief nodig**, geen speculatief werk |
-  | `MCF_React_` | Scripted AI Reactions — herbruikbare gedragsrecepten-catalogus (5.12) + Sequence Recorder (5.13), combineert bestaande bouwstenen, geen eigen gedragslogica |
+  | `MCF_Interact_` | Interaction hint system (5.6) |
+  | `MCF_AAR_` | Debrief module (5.8) |
+  | `MCF_Squad_` | Squad Cohesion/C2 layer (5.10) |
+  | `MCF_Build_` | Field Construction module — worked out separately in `docs/modules/field-construction.md`, deliberately not included in the phased roadmap (section 9) |
+  | `MCF_ACE_` | ACE Anvil compatibility bridge — worked out separately in `docs/modules/ace-anvil-compatibility.md`, always optional (soft dependency), modularly toggleable per integration point (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`) — **confirmed actively needed**, not speculative work |
+  | `MCF_React_` | Scripted AI Reactions — reusable behavior-recipe catalog (5.12) + Sequence Recorder (5.13), combines existing building blocks, no behavior logic of its own |
 
-  Nieuwe modules die niet in deze tabel passen, krijgen pas een nieuwe namespace na overleg — voorkomt namespace-wildgroei.
-- **Event-contract.** Elk event heeft een vast namespace-patroon (`Module_Actie`, bijv. `Objective_Complete`, `Hostility_ThresholdCrossed`) en een gedocumenteerd payload-schema. Geen enkel event wordt ad-hoc genaamd — nieuwe events worden centraal geregistreerd in de Module Registry, niet losjes verzonnen per module.
-- **Authority-beleid.** Alle state-mutaties (objective-status, hostility-waarde, infrastructuur-status, ROE-uitkomst) zijn **server-authoritative**. Clients ontvangen uitsluitend gerepliceerde resultaten via de Replicatie-helper — nooit lokale voorspellingen die later gecorrigeerd moeten worden. Dit geldt voor élke module, zonder uitzondering.
-- **Faction Alias-integratie.** De Core hergebruikt SF's bewezen `SCR_FactionAliasComponent`-patroon in plaats van een eigen factie-abstractie te verzinnen. Elke module die een factie nodig heeft (Hostility, ROE, Objective-condities) verwijst naar een Alias, niet naar een harde Faction Key — zo is een scenario herbruikbaar met andere factie-combinaties zonder herbouw.
-- **GameMode-compatibiliteit.** De Core is **additief**: een los component naast `GameMode_Base`, geen vervanging ervan. Dit garandeert dat de Core naast vanilla Conflict/Combat Ops kan draaien als de unit dat ooit wil, in plaats van het framework te dwingen als exclusief scenario-type.
-- **Validatie-pass bij missie-init.** Bij het starten van een scenario loopt een validatieronde die ontbrekende tag-referenties, verkeerd geconfigureerde condities en module-dependency-conflicten logt — met hetzelfde (W)/(E)-severity-onderscheid als SF's debug-systeem. Een missiemaker-typfout mag nooit stilzwijgend een systeem laten falen.
-- **Event Bus-lifecycle-koppeling.** Listeners worden automatisch uitgeschreven wanneer hun entity wordt vernietigd/despawned — voorkomt dangling listeners en geheugenlekken zonder dat elke module dit zelf hoeft te beheren.
+  New modules that don't fit this table only get a new namespace after discussion — prevents namespace sprawl.
+- **Event contract.** Every event has a fixed namespace pattern (`Module_Action`, e.g. `Objective_Complete`, `Hostility_ThresholdCrossed`) and a documented payload schema. No event is named ad hoc — new events are registered centrally in the Module Registry, not invented loosely per module.
+- **Authority policy.** All state mutations (objective status, hostility value, infrastructure status, ROE outcome) are **server-authoritative**. Clients only ever receive replicated results via the Replication Helper — never local predictions that need to be corrected later. This applies to every module, without exception.
+- **Faction Alias integration.** The Core reuses SF's proven `SCR_FactionAliasComponent` pattern instead of inventing its own faction abstraction. Any module that needs a faction (Hostility, ROE, Objective conditions) refers to an Alias, not a hard Faction Key — so a scenario is reusable with different faction combinations without a rebuild.
+- **GameMode compatibility.** The Core is **additive**: a component alongside `GameMode_Base`, not a replacement for it. This guarantees the Core can run alongside vanilla Conflict/Combat Ops if the unit ever wants that, instead of forcing the framework to be an exclusive scenario type.
+- **Validation pass at mission init.** When a scenario starts, a validation pass runs that logs missing tag references, misconfigured conditions, and module dependency conflicts — with the same (W)/(E) severity distinction as SF's debug system. A mission maker's typo must never let a system fail silently.
+- **Event Bus lifecycle coupling.** Listeners are automatically unsubscribed when their entity is destroyed/despawned — prevents dangling listeners and memory leaks without every module having to manage this itself.
 
-### 3.2 Test- en stress-testinfrastructuur (verplicht aanhaakpunt, geen los initiatief per module)
+### 3.2 Test and stress-test infrastructure (mandatory hook, not a per-module side initiative)
 
-Twee aparte doelen, met één centrale registratie zodat niemand zijn eigen ad-hoc testscript hoeft te verzinnen:
+Two separate goals, with one central registration so nobody has to invent their own ad-hoc test script:
 
-**Functionele tests — bouwt op Bohemia's officiële Autotest Framework**
-- Elke module levert een test-suite die overerft van `SCR_AutotestSuiteBase`, draaiend in een dedicated testwereld (BI's `MpTest`-patroon, eventueel een eigen MCF-testwereld)
-- Test-suites worden geregistreerd bij de Module Registry, samen met de module zelf — geen los, ongedocumenteerd testscript ergens in een submap
-- **Realistische grens:** dit draait via Workbench, niet via een simpele GitHub Actions-runner (zie de CI-beperking uit `CONTRIBUTING.md`) — het automatiseert het "test in Workbench"-stap uit onze workflow, het vervangt die stap niet
+**Functional tests — builds on Bohemia's official Autotest Framework**
+- Every module ships a test suite that inherits from `SCR_AutotestSuiteBase`, running in a dedicated test world (BI's `MpTest` pattern, possibly a dedicated MCF test world)
+- Test suites are registered with the Module Registry, alongside the module itself — no loose, undocumented test script somewhere in a subfolder
+- **Realistic limit:** this runs via Workbench, not via a plain GitHub Actions runner (see the CI limitation in `CONTRIBUTING.md`) — it automates the "test in Workbench" step in our workflow, it does not replace that step
 
-**Stress-tests — eigen laag, geïnspireerd op een bestaand community-patroon**
-- Elke module kan optioneel een **Stress Profile** registreren: een simpele receptuur (hoeveel instanties van zichzelf spawnen, met welke intensiteit, hoe lang) — bijv. Ambient Life registreert "spawn 150 NPC's over 5 dorpen", Infrastructuur-netwerk registreert "activeer 20 graafnodes met wisselende status"
-- **Eén centrale Stress Test Controller** (GM-plaatsbare entity, zelfde patroon als andere MCF-nodes) kan losse profielen of een combinatie ervan afvuren — zo simuleer je het "40+ spelers + druk bevolkt dorp"-scenario uit de roadmap met echte cijfers in plaats van giswerk
-- Resultaten (FPS/tick-timing per profiel) loggen naar de Debug Overlay uit sectie 7 — hergebruik van bestaande infrastructuur, geen nieuw rapportagesysteem
+**Stress tests — its own layer, inspired by an existing community pattern**
+- Every module can optionally register a **Stress Profile**: a simple recipe (how many instances of itself to spawn, at what intensity, for how long) — e.g. Ambient Life registers "spawn 150 NPCs across 5 villages", the Infrastructure Network registers "activate 20 graph nodes with varying status"
+- **One central Stress Test Controller** (a GM-placeable entity, same pattern as other MCF nodes) can fire individual profiles or a combination — this lets you simulate the "40+ players + a busy village" scenario from the roadmap with real numbers instead of guesswork
+- Results (FPS/tick timing per profile) are logged to the Debug Overlay from section 7 — reuse of existing infrastructure, no new reporting system
 
-**Consequentie voor de checklist:** dit wordt een verplicht onderdeel per nieuwe module vanaf Fase 0, niet een latere toevoeging — zie bijgewerkte `CONTRIBUTING.md`.
+**Consequence for the checklist:** this becomes a mandatory part of every new module from Phase 0 onward, not a later addition — see the updated `CONTRIBUTING.md`.
 
 ---
 
-## 4. Narratieve laag
+## 4. Narrative layer
 
 ### 4.1 Objective Node
-De basisbouwsteen voor verhalende taken.
+The basic building block for narrative tasks.
 
-**Attributen:**
-- Titel / beschrijving
-- **Visible on Map** (ja/nee) — toggle voor kaartmarker
-- **Conditie-slot** — koppelbaar aan willekeurige boolean-check (reputatie, tijd, item-bezit, andere node-status)
-- **On Complete → Event Out** — vuurt een event op de Event Bus af zodra voltooid, waar andere nodes op kunnen luisteren
-- **On Fail → Event Out** (nieuw toegevoegd — elke objective moet ook een faalpad kunnen triggeren, anders wordt je verhaal een rechte lijn)
-- **Intel-gate** (nieuw) — objective blijft verborgen/onduidelijk totdat een informatiebron (civiel, document, radio-intercept) hem "unlockt". Dit is de generalisatie van je "intel via civiel met goede reputatie"-voorbeeld: elke informatiebron kan een gate zijn, niet alleen civiele reputatie.
+**Attributes:**
+- Title / description
+- **Visible on Map** (yes/no) — toggle for the map marker
+- **Condition slot** — connectable to any boolean check (reputation, time, item ownership, another node's status)
+- **On Complete → Event Out** — fires an event on the Event Bus once complete, which other nodes can listen for
+- **On Fail → Event Out** (newly added — every objective must also be able to trigger a failure path, otherwise your story becomes a straight line)
+- **Intel gate** (new) — the objective stays hidden/unclear until an information source (civilian, document, radio intercept) "unlocks" it. This is the generalization of your "intel via a civilian with good reputation" example: any information source can be a gate, not just civilian reputation.
 
 ### 4.2 POI / Observation Node
-Voor het "meerdere locaties monitoren"-patroon.
+For the "monitor multiple locations" pattern.
 
-- Losse trigger-zones die elk activiteit rapporteren aan één gedeelde Observation-listener
-- De listener bepaalt branching: welke POI het eerst rapporteert, bepaalt het vervolg
-- **Toegevoegd idee: Observation-decay** — als een POI te lang niet bezocht wordt, kan de kans op een "gemiste gebeurtenis" (bijv. konvooi passeert ongezien) meetellen in een debrief-score. Geeft spelers een reden om patrouilles serieus te verdelen — sterk voor milsim.
+- Separate trigger zones that each report activity to one shared Observation listener
+- The listener decides branching: whichever POI reports first determines what happens next
+- **Added idea: Observation decay** — if a POI isn't visited for too long, the chance of a "missed event" (e.g. a convoy passing unseen) can factor into a debrief score. Gives players a reason to actually divide up patrols — strong for milsim.
 
 ### 4.3 Logic Nodes
-AND / OR / Counter / Timer-nodes — generieke boolean- en telsystemen waar Objective- en POI-nodes op inpluggen. Zelfde concept als SF's LogicCounter, maar losgekoppeld zodat elk nodetype ze kan gebruiken.
+AND / OR / Counter / Timer nodes — generic boolean and counting systems that Objective and POI nodes plug into. Same concept as SF's LogicCounter, but decoupled so any node type can use them.
 
 ### 4.4 Voice Line / Comms Node
-- Scripting: node triggert een voice line/sequence op een gekoppelde entity (zelfde patroon als SF's Voice Over-acties)
-- **Let op — apart werkproces:** dit vereist een audio-pipeline los van je Core-code: opnemen → importeren in Workbench → koppelen via `.acp`-config aan een `SCR_CommunicationSoundComponent`. Plan dit vroeg als je veel lijnen wil, want het schaalt niet automatisch mee met je scripting-snelheid.
-- **Toegevoegd idee: Voice Line Priority Queue** — bij meerdere gelijktijdige triggers (bijv. twee objectives voltooien tegelijk) moet je bepalen welke voice line voorrang krijgt en welke wacht/vervalt. Zonder dit systeem overlappen lijnen elkaar en wordt het rommelig.
+- Scripting: node triggers a voice line/sequence on a linked entity (same pattern as SF's Voice Over actions)
+- **Note — separate workflow:** this requires an audio pipeline separate from your Core code: record → import into Workbench → link via an `.acp` config to an `SCR_CommunicationSoundComponent`. Plan this early if you want a lot of lines, because it doesn't scale automatically with your scripting speed.
+- **Added idea: Voice Line Priority Queue** — with multiple simultaneous triggers (e.g. two objectives completing at once) you need to decide which voice line takes priority and which waits/gets dropped. Without this, lines overlap and it gets messy.
 
 ---
 
-## 5. Wereld-systemen
+## 5. World systems
 
-### 5.1 Hostility / Reputatie-manager
-Zoals eerder ontworpen: server-side singleton, per gebied/factie een vervalwaarde, gevoed door impact-hooks (burgerslachtoffers, destructie, hulp), gelezen door civiele AI-gedragsprofielen en door Objective-nodes (intel-gates).
+### 5.1 Hostility / Reputation manager
+As designed earlier: a server-side singleton, a decay value per area/faction, fed by impact hooks (civilian casualties, destruction, aid), read by civilian AI behavior profiles and by Objective nodes (intel gates).
 
-### 5.2 Infrastructuur-netwerk — NIEUW, voor je AI Warning System
-Dit is de generieke oplossing voor je communicatietoren-idee, en herbruikbaar voor vergelijkbare puzzels later (stroomnetten, waterzuivering, radar-ketens).
+### 5.2 Infrastructure network — NEW, for your AI Warning System
+This is the generic solution for your comms-tower idea, and reusable for similar puzzles later (power grids, water treatment, radar chains).
 
-**Concept:** een graaf van gekoppelde nodes met afhankelijkheden.
+**Concept:** a graph of linked nodes with dependencies.
 
 ```
-[Generator] --(stroom)--> [Kabel-segment A] --> [Kabel-segment B] --> [Comms Tower] --> AI Warning actief
+[Generator] --(power)--> [Cable segment A] --> [Cable segment B] --> [Comms Tower] --> AI Warning active
 ```
 
-- Elke node heeft een status (actief/inactief) en een lijst afhankelijkheden
-- Als een generator vernietigd wordt of een kabelsegment doorgesneden, propageert de statuswijziging door de graaf → de toren valt uit → het AI warning-systeem (bijv. QRF-oproep, artillerie-inzet, versterkingsalarm) wordt vertraagd of volledig uitgeschakeld
-- **Intel-koppeling:** spelers moeten weten *waar* de zwakke schakel zit — dit koppel je terug aan je intel-systeem (recon, gevangenen ondervragen, documenten), zodat sabotage een beloning is voor goede verkenning, niet een gok
-- **Herstelbaarheid (nieuw idee):** vijandelijke AI kan gescript worden om een generator te repareren of kabels te vervangen na verloop van tijd — dit voorkomt dat één sabotage-actie de hele missie permanent "uitzet" en houdt spanning erin
-- **Performance:** de graaf hoeft alleen herberekend te worden bij een statuswijziging (event-driven), niet continu gepolld — sluit direct aan bij de performance-principes in sectie 7
+- Every node has a status (active/inactive) and a list of dependencies
+- If a generator is destroyed or a cable segment is cut, the status change propagates through the graph → the tower goes offline → the AI warning system (e.g. QRF call, artillery strike, reinforcement alarm) is delayed or fully disabled
+- **Intel coupling:** players need to know *where* the weak link is — tie this back into your intel system (recon, interrogating prisoners, documents), so sabotage rewards good scouting instead of a guess
+- **Repairability (new idea):** enemy AI can be scripted to repair a generator or replace cables after some time — this prevents one sabotage action from permanently "turning off" the whole mission, keeping tension alive
+- **Performance:** the graph only needs to be recalculated on a status change (event-driven), not continuously polled — lines up directly with the performance principles in section 7
 
-### 5.3 Civiele AI-gedrag
-Utility AI/behavior tree die hostility-waarde uitleest en schakelt tussen gedragsprofielen (neutraal → angstig → tippend aan OPFOR → actief verzet). Perception/sensor-hooks i.p.v. simpele proximity-checks.
+### 5.3 Civilian AI behavior
+Utility AI/behavior tree that reads the hostility value and switches between behavior profiles (neutral → fearful → tipping off OPFOR → active resistance). Perception/sensor hooks instead of simple proximity checks.
 
-**Zie ook:** het uitgebreide vier-staten Alert-systeem (Onwetend/Argwanend/Onderzoekend/In gevecht) in `docs/modules/stealth-and-suppression.md` sectie 3.4 — oorspronkelijk uitgewerkt voor stealth-detectie, maar inmiddels de gedeelde staatsmachine waar Compliance/ROE (5.7), AI Commando-Watchdog (5.11), Scripted AI Reactions (5.12) en Sequence Recorder (5.13) allemaal op leunen. Dit woont in een los document vanwege de ontstaansgeschiedenis, niet omdat het stealth-specifiek is — bij een grotere doc-opschoning is dit een kandidaat om hierheen te verplaatsen.
+**See also:** the expanded four-state Alert system (Unaware/Suspicious/Investigating/Engaged) in `docs/modules/stealth-and-suppression.md` section 3.4 — originally worked out for stealth detection, but by now the shared state machine that Compliance/ROE (5.7), AI Command Watchdog (5.11), Scripted AI Reactions (5.12), and Sequence Recorder (5.13) all lean on. This lives in a separate document for historical reasons, not because it's stealth-specific — a candidate to move here during a future doc cleanup.
 
-### 5.4 Waypoint + Animatie-module
-Custom waypoint-subklasse die bij aankomst een specifieke animatie triggert via de CharacterAnimationComponent/animgraph.
+### 5.4 Waypoint + Animation module
+Custom waypoint subclass that triggers a specific animation on arrival via the CharacterAnimationComponent/animgraph.
 
-### 5.5 Ambient Life / Pattern-of-Life-module — NIEUW
-Geen echte A-life-simulatie (te zwaar, te complex) — een lichte, goedkope illusie van een levend dorp, gebouwd bovenop de Waypoint+Animatie-module die al gepland staat.
+### 5.5 Ambient Life / Pattern-of-Life module — NEW
+Not real A-life simulation (too heavy, too complex) — a light, cheap illusion of a living village, built on top of the already-planned Waypoint+Animation module.
 
-**Kernconcept: Lifestyle-POI's + Rollen**
-- **Lifestyle-POI**: een variant op de POI-node (4.2), maar dan getagd met een rol in plaats van een observatiefunctie — Winkel, Huis, Marktkraam, Checkpoint, Put. Elke Lifestyle-POI heeft een "slot" (hoeveel NPC's er tegelijk kunnen zijn) en een set idle-animaties die daar passen.
-- **Actor-archetypes** (gedragsprofielen, geen nieuwe AI-logica — gewoon een voorgeprogrammeerde cyclus):
-  - **Shopkeeper** — stationair op één Lifestyle-POI, cyclet door idle-animaties (uitstallen, wachten, opruimen)
-  - **Klant/Civiel** — roamt tussen 2-4 Lifestyle-POI's in een dorp, "browse"-animatie voor een willekeurige duur per stop, dan door naar de volgende — exact hetzelfde patroon als een Patrol-waypoint-cyclus, alleen civiel geframed
-  - **Militie/vijand off-duty** — zelfde roam-cyclus als Klant, maar met vijandelijke factie: geeft de speler het gevoel dat de tegenstander ook "gewoon leeft" in het dorp i.p.v. constant in gevechtshouding te staan
-  - **Verkeer** — voertuigen die tussen dorpen rijden op wegen, spawnen buiten zichtlijn, despawnen op afstand (zelfde patroon als bestaande Ambient Civilians-achtige mods)
-- **"Fake conversations"** — twee NPC's die toevallig op dezelfde POI staan, spelen periodiek een gesynchroniseerd paar idle/praat-animaties voor een paar seconden. Geen dialoogsysteem, geen logica — puur getimede animatie-paren die de illusie van interactie geven.
+**Core concept: Lifestyle POIs + Roles**
+- **Lifestyle POI**: a variant of the POI node (4.2), but tagged with a role instead of an observation function — Shop, House, Market Stall, Checkpoint, Well. Every Lifestyle POI has a "slot" (how many NPCs can be present at once) and a set of idle animations that fit it.
+- **Actor archetypes** (behavior profiles, no new AI logic — just a pre-scripted cycle):
+  - **Shopkeeper** — stationary at one Lifestyle POI, cycles through idle animations (setting up stock, waiting, tidying)
+  - **Customer/Civilian** — roams between 2-4 Lifestyle POIs in a village, a "browse" animation for a random duration per stop, then on to the next — exactly the same pattern as a Patrol waypoint cycle, just framed as civilian
+  - **Militia/enemy off-duty** — same roam cycle as Customer, but with an enemy faction: gives the player the sense that the opposition also "just lives" in the village instead of constantly standing in a combat stance
+  - **Traffic** — vehicles driving between villages on roads, spawning out of sight, despawning at distance (same pattern as existing Ambient Civilians-style mods)
+- **"Fake conversations"** — two NPCs who happen to be at the same POI periodically play a synced pair of idle/talk animations for a few seconds. No dialogue system, no logic — purely timed animation pairs that give the illusion of interaction.
 
-**Integratie met bestaande modules (geen nieuwe dependencies, alles via de Event Bus):**
-- **Hostility-manager** — stijgt de hostility-waarde in een gebied, dan luistert deze module mee en stuurt shopkeepers "naar binnen", laat civielen de straat verlaten, en zet militie-NPC's van "winkelen" naar alert-gedrag. Geen nieuwe koppeling nodig, gewoon een event-listener.
-- **Reputatie/intel-systeem** — een shopkeeper- of civiel-NPC uit deze module kán tegelijk de intel-gever zijn uit sectie 4.1. Spelers kunnen visueel geen onderscheid maken tussen een decoratieve en een functionele NPC — precies de "fake it until je het echt nodig hebt"-gedachte.
+**Integration with existing modules (no new dependencies, everything via the Event Bus):**
+- **Hostility manager** — if the hostility value in an area rises, this module listens in and sends shopkeepers "inside", clears civilians off the street, and switches militia NPCs from "shopping" to alert behavior. No new coupling needed, just an event listener.
+- **Reputation/intel system** — a shopkeeper or civilian NPC from this module *can* simultaneously be the intel giver from section 4.1. Players can't visually tell a decorative NPC apart from a functional one — exactly the "fake it until you actually need it" idea.
 
-**Performance — dit is de zwaarste module qua NPC-aantal, dus extra streng:**
-- Volledig gebonden aan **Dynamic Spawn/Despawn per Area**: buiten spelersbereik worden Lifestyle-NPC's niet gesimuleerd of zelfs gespawnd
-- **Global budget** op aantal actieve Ambient Life-NPC's tegelijk, instelbaar per scenario (sluit aan op de budgetten uit sectie 7)
-- **Gespreide update-timers**: niet alle NPC's herberekenen hun volgende animatie in hetzelfde frame — willekeurige offset per NPC om CPU-pieken te voorkomen
-- **Geen perception/AI-overhead voor pure decor-NPC's** — een shopkeeper die nooit gevaar hoeft te detecteren, hoeft niet dezelfde dure sensor-checks te draaien als een gevechts-AI
+**Performance — this is the heaviest module in terms of NPC count, so extra strict:**
+- Fully bound to **Dynamic Spawn/Despawn per Area**: outside player range, Lifestyle NPCs are not simulated or even spawned
+- **Global budget** on the number of active Ambient Life NPCs at once, configurable per scenario (ties into the budgets from section 7)
+- **Staggered update timers**: not all NPCs recalculate their next animation on the same frame — random offset per NPC to avoid CPU spikes
+- **No perception/AI overhead for pure decor NPCs** — a shopkeeper who never needs to detect danger doesn't need to run the same expensive sensor checks as combat AI
 
-### 5.6 Interactie-hint-systeem — NIEUW
-Slim omgaan met interactie betekent hier vooral: **de meeste NPC's kosten helemaal niets**, en alleen een kleine subset heeft ooit een kans op een écht bruikbare reactie. Geen dialoogbomen, geen NLP, geen per-NPC scriptwerk — een gelaagd tier-systeem met tekstpools.
+### 5.6 Interaction hint system — NEW
+Being smart about interaction here mainly means: **most NPCs cost nothing at all**, and only a small subset ever has a chance at a genuinely useful reaction. No dialogue trees, no NLP, no per-NPC scripting work — a layered tier system with text pools.
 
-**Drie tiers, oplopend in kosten:**
+**Three tiers, increasing in cost:**
 
-| Tier | Wie | Interactie | Kosten |
+| Tier | Who | Interaction | Cost |
 |---|---|---|---|
-| **0 — Decor** | Meerderheid van Ambient Life-NPC's | Geen enkele interactiemogelijkheid | Nul — geen component nodig |
-| **1 — Barker** | Kleine subset, door missiemaker getagd | `UserAction` ("Aanspreken") toont één regel uit een generieke tekstpool | Eén component + gedeelde tekstpool, geen unieke content per NPC |
-| **2 — Informant-capable** | Server-side onzichtbaar gemarkeerde subset van Tier 1 | Zelfde interactie, maar met een kanspercentage op een "pointer"-regel i.p.v. generieke filler | Eén extra attribuut (kanspercentage) + pointer-tekstsjablonen |
+| **0 — Decor** | Majority of Ambient Life NPCs | No interaction possibility at all | Zero — no component needed |
+| **1 — Barker** | Small subset, tagged by the mission maker | `UserAction` ("Talk to") shows one line from a generic text pool | One component + shared text pool, no unique content per NPC |
+| **2 — Informant-capable** | Server-side, invisibly marked subset of Tier 1 | Same interaction, but with a chance of a "pointer" line instead of generic filler | One extra attribute (chance) + pointer text templates |
 
-**Hoe de "pointer" werkt (het cryptische, realistische deel):**
-- Bij interactie met een Tier 2-NPC rolt het systeem een percentage. Bij een treffer krijgt de speler een **sjabloon-regel** met een ingevulde referentie, bijv.: *"Misschien kan %1 je helpen."* — waarbij %1 wordt ingevuld met de rol/naam van de daadwerkelijke intel-gever (sectie 4.1) of een vage richting ("bij de haven", "de man met de rode pet")
-- Bij een misser krijgt de speler gewoon een Tier 1-generieke regel — voor de speler niet te onderscheiden van een NPC die toevallig niets weet
-- Dit levert **speurwerk zonder dialoogbomen**: spelers moeten rondvragen, en de meeste antwoorden zijn ruis — precies zoals je vroeg, "fake it until you make it"
+**How the "pointer" works (the cryptic, realistic part):**
+- On interacting with a Tier 2 NPC, the system rolls a percentage. On a hit, the player gets a **template line** with a filled-in reference, e.g.: *"Maybe %1 can help you."* — where %1 is filled with the role/name of the actual intel giver (section 4.1) or a vague direction ("near the harbor", "the man with the red cap")
+- On a miss, the player just gets a generic Tier 1 line — indistinguishable to the player from an NPC who simply doesn't know anything
+- This produces **investigation without dialogue trees**: players have to ask around, and most answers are noise — exactly as you asked, "fake it until you make it"
 
-**Kanspercentage — gevoed door bestaande state, geen nieuw systeem nodig:**
-- Basiskans ingesteld door missiemaker per Tier 2-NPC
-- **Gemodificeerd door de hostility/reputatie-waarde** van het gebied (sectie 5.1) — hoger vertrouwen, hogere kans op een bruikbare pointer
-- **Herprobeerbaar, maar met tijd-cooldown i.p.v. eenmaligheid** — een gemiste roll is niet permanent verloren; de speler kan het later opnieuw proberen als de reputatie in het gebied is gestegen. Om te voorkomen dat dit ontaardt in spam-klikken tot een treffer, geldt een vaste minimale hertry-tijd per NPC (bijv. enkele minuten in-game), losstaand van reputatie-groei. Dit behoudt het realistische "vertrouwen winnen loont" zonder dat de kanspercentage-mechaniek zinloos wordt door oneindige directe herhaling.
+**Chance percentage — fed by existing state, no new system needed:**
+- Base chance set by the mission maker per Tier 2 NPC
+- **Modified by the hostility/reputation value** of the area (section 5.1) — higher trust, higher chance of a useful pointer
+- **Retryable, but with a time cooldown instead of a one-shot** — a missed roll isn't permanently lost; the player can try again later once reputation in the area has risen. To prevent this from degenerating into spam-clicking until a hit, a fixed minimum retry time per NPC applies (e.g. a few in-game minutes), independent of reputation growth. This keeps the realistic "earning trust pays off" feel without the chance mechanic becoming meaningless due to infinite immediate repetition.
 
-**Content-authoring blijft licht:** missiemakers schrijven een handvol generieke Tier 1-regels en een handvol pointer-sjablonen per scenario — geen unieke tekst per individuele NPC nodig. Dit past bij de "niet te diep, wel levend" doelstelling: de content-inspanning schaalt met het aantal *soorten* interactie, niet met het aantal NPC's.
+**Content authoring stays light:** mission makers write a handful of generic Tier 1 lines and a handful of pointer templates per scenario — no unique text per individual NPC needed. This fits the "not too deep, but alive" goal: content effort scales with the number of interaction *types*, not the number of NPCs.
 
-### 5.7 Compliance / ROE-interactielaag — NIEUW
-Een Ready or Not-achtige laag: spelers kunnen NPC's onder schot dwingen tot nalevingsgedrag. Sterke aanvulling op het milsim-doel, want dit oefent letterlijk escalation-of-force/ROE-procedures — geen decoratie, maar trainingswaarde.
+### 5.7 Compliance / ROE interaction layer — NEW
+A Ready or Not-style layer: players can force NPCs into compliance behavior at gunpoint. A strong addition to the milsim goal, since this literally practices escalation-of-force/ROE procedures — not decoration, but training value.
 
-**Kerncommando's:**
-- **"Drop your weapon"** — gericht op gewapende AI (vijandelijk of onduidelijke status). Bij naleving: AI laat wapen vallen (hergebruikt het bestaande Item Safeguard/inventory-drop-mechanisme uit sectie 6), gaat in een "hands up"-animatiestaat, wordt arresteerbaar/vervoerbaar.
-- **"Stand back"** — gericht op ongewapende NPC's (civiel). Bij naleving: NPC stopt met bewegen/nadert niet verder. Simpeler en goedkoper dan de wapen-drop-variant, geen item-interactie nodig.
+**Core commands:**
+- **"Drop your weapon"** — aimed at armed AI (enemy or unclear status). On compliance: the AI drops its weapon (reuses the existing Item Safeguard/inventory-drop mechanism from section 6), enters a "hands up" animation state, becomes arrestable/transportable.
+- **"Stand back"** — aimed at unarmed NPCs (civilians). On compliance: the NPC stops moving/doesn't approach further. Simpler and cheaper than the weapon-drop variant, no item interaction needed.
 
-**Trigger-mechanisme (het haalbare deel):**
-- Een `UserAction`-achtige context-actie (zelfde patroon als de Tier-interacties in 5.6), beschikbaar zodra: speler wapen geheven heeft, AIM-vector de NPC binnen bereik/kegel raakt, en line-of-sight vrij is
-- **On-demand check, geen polling** — de aim/LOS-conditie wordt alleen geëvalueerd op het moment van interactie-poging, niet continu per NPC-speler-paar. Cruciaal voor performance bij meerdere spelers/NPC's tegelijk.
-- **Optioneel gekoppeld aan een voice line + keybind**, niet aan echte spraakherkenning (zie kanttekening hieronder)
+**Trigger mechanism (the feasible part):**
+- A `UserAction`-like context action (same pattern as the Tier interactions in 5.6), available once: the player has their weapon raised, the aim vector hits the NPC within range/cone, and line-of-sight is clear
+- **On-demand check, no polling** — the aim/LOS condition is only evaluated at the moment of an interaction attempt, not continuously per player-NPC pair. Critical for performance with multiple players/NPCs at once.
+- **Optionally linked to a voice line + keybind**, not to actual speech recognition (see the note below)
 
-**Nalevingskans — hergebruikt bestaande systemen, geen nieuw mechanisme:**
-- Basiskans per factie/eenheidstype, instelbaar door missiemaker (een doorgewinterde militielid is minder snel compliant dan een lagere-moraal-eenheid)
-- Gemodificeerd door dezelfde morele/threat-state-factoren die al gepland staan voor AI-gedrag (suppressie, aantal vijanden in de buurt, geïsoleerd zijn) — geen apart systeem nodig, hetzelfde threat-state-concept dat al in 5.3 zit
-- Bij weigering: AI vervalt naar normaal gedrag (vecht/vlucht) — geen aparte "weigerings-animatie" nodig, gewoon terugvallen op bestaand gedrag
+**Compliance chance — reuses existing systems, no new mechanism:**
+- Base chance per faction/unit type, configurable by the mission maker (a seasoned militia member is less quick to comply than a lower-morale unit)
+- Modified by the same morale/threat-state factors already planned for AI behavior (suppression, number of nearby enemies, being isolated) — no separate system needed, the same threat-state concept already in 5.3
+- On refusal: the AI falls back to normal behavior (fight/flee) — no separate "refusal animation" needed, just falling back to existing behavior
 
-**Consequentie-koppeling met Hostility-manager (sectie 5.1):**
-- Correct gebruik op een daadwerkelijke dreiging: neutraal tot positief voor reputatie
-- "Stand back" tegen een ongewapende civiel die niet dreigt, of excessief geweld na naleving: rechtstreeks negatief voor de hostility-waarde in het gebied — hergebruikt de bestaande "friendly-caused casualties/ROE"-onderscheiding uit sectie 5.1. Zo wordt deze module een **oefenmiddel voor escalation-of-force**, niet alleen een leuke actie-knop.
+**Consequence coupling with the Hostility manager (section 5.1):**
+- Correct use against an actual threat: neutral to positive for reputation
+- "Stand back" against an unarmed, non-threatening civilian, or excessive force after compliance: directly negative for the hostility value in the area — reuses the existing "friendly-caused casualties/ROE" distinction from section 5.1. This turns the module into an **escalation-of-force training tool**, not just a fun action button.
 
-**Kanttekening — voice-commando via spraakherkenning: waarschijnlijk niet haalbaar binnen normale modding.**
-Reforger's VoN-audiosysteem geeft mods geen toegang tot ruwe audio of spraak-naar-tekst — het is puur een doorgeefluik dat gecomprimeerde audio tussen spelers routeert. Een echte "speler zegt het hardop → AI reageert"-koppeling zou een extern proces vereisen dat buiten het spel om luistert, wat noch stabiel noch verstandig is voor een unit-project (anti-cheat/EULA-risico in MP). **Pragmatisch alternatief met vrijwel hetzelfde gevoel:** een keybind/radiaal-commando dat gelijktijdig (a) de bijpassende voice line hoorbaar afspeelt via VoN naar andere spelers, en (b) de AI-logica triggert. De speler "roept" het dus echt hardop het commando, alleen de detectie loopt via een knop, niet via spraakherkenning.
+**Note — voice command via speech recognition: likely not feasible within normal modding.**
+Reforger's VoN audio system does not give mods access to raw audio or speech-to-text — it's purely a pass-through that routes compressed audio between players. A real "player says it out loud → AI reacts" link would require an external process listening outside the game, which is neither stable nor sensible for a unit project (anti-cheat/EULA risk in MP). **Pragmatic alternative with almost the same feel:** a keybind/radial command that simultaneously (a) audibly plays the matching voice line via VoN to other players, and (b) triggers the AI logic. The player really does "shout" the command out loud — only the detection runs via a button, not speech recognition.
 
-### 5.8 After-Action Review (AAR) / Debrief-module — HERSTELD
-Vroeg in de brainstorm genoemd ("milsim-eenheden zijn dol op debriefs"), maar in eerdere versies van dit document niet uitgewerkt. Dit is de natuurlijke plek om de Event Bus-geschiedenis van een hele sessie samen te vatten, en kost weinig extra bouwwerk omdat elke module al events op de Bus zet.
+### 5.8 After-Action Review (AAR) / Debrief module — RESTORED
+Mentioned early in the brainstorm ("milsim units love debriefs"), but not worked out in earlier versions of this document. This is the natural place to summarize a whole session's Event Bus history, and costs little extra build work since every module already puts events on the Bus.
 
-- **Luistert passief mee** op de Event Bus gedurende de hele missie — geen aparte data-verzameling per module nodig, alleen een centrale logger die alle relevante events opslaat met tijdstempel
-- **Aggregeert bij missie-einde:** voltooide/gefaalde objectives, ROE-compliance-uitkomsten (correcte vs. onterechte "stand back"/"drop weapon"-acties), gemiste POI-observaties, hostility-verloop per gebied over tijd
-- **Output:** een samenvattend debrief-scherm of exporteerbaar tekstbestand — waardevol voor milsim-eenheden die sessies naderhand bespreken
-- **Performance:** puur event-gedreven, geen polling — de goedkoopste module in het hele framework omdat hij nooit iets hoeft te initiëren, alleen te registreren
+- **Passively listens** on the Event Bus for the whole mission — no separate data collection per module needed, just a central logger that stores all relevant events with a timestamp
+- **Aggregates at mission end:** completed/failed objectives, ROE compliance outcomes (correct vs. incorrect "stand back"/"drop weapon" actions), missed POI observations, hostility trend per area over time
+- **Output:** a summary debrief screen or exportable text file — valuable for milsim units that discuss sessions afterward
+- **Performance:** purely event-driven, no polling — the cheapest module in the whole framework since it never has to initiate anything, only record
 
-### 5.9 Logistiek/Supply — BACKLOG, bewust niet in eerste scope
-Ook vroeg genoemd, maar bewust **niet** in de kernroadmap opgenomen om scope-kruip te voorkomen. Zou leunen op vergelijkbare Area/Dynamic-Despawn-patronen als de rest van het framework (supply-punten als Lifestyle-POI-achtige nodes, konvooien als POI/Observation-ketens), dus technisch geen nieuw patroon — wel een bewuste latere uitbreiding, geen verplichting binnen de huidige gefaseerde roadmap (sectie 9).
+### 5.9 Logistics/Supply — BACKLOG, deliberately not in initial scope
+Also mentioned early, but deliberately **not** included in the core roadmap to prevent scope creep. Would lean on similar Area/Dynamic-Despawn patterns as the rest of the framework (supply points as Lifestyle-POI-like nodes, convoys as POI/Observation chains), so technically not a new pattern — but a deliberate later extension, not a requirement within the current phased roadmap (section 9).
 
-### 5.10 Squad Cohesion / C2-laag — NIEUW, uit community-onderzoek
-Direct voortgekomen uit `docs/research/mission-maker-pain-points.md`: de meest herhaalde klacht van ervaren milsim-spelers is niet gebrek aan content, maar dat squad-lidmaatschap in vanilla Reforger "geen betekenis heeft" — geen zicht op teamposities, spawn losgekoppeld van squad, geen coördinatie-prikkel.
+### 5.10 Squad Cohesion / C2 layer — NEW, from community research
+Directly derived from `docs/research/mission-maker-pain-points.md`: the most repeated complaint from experienced milsim players is not lack of content, but that squad membership in vanilla Reforger "has no meaning" — no visibility of team positions, spawn decoupled from squad, no coordination incentive.
 
-- **Squad-positie-overzicht voor de leider**: een lichte, opt-in kaartlaag die alleen squadleden aan elkaar toont (nooit het hele leger) — puur informatief, geen nieuwe AI-logica
-- **Muster-gate (optioneel, missiemaker-instelbaar)**: een Objective-node (hergebruikt sectie 4.1) kan als conditie eisen dat een squad fysiek bij elkaar is voordat een volgend narratief stuk vrijgeeft — verplicht coördinatie zonder een hard "je mag niet spawnen"-slot te forceren
-- **Radio-respawn-zichtbaarheid**: een simpele UI-hint die het bestaande maar onbekende radio-respawn-mechanisme zichtbaar maakt, zodat squads het daadwerkelijk gebruiken
+- **Squad position overview for the leader**: a light, opt-in map layer that only shows squad members to each other (never the whole army) — purely informational, no new AI logic
+- **Muster gate (optional, mission-maker configurable)**: an Objective node (reuses section 4.1) can require, as a condition, that a squad is physically together before releasing the next narrative beat — enforces coordination without forcing a hard "you may not spawn" slot
+- **Radio-respawn visibility**: a simple UI hint that makes the existing but little-known radio-respawn mechanism visible, so squads actually use it
 
-**Namespace:** `MCF_Squad_` — nieuw, want dit is spelerscoördinatie, geen AI-gedrag (dus bewust niet onder `MCF_AI_`) en geen verhalende node (dus niet onder `MCF_Obj_`).
+**Namespace:** `MCF_Squad_` — new, since this is player coordination, not AI behavior (so deliberately not under `MCF_AI_`) and not a narrative node (so not under `MCF_Obj_`).
 
-**Performance:** puur informatief/event-gedreven (kaartlaag update alleen bij positieverandering van squadleden), geen polling-overhead.
+**Performance:** purely informational/event-driven (map layer updates only on a squad member's position change), no polling overhead.
 
-**Scope-grens:** dit repareert geen AI-commandogedrag (zie `docs/research/mission-maker-pain-points.md` sectie 4 — dat is engine-niveau en bewust buiten bereik) — dit lost alleen het *informatie- en coördinatie-gebrek tussen menselijke spelers* op.
+**Scope boundary:** this does not fix AI command behavior (see `docs/research/mission-maker-pain-points.md` section 4 — that's engine-level and deliberately out of scope) — this only solves the *information and coordination gap between human players*.
 
-### 5.11 AI Commando-Watchdog — pleister, geen structurele fix
-Direct antwoord op de erkende, veelgenoemde klacht uit sectie 4 van het onderzoek — met de beperking vooraf en herhaaldelijk benadrukt: dit **onderdrukt symptomen**, het repareert geen pathfinding-/commandologica die in gesloten C++ zit.
+### 5.11 AI Command Watchdog — a patch, not a structural fix
+A direct answer to the acknowledged, frequently-mentioned complaint from section 4 of the research — with the limitation stated up front and repeatedly: this **suppresses symptoms**, it does not fix pathfinding/command logic that lives in closed C++.
 
-**Patroon:**
-1. **Detectie** — lage-prioriteit Tick Manager-check monitort AI die een "get out"- of follow-commando kreeg; blijft de staat/positie langer dan een instelbare drempel ongewijzigd, markeer als vastgelopen
-2. **Eerste poging: commando herhalen** — vaak genoeg om de AI-state machine te "wekken" zonder ingrijpen. Altijd eerst proberen, goedkoopst en veiligst
-3. **Laatste redmiddel: geforceerde correctie** — alléén als herhalen niet werkt: AI die vastzit in een voertuig wordt naar een **gevalideerde, veilige exit-positie** geplaatst; AI die niet meer volgt krijgt een directe positiecorrectie richting de groep
+**Pattern:**
+1. **Detection** — a low-priority Tick Manager check monitors AI that received a "get out" or follow command; if the state/position stays unchanged past a configurable threshold, mark it as stuck
+2. **First attempt: repeat the command** — often enough to "wake" the AI state machine without intervention. Always try this first, cheapest and safest
+3. **Last resort: forced correction** — only if repeating doesn't work: AI stuck in a vehicle gets placed at a **validated, safe exit position**; AI that's no longer following gets a direct position correction toward the group
 
-**Harde eisen, niet optioneel:**
-- **Veilige-positie-validatie verplicht** vóór elke geforceerde teleportatie — voorkomt dat een AI in geometrie/water verschijnt, wat een nieuwe bug zou zijn in plaats van een oplossing
-- **Zorgvuldig getunede drempelwaarde** — te kort en normale, trage AI-activiteit wordt onterecht als "vastgelopen" bestempeld; te lang en de pleister voelt nutteloos traag
-- **Loggen van elke ingreep** (via de validatie-pass/debug-overlay uit sectie 3.1/7) — zodat je kan zien hoe vaak dit daadwerkelijk nodig is, en of de drempel bijgesteld moet worden
+**Hard requirements, not optional:**
+- **Safe-position validation is mandatory** before any forced teleport — prevents an AI from appearing inside geometry/water, which would be a new bug instead of a fix
+- **Carefully tuned threshold value** — too short and normal, slow AI activity gets wrongly flagged as "stuck"; too long and the patch feels uselessly slow
+- **Log every intervention** (via the validation pass/debug overlay from section 3.1/7) — so you can see how often this is actually needed, and whether the threshold needs adjusting
 
-**Namespace:** valt onder `MCF_AI_` — het is generiek AI-commandogedrag, niet gebonden aan civiele, Ambient Life- of ROE-specifieke logica.
+**Namespace:** falls under `MCF_AI_` — it's generic AI command behavior, not tied to civilian-, Ambient-Life-, or ROE-specific logic.
 
-**Performance:** lage-prioriteit tick (zie sectie 7.8) — dit hoeft niet vaak te checken, vastlopen is per definitie een langzaam-optredend probleem.
+**Performance:** low-priority tick (see section 7.8) — this doesn't need to check often, getting stuck is by definition a slow-occurring problem.
 
-### 5.12 Scripted AI Reactions — herbruikbare gedragsrecepten-catalogus, NIEUW
-Antwoord op de wens naar "makkelijk uitbreidbare AI-acties via een visuele editor" — met een bewuste scope-keuze die eerlijk wordt uitgelegd voordat we verder gaan.
+### 5.12 Scripted AI Reactions — reusable behavior-recipe catalog, NEW
+An answer to the wish for "easily extendable AI actions via a visual editor" — with a deliberate scope decision that's explained honestly before we go further.
 
-**Scope-beslissing: catalogus van kant-en-klare recepten, geen node-graaf-editor bouwen.** Een eigen drag-and-drop visuele scripting-tool zou in feite een eigen Eden-editor betekenen — een veel groter project dan de rest van dit framework samen, en buiten proportie met de rest van de roadmap. In plaats daarvan: **elk gedrag is een genoemd, herbruikbaar "recept"** dat een missiemaker uit een dropdown kiest (zelfde GM-attribuutpatroon als de rest van het framework, sectie 6) — geen node-graaf nodig om 90% van de waarde te krijgen.
+**Scope decision: a catalog of ready-made recipes, not building a node-graph editor.** A custom drag-and-drop visual scripting tool would essentially mean building our own Eden editor — a much bigger project than the rest of this framework combined, and out of proportion with the rest of the roadmap. Instead: **every behavior is a named, reusable "recipe"** that a mission maker picks from a dropdown (same GM attribute pattern as the rest of the framework, section 6) — no node graph needed to get 90% of the value.
 
-**Wat een "recept" technisch is:** een trigger (meestal een staatsovergang uit het Alert-systeem, zie `docs/modules/stealth-and-suppression.md` sectie 3.4) gekoppeld aan een vaste reeks van reeds bestaande bouwstenen — Waypoint+Animatie (5.4), Voice Line (4.4), bestaande Actions zoals Kill Entity/Add Waypoint. **Geen nieuwe Core-functionaliteit nodig** — een recept is puur configuratie van dingen die al bestaan, wat het echt "makkelijk uitbreidbaar" maakt: nieuwe recepten toevoegen is content maken, geen code schrijven.
+**What a "recipe" technically is:** a trigger (usually a state transition from the Alert system, see `docs/modules/stealth-and-suppression.md` section 3.4) tied to a fixed sequence of already-existing building blocks — Waypoint+Animation (5.4), Voice Line (4.4), existing Actions like Kill Entity/Add Waypoint. **No new Core functionality needed** — a recipe is purely configuration of things that already exist, which is what makes it genuinely "easily extendable": adding new recipes is making content, not writing code.
 
-**Startcatalogus (voorbeelden uit je eigen vraag, plus enkele veelvoorkomende milsim-tropes):**
+**Starter catalog (examples from your own question, plus a few common milsim tropes):**
 
-| Recept | Trigger | Bouwstenen (allemaal al gepland) |
+| Recipe | Trigger | Building blocks (all already planned) |
 |---|---|---|
-| **HVT Vlucht per Voertuig** | Onderzoekend/In gevecht (stealth-and-suppression.md 3.4) | Waypoint naar dichtstbijzijnde voertuig → Get In-actie → vluchtroute-waypoint |
-| **HVT Vlucht per Helikopter** | Idem | Voice Line ("oproep evacuatie") → wachttijd → heli-waypoint → Get In → extractie-waypoint |
-| **Gijzelaar-executie bij Alarm** | In gevecht binnen X seconden na eerste contact | Animatie (dreigen/schieten) → Kill Entity-actie → koppelbaar aan de bestaande hostility-consequenties (5.1) omdat dit zwaar tegen de speler zou moeten wegen als het gebeurt door falend spelersgedrag |
-| **Nepoverdgave** | Speler nadert een "compliant" NPC (hergebruikt de wapen-drop-animatie uit de Compliance/ROE-module, 5.7!) | Wapen-drop-animatie → wachten tot speler dichtbij is → verrassingsaanval. Mooi voorbeeld van hergebruik: dit recept voegt geen nieuwe animatie toe, het combineert een bestaande op een nieuwe manier |
-| **Versterking Oproepen** | Argwanend/Onderzoekend (stealth-and-suppression.md 3.4) | Voice Line → QRF-systeem triggeren (al bestaand) |
+| **HVT Flees by Vehicle** | Investigating/Engaged (stealth-and-suppression.md 3.4) | Waypoint to nearest vehicle → Get In action → escape-route waypoint |
+| **HVT Flees by Helicopter** | Same | Voice Line ("call for evacuation") → wait → heli waypoint → Get In → extraction waypoint |
+| **Hostage Execution on Alarm** | Engaged within X seconds of first contact | Animation (threaten/shoot) → Kill Entity action → linkable to existing hostility consequences (5.1), since this should weigh heavily against the player if it happens due to failed player behavior |
+| **Fake Surrender** | Player approaches a "compliant" NPC (reuses the weapon-drop animation from the Compliance/ROE module, 5.7!) | Weapon-drop animation → wait until the player is close → surprise attack. A nice example of reuse: this recipe adds no new animation, it combines an existing one in a new way |
+| **Call for Reinforcements** | Suspicious/Investigating (stealth-and-suppression.md 3.4) | Voice Line → trigger the QRF system (already exists) |
 
-**Extensibiliteit in de praktijk:** een nieuw recept toevoegen = een nieuwe rij in de catalogus-config, geen nieuwe class. Iedereen in de unit die de bouwstenen kent (waypoints, animaties, voice lines) kan in principe een nieuw recept samenstellen zonder Enforce Script te schrijven — dat is de daadwerkelijke "makkelijk uitbreidbaar"-belofte, sterker dan een visuele editor zou zijn geweest voor de investering die het zou kosten.
+**Extensibility in practice:** adding a new recipe = a new row in the catalog config, no new class. Anyone in the unit who knows the building blocks (waypoints, animations, voice lines) can in principle assemble a new recipe without writing Enforce Script — that's the actual "easily extendable" promise, stronger than a visual editor would have been for the investment it would have cost.
 
-**Eerlijke stretch-optie voor later:** als dit systeem eenmaal staat en de catalogus groeit, zou een simpel Workbench-plugin (zelfde soort als SF's "Game Mode Setup"-plugin) het samenstellen van nieuwe recepten kunnen versimpelen tot een formulier i.p.v. los config-werk. Dat is geen node-graaf-editor, wel een stap richting "visueler" — expliciet als backlog-idee, niet als kernscope.
+**Honest stretch option for later:** once this system exists and the catalog grows, a simple Workbench plugin (same kind as SF's "Game Mode Setup" plugin) could simplify assembling new recipes into a form instead of loose config work. That's not a node-graph editor, but a step toward "more visual" — explicitly a backlog idea, not core scope.
 
-**Namespace:** `MCF_React_` — nieuw, want dit is een recepten-catalogus die dwars door meerdere bestaande modules heen combineert, geen eigen gedragslogica.
+**Namespace:** `MCF_React_` — new, since this is a recipe catalog that combines across multiple existing modules, with no behavior logic of its own.
 
-**Performance:** een recept kost exact wat zijn bouwstenen al kosten (een waypoint, een animatie, een voice line) — geen extra overhead bovenop wat al gepland was.
+**Performance:** a recipe costs exactly what its building blocks already cost (a waypoint, an animation, a voice line) — no extra overhead on top of what was already planned.
 
-### 5.13 Sequence Recorder — pad-en-cue-opname voor mini-scripted scenario's, NIEUW
-Directe uitbreiding op 5.12: een **nieuw type recept-input** naast handmatig samengestelde recepten. In plaats van waypoints en animaties één voor één te kiezen, speelt de missiemaker de scène zelf voor en neemt het systeem op wat er gebeurde.
+### 5.13 Sequence Recorder — path-and-cue recording for mini scripted scenarios, NEW
+A direct extension of 5.12: a **new kind of recipe input** alongside manually assembled recipes. Instead of picking waypoints and animations one by one, the mission maker acts out the scene themselves and the system records what happened.
 
-**Belangrijk onderscheid, eerst vastgelegd zodat de verwachting klopt:**
-- **Dit is geen motion-capture.** Wat wordt opgenomen is *positie/richting over tijd* plus *momenten waarop een bestaande actie/animatie werd getriggerd* (zitten, interactie, instappen, wapen heffen) — geen nieuwe skeletanimatie.
-- Een compleet nieuw gebaar dat nog niet bestaat, vereist Reforger's eigen Animation Editor en een animator — een ander vakgebied dan missiescripting, niet iets wat dit systeem kan vervangen.
+**Important distinction, stated up front so expectations are correct:**
+- **This is not motion capture.** What gets recorded is *position/orientation over time* plus *moments when an existing action/animation was triggered* (sitting, interacting, getting in, raising a weapon) — no new skeletal animation.
+- A completely new gesture that doesn't exist yet requires Reforger's own Animation Editor and an animator — a different discipline than mission scripting, not something this system can replace.
 
-**Hoe het werkt:**
-1. **Opnemen** — een speler (typisch de missiemaker zelf, tijdens het bouwen) loopt/handelt de gewenste routine, terwijl een Recorder op vaste interval positie+rotatie vastlegt en elke keer dat een bestaande actie/animatie wordt aangeroepen een tijdgestempelde "cue" toevoegt
-2. **Opslaan** — het resultaat is een **Sequence Asset**: in essentie een fijnmazige waypoint-keten plus cue-events, opgeslagen als data — geen nieuw animatiebestand
-3. **Afspelen** — toegewezen aan een AI-personage via de Scripted AI Reactions-catalogus (5.12): de AI volgt het opgenomen pad met zijn normale bewegingsanimaties, en triggert dezelfde cues op hetzelfde relatieve moment. De AI "beweegt als zichzelf", maar volgt jouw geregisseerde route en timing
+**How it works:**
+1. **Recording** — a player (typically the mission maker themselves, while building) walks/performs the desired routine, while a Recorder captures position+rotation at a fixed interval and adds a timestamped "cue" every time an existing action/animation is invoked
+2. **Saving** — the result is a **Sequence Asset**: essentially a fine-grained waypoint chain plus cue events, stored as data — no new animation file
+3. **Playback** — assigned to an AI character via the Scripted AI Reactions catalog (5.12): the AI follows the recorded path using its normal movement animations, and triggers the same cues at the same relative moment. The AI "moves as itself", but follows your directed route and timing
 
-**Waarom dit mini-scripted scenario's binnen een groter geheel mogelijk maakt:** een Sequence Asset gecombineerd met een klein clustertje Objective-/Logic-nodes (4.1/4.3) vormt een zelfstandige "vignette" — bijv. een complete checkpoint-routine of een hinderlaag-opstelling — die als herbruikbare eenheid in elke grotere missie gedropt kan worden. Dit is geen nieuw concept naast de bestaande node-hiërarchie, het is die hiërarchie gewoon toegepast op een kleinere schaal, precies zoals Area→Layer→Slot dat al ondersteunt.
+**Why this enables mini scripted scenarios within a larger whole:** a Sequence Asset combined with a small cluster of Objective/Logic nodes (4.1/4.3) forms a self-contained "vignette" — e.g. a complete checkpoint routine or an ambush setup — that can be dropped into any larger mission as a reusable unit. This is not a new concept alongside the existing node hierarchy, it's that hierarchy simply applied at a smaller scale, exactly as Area→Layer→Slot already supports.
 
-**Namespace:** valt onder `MCF_React_` — een Sequence Asset is technisch gewoon een nieuw type recept-input, geen apart systeem.
+**Namespace:** falls under `MCF_React_` — a Sequence Asset is technically just a new type of recipe input, not a separate system.
 
-**Open vragen om vroeg te beantwoorden:**
-- Hoe fijnmazig moet de opname-interval zijn voor een vloeiend resultaat zonder de Sequence Asset onnodig groot te maken — dit is een praktische afweging die alleen via testen in Workbench vastgesteld kan worden
-- Reageert de afspelende AI natuurlijk op onverwachte obstakels tijdens het volgen van een opgenomen pad (bijv. een speler die per ongeluk in de weg staat), of loopt hij star het pad af ongeacht omstandigheden? Bepaalt of er een fallback-gedrag nodig is bovenop de letterlijke afspeellogica
-
----
-
-## 6. GM-integratielaag
-
-Elke node hierboven wordt een custom prefab met:
-- `SCR_EditableEntityComponent` + `PLACEABLE`-flag → verschijnt in GM's catalogus
-- Custom Editor Attributes (sliders, dropdowns) → live configureerbaar door de GM zonder Workbench
-- Automatische opname in de mission save-serialisatie (native BI-systeem)
+**Open questions to answer early:**
+- How fine-grained does the recording interval need to be for a smooth result without making the Sequence Asset unnecessarily large — a practical trade-off that can only be determined by testing in Workbench
+- Does the playing-back AI react naturally to unexpected obstacles while following a recorded path (e.g. a player accidentally standing in the way), or does it rigidly follow the path regardless of circumstances? Determines whether fallback behavior is needed on top of the literal playback logic
 
 ---
 
-## 7. Performance-bewuste ontwerpprincipes
+## 6. GM integration layer
 
-Dit raakt letterlijk elke laag hierboven, dus expliciet als eigen sectie:
-
-1. **Event-driven boven polling.** Elke node reageert op events, niet op een eigen tick-loop. Waar een check echt periodiek moet (bijv. hostility-decay), loopt die via de centrale **Tick Manager** met een instelbare update-rate — nooit per-entity `EOnFrame`.
-2. **Dynamic spawn/despawn per Area**, zelfde patroon als SF: content buiten spelersbereik wordt niet gesimuleerd. Areas onthouden hun state (posities, voltooiing) zodat despawn geen voortgang kost.
-3. **Graaf-updates alleen bij wijziging** (infrastructuur-netwerk, reputatie) — geen continue herberekening.
-4. **Gebundelde replicatie.** Combineer gerelateerde state in één `RplProp`-component in plaats van los te repliceren — minder netwerkoverhead, makkelijker te debuggen.
-5. **Configureerbare budgetten.** Missiemaker kan per scenario een max. aantal actieve AI-groepen, actieve triggers en actieve infrastructuur-nodes instellen — voorkomt dat een enthousiaste GM de server op de knieën krijgt.
-6. **Voice line-queue** (zie 4.4) voorkomt audio-stacking maar bespaart ook onnodige gelijktijdige sound-instanties.
-7. **Debug-overlay vanaf dag 1** (zoals SF's debug menu) — laat live zien welke nodes actief zijn, welke graaf-status infrastructuur heeft, welke hostility-waarde een gebied heeft. Dit is niet alleen voor jullie handig tijdens bouwen, maar ook een performance-diagnosetool: je ziet meteen als iets onnodig blijft draaien.
-8. **Tick-prioriteitsniveaus** i.p.v. één vlakke update-rate voor de hele Tick Manager: een "kritiek"-laag met korte interval voor gameplay-bepalende checks (bijv. ROE-nalevingsstatus), en een "cosmetisch"-laag met een veel langere interval voor decor (Ambient Life-animatiekeuzes). Eén rate voor alles is ofwel te traag voor wat ertoe doet, ofwel nodeloos duur voor wat niet opvalt.
-9. **Event Bus-lifecycle-koppeling** — listeners worden automatisch uitgeschreven bij entity-destructie (zie sectie 3.1), zodat despawnende NPC's en verwijderde nodes geen dangling listeners achterlaten die stil geheugen blijven vasthouden.
+Every node above becomes a custom prefab with:
+- `SCR_EditableEntityComponent` + `PLACEABLE` flag → appears in the GM catalog
+- Custom Editor Attributes (sliders, dropdowns) → live configurable by the GM without Workbench
+- Automatic inclusion in the mission save serialization (native BI system)
 
 ---
 
-## 8. Persistentie / Save-Load
+## 7. Performance-conscious design principles
 
-- Basis: native `SCR_EditableEntityComponent`-serialisatie (positie, staat, custom attributen) — al onderdeel van het save-bestand
-- Aanvullend: een eigen **Module State Serializer** voor data die geen entity-attribuut is — reputatiewaarden per gebied, infrastructuur-netwerkstatus, Event Bus-geschiedenis (welke objectives al voltooid zijn)
-- Doel: missiemakers kunnen prebuilden én live GM-sessies kunnen tussentijds opslaan/hervatten zonder voortgang te verliezen
+This literally touches every layer above, so it's given its own explicit section:
+
+1. **Event-driven over polling.** Every node reacts to events, not its own tick loop. Where a check genuinely needs to be periodic (e.g. hostility decay), it runs through the central **Tick Manager** with a configurable update rate — never per-entity `EOnFrame`.
+2. **Dynamic spawn/despawn per Area**, same pattern as SF: content outside player range is not simulated. Areas remember their state (positions, completion) so despawning doesn't cost progress.
+3. **Graph updates only on change** (infrastructure network, reputation) — no continuous recalculation.
+4. **Bundled replication.** Combine related state into one `RplProp` component instead of replicating it separately — less network overhead, easier to debug.
+5. **Configurable budgets.** The mission maker can set, per scenario, a max number of active AI groups, active triggers, and active infrastructure nodes — prevents an enthusiastic GM from bringing the server to its knees.
+6. **Voice line queue** (see 4.4) prevents audio stacking but also saves unnecessary simultaneous sound instances.
+7. **Debug overlay from day 1** (like SF's debug menu) — live shows which nodes are active, what graph status infrastructure has, what hostility value an area has. Not only handy for you while building, but also a performance diagnostic tool: you immediately see if something keeps running unnecessarily.
+8. **Tick priority levels** instead of one flat update rate for the whole Tick Manager: a "critical" tier with a short interval for gameplay-deciding checks (e.g. ROE compliance status), and a "cosmetic" tier with a much longer interval for decor (Ambient Life animation choices). One rate for everything is either too slow for what matters, or needlessly expensive for what nobody notices.
+9. **Event Bus lifecycle coupling** — listeners are automatically unsubscribed on entity destruction (see section 3.1), so despawning NPCs and removed nodes don't leave dangling listeners silently holding onto memory.
 
 ---
 
-## 9. Gefaseerde roadmap
+## 8. Persistence / Save-Load
 
-| Fase | Doel |
+- Base: native `SCR_EditableEntityComponent` serialization (position, state, custom attributes) — already part of the save file
+- Additional: a dedicated **Module State Serializer** for data that isn't an entity attribute — reputation values per area, infrastructure network status, Event Bus history (which objectives are already complete)
+- Goal: mission makers can pre-build, and live GM sessions can be saved/resumed mid-session without losing progress
+
+---
+
+## 9. Phased roadmap
+
+| Phase | Goal |
 |---|---|
-| **0 — Proof of concept** | Eén Trigger Zone-entity: GM-plaatsbaar, live attributen, volledige save/load-cyclus getest, **plus** het event-naamgevingscontract, authority-beleid, validatie-pass én de Test-/Stress-registratie uit sectie 3.1-3.2 vanaf het begin toegepast — dit zijn geen latere toevoegingen maar fundament |
-| **1** | Objective Node volledig (titel, map-visibility, conditie-slot, on-complete/on-fail events, intel-gate) |
-| **2** | POI/Observation Node + Logic Nodes, Event Bus-koppeling tussen beide |
-| **3** | Hostility/Reputatie-manager + civiele gedragshaak + Faction Alias-integratie |
-| **4** | Infrastructuur-netwerk (AI Warning System) + intel-koppeling |
-| **5** | Waypoint+Animatie-module, Voice Line-module + priority queue |
-| **6** | Ambient Life/Pattern-of-Life-module (Lifestyle-POI's, actor-archetypes, fake conversations) + interactie-hint-systeem (tiers, pointer-sjablonen) — bouwt direct op Fase 5 |
-| **7** | Compliance/ROE-interactielaag (gunpoint, drop weapon, stand back) + koppeling aan Hostility-manager |
-| **8** | AAR/Debrief-module — aggregeert de Event Bus-geschiedenis van alle voorgaande fases, dus pas zinvol als afsluiter |
-| **9** | Squad Cohesion/C2-laag — losstaand van de rest, kan bij voldoende capaciteit ook eerder parallel opgepakt worden |
-| **10** | AI Commando-Watchdog — pas oppakken nadat de basis-AI-modules (Fase 3, 6, 7) draaien, zodat er genoeg echte gebruikssituaties zijn om de drempelwaarde tegen te testen |
-| **11** | Scripted AI Reactions-catalogus — pas zinvol na Fase 3-7 (Hostility, Waypoint+Animatie, Voice Line, Compliance/ROE), want elk recept hergebruikt die bouwstenen |
-| **12** | Sequence Recorder — bouwt direct op Fase 11, want een opname is technisch een nieuw type recept-input |
-| **13** | Performance-pass: Tick Manager-prioriteitsniveaus, budgetten, debug-overlay verfijnen onder belasting (test met 40+ spelers én druk bevolkt dorp tegelijk) |
-| **14** | GM-attribuut-UI polish + documentatie voor andere missiemakers in de unit (doorlopend vanaf Fase 0, niet pas hier beginnen) |
+| **0 — Proof of concept** | One Trigger Zone entity: GM-placeable, live attributes, full save/load cycle tested, **plus** the event naming contract, authority policy, validation pass, and the Test/Stress registration from section 3.1-3.2 applied from the start — these are not later additions but foundation |
+| **1** | Objective Node complete (title, map visibility, condition slot, on-complete/on-fail events, intel gate) |
+| **2** | POI/Observation Node + Logic Nodes, Event Bus coupling between them |
+| **3** | Hostility/Reputation manager + civilian behavior hook + Faction Alias integration |
+| **4** | Infrastructure network (AI Warning System) + intel coupling |
+| **5** | Waypoint+Animation module, Voice Line module + priority queue |
+| **6** | Ambient Life/Pattern-of-Life module (Lifestyle POIs, actor archetypes, fake conversations) + interaction hint system (tiers, pointer templates) — builds directly on Phase 5 |
+| **7** | Compliance/ROE interaction layer (gunpoint, drop weapon, stand back) + coupling to the Hostility manager |
+| **8** | AAR/Debrief module — aggregates the Event Bus history of all previous phases, so it only makes sense as a closer |
+| **9** | Squad Cohesion/C2 layer — standalone from the rest, can also be picked up in parallel earlier if capacity allows |
+| **10** | AI Command Watchdog — only take on once the base AI modules (Phase 3, 6, 7) are running, so there are enough real usage scenarios to test the threshold against |
+| **11** | Scripted AI Reactions catalog — only makes sense after Phase 3-7 (Hostility, Waypoint+Animation, Voice Line, Compliance/ROE), since every recipe reuses those building blocks |
+| **12** | Sequence Recorder — builds directly on Phase 11, since a recording is technically a new type of recipe input |
+| **13** | Performance pass: Tick Manager priority levels, budgets, refine the debug overlay under load (test with 40+ players and a busy village at once) |
+| **14** | GM attribute UI polish + documentation for other mission makers in the unit (ongoing from Phase 0, not starting only here) |
 
 ---
 
-## 10. Openstaande ontwerpvragen om vroeg te prototypen
+## 10. Open design questions to prototype early
 
-- Hoe robuust is custom-attribuut-serialisatie in de praktijk bij geneste node-hiërarchieën? (risico geïdentificeerd in fase 0)
-- Hoeveel gelijktijdige infrastructuur-graafnodes kan de Tick Manager aan voor je performance-doel acceptabel blijft?
-- Hoe ver kun je "herstelbare" sabotage (generator-reparatie door AI) laten gaan voordat het voor spelers frustrerend aanvoelt i.p.v. spannend?
+- How robust is custom attribute serialization in practice with nested node hierarchies? (risk identified in Phase 0)
+- How many concurrent infrastructure graph nodes can the Tick Manager handle before your performance target is no longer acceptable?
+- How far can "repairable" sabotage (AI repairing a generator) go before it feels frustrating to players instead of tense?
