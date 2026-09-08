@@ -1,8 +1,9 @@
 //! Ambient actor archetype (ARCHITECTURE.md 5.5) -- roams between a fixed
-//! list of Lifestyle POI tags. Advancing to the next POI is a manual call
-//! for now (AdvanceToNextPOI()); actual movement and animation cycling
-//! are not wired up, same pattern as the other manual-trigger nodes in
-//! this framework.
+//! list of Lifestyle POI tags. AdvanceToNextPOI() now actually moves the
+//! owner there via MCF_AI_SimpleMoverComponent (straight-line movement,
+//! not real pathfinding) if one is present on the same entity; without
+//! one, it still tracks which POI it should be heading to but doesn't
+//! move.
 
 [ComponentEditorProps(category: "MCF/AI", description: "Roams between a list of Lifestyle POI tags. Archetype is free text (\"Shopkeeper\", \"Customer\", \"MilitiaOffDuty\", etc).")]
 class MCF_AI_AmbientActorComponentClass : ScriptComponentClass
@@ -18,10 +19,12 @@ class MCF_AI_AmbientActorComponent : ScriptComponent
 	protected ref array<string> m_aPoiTags;
 
 	protected int m_iCurrentIndex;
+	protected MCF_AI_SimpleMoverComponent m_Mover;
 
 	override void EOnInit(IEntity owner)
 	{
 		m_iCurrentIndex = -1;
+		m_Mover = MCF_AI_SimpleMoverComponent.Cast(owner.FindComponent(MCF_AI_SimpleMoverComponent));
 	}
 
 	string GetArchetype()
@@ -29,7 +32,8 @@ class MCF_AI_AmbientActorComponent : ScriptComponent
 		return m_sArchetype;
 	}
 
-	//! Advances to the next POI tag in the list, wrapping around. Returns
+	//! Advances to the next POI tag in the list, wrapping around, and
+	//! moves there if a MCF_AI_SimpleMoverComponent is present. Returns
 	//! an empty string if no POI tags are configured.
 	string AdvanceToNextPOI()
 	{
@@ -37,7 +41,16 @@ class MCF_AI_AmbientActorComponent : ScriptComponent
 			return "";
 
 		m_iCurrentIndex = (m_iCurrentIndex + 1) % m_aPoiTags.Count();
-		return m_aPoiTags[m_iCurrentIndex];
+		string tag = m_aPoiTags[m_iCurrentIndex];
+
+		if (m_Mover)
+		{
+			IEntity target = MCF_Core_TagRegistry.GetInstance().GetByTag(tag);
+			if (target)
+				m_Mover.MoveTo(target.GetOrigin());
+		}
+
+		return tag;
 	}
 
 	string GetCurrentPOITag()

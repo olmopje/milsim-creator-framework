@@ -1,13 +1,12 @@
 //! Sequence Playback (ARCHITECTURE.md 5.13) -- plays back samples and
 //! cues recorded by MCF_React_SequenceRecorderComponent. Advances itself
-//! every frame via EOnFrame while playing (frame-accurate, not tied to
-//! the coarser Tick Manager intervals). Actually moving an AI along the
-//! recorded path is not wired up here -- GetCurrentPosition() only
-//! returns the recorded position for something else (a movement driver,
-//! not yet built) to read. Cue firing IS wired up, reusing
-//! MCF_React_StepRunner (the same execution used by Recipe steps).
+//! every frame via EOnFrame while playing, and now actually relocates its
+//! owner along the recorded path (via SetOrigin each frame) -- this is
+//! straight-line interpolation between samples, not real character
+//! movement/animation. Cue firing reuses MCF_React_StepRunner (the same
+//! execution used by Recipe steps).
 
-[ComponentEditorProps(category: "MCF/React", description: "Plays back a recorded sequence's cues; exposes positions for a movement driver to read.")]
+[ComponentEditorProps(category: "MCF/React", description: "Plays back a recorded sequence -- moves the owner along the path and fires cues.")]
 class MCF_React_SequencePlaybackComponentClass : ScriptComponentClass
 {
 }
@@ -23,7 +22,7 @@ class MCF_React_SequencePlaybackComponent : ScriptComponent
 	override void EOnFrame(IEntity owner, float timeSlice)
 	{
 		if (m_bPlaying)
-			Advance(timeSlice);
+			Advance(timeSlice, owner);
 	}
 
 	//! Loads a recorded sequence and starts playback from time 0.
@@ -37,15 +36,19 @@ class MCF_React_SequencePlaybackComponent : ScriptComponent
 		SetEventMask(GetOwner(), EntityEvent.FRAME);
 	}
 
-	//! Advances playback time and fires any cues whose timestamp has been
-	//! reached. Called automatically every frame while playing (see
-	//! EOnFrame), but can also be called directly if needed.
-	void Advance(float deltaTime)
+	//! Advances playback time, moves owner to the interpolated position,
+	//! and fires any cues whose timestamp has been reached. Called
+	//! automatically every frame while playing (see EOnFrame), but can
+	//! also be called directly if needed.
+	void Advance(float deltaTime, IEntity owner)
 	{
 		if (!m_bPlaying || !m_aCues)
 			return;
 
 		m_fPlaybackTime += deltaTime;
+
+		if (owner)
+			owner.SetOrigin(GetCurrentPosition());
 
 		while (m_iNextCueIndex < m_aCues.Count() && m_aCues[m_iNextCueIndex].m_fTimestamp <= m_fPlaybackTime)
 		{
