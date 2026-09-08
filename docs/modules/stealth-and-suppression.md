@@ -1,107 +1,107 @@
-# Stealth & Suppressie-verbetering — technisch deelproject
+# Stealth & Suppression improvement — technical sub-project
 
-Los document, zelfde reden als het voertuig-schiet-document: dit raakt wapenstatistieken, character-animatie en (mogelijk) AI-perceptie — niet de Core/Event Bus-architectuur van het missie-framework.
-
----
-
-## 1. Uitgangssituatie — eerst de aanname corrigeren
-
-"Silencers zijn nutteloos" klopt niet volledig. Bevestigd in vanilla:
-- Suppressors dempen geluid en maskeren grotendeels de mondingsflits (niet volledig)
-- Spelers melden bruikbare stealth-engagements op 400+ meter, omdat AI zonder zichtbare mondingsflits alleen op geluidsrichting kan terugvuren, met een forse precisie-penalty
-
-**Het echte probleem:** er is geen subsonic-munitie beschikbaar via Arsenal. Kogels blijven supersoon en produceren dus altijd een hoorbare knal ("crack"), los van de suppressor. De suppressor doet zijn werk, de munitie ondermijnt het.
+Standalone document, same reason as the vehicle-shooting document: this touches weapon stats, character animation, and (possibly) AI perception — not the Core/Event Bus architecture of the mission framework.
 
 ---
 
-## 2. Relevante bestaande bouwstenen (officieel)
+## 1. Starting situation — correcting the assumption first
 
-| Component | Relevantie |
+"Silencers are useless" is not fully correct. Confirmed in vanilla:
+- Suppressors dampen sound and largely mask the muzzle flash (not entirely)
+- Players report usable stealth engagements at 400+ meters, since AI without a visible muzzle flash can only return fire based on sound direction, with a heavy accuracy penalty
+
+**The real problem:** there is no subsonic ammunition available via the Arsenal. Bullets stay supersonic and therefore always produce an audible "crack", independent of the suppressor. The suppressor does its job, the ammunition undermines it.
+
+---
+
+## 2. Relevant existing building blocks (official)
+
+| Component | Relevance |
 |---|---|
-| **`SCR_WeaponStatsManagerComponent`** | Officieel systeem waarmee attachments (inclusief suppressors) wapenstatistieken wijzigen (bijv. mondingssnelheid-factor). De juiste, gedocumenteerde plek om suppressor-effectiviteit en subsonic-munitie-gedrag te implementeren — geen nieuw systeem nodig. |
-| **`InventoryItemComponent` custom attributes** | Basis waarop `WeaponStatsManagerComponent` leunt — nodig om een nieuwe munitie-variant (subsonic) als aparte, moddable entiteit te definiëren |
-| **Perception Factor (uit Scenario Framework-acties, sectie 5.3 in het hoofdproject)** | Bevestigd bestaand concept: AI-perceptievermogen is al instelbaar als attribuut. Aanknopingspunt om geluidsdetectie per munitietype te differentiëren, mits het onderliggende systeem dat toelaat (zie open vraag hieronder) |
-| **Scroll-wheel stance-systeem (vanilla)** | Community-breed als sterk ervaren t.o.v. Arma 3 — uitbreiden, niet vervangen |
+| **`SCR_WeaponStatsManagerComponent`** | Official system through which attachments (including suppressors) modify weapon stats (e.g. muzzle velocity factor). The right, documented place to implement suppressor effectiveness and subsonic ammo behavior — no new system needed. |
+| **`InventoryItemComponent` custom attributes** | Basis that `WeaponStatsManagerComponent` leans on — needed to define a new ammo variant (subsonic) as a separate, moddable entity |
+| **Perception Factor (from Scenario Framework actions, section 5.3 in the main project)** | Confirmed existing concept: AI perception ability is already configurable as an attribute. An anchor point to differentiate sound detection per ammo type, provided the underlying system allows it (see open question below) |
+| **Scroll-wheel stance system (vanilla)** | Widely regarded by the community as stronger than Arma 3 — extend, don't replace |
 
-**Belangrijke onzekerheid:** Bohemia documenteert het AI-detectiesysteem zelf expliciet niet ("ongoing development"). De stance/snelheid-naar-camouflage-koppeling die in Arma 3 hard vastligt, mag niet zomaar verondersteld worden 1-op-1 aanwezig te zijn in Reforger — dit moet eerst empirisch getest worden voordat er iets op gebouwd wordt.
+**Important uncertainty:** Bohemia itself does not explicitly document the AI detection system ("ongoing development"). The stance/speed-to-camouflage coupling that's hard-coded in Arma 3 must not simply be assumed to be present 1:1 in Reforger — this needs to be empirically tested first before anything is built on it.
 
 ---
 
-## 3. Voorgestelde verbeteringen
+## 3. Proposed improvements
 
-### 3.1 Subsonic-munitie (grootste hefboom, laagste risico)
-- Nieuwe munitie-variant per suppressor-compatibel kaliber, via `WeaponStatsManagerComponent`
-- Significant lagere geluidsdetectie-straal dan standaardmunitie, in ruil voor een realistische penalty (lager effectief bereik/stopping power op afstand — subsonic munitie is in werkelijkheid ook zwakker)
-- **Balans-eis:** geen "gratis onzichtbaarheid" — de penalty moet voelbaar genoeg zijn dat het een tactische keuze blijft (dichterbij sluipen, minder bereik) in plaats van een strict-betere optie
+### 3.1 Subsonic ammunition (biggest lever, lowest risk)
+- New ammo variant per suppressor-compatible caliber, via `WeaponStatsManagerComponent`
+- Significantly lower sound-detection radius than standard ammunition, in exchange for a realistic penalty (lower effective range/stopping power at distance — subsonic ammunition is also weaker in reality)
+- **Balance requirement:** no "free invisibility" — the penalty must be significant enough that it stays a tactical choice (sneak closer, less range) rather than a strictly-better option
 
-### 3.2 Stance/camouflage-koppeling verifiëren en zo nodig expliciet maken
-- Eerst testen: reageert vanilla-AI daadwerkelijk merkbaar anders op prone+stilstaand vs. crouch+bewegend vs. staand+rennend qua detectieafstand?
-- Alleen als dat onvoldoende differentieert: een eigen laag toevoegen die stance+snelheid vertaalt naar een aanpassing op de Perception Factor-achtige waarde — **niet** blind bouwen zonder eerst te bevestigen wat vanilla al doet, anders bouw je iets dat al bestaat of dat conflicteert met de native logica
+### 3.2 Verify stance/camouflage coupling and make it explicit if needed
+- Test first: does vanilla AI actually noticeably react differently to prone+stationary vs. crouch+moving vs. standing+running in terms of detection range?
+- Only if that doesn't differentiate enough: add a dedicated layer that translates stance+speed into an adjustment on the Perception-Factor-like value — **don't** build blind without first confirming what vanilla already does, otherwise you build something that already exists or that conflicts with the native logic
 
-### 3.3 Fijnere prone/crouch-hoogteregeling
-- Uitbreiding van het bestaande scroll-wheel stance-systeem met meer tussenstappen voor hoogte, specifiek gericht op net-over-dekking-mikken
-- Dit is animatie-/character-controller-werk, zelfde technische domein als het voertuig-schiet-document — geen scripting-logica
+### 3.3 Finer prone/crouch height control
+- Extension of the existing scroll-wheel stance system with more intermediate steps for height, specifically aimed at aiming just over cover
+- This is animation/character-controller work, same technical domain as the vehicle-shooting document — no scripting logic
 
-### 3.4 Detectie-feedback voor de speler — Alert-systeem
-De speler moet kunnen aanvoelen dat hij bijna ontdekt is (en nog kan ontsnappen) zonder dat het een gamey HUD-meter wordt die de immersie breekt — consistent met de "fake it until je het nodig hebt"-filosofie uit het hoofdproject.
+### 3.4 Detection feedback for the player — Alert system
+The player needs to be able to sense that they're close to being spotted (and can still escape) without it becoming a gamey HUD meter that breaks immersion — consistent with the "fake it until you need it" philosophy from the main project.
 
-**Kernidee: reageer op AI-staatsovergangen, niet op ruwe detectiewaardes.**
-Dit ontkoppelt het systeem volledig van de onzekere interne perceptie-logica uit sectie 3.2 (die nog niet bevestigd is) — je luistert alleen naar *wanneer* de AI van staat wisselt, niet naar *hoe* die beslissing tot stand komt. **Vier staten** (uitgebreid t.o.v. het oorspronkelijke drie-staten-ontwerp, om het dynamischer te laten voelen — AI die eerst wil dichterbij komen in plaats van direct vol alarm te slaan):
+**Core idea: react to AI state transitions, not raw detection values.**
+This fully decouples the system from the uncertain internal perception logic in section 3.2 (not yet confirmed) — you only listen for *when* the AI changes state, not *how* that decision came about. **Four states** (expanded from the original three-state design, to make it feel more dynamic — AI that wants to get closer first instead of immediately going to full alarm):
 
-| Overgang | Wat er gebeurt | Wat de speler waarneemt (diegetisch, geen HUD) |
+| Transition | What happens | What the player perceives (diegetic, no HUD) |
 |---|---|---|
-| **Onwetend → Argwanend** | AI registreert iets ambigus (geluid/glimp), blijft ter plekke | Bark ("Wat was dat?"), hoofd-/lichaamsdraai naar de richting — subtiel, makkelijk te missen |
-| **Argwanend → Onderzoekend** | AI verlaat zijn wacht-/ankerpositie om de bron te onderzoeken — hergebruikt de bestaande **Investigation Distance**-instelling (onderdeel van "Set Max Autonomous Distance") zodat de groep tijdelijk verder van zijn normale patrouillegebied mag afwijken | Zichtbare, voorzichtige beweging richting de laatst bekende locatie — wapen geheven, geen vuur. Dit is het spannendste moment: de speler ziet de AI dichterbij komen zonder zekerheid of hij ontdekt is |
-| **Onderzoekend → In gevecht** | Visueel/geluidscontact bevestigd tijdens het onderzoeken | Onmiskenbaar: geschreeuw, vuur, radiomelding voor versterking (haakt in op het QRF-systeem) |
-| **Onderzoekend → Onwetend (niets gevonden)** | Onderzoekstijd verstrijkt zonder bevestigd contact — AI keert terug naar zijn ankerpositie/patrouille | Aparte "stand-down"-bark/animatie — duidelijk afsluitmoment voor de speler: "ik ben ontsnapt" |
-| **In gevecht → Onwetend (verloren contact)** | AI verliest contact tijdens het gevecht zelf | Zelfde stand-down-signaal als hierboven |
+| **Unaware → Suspicious** | AI registers something ambiguous (sound/glimpse), stays in place | Bark ("What was that?"), head/body turn toward the direction — subtle, easy to miss |
+| **Suspicious → Investigating** | AI leaves its guard/anchor position to investigate the source — reuses the existing **Investigation Distance** setting (part of "Set Max Autonomous Distance") so the group may temporarily deviate further from its normal patrol area | Visible, cautious movement toward the last known location — weapon raised, no fire. This is the tensest moment: the player sees the AI getting closer with no certainty whether they've been spotted |
+| **Investigating → Engaged** | Visual/sound contact confirmed while investigating | Unmistakable: shouting, gunfire, radio call for reinforcements (hooks into the QRF system) |
+| **Investigating → Unaware (nothing found)** | Investigation time elapses without confirmed contact — AI returns to its anchor position/patrol | Separate "stand-down" bark/animation — a clear closing moment for the player: "I got away" |
+| **Engaged → Unaware (lost contact)** | AI loses contact during the fight itself | Same stand-down signal as above |
 
-**Twee aparte ontsnappingsvensters, niet één:**
-- **Tijdens Argwanend** (voor de AI besluit te gaan onderzoeken): blijft de speler stil/uit het zicht, dan valt de AI direct terug naar Onwetend zonder ooit te bewegen — het goedkoopste en meest wenselijke uitkomst
-- **Tijdens Onderzoekend** (de AI is al onderweg): een langer venster, want de AI moet fysiek de afstand afleggen — geeft de speler tijd om zich te verplaatsen of dieper weg te duiken terwijl de AI dichterbij komt. Dit is het stuk dat het "dynamischer" maakt: de speler ziet de dreiging naderen in plaats van een binaire schakelaar
+**Two separate escape windows, not one:**
+- **During Suspicious** (before the AI decides to investigate): if the player stays still/out of sight, the AI falls straight back to Unaware without ever moving — the cheapest and most desirable outcome
+- **During Investigating** (the AI is already on its way): a longer window, since the AI has to physically cover the distance — gives the player time to relocate or duck deeper into cover while the AI approaches. This is the part that makes it "more dynamic": the player sees the threat approaching instead of a binary switch
 
-**Belangrijke onzekerheid, zelfde soort als in sectie 3.2:** het is nog niet bevestigd of vanilla Reforger's onderliggende Threat State-enum al native vier granulariteitsniveaus kent, of dat "Onderzoekend" een eigen sub-staat is die wij bovenop de bestaande Argwanend/In-gevecht-staten moeten bouwen met de Investigation Distance-instelling als bewegingsmiddel. **Eerst in Workbench inspecteren welke Threat State-waarden daadwerkelijk bestaan**, niet aannemen dat er al vier stappen native aanwezig zijn.
+**Important uncertainty, same kind as in section 3.2:** it is not yet confirmed whether vanilla Reforger's underlying Threat State enum already natively has four granularity levels, or whether "Investigating" is a dedicated sub-state we need to build on top of the existing Suspicious/Engaged states with the Investigation Distance setting as the movement mechanism. **First inspect in Workbench which Threat State values actually exist**, don't assume four native steps are already present.
 
-**Missiemaker-configureerbaar, niet hardcoded (past bij Config-laag-filosofie) — twee lagen, geen vaste standaard:**
+**Mission-maker configurable, not hardcoded (fits the Config-Layer philosophy) — two layers, no fixed default:**
 
-Geen enkel niveau is "de" standaard — in plaats daarvan een plafond-en-voorkeur-model:
+No single level is "the" default — instead, a ceiling-and-preference model:
 
-- **Scenario-plafond (missiemaker, server-side, geldt voor iedereen gelijk):** de missiemaker stelt per scenario het *maximaal toegestane* feedback-niveau in — puur diegetisch, diegetisch+cue, of diegetisch+indicator. Dit is de enige laag die de daadwerkelijke mechaniek raakt (het ontsnappingsvenster/timer blijft altijd server-authoritative en identiek voor iedereen, ongeacht dit plafond — eerlijkheid blijft gewaarborgd).
-- **Persoonlijke voorkeur (speler, client-side, alleen presentatie):** binnen dat plafond kiest elke speler zelf hoeveel hij ziet/hoort — dit raakt alleen de eigen scherm-/audio-weergave, niet de onderliggende AI-logica of wat andere spelers zien. Een speler die liever puur diegetisch speelt kan dat kiezen, ook als de missiemaker een hogere indicator toestaat; een speler kan nooit méér krijgen dan het scenario-plafond.
+- **Scenario ceiling (mission maker, server-side, applies equally to everyone):** the mission maker sets, per scenario, the *maximum allowed* feedback level — purely diegetic, diegetic+cue, or diegetic+indicator. This is the only layer that touches the actual mechanic (the escape window/timer always stays server-authoritative and identical for everyone, regardless of this ceiling — fairness stays guaranteed).
+- **Personal preference (player, client-side, presentation only):** within that ceiling, every player chooses for themselves how much they see/hear — this only affects their own screen/audio display, not the underlying AI logic or what other players see. A player who prefers to play purely diegetically can choose that, even if the mission maker allows a higher indicator; a player can never get more than the scenario ceiling.
 
-Dit lost het "instelbaar"-vraagstuk structureel op: de unit hoeft niet één keuze voor iedereen te maken, en toegankelijkheidsvoorkeur (sommige spelers willen meer duidelijkheid) ondermijnt nooit de eerlijkheid tussen spelers, omdat de mechaniek zelf nooit verandert — alleen wat je er zelf van te zien/horen krijgt.
+This resolves the "configurable" question structurally: the unit doesn't have to make one choice for everyone, and accessibility preference (some players want more clarity) never undermines fairness between players, because the mechanic itself never changes — only what you personally get to see/hear from it.
 
-**Integratie (geen nieuwe Core-onderdelen nodig):**
-- Loopt volledig via de Event Bus, binnen de `MCF_AI_`-namespace uit het hoofdproject
-- Zuiver event-gedreven — kost niets zolang er geen staatsovergang plaatsvindt, sluit direct aan bij de performance-principes. De Onderzoekend-fase kost wél iets extra: de AI-groep beweegt daadwerkelijk, dus dit valt onder de reguliere AI-simulatiekosten, niet onder "gratis event-overhead" — geen misvatting daarover laten bestaan
-- De keuze tussen de drie feedback-niveaus is een Config-laag-attribuut per scenario, niet een globale instelling — verschillende missies binnen dezelfde unit kunnen een ander niveau kiezen
+**Integration (no new Core components needed):**
+- Runs entirely through the Event Bus, within the `MCF_AI_` namespace from the main project
+- Purely event-driven — costs nothing as long as no state transition occurs, lining up directly with the performance principles. The Investigating phase *does* cost something extra: the AI group actually moves, so this falls under regular AI simulation cost, not "free event overhead" — no misconception about that should be allowed to stand
+- The choice between the three feedback levels is a Config-Layer attribute per scenario, not a global setting — different missions within the same unit can choose a different level
 
-**Afhankelijkheid, expliciet benoemd:** dit systeem werkt ongeacht de uitkomst van het onderzoek in sectie 3.2 (stance/camouflage-koppeling) — het reageert op staatsovergangen, niet op de onderliggende detectieformule. Kan dus onafhankelijk gebouwd en getest worden.
-
----
-
-## 4. Wat hier expliciet niet bij hoort (scope-bewaking)
-
-- Geen volledige eigen AI-perceptie-engine bouwen — dat zou het "ongoing development"-systeem van Bohemia zelf dupliceren en voortdurend uit sync raken met engine-updates
-- Geen ghillie-suit-camouflagesysteem in deze fase — apart, groter onderwerp (texture/materiaal-gebaseerde camouflage-coëfficiënten), pas oppakken als dit fundament staat
+**Dependency, explicitly stated:** this system works regardless of the outcome of the research in section 3.2 (stance/camouflage coupling) — it reacts to state transitions, not the underlying detection formula. Can therefore be built and tested independently.
 
 ---
 
-## 5. Voorgestelde eerste stap
+## 4. What is explicitly out of scope here (scope guarding)
 
-1. **Test eerst, bouw daarna:** meet in Workbench hoe de huidige AI daadwerkelijk reageert op verschillende houding/snelheid-combinaties, voordat er één regel code voor stap 3.2 geschreven wordt
-2. Bouw parallel de subsonic-munitie (3.1) — laagste risico, duidelijkste winst, hangt niet af van de uitkomst van de AI-test
-3. Stance-hoogteregeling (3.3) als losse, onafhankelijke verbetering — kan altijd, ongeacht uitkomst van 1 en 2
-4. **Detectie-feedbacksysteem (3.4) kan meteen parallel starten** — onafhankelijk van 1 t/m 3, omdat het alleen op AI-staatsovergangen reageert, niet op de onderliggende detectiewaarde. Goede kandidaat om als eerste tastbare resultaat te tonen: kost weinig bouwwerk, geeft direct speelbare feedback.
+- No building a full custom AI perception engine — that would duplicate Bohemia's own "ongoing development" system and continuously fall out of sync with engine updates
+- No ghillie-suit camouflage system at this stage — a separate, bigger topic (texture/material-based camouflage coefficients), only take on once this foundation is in place
 
 ---
 
-## 6. Open vragen om vroeg te beantwoorden
+## 5. Proposed first step
 
-- Reageert vanilla Reforger-AI merkbaar op stance/snelheid voor visuele detectie, of is dit systeem nog te onvolwassen om op te bouwen?
-- Is er al een audibleFire-achtige coëfficiënt per munitietype in de huidige game-data aanwezig die hergebruikt kan worden, of moet die volledig nieuw gedefinieerd worden?
-- Welke realistische penalty voor subsonic-munitie past het beste bij milsim-balans zonder frustrerend te worden (bereik? stopping power? beide, afgezwakt)?
-- Is `AI Threat State`/`On Threat State Changed` rechtstreeks bruikbaar zoals SF het exposet, of moet er een eigen wrapper omheen om de drie feedback-niveaus (puur diegetisch / subtiele cue / expliciete indicator) te ondersteunen?
-- **Nieuw:** kent vanilla Reforger's Threat State-enum al vier granulariteitsniveaus (inclusief een apart "onderzoekend"-stadium), of moet dat als eigen sub-staat bovenop de bestaande staten gebouwd worden met Investigation Distance als bewegingsmiddel? Eerste stap: dit in Workbench opzoeken vóór er één regel state-machine-code geschreven wordt.
-- Hoe lang moet het Onderzoekend-venster duren om "dynamisch en spannend" aan te voelen zonder frustrerend traag te worden — dit is een gevoelswaarde die alleen via speeltests vastgesteld kan worden, niet via een formule.
-- Welk feedback-plafond is een redelijke default voor nieuwe scenario's als de missiemaker niets instelt — of moet dit veld verplicht expliciet gekozen worden bij scenario-setup (aansluitend bij de validatie-pass uit het hoofdproject die nooit stil mag falen)?
+1. **Test first, build second:** measure in Workbench how the current AI actually reacts to different stance/speed combinations, before a single line of code for step 3.2 is written
+2. Build the subsonic ammunition (3.1) in parallel — lowest risk, clearest win, doesn't depend on the outcome of the AI test
+3. Stance height control (3.3) as a separate, independent improvement — can happen anytime, regardless of the outcome of 1 and 2
+4. **The detection feedback system (3.4) can start in parallel right away** — independent of 1-3, since it only reacts to AI state transitions, not the underlying detection value. A good candidate to show as the first tangible result: costs little build work, gives immediately playable feedback.
+
+---
+
+## 6. Open questions to answer early
+
+- Does vanilla Reforger AI noticeably react to stance/speed for visual detection, or is this system still too immature to build on?
+- Is there already an audibleFire-like coefficient per ammo type present in the current game data that can be reused, or does it need to be fully newly defined?
+- What realistic penalty for subsonic ammunition fits milsim balance best without becoming frustrating (range? stopping power? both, toned down)?
+- Is `AI Threat State`/`On Threat State Changed` directly usable as SF exposes it, or does it need its own wrapper to support the three feedback levels (purely diegetic / subtle cue / explicit indicator)?
+- **New:** does vanilla Reforger's Threat State enum already have four granularity levels (including a separate "investigating" stage), or does that need to be built as a dedicated sub-state on top of the existing states with Investigation Distance as the movement mechanism? First step: look this up in Workbench before a single line of state-machine code is written.
+- How long should the Investigating window last to feel "dynamic and tense" without becoming frustratingly slow — this is a feel value that can only be determined through playtesting, not via a formula.
+- What feedback ceiling is a reasonable default for new scenarios if the mission maker doesn't configure anything — or should this field be mandatory to explicitly choose during scenario setup (in line with the validation pass from the main project that must never fail silently)?
