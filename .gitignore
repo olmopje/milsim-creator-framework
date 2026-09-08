@@ -6,6 +6,11 @@
 /build/
 /.workbench/
 
+# Tijdelijke enfusion-mcp NET API-handlerscripts -- worden door de tool zelf
+# in de mod gekopieerd om Workbench aan te sturen, horen niet in git en
+# moeten voor publicatie verwijderd worden via wb_cleanup
+addons/MCF/Scripts/WorkbenchGame/
+
 # OS/editor ruis
 .DS_Store
 Thumbs.db
