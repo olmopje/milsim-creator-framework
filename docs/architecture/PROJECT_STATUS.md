@@ -54,6 +54,8 @@ Every phase in the roadmap has a working, confirmed-compiling implementation. Se
 
 `enfusion-mcp:wb_reload` is frequently flaky -- it often reports success without a fresh compile actually appearing in the log. When that happens: retry a few times with 15-20s waits, and if it stays stuck, ask whoever is at the PC to click into the Workbench window (giving it focus reliably un-sticks it). Always confirm via the log's `Compiling Game scripts took` / `SCRIPT (E)` lines, never trust the tool's "Reload Complete" message alone.
 
+After many reload cycles in one long session, Workbench can pop an Enfusion engine "Assertion failed: Resources are leaking!" dialog (in `GameApp.cpp`, unrelated to any of our own script files). Clicking **Retry** has been observed to resolve it and let Workbench continue working normally -- this is an engine-internal resource-tracking assertion, not something caused by MCF code.
+
 ---
 
 # Historical: original Phase 0 handoff notes
