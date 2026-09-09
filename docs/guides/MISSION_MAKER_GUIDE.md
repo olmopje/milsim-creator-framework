@@ -277,9 +277,9 @@ systems. Decay toward zero can be enabled on the Game Mode Starter.
 **Civilian Behavior Hook** reports "neutral", "fearful" or "hostile" for its
 area, but does not change the civilian's behaviour on its own.
 
-**Compliance** lets players force an NPC compliant at gunpoint. Something still
-has to call it when a player presses interact. Marking an attempt "unjustified"
-raises area Hostility automatically.
+**Compliance** decides whether one person gives in when shouted at. It is no
+longer something a menu entry calls; the shout system drives it. See "Shouting,
+surrender and escort" below.
 
 **AI Command Watchdog** detects AI that has not moved for a while and
 force-corrects it to the nearest Safe Fallback Point.
@@ -369,3 +369,92 @@ MCF_Core_Log.SetEnabled(false);
 ```
 
 Warnings and errors ignore that switch, so validation problems still surface.
+
+---
+
+# Talking to people
+
+Every character in the game can be talked to — not a special MCF prefab, every
+character, vanilla or modded, in any faction. MCF overrides vanilla
+`Character_Base`, so there is nothing to place and nothing to configure before
+it works. Walk up to any AI and look at its chest.
+
+Each person carries two numbers about the players, **trust** and **fear**, and
+what they are willing to say depends on those numbers. Fear is not stored and
+updated by something; it is their personal fear plus the live hostile share of
+the area they are in, so a firefight in the village frightens everybody in it
+without any node pushing a value around.
+
+A conversation is nodes (what they say) and choices (what you may say back).
+Each choice can require a minimum trust, a maximum fear, or a flag set earlier
+in the same conversation; can change trust and fear; and can **publish an MCF
+event**. That last one is how a conversation causes anything — an informant who
+finally gives up the cache location fires `CacheLocationKnown`, and from there
+it is an ordinary event you can hang an Intel Source or a Recipe on.
+
+Conversations live in a **library**, not on each person, so you write one and
+put it on twenty villagers. Game Master can assign one to a selected character,
+edit the library, or create a new entry from the character you have selected.
+Edits apply immediately.
+
+A character has two conversation slots: a normal one and an interrogation one.
+The interrogation conversation is offered only once somebody is restrained.
+
+⚠️ Conversation flags, trust and fear do not survive a server restart.
+
+# Shouting, surrender and escort
+
+Raise your weapon and press **H** to shout for surrender, or **U** to tell
+people to keep their distance. A shout carries 25 metres and everybody inside
+that sphere is asked *individually*, so a squad can break unevenly.
+
+Each person weighs how far away you are, whether your weapon is raised, their
+own fear, and whether they are armed. Every weight is editable in Game Master on
+`MCF_AI_ComplianceComponent`: Fear Weight, Armed Resistance, Weapon Raised
+Weight, Fear On Surrender, and a Base Compliance Chance everything else
+modifies. Set Armed Resistance high for soldiers and it stops mattering for
+civilians, which is how you get "civilians give up, soldiers usually do not"
+without two separate systems.
+
+**Punish Unjustified** is on by default: screaming at unarmed civilians for no
+reason raises the area's Hostility, which raises everybody else's fear. Turn it
+off for anyone who is fair game.
+
+Somebody who gives in drops their weapon and holds position. Walk up and you can
+Restrain them, Interrogate them, Release them, or escort them — Follow (they
+trail you) or Lead (they walk in front and you steer). An **unrestrained**
+escortee rolls every second for a chance to break away, and publishes
+`MCF_AI_SubjectEscaped` when they do. A restrained one never rolls. That is the
+whole trade.
+
+⚠️ Restraining works but has no animation yet. Arma Reforger ships no surrender
+or restrained pose at all, and the obvious workaround crashes the Workbench, so
+this needs a purpose-built animation clip.
+
+# The operations board
+
+`MCF_Task_Board` is placeable. It shows taskings and intel, with a read/amend
+split — seeing an entry and being allowed to change it are separate rights —
+and it shows you what role the system thinks you have, so a wrong answer gets
+noticed.
+
+⚠️ Role restrictions are written but currently switched off: everybody can do
+everything until roles have been watched in a real session.
+
+Intel carries its provenance ("Handwritten letter", "Radio intercept",
+"Captured map") and a faction key. A record with a key is visible only to that
+faction; one without is visible to everyone.
+
+`MCF_Intel_SourceComponent` turns any event into intel, so intel becomes a
+consequence of play rather than something placed in advance. **DROP** spawns a
+document somebody must find and carry back; **SIGNAL** enters it on a faction's
+board directly and requires a faction key. Leave **Once** on unless you really
+want one document per trigger crossing.
+
+⚠️ Faction-scoped intel needs a two-faction test that has not been run, and
+dropped intel objects do not survive a server restart.
+
+---
+
+The wiki at <https://github.com/olmopje/milsim-creator-framework/wiki> covers
+all of this at more length, with a troubleshooting page.

@@ -5,6 +5,94 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-10 - Talking to, subduing and escorting AI
+The framework stops being only a trigger-and-event system and starts being something
+the player interacts with directly. Every character in the game -- vanilla or modded,
+any faction -- can now be talked to, shouted at, made to surrender, restrained and
+walked somewhere.
+
+### Added -- Dialogue
+- `MCF_Dialogue_Data`, `_Script`, `_View`, `_Library` -- a server-authoritative
+  conversation graph, a text serializer (three separator levels with newline escaping),
+  and a runtime-extensible library that persists across restarts
+- `MCF_Dialogue_Component` -- drives one conversation per character. Replicates the
+  conversation *id*, not its text, so a client raises the interaction prompt from the
+  id alone; the server owns every state transition
+- `MCF_AI_DispositionComponent` -- trust and fear per character. Fear is a personal
+  component plus the live hostile share of the surrounding area, so it moves during a
+  fight without anything having to push it
+- Replies are gated on those two numbers; outcomes publish MCF events, so a conversation
+  can drive the same logic nodes a trigger can
+- `MCF_Dialogue_Menu` and `MCF_Dialogue.layout` -- a running-chat screen, newest line at
+  the top, deliberately not matching the placeholder styling of the other MCF menus
+
+### Added -- Reaching every faction
+- `Prefabs/Characters/Core/Character_Base.et` overrides vanilla `{37578B1666981FCE}`,
+  generated mechanically via `game_duplicate` rather than hand-written. Every character
+  inherits the dialogue, disposition, compliance and subject-control components, a
+  `MCF_Talk` UserActionContext on Spine5, and the Talk / Restrain / Release / Escort
+  actions. This replaced a per-faction approach that could never cover modded factions
+
+### Added -- Game Master authoring
+- `MCF_ContextActions.conf` and `MCF_EditorAttributes.conf` with the menus under
+  `Scripts/Game/UI` -- assign a conversation to a character, edit the library itself,
+  and create a new library entry from the character you have selected
+- Editor attributes carry 12 bytes and cannot hold text, so a pick travels as a number
+  and the text travels by RPC through a custom menu
+
+### Added -- Shout, surrender, restrain, escort
+- `Configs/System/chimeraInputCommon.conf` appends an MCF action context to vanilla's
+  bindings. A mod adding its own keybind was previously unproven here; it is now
+  verified in play. H shouts surrender, U shouts stay back
+- `MCF_AI_Shout` -- queries a 25 m sphere and asks each AI in it individually
+- `MCF_AI_ComplianceComponent.WillSurrender` weighs distance, whether the shouter's
+  weapon is raised, and the subject's own fear, with civilians dialled likelier to give
+  in than soldiers. All weights are Game Master configurable
+- A subject who gives in drops its weapon and holds position, and can then be restrained
+- `MCF_AI_SubjectControlComponent` -- standing orders (follow, lead, stand off), an
+  escape roll for the unrestrained, and a marching pace matched to the escort's own velocity
+- `MCF_AI_MarchBehavior` -- re-issues combat-move requests without tearing the behaviour
+  down, which is what finally removed the arrive-stop-repeat stutter of pathfinding to a
+  point four metres ahead
+
+### Changed -- Intel
+- `MCF_Intel_CarrierComponent` moved from a broadcast to an `RplProp`, so Game Master
+  edits survive late join and streaming instead of being missed by anyone not present
+  at the moment of the edit
+- `MCF_Intel_Record` gained a faction key, and `MCF_Core_IntelStore` filters on it: a
+  board shows only what that faction knows. An empty key on a record means visible to
+  all; an empty faction on a player means they see nothing
+- `MCF_Intel_SourceComponent` -- turns a trigger into intel, either dropped into the
+  world as an object or signalled straight to a faction's board
+- `MCF_Task_Permissions.ResolveRole` is real rather than stubbed: Game Master rights,
+  then faction commander, then group leader, then soldier. The master override
+  `m_bEveryoneMayDoEverything` is still on until roles have been watched in a session
+
+### Removed
+- `MCF_AI_SurrenderAction` and `MCF_AI_StandOffAction` -- superseded by the shout path,
+  which decides from the shouter's position and the subject's fear rather than from a
+  menu entry on each person
+- `MCF_AI_ComplianceComponent.AttemptCompliance` -- a second surrender roll that nothing
+  ever called, predating `WillSurrender`
+
+### Repository hygiene
+- Research notes moved from `addons/MCF/docs/` to `docs/research/`; anything under
+  `addons/MCF/` is packed into the shipped addon, so those notes were being distributed
+  to every player
+- `.gitignore` rewritten in English, `*.bak` added, and the local `server/` folder
+  untracked -- it held an admin password and pure runtime logs
+
+### Known gaps
+- The restrained pose is deliberately empty. Mounting the 23 KB narrative animation
+  graph as a loiter attachment crashes the Workbench natively; vanilla's own officer
+  graph is 475 bytes, so this needs a purpose-built one-clip graph
+- No script API can raise a noise the AI hears -- `EarsSensor` and danger events are
+  engine-raised only, so a shout is a query, not a sound the AI perceives
+- Characters cannot be physically coupled: `Character_Base` lists itself under
+  "Forbidden linking". Carry mods work only because their subject is unconscious
+- Faction-scoped intel and late-join replication still need a two-peer test
+
+
 ## [0.2.1] - 2026-09-09 - Game Master placeable-entity visibility fix
 After an extensive debugging session, resolved all 12 placeable prefabs not appearing in the
 Game Master Entity Browser despite compiling and loading with zero errors.

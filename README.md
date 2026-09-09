@@ -4,24 +4,42 @@ A self-built, modular mission framework for Arma Reforger. Gives mission makers 
 
 No dependency on third-party frameworks (Scenario Framework, Ci5, GME) — informed by their design, but built independently. See [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) for the full rationale.
 
+📖 **[The wiki](https://github.com/olmopje/milsim-creator-framework/wiki) is the place to start** — mission-maker guides, the node reference, and the Enfusion lessons that cost us the most time.
+
 ## Status
 
-🚧 **Full roadmap implemented (Phases 0-14), first working version.** All planned modules exist and are confirmed compiling in Workbench -- crude but functional, not polished. See [`docs/architecture/PROJECT_STATUS.md`](docs/architecture/PROJECT_STATUS.md) for exact status, known gaps, and environment notes. See [`docs/guides/MISSION_MAKER_GUIDE.md`](docs/guides/MISSION_MAKER_GUIDE.md) for a plain-language reference to every placeable node. No polished/tested-in-a-full-session build yet.
+🚧 **Working, unpolished, pre-release.** There is no tagged build yet and no Workshop publication.
+
+What is proven in a live session, not merely compiling:
+
+- **An event-driven core** — event bus, tick manager, budget caps, cross-restart persistence outside the engine's own saves.
+- **Twelve placeable nodes**, every one observed firing: proximity, cone and line-of-sight detection, AND/OR/counter logic, relays, recipes, objectives, observation points, on-screen text.
+- **An operations board** — taskings and intel with a read/amend permission split, edited live in Game Master.
+- **Conversations with any AI** — trust and fear per character, replies gated on those numbers, authored from a Game Master library. Reaches every character in the game, vanilla or modded, through an override of `Character_Base` rather than an MCF-only prefab.
+- **Shout, surrender, restrain, escort** — a real custom keybind (H / U) forces nearby AI to weigh distance, your weapon, and their own fear; those who give in drop their weapon, can be restrained, and can be walked somewhere.
+
+What is not proven: faction-scoped intel and late-join replication both need a two-peer test, and the audience filter on text lines is plumbed but never observed selecting.
+
+The chronological record, including every dead end, is [`docs/architecture/PROJECT_STATUS.md`](docs/architecture/PROJECT_STATUS.md). Where it is going next is [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Structure
 
 ```
-addons/MCF/          — the actual mod (loads in-game)
-  Prefabs/            — .et prefab files
-  Scripts/Game/Core/  — Event Bus, Object Identity, Module Registry, Tick Manager, etc.
-  Scripts/Game/Modules/ — individual modules (Objective, Hostility, Ambient Life, ROE, ...)
-  Configs/            — .conf files, StringTables
-  UI/                 — GM attribute layouts
+addons/MCF/           — the actual mod (loads in-game)
+  Prefabs/              — .et prefab files, including the Character_Base override
+  Scripts/Game/Core/    — event bus, identity, tick manager, stores, dialogue data
+  Scripts/Game/Modules/ — per-entity components (triggers, dialogue, disposition, escort)
+  Scripts/Game/Editor/  — Game Master context actions and editor attributes
+  Scripts/Game/UI/      — MCF menus (operations board, dialogue, editors)
+  Configs/              — .conf files, StringTables, the input-binding override
+  UI/layouts/           — .layout files for those menus
 
 docs/
-  architecture/       — the full architecture plan (leading document)
-  modules/            — standalone technical sub-projects (e.g. vehicle shooting, ACE compatibility)
-  research/           — research into community/mission-maker complaints that informs the roadmap
+  architecture/         — ARCHITECTURE.md (the plan), PROJECT_STATUS.md (the record)
+  guides/               — MISSION_MAKER_GUIDE.md, plain-language node reference
+  modules/              — standalone technical sub-projects
+  research/             — design notes and community pain-point research
+  ROADMAP.md            — what is verified, what is missing, what comes next
 
 .github/              — issue templates, CI workflows
 ```

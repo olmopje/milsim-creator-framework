@@ -179,9 +179,9 @@ supersede others.
 
 | Document | What it settles |
 |---|---|
-| `addons/MCF/docs/research/prefab-mflags-parse-bug.md` | Why prefabs were invisible in Game Master. Resolved. |
-| `addons/MCF/docs/research/editor-attributes-research.md` | How placed nodes expose editable properties. |
-| `addons/MCF/docs/research/multiplayer-and-audience.md` | Server authority and the broadcast/filter pattern. Partly implemented. |
+| `docs/research/prefab-mflags-parse-bug.md` | Why prefabs were invisible in Game Master. Resolved. |
+| `docs/research/editor-attributes-research.md` | How placed nodes expose editable properties. |
+| `docs/research/multiplayer-and-audience.md` | Server authority and the broadcast/filter pattern. Partly implemented. |
 
 ### Design questions — open, ordered by when they must be answered
 
@@ -271,9 +271,11 @@ Each of these cost real time to discover.
 ## Where documents live
 
 Developer-facing docs (`ARCHITECTURE.md`, `PROJECT_STATUS.md`, this file,
-guides, module notes) live in `G:\MCF\docs`. Research notes written alongside
-the code live in `G:\MCF\addons\MCF\docs\research` and ship with the addon.
-Keep new research with the code; keep planning and status here.
+guides, module notes) live in `G:\MCF\docs`. Research notes live in
+`G:\MCF\docs\research`. They used to sit under `addons\MCF\docs`, which meant
+they were packed into the shipped addon and handed to every player; they moved
+on 2026-09-10. Everything documentation-shaped belongs in `docs`, nothing under
+`addons`.
 
 
 ---
