@@ -1709,12 +1709,78 @@ a completely different project (`loaded 5660x files`, and a stream of
 handlers were not loaded at all). **Check the file and class count before
 trusting any session.**
 
-### Not verified
 
-Nothing has been watched running since the split. The refactor moved
-`MCF_Task_Permissions.ResolveRole` to `MCF_Core_Roles` and every dialogue
-Game-Master check with it, and folded the hostility decay setting back into
-Core's game mode component. A play session still has to confirm the board, a
-conversation, and a shout all behave. And the split `modded class
-SCR_PlayerController` now genuinely spans four addons -- Core, Ops, Dialogue
-and Subdue -- which compiles, but has not been exercised over a wire since.
+### Verified in a live session, all eight addons loaded (2026-09-10)
+
+Every module was exercised over the wire, and each one crosses an addon
+boundary to do it.
+
+**Core lifecycle, and the listen-server race again.** The host registered
+before the game mode started, exactly as before, and the deferral held:
+
+```
+01:53:24.274  player 1 registered before the task store was ready -- deferring their tasks
+01:53:24.380  GameMode start -- resetting per-mission state
+01:53:24.381  PersistentStore: this server has started 56 times -- previous runs survived restart
+01:53:24.381  restored 2 authored conversation(s) from previous sessions     MCF_Dialogue
+01:53:24.381  TaskStore loaded 2 task(s) from previous sessions              MCF_Ops
+01:53:24.382  IntelStore loaded 3 record(s) from previous sessions           MCF_Ops
+01:53:24.382  TaskStore ready -- catching up 1 already-connected player(s)
+01:53:24.382  sent 1 task(s) to player 1 (no faction yet): t5
+01:53:24.382  Event validation passed -- every consumed event has a publisher
+```
+
+Two module addons answered Core's `MCF_Core_PersistentStoreReady` from outside
+Core, and the join push and the faction re-push (`player 1 changed faction to
+US` -> `sent 1 task(s) to player 1 (US)`) both landed.
+
+**Objectives.** All three detection components registered through Core's
+watcher registry and the watch list grew as controllables spawned:
+
+```
+Controllable spawned -- notifying 3 registered watcher(s)
+ProximityTrigger now watching 1 ... 5 entities
+ProximityTrigger FIRED, publishing MCF_Obj_ProximityDetected
+SpottedByPlayer FIRED, publishing MCF_Obj_PlayerSpottedTarget
+ConeDetection FIRED, publishing MCF_Obj_ConeDetected
+```
+
+All three fired. The prefabs live in `MCF_Objectives`, the world in `MCF_Dev`,
+the registry and base class in `MCF`.
+
+**Ops.** `Creating menu 'MCF_PlanningBoard'` ->
+`CrateWidgets @"{6A1C4F0B39D2A100}UI/layouts/MCF/MCF_PlanningBoard.layout"` ->
+`operations board opened` / `closed`. The **menu preset is in Core's
+`chimeraMenus.conf` manifest and the layout is in `MCF_Ops`** — the manifest
+resolving across an addon boundary, watched.
+
+**Dialogue.** `'Farmer' assigned conversation 'farmer_mill'`, then
+`player 1 opens dialogue with 'Farmer', trust=50 fear=0`. Three things at once:
+the Game-Master check now runs through `MCF_Core_Roles` in Core, called from
+`MCF_PlayerController_Dialogue` in `MCF_Dialogue`; the `trust=50 fear=0` is the
+disposition component from Core's `Character_Base` manifest being read by the
+dialogue module; and the dialogue block of the split `modded class` answered
+over the wire.
+
+**Subdue.** `shout keys bound` — the input context is declared in Core's
+`chimeraInputCommon.conf` manifest and bound by `MCF_ShoutInput` in
+`MCF_Subdue`.
+
+**React.** `Recipe init but no trigger event set -- inactive`, which is correct
+for an unconfigured recipe.
+
+**So the `modded class SCR_PlayerController` merges across four addons at
+runtime**, not merely at compile time: Core supplies `MCF_SendMessage`, and the
+Ops and Dialogue blocks in their own addons both used it.
+
+Every `(E)` in the session is pre-existing or vanilla: the
+`Multiple map entities present!` pair, `Unknown keyword/data 'm_sWorldFile'`
+from the unregistered `Missions/Milsim.conf`, vanilla world content
+(`SlidingTrackMaterial`, `Parent`), and six
+`Trying to use managed texture as widget's image` on
+`UI/Textures/Editor/Toolbar/ToolbarAction_Map.edds` — a vanilla Game Master
+toolbar icon, one per `Mode_Edit.layout` creation, nothing to do with MCF.
+**No `Wrong GUID/name`. No `Unknown class`.**
+
+Not exercised in this session: an actual shout (only the key binding was
+observed), and the restrain/escort chain.

@@ -132,29 +132,36 @@ a library, and libraries go in Core.
 `Module: Game; loaded 5746x files; 11270x classes`, no `(E)`, and the test
 world in `MCF_Dev` initialised prefabs from four different addons.
 
-### Not verified
+### Watched running, and it holds
 
-Nothing has been watched running since the final split. The last step moved
-`ResolveRole` out of `MCF_Task_Permissions` into `MCF_Core_Roles` — every
-dialogue Game-Master check goes through it — and folded the hostility decay
-setting back into Core's game mode component. And the split
-`modded class SCR_PlayerController` now spans four addons (Core, Ops, Dialogue,
-Subdue); it compiles, but has not been exercised over a wire.
+A live session with all eight addons exercised every module across an addon
+boundary: the listen-server race and the deferral, both stores loading from
+module addons on Core's event, the join push and faction re-push, all three
+detection triggers registering through Core's watcher registry and firing, the
+planning board opening from a preset in Core's manifest with a layout in
+`MCF_Ops`, a conversation assigned and opened (`trust=50 fear=0` — the
+disposition component from Core's `Character_Base` manifest, read by the
+dialogue module, with the Game-Master check going through `MCF_Core_Roles`),
+and `shout keys bound` from `MCF_Subdue` against Core's input manifest.
+
+**The `modded class SCR_PlayerController` merges across four addons at
+runtime**, not merely at compile time. No `Wrong GUID/name`, no
+`Unknown class`; every `(E)` in the session is pre-existing or vanilla.
+
+Not exercised: an actual shout (only the key binding), and the restrain/escort
+chain.
 
 ### Next, in order
 
-1. **A play session that proves the split did not break anything.** Open the
-   board, talk to somebody, shout at somebody. That also finally answers
-   whether the `modded class` chain merges across addons at runtime.
-2. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
+1. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
    late-join replication and the audience filter — and can fold in the two
    remaining modularisation unknowns: the dropped-component behaviour at
    runtime on a dedicated server, and the same packed to `.pak`.
-3. **Decide what gets published and how.** Eight addons is a lot for a user to
+2. **Decide what gets published and how.** Eight addons is a lot for a user to
    install. Worth checking whether a Workshop dependency chain does the work,
    or whether a bundle is needed.
-4. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
-5. A one-clip animation graph for the restrained pose. Build it small — the
+3. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
+4. A one-clip animation graph for the restrained pose. Build it small — the
    crash is a size problem, not a concept problem. `arms_back` was the clip the
    user picked. Preview in `anims/workspaces/player/player_main.aw`.
 
@@ -176,26 +183,25 @@ the launcher with the addon ticked. The log confirms it with
 Workbench closed — rewriting it while the launcher is waiting just makes it
 wait longer.
 
-**Launching the Workbench.** The project file is `addon.gproj`, not
-`MCF.gproj`, and the path must be `G:\MCF\addons\MCF` — passing `G:\MCF` gives
+**Launching the Workbench.** For an already-registered project the path must
+be the `addon.gproj` itself — passing `G:\MCF` gives
 `projectPath resolves outside every configured root`, after which the MCP tool
 may silently auto-launch its own `EnfusionMCP.gproj` instead. `wb_launch` on an
 unregistered project did exactly that: it opened something else entirely
 (`loaded 5660x files` and endless `Failed to call not existing Net API function
 'EMCP_WB_Ping'`). **Always check the file/class count before trusting a
-session.** `wb_reload` is
-unreliable. The loop that works:
+session.** `wb_reload` is unreliable. The loop that works:
 
 ```
 kill the Workbench
-Start-Process -ArgumentList '-gproj','G:\MCF\addons\MCF\addon.gproj'
+Start-Process -ArgumentList '-gproj','<a registered addon.gproj>'
 sleep ~55s
 logs_filter for  \(E\)|Module: Game;
 ```
 
-A clean compile reads `Module: Game; loaded 5746x files; 11271x classes` with no
-`(E)` lines. That proves the scripts compiled and **nothing else** — see the
-first rule below.
+With all eight addons loaded a clean compile reads
+`Module: Game; loaded 5746x files; 11270x classes` with no `(E)` lines. That
+proves the scripts compiled and **nothing else** — see the first rule below.
 
 **PowerShell quoting breaks constantly** on nested quotes. Pass literal content
 through the `var1`..`var4` parameters rather than inlining it. Use `.Contains()`
