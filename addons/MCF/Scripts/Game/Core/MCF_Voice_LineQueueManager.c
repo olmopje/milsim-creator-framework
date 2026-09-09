@@ -50,12 +50,12 @@ class MCF_Voice_LineQueueManager
 {
 	private static ref MCF_Voice_LineQueueManager s_Instance;
 
-	protected ref array<ref MCF_Core_LineQueueEntry> m_aQueue;
+	protected ref array<ref MCF_Voice_LineQueueEntry> m_aQueue;
 	protected bool m_bBusy;
 
 	void MCF_Voice_LineQueueManager()
 	{
-		m_aQueue = new array<ref MCF_Core_LineQueueEntry>();
+		m_aQueue = new array<ref MCF_Voice_LineQueueEntry>();
 
 		// Declare the event we publish, so the validation pass does not
 		// report the display component as listening for something nothing
@@ -85,7 +85,7 @@ class MCF_Voice_LineQueueManager
 	//! ones already queued. Processes immediately if nothing is active.
 	void Enqueue(string text, int priority, MCF_EAudience audience = MCF_EAudience.EVERYONE, string factionKey = "", int playerId = 0)
 	{
-		MCF_Core_LineQueueEntry entry = new MCF_Core_LineQueueEntry();
+		MCF_Voice_LineQueueEntry entry = new MCF_Voice_LineQueueEntry();
 		entry.m_sText = text;
 		entry.m_iPriority = priority;
 		entry.m_eAudience = audience;
@@ -116,7 +116,7 @@ class MCF_Voice_LineQueueManager
 			return;
 		}
 
-		MCF_Core_LineQueueEntry entry = m_aQueue[0];
+		MCF_Voice_LineQueueEntry entry = m_aQueue[0];
 		m_aQueue.RemoveOrdered(0);
 
 		m_bBusy = true;
@@ -145,7 +145,7 @@ class MCF_Voice_LineQueueManager
 //! One queued line. A class rather than parallel arrays so that adding a field
 //! (audience, and whatever comes after it) does not mean adding another array
 //! and another place to keep the indices in step.
-class MCF_Core_LineQueueEntry
+class MCF_Voice_LineQueueEntry
 {
 	string m_sText;
 	int m_iPriority;

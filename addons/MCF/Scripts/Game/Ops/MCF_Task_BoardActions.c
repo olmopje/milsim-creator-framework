@@ -19,7 +19,7 @@
 //! it, which is why HasLocalEffectOnlyScript returns true. Opening a screen is
 //! a purely local act. Everything the screen then does that changes shared
 //! state goes to the server as a request through SCR_PlayerController, and the
-//! server re-checks it -- see MCF_PlayerControllerTasks.c.
+//! server re-checks it -- see MCF_PlayerController_Ops.c.
 //!
 //! HARD-WON PREFAB DETAIL: the action will register fine and still never
 //! appear if the UserActionContext has no position. An empty `Position {}`

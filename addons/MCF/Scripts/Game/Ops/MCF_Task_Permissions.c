@@ -15,7 +15,7 @@
 //!
 //! THE ENFORCEMENT POINT IS THE SERVER. The UI calls these to decide whether
 //! to grey a button out, which is a courtesy to the player. The request
-//! handlers in MCF_PlayerControllerTasks.c call them again before changing
+//! handlers in MCF_PlayerController_Ops.c call them again before changing
 //! anything, which is the part that actually matters. A client that lies
 //! about its role gets nowhere, because the server never asks the client what
 //! its role is -- it resolves it from the player id the RPC arrived with.
@@ -177,7 +177,7 @@ class MCF_Task_Permissions
 		{
 			// Reading the board is what a board is for. Which *tasks* a
 			// player sees is a separate question, answered per task by
-			// MCF_Core_TaskStore.IsVisibleTo -- this only says whether they
+			// MCF_Task_Store.IsVisibleTo -- this only says whether they
 			// may open the thing at all.
 			case MCF_ETaskAction.READ:
 				return true;

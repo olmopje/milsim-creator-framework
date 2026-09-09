@@ -18,11 +18,11 @@
 //! the "not player-only yet" caveat).
 
 [ComponentEditorProps(category: "MCF/Objective", description: "Fires once a registered player has this entity within view range/angle -- use to gate events on 'has actually been seen'.")]
-class MCF_Obj_SpottedByPlayerComponentClass : ScriptComponentClass
+class MCF_Obj_SpottedByPlayerComponentClass : MCF_Core_ControllableWatcherComponentClass
 {
 }
 
-class MCF_Obj_SpottedByPlayerComponent : ScriptComponent
+class MCF_Obj_SpottedByPlayerComponent : MCF_Core_ControllableWatcherComponent
 {
 	[Attribute(defvalue: "100", uiwidget: UIWidgets.EditBox, desc: "Maximum distance in metres at which a watcher can spot this entity.")]
 	protected float m_fMaxRange;
@@ -65,7 +65,7 @@ class MCF_Obj_SpottedByPlayerComponent : ScriptComponent
 		m_TickInvoker = MCF_Core_EventManager.GetInstance().GetInvoker("MCF_Core_TickCritical");
 		m_TickInvoker.Insert(OnTickCritical);
 
-		MCF_Core_AutoWatcherRegistry.GetInstance().RegisterSpottedTrigger(this);
+		MCF_RegisterAsWatcher();
 
 		MCF_Core_Log.Debug("SpottedByPlayer init, range=" + m_fMaxRange.ToString() + " event=" + m_sSpottedEvent);
 	}
@@ -75,7 +75,14 @@ class MCF_Obj_SpottedByPlayerComponent : ScriptComponent
 		if (m_TickInvoker)
 			m_TickInvoker.Remove(OnTickCritical);
 
-		MCF_Core_AutoWatcherRegistry.GetInstance().UnregisterSpottedTrigger(this);
+		MCF_UnregisterAsWatcher();
+	}
+
+	//! Every newly spawned controllable becomes a potential spotter of this
+	//! one. Called by MCF_Core_AutoWatcherRegistry.
+	override void OnControllableSpawned(IEntity entity)
+	{
+		RegisterWatcher(entity);
 	}
 
 	//! Adds a player-controlled entity as a potential spotter of this one.

@@ -226,7 +226,7 @@ class MCF_Intel_SourceComponent : ScriptComponent
 
 		// Player id 0: nobody logged this, it arrived. The board shows the
 		// source line, which is what a reader actually judges it by.
-		MCF_Intel_Record record = MCF_Core_IntelStore.GetInstance().Log(m_sSource, m_sHeading, m_sTimestamp, m_sBody, 0, m_sFactionKey);
+		MCF_Intel_Record record = MCF_Intel_Store.GetInstance().Log(m_sSource, m_sHeading, m_sTimestamp, m_sBody, 0, m_sFactionKey);
 
 		if (!record)
 			return false;
@@ -246,14 +246,14 @@ class MCF_Intel_SourceComponent : ScriptComponent
 		if (!gameMode)
 			return;
 
-		MCF_Core_GameModeComponent mcf = MCF_Core_GameModeComponent.Cast(gameMode.FindComponent(MCF_Core_GameModeComponent));
-		if (!mcf)
+		MCF_Ops_GameModeComponent ops = MCF_Ops_GameModeComponent.Cast(gameMode.FindComponent(MCF_Ops_GameModeComponent));
+		if (!ops)
 		{
-			MCF_Core_Log.Warn("no MCF_Core_GameModeComponent on the game mode -- signalled intel will not reach anyone until the next refresh");
+			MCF_Core_Log.Warn("no MCF_Ops_GameModeComponent on the game mode -- signalled intel will not reach anyone until the next refresh");
 			return;
 		}
 
-		mcf.RefreshTasksForAllPlayers();
+		ops.RefreshTasksForAllPlayers();
 	}
 
 	int GetProduceCount()

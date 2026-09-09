@@ -7,7 +7,7 @@
 //! who can enter it. That is why logging is a server call and not a side
 //! effect of reading.
 //!
-//! Mirrors MCF_Core_TaskStore deliberately, down to the persistence keys and
+//! Mirrors MCF_Task_Store deliberately, down to the persistence keys and
 //! the clear-then-resend transport. Two stores that behave differently would
 //! be two sets of bugs; one that behaves the same is one set of lessons.
 //!
@@ -24,27 +24,27 @@
 //! leaving a stale copy on their board.
 
 
-class MCF_Core_IntelStore
+class MCF_Intel_Store
 {
 	protected static const string KEY_INDEX = "intel";
 	protected static const string KEY_NEXT_ID = "intelNextId";
 	protected static const string KEY_PREFIX = "intel.";
 
-	private static ref MCF_Core_IntelStore s_Instance;
+	private static ref MCF_Intel_Store s_Instance;
 
 	protected ref map<string, ref MCF_Intel_Record> m_mRecords;
 	protected int m_iNextId;
 
-	void MCF_Core_IntelStore()
+	void MCF_Intel_Store()
 	{
 		m_mRecords = new map<string, ref MCF_Intel_Record>();
 		m_iNextId = 1;
 	}
 
-	static MCF_Core_IntelStore GetInstance()
+	static MCF_Intel_Store GetInstance()
 	{
 		if (!s_Instance)
-			s_Instance = new MCF_Core_IntelStore();
+			s_Instance = new MCF_Intel_Store();
 		return s_Instance;
 	}
 

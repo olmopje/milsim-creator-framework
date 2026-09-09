@@ -26,4 +26,25 @@ class MCF_Core_FactionHelper
 
 		return aliasComponent.ResolveFactionAlias(aliasKey);
 	}
+
+	//! \return The player's faction key, or empty if they have not picked one
+	//! yet.
+	//!
+	//! At registration time this is normally empty: faction is chosen at
+	//! spawn, which happens well after a player registers. Anything
+	//! faction-scoped therefore cannot be delivered on join, and needs a
+	//! re-send once the player picks a side -- which is what
+	//! MCF_Core_PlayerFactionChanged is for.
+	static string GetPlayerFactionKey(int playerId)
+	{
+		SCR_FactionManager factionManager = SCR_FactionManager.Cast(GetGame().GetFactionManager());
+		if (!factionManager)
+			return string.Empty;
+
+		Faction faction = factionManager.GetPlayerFaction(playerId);
+		if (!faction)
+			return string.Empty;
+
+		return faction.GetFactionKey();
+	}
 }

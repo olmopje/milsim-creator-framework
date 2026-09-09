@@ -15,11 +15,11 @@
 //! SCR_BaseAreaMeshComponent, which sets the mask the same way.
 
 [ComponentEditorProps(category: "MCF/Objective", description: "Fires an event when a registered entity comes within range.")]
-class MCF_Obj_ProximityTriggerComponentClass : ScriptComponentClass
+class MCF_Obj_ProximityTriggerComponentClass : MCF_Core_ControllableWatcherComponentClass
 {
 }
 
-class MCF_Obj_ProximityTriggerComponent : ScriptComponent
+class MCF_Obj_ProximityTriggerComponent : MCF_Core_ControllableWatcherComponent
 {
 	[Attribute(defvalue: "50", uiwidget: UIWidgets.EditBox, desc: "Detection radius in metres.")]
 	protected float m_fRadius;
@@ -87,7 +87,7 @@ class MCF_Obj_ProximityTriggerComponent : ScriptComponent
 		m_TickInvoker = MCF_Core_EventManager.GetInstance().GetInvoker("MCF_Core_TickCritical");
 		m_TickInvoker.Insert(OnTickCritical);
 
-		MCF_Core_AutoWatcherRegistry.GetInstance().RegisterProximityTrigger(this);
+		MCF_RegisterAsWatcher();
 
 		MCF_Core_Log.Debug("ProximityTrigger init, radius=" + m_fRadius.ToString() + " event=" + m_sTriggeredEvent);
 	}
@@ -97,7 +97,14 @@ class MCF_Obj_ProximityTriggerComponent : ScriptComponent
 		if (m_TickInvoker)
 			m_TickInvoker.Remove(OnTickCritical);
 
-		MCF_Core_AutoWatcherRegistry.GetInstance().UnregisterProximityTrigger(this);
+		MCF_UnregisterAsWatcher();
+	}
+
+	//! Every newly spawned controllable becomes something this trigger
+	//! checks against. Called by MCF_Core_AutoWatcherRegistry.
+	override void OnControllableSpawned(IEntity entity)
+	{
+		RegisterWatchedEntity(entity);
 	}
 
 	//! Adds entity to the list this trigger checks against each tick.

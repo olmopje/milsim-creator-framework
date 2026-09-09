@@ -23,27 +23,27 @@
 //! this player about, which is deliberately not everything -- see
 //! IsVisibleTo().
 
-class MCF_Core_TaskStore
+class MCF_Task_Store
 {
 	protected static const string KEY_INDEX = "tasks";
 	protected static const string KEY_NEXT_ID = "taskNextId";
 	protected static const string KEY_PREFIX = "task.";
 
-	private static ref MCF_Core_TaskStore s_Instance;
+	private static ref MCF_Task_Store s_Instance;
 
 	protected ref map<string, ref MCF_Task> m_mTasks;
 	protected int m_iNextId;
 
-	void MCF_Core_TaskStore()
+	void MCF_Task_Store()
 	{
 		m_mTasks = new map<string, ref MCF_Task>();
 		m_iNextId = 1;
 	}
 
-	static MCF_Core_TaskStore GetInstance()
+	static MCF_Task_Store GetInstance()
 	{
 		if (!s_Instance)
-			s_Instance = new MCF_Core_TaskStore();
+			s_Instance = new MCF_Task_Store();
 		return s_Instance;
 	}
 

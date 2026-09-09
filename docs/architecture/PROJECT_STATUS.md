@@ -1283,3 +1283,128 @@ superseded by the shout system, which decides surrender from the shouter's
 position and the AI's own fear rather than from a per-person menu entry), and
 `MCF_AI_ComplianceComponent.AttemptCompliance` (a second, unreachable
 surrender roll that predated `WillSurrender`).
+
+
+## Modularisation, phase 0 (2026-09-10)
+
+MCF is to become splittable into separate addons -- Core alone, Core plus a
+module, and so on -- so that a mission maker installs only what they use. The
+design is in `docs/architecture/MODULARISATION.md`. This entry records the
+first step, which moved no files out of the addon and changed no behaviour.
+
+### The measurement the whole design rests on
+
+The open question was what the engine does with a prefab that names a script
+class from an addon that is not loaded. It was measured rather than reasoned
+about: a throwaway prefab with one non-existent component and three real ones
+was placed in the test world.
+
+```
+WORLD (E): Unknown class 'MCF_Probe_ThisClassDoesNotExist' at offset 293(0x125)
+```
+
+The entity loaded with **Component Count: 3** -- the three real components all
+present and correct. **An unresolvable component is dropped and the entity
+survives it**, at a cost of one error line per missing class per prefab load.
+
+Two further probes in the same launch: a `MenuPreset` naming a script `Class`
+that does not exist is **completely silent**; a `MenuPreset` naming a `Layout`
+GUID that does not exist logs one `RESOURCES (E)` at `MenuManager config load`
+and the other five presets load normally.
+
+This kills both options that had been on the table. Runtime component
+attachment is not needed (and there is no `AddComponent` in the scripting API
+anyway), and the `Character_Base` override does not have to live in the most
+dependent module and drag everything with it. Instead:
+
+> **Exactly one MCF addon may override a vanilla GUID, and that addon is Core.
+> Modules never override vanilla.**
+
+Each of the four vanilla overrides -- `Character_Base.et`, `EditorModeEdit.et`,
+`chimeraMenus.conf`, `chimeraInputCommon.conf` -- becomes a manifest that names
+every module's contribution whether or not that module is installed.
+
+Still unproven, and folded into the two-peer session: the same behaviour at
+runtime on a dedicated server, the same behaviour packed to `.pak`, and whether
+a **user action** entry naming a missing class behaves like a component entry.
+`Character_Base` carries six of them.
+
+### The event bus was a seam in intent, not in fact
+
+`MCF_Core_EventManager`'s header claims modules never reference each other
+directly. A full symbol cross-reference across all 81 scripts found eight
+places where they did, most of them pointing the wrong way -- from Core into a
+module that is meant to be optional. All eight are now cut:
+
+- `MCF_Core_AutoWatcherRegistry` held three typed arrays, one per detection
+  component, so Core named three Objectives classes. It now holds one array of
+  `MCF_Core_ControllableWatcherComponent`, a new base class Core owns; the
+  three detection components extend it and override `OnControllableSpawned`.
+  The fan-out is otherwise unchanged -- same registry, same order, same call
+  per spawn.
+- `MCF_Core_GameModeComponent` booted the dialogue library, the hostility
+  manager, the task store and the intel store by name, and pushed tasks and
+  intel to each player itself. It now publishes four lifecycle events --
+  `MCF_Core_PersistentStoreReady`, `MCF_Core_MissionStart`,
+  `MCF_Core_PlayerRegistered`, `MCF_Core_PlayerFactionChanged` -- and three new
+  module game-mode components listen for the ones they care about:
+  `MCF_Ops_GameModeComponent`, `MCF_Dialogue_GameModeComponent`,
+  `MCF_AI_GameModeComponent`. The module settings moved with them, so
+  `m_bCreateSampleTask` is now an Ops attribute and the hostility decay pair
+  an AI attribute.
+- `MCF_PlayerControllerTasks.c` -- 37 KB, one `modded class SCR_PlayerController`
+  carrying task, intel *and* dialogue RPCs -- split into four files by module:
+  `MCF_PlayerController_Core.c` (the message pair everything uses),
+  `_Ops.c`, `_Dialogue.c`, `_Subdue.c`.
+- `MCF_RestraintPoseEditorAttribute` moved out of the dialogue attributes file
+  into its own, under Subdue. It was the only thing making Dialogue name a
+  Subdue class.
+- Renames: `MCF_Core_IntelStore` -> `MCF_Intel_Store`, `MCF_Core_TaskStore` ->
+  `MCF_Task_Store`, `MCF_Core_LineQueueEntry` -> `MCF_Voice_LineQueueEntry`.
+
+Three apparent back-edges turned out to be comments only and needed nothing:
+`MCF_Core_ValidationRegistry` -> `MCF_Obj_LogicComponent`,
+`MCF_Core_BudgetManager` -> `MCF_React_RecipeComponent`, and
+`MCF_AI_DispositionComponent` -> `MCF_ETaskState`.
+
+### The split modded class compiles
+
+The old file was deliberately one block. The comment said why: Enforce chains
+modded classes, a block only sees members declared earlier in the chain, and
+the order across files was not something the project controlled. Splitting it
+was therefore the one genuinely risky change here.
+
+It compiles. `Module: Game; loaded 5746x files; 11271x classes` with no `(E)`,
+against a baseline of 5738/11261. Four `modded class SCR_PlayerController`
+blocks in four files, three of them calling `MCF_SendMessage` declared in the
+fourth. That is half of the phase-1 probe answered early, within one addon; it
+still has to be confirmed *across* addons, where the chain order comes from the
+dependency graph rather than the file scan.
+
+The order is made safe in one direction only: `MCF_SendMessage` lives in Core's
+block, every other block calls it, and nothing in Core's block calls anything a
+module declares. If that is ever wrong the compiler says so -- this is not a
+failure mode that can go quiet, which is what made the split acceptable.
+
+### Folder layout
+
+`Scripts/Game/` was reorganised from `Core` / `Modules` / `Editor` / `UI` into
+one folder per future addon: `Core`, `Objectives`, `Ops`, `Dialogue`, `AI`,
+`Subdue`, `Ambient`, `React`. Extracting a module is now a folder move rather
+than an untangling.
+
+`Prefabs/Systems/Milsim.et` and the test world's `default.layer` gained the
+three new module game-mode components. Milsim.et is now explicitly documented
+as a manifest.
+
+### What was verified, and what was not
+
+Verified: a clean compile with no `(E)`, and the test world opens with no
+`Unknown class` on the game mode -- so all three module components resolve.
+
+**Not verified: that any of this still behaves.** Per the standing rule,
+compiling proves nothing. Nothing in this session was watched running. The
+lifecycle rewrite in particular changed the order in which the task store comes
+up relative to a player registering, which is exactly the race that cost a
+session before. The next play session has to confirm that the host still
+receives its sample tasks.

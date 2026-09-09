@@ -10,11 +10,11 @@
 //! MCF_Obj_ProximityTriggerComponent.
 
 [ComponentEditorProps(category: "MCF/Objective", description: "Fires when a registered entity is within range and within a facing cone (distance+angle approximation, not true LOS).")]
-class MCF_Obj_ConeDetectionTriggerComponentClass : ScriptComponentClass
+class MCF_Obj_ConeDetectionTriggerComponentClass : MCF_Core_ControllableWatcherComponentClass
 {
 }
 
-class MCF_Obj_ConeDetectionTriggerComponent : ScriptComponent
+class MCF_Obj_ConeDetectionTriggerComponent : MCF_Core_ControllableWatcherComponent
 {
 	[Attribute(defvalue: "50", uiwidget: UIWidgets.EditBox, desc: "Detection radius in metres.")]
 	protected float m_fRadius;
@@ -59,7 +59,7 @@ class MCF_Obj_ConeDetectionTriggerComponent : ScriptComponent
 
 		// Without this the trigger ticks forever over an empty watch list and
 		// can never fire. It was missing until 2026-09-09.
-		MCF_Core_AutoWatcherRegistry.GetInstance().RegisterConeTrigger(this);
+		MCF_RegisterAsWatcher();
 
 		MCF_Core_Log.Debug("ConeDetection init, radius=" + m_fRadius.ToString() + " halfAngle=" + m_fHalfAngleDegrees.ToString() + " event=" + m_sTriggeredEvent);
 	}
@@ -69,7 +69,14 @@ class MCF_Obj_ConeDetectionTriggerComponent : ScriptComponent
 		if (m_TickInvoker)
 			m_TickInvoker.Remove(OnTickCritical);
 
-		MCF_Core_AutoWatcherRegistry.GetInstance().UnregisterConeTrigger(this);
+		MCF_UnregisterAsWatcher();
+	}
+
+	//! Every newly spawned controllable becomes something this cone can
+	//! detect. Called by MCF_Core_AutoWatcherRegistry.
+	override void OnControllableSpawned(IEntity entity)
+	{
+		RegisterWatchedEntity(entity);
 	}
 
 	void RegisterWatchedEntity(IEntity entity)

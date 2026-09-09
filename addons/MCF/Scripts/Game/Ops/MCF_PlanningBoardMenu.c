@@ -247,7 +247,7 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		if (m_bAmending)
 		{
 			SetAmending(false);
-			ShowDetail(MCF_Core_TaskStore.GetInstance().GetTask(m_sSelectedTaskId));
+			ShowDetail(MCF_Task_Store.GetInstance().GetTask(m_sSelectedTaskId));
 			return;
 		}
 
@@ -275,7 +275,7 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		ClearList();
 
 		array<MCF_Task> visible = {};
-		MCF_Core_TaskStore.GetInstance().GetTasksVisibleTo(GetLocalPlayerId(), GetLocalFactionKey(), visible);
+		MCF_Task_Store.GetInstance().GetTasksVisibleTo(GetLocalPlayerId(), GetLocalFactionKey(), visible);
 
 		foreach (MCF_Task task : visible)
 			AddRow(task);
@@ -372,7 +372,7 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		if (index >= 0)
 			GetGame().GetWorkspace().SetFocusedWidget(m_aRowWidgets[index]);
 
-		ShowDetail(MCF_Core_TaskStore.GetInstance().GetTask(taskId));
+		ShowDetail(MCF_Task_Store.GetInstance().GetTask(taskId));
 	}
 
 	// -------------------------------------------------------------- detail
@@ -449,12 +449,12 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 			// Leaving amend mode without recording throws the typing away and
 			// redraws from the authoritative copy.
 			SetAmending(false);
-			ShowDetail(MCF_Core_TaskStore.GetInstance().GetTask(m_sSelectedTaskId));
+			ShowDetail(MCF_Task_Store.GetInstance().GetTask(m_sSelectedTaskId));
 			return;
 		}
 
 		SetAmending(true);
-		UpdateButtons(MCF_Core_TaskStore.GetInstance().GetTask(m_sSelectedTaskId));
+		UpdateButtons(MCF_Task_Store.GetInstance().GetTask(m_sSelectedTaskId));
 	}
 
 	//! Loads the selected order into the input fields.
@@ -756,7 +756,7 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		ClearList();
 
 		array<MCF_Intel_Record> visible = {};
-		MCF_Core_IntelStore.GetInstance().GetVisibleTo(GetLocalPlayerId(), GetLocalFactionKey(), visible);
+		MCF_Intel_Store.GetInstance().GetVisibleTo(GetLocalPlayerId(), GetLocalFactionKey(), visible);
 
 		foreach (MCF_Intel_Record record : visible)
 			AddIntelRow(record);
@@ -812,7 +812,7 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		if (index >= 0)
 			GetGame().GetWorkspace().SetFocusedWidget(m_aRowWidgets[index]);
 
-		ShowIntelDetail(MCF_Core_IntelStore.GetInstance().GetRecord(recordId));
+		ShowIntelDetail(MCF_Intel_Store.GetInstance().GetRecord(recordId));
 	}
 
 	protected void ShowIntelDetail(MCF_Intel_Record record)
