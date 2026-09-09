@@ -4,10 +4,11 @@
 
 This document exists in two places and they must be kept identical: as a doc in
 the Claude project (which a new chat surfaces on its own) and as `HANDOVER.md`
-in the repository root (which is gitignored, so it never leaves this machine).
-When you update one, update the other.
+in the repository root, which is tracked in git (it was gitignored until
+`f80bff5`; the older text saying otherwise is stale). When you update one,
+update the other.
 
-Last updated: 2026-09-10.
+Last updated: 2026-09-10, after the modularisation phase-0 session.
 
 ---
 
@@ -43,7 +44,8 @@ Nothing important should live only in a chat. In order of authority:
 
 | Document | What it is |
 |---|---|
-| `docs/architecture/PROJECT_STATUS.md` | The chronological record, ~1290 lines. Every session including the dead ends. **The primary source.** |
+| `docs/architecture/PROJECT_STATUS.md` | The chronological record, ~1400 lines. Every session including the dead ends. **The primary source.** |
+| `docs/architecture/MODULARISATION.md` | The plan for splitting MCF into separate addons, and the measurements it rests on. **The current main thread of work.** |
 | `docs/ROADMAP.md` | What is verified, what is missing, what comes next |
 | `docs/architecture/ARCHITECTURE.md` | The plan: layering, the core, the integration contract |
 | `docs/guides/MISSION_MAKER_GUIDE.md` | Plain-language reference to every node and player-facing system |
@@ -58,8 +60,6 @@ If you learn something that cost time to discover, it belongs in
 
 ## State as of 2026-09-10
 
-Working tree clean, everything pushed. Last commit `4c17102`.
-
 ### Proven in a live session
 
 - The event-driven core: event bus, tick manager, budget caps, persistence via
@@ -71,11 +71,17 @@ Working tree clean, everything pushed. Last commit `4c17102`.
   `Character_Base` rather than an MCF prefab.
 - A custom keybind (H / U) appended to vanilla's input config. This was
   previously unproven for any Arma Reforger mod.
-- Shout to surrender to restrain to interrogate to escort, end to end.
+- Shout → surrender → restrain → interrogate → escort, end to end.
 - `RplProp` on a ScriptComponent over a real wire, with `BumpMe()` sufficient.
+
+**Everything in that list was proven BEFORE the phase-0 refactor below, and
+nothing has been watched running since.** Treat it as "worked yesterday", not
+as "works".
 
 ### Not proven
 
+- **Phase 0 of the modularisation.** It compiles and the test world opens. No
+  behaviour has been observed. See the next section.
 - **Faction-scoped intel.** Implemented, needs two factions and two peers.
 - **Late-join replication** of Game Master intel edits. Built on `RplProp` and
   believed correct, never watched with a client joining late.
@@ -98,22 +104,64 @@ Working tree clean, everything pushed. Last commit `4c17102`.
 
 ---
 
-## Suggested next steps, ordered by dependency
+## The modularisation, which is the current thread
 
-1. **A two-peer, two-faction session.** This unblocks three unproven things at
-   once: faction-scoped intel, late-join replication and the audience filter.
-   Cheapest verification available and it is overdue.
-2. **Turn off `m_bEveryoneMayDoEverything`** and watch role resolution in that
-   same session. One switch, revertible without a rebuild.
-3. **A one-clip animation graph for the restrained pose.** Build it small —
-   the crash is a size problem, not a concept problem. `arms_back` was the
-   clip the user picked. Preview animations in
-   `anims/workspaces/player/player_main.aw` (it loads without a body; add one).
-4. Persist conversation flags and dropped intel objects across a restart.
-5. Map integration for objectives.
+The goal: MCF splittable into separate addons, so someone can install Core
+alone, or Core plus a module, and adding or removing one breaks nothing. The
+full design is `docs/architecture/MODULARISATION.md`. The three things worth
+carrying in your head:
 
-None of this is committed to. Ask the user what they want rather than assuming
-this order.
+**The measured fact everything rests on.** A prefab that names a script class
+from an addon that is not loaded still loads. The unresolvable component is
+dropped, the rest of the entity is intact, and it costs one `WORLD (E)` line.
+Measured 2026-09-10 with a throwaway prefab. This is why the design works at
+all.
+
+**The rule.** Exactly one MCF addon may override a vanilla GUID, and that addon
+is Core. There are four such overrides — `Character_Base.et`,
+`EditorModeEdit.et`, `chimeraMenus.conf`, `chimeraInputCommon.conf` — and each
+becomes a manifest naming every module's contribution whether or not that
+module is installed. Modules never override vanilla.
+
+**The eight modules.** Core (which now also holds the line/voice primitive and
+the AAR manager), Objectives, AI, Subdue, Ambient, Ops (tasks *and* intel — they
+are one product, splitting them is circular), Dialogue, React.
+`Scripts/Game/` already has one folder per module, so extracting one is a
+folder move.
+
+### Where phase 0 got to
+
+Done: all eight cross-module back-edges cut, the folder reorganisation, Core's
+game-mode component reduced to publishing four lifecycle events, three new
+module game-mode components listening for them, and
+`MCF_PlayerControllerTasks.c` split four ways. Compiles clean at
+`Module: Game; loaded 5746x files; 11271x classes`.
+
+**Not done: watching any of it run.** The lifecycle rewrite changed the order
+in which the task store comes up relative to a player registering — the exact
+race that cost a session before. Confirm the host still receives its sample
+tasks before building anything on top.
+
+### Next, in order
+
+1. **A play session that proves phase 0 did not break anything.** Cheapest
+   possible check: open the test world, confirm the sample tasks arrive.
+2. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
+   late-join replication and the audience filter — and can fold in the three
+   remaining modularisation unknowns: the dropped-component behaviour at
+   runtime on a dedicated server, the same packed to `.pak`, and whether a
+   **user action** naming a missing class behaves like a component
+   (`Character_Base` carries six).
+3. **Phase 1 probe:** two addons both declaring `modded class SCR_PlayerController`.
+   Half-answered already — four such blocks in four files compile inside one
+   addon — but across addons the chain order comes from the dependency graph,
+   not the file scan.
+4. **Phase 2: extract MCF React** as the first real addon. Four files, no
+   vanilla overrides, nothing depends on it.
+5. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
+6. A one-clip animation graph for the restrained pose. Build it small — the
+   crash is a size problem, not a concept problem. `arms_back` was the clip the
+   user picked. Preview in `anims/workspaces/player/player_main.aw`.
 
 ---
 
@@ -128,32 +176,29 @@ unreliable. The loop that works:
 ```
 kill the Workbench
 Start-Process -ArgumentList '-gproj','G:\MCF\addons\MCF\addon.gproj'
-sleep ~48s
-find the newest log directory
+sleep ~55s
 logs_filter for  \(E\)|Module: Game;
 ```
 
-A clean compile reads `Module: Game; loaded 5738x files; 11261x classes` with no
+A clean compile reads `Module: Game; loaded 5746x files; 11271x classes` with no
 `(E)` lines. That proves the scripts compiled and **nothing else** — see the
 first rule below.
 
 **PowerShell quoting breaks constantly** on nested quotes. Pass literal content
 through the `var1`..`var4` parameters rather than inlining it. Use `.Contains()`
-rather than `-like`. Normalise CRLF to LF before matching multi-line text.
+rather than `-like`. Normalise `\r\n` to `\n` before matching multi-line text.
 
-**Files in `G:\MCF` are intermittently locked.** `Add-LinesToFile` and friends
-fail with *"Unable to move the replacement file to the file to be replaced"* —
-the create succeeds, the atomic replace does not, and the file is silently
-unchanged. Always verify the write landed. The reliable pattern for editing an
-existing file:
+**Files in `G:\MCF` are intermittently locked, and a failed write is SILENT.**
+This bit again on 2026-09-10: `device_commit_files` reported success, the file
+on disk was unchanged, and the same compile error reappeared from a file that
+had "already been fixed". The create succeeds, the atomic replace does not.
+**Always read the file back after writing it.** The reliable pattern is to
+delete first:
 
 ```powershell
-$raw = [IO.File]::ReadAllText($p)   # or build the new content
 Remove-Item $p -Force
 [IO.File]::WriteAllText($p, $new)
 ```
-
-Take a backup copy outside the repo first if the file matters.
 
 **`Show-TextFiles`** takes `-LineRange '10-70'` and `-Pattern`, not `-Head` or
 `-StartLine`.
@@ -174,8 +219,17 @@ is server and client at once and hides every replication bug.
 with `game_duplicate`; never hand-write one. But `+{ }` inside a config override
 **appends**, which is how the keybind and the menu presets work.
 
+**An unresolvable component class in a prefab is DROPPED, not fatal.** One
+`WORLD (E)` line, and the entity loads with its remaining components intact.
+Measured 2026-09-10. A `MenuPreset` naming a missing script class is silent;
+one naming a missing layout GUID logs a single `RESOURCES (E)`.
+
 **`[BaseContainerProps()]` on every class that appears in a `.conf`**, or the
 parser silently skips them and the config loads empty with no error.
+
+**A `SCR_BaseGameModeComponent` subclass cannot name a method the base class
+already has.** `OnPlayerRegistered` as a ScriptInvoker callback fails with
+"Callbacks do not support overloaded methods". Prefix your own handlers.
 
 **Game Master attributes carry 12 bytes and cannot hold text.** A pick is a
 number; free text needs a custom menu and an RPC. A slider-backed attribute
@@ -206,8 +260,15 @@ visible, always-enabled close button.
 - Research notes go in `docs/research/`, **never** under `addons/MCF/` —
   anything under the addon is packed into the shipped mod and handed to every
   player. This was fixed on 2026-09-10.
+- `Scripts/Game/` has one folder per future addon: `Core`, `Objectives`, `Ops`,
+  `Dialogue`, `AI`, `Subdue`, `Ambient`, `React`. Put a new file in the folder
+  of the module it belongs to, and do not let a module name a class from a
+  module it does not depend on.
 - `server/` is untracked: it holds a launcher config with an admin password and
   a profile folder of pure runtime logs.
+- `addons/MCF/EnfusionMCP/` and `Scripts/WorkbenchGame/EnfusionMCP/` are the MCP
+  tool's own handlers, living inside the addon that gets packed for players.
+  They should become their own addon during the split.
 - The UI is deliberately placeholder and uniform, with one exception: the
   conversation screen is a running chat with the newest line at the top, and is
   meant to look different.
