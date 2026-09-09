@@ -64,8 +64,14 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
   }
   MCF_Core_TickManagerComponent "{6A515757BD053812}" {
   }
-  SCR_EntityCatalogManagerComponent "{5C9AD18D91F9E87E}" {
-  }
  }
  coords 1891.659 11.326 1821.161
+}
+GenericEntity MCF_EntityTypeTest : "{8A24F93EA862750C}Prefabs/MCF_Obj_ProximityTrigger.et" {
+ components {
+  SCR_EditableEntityComponent "{51D0B5C71CA36324}" {
+   m_EntityType SYSTEM
+  }
+ }
+ coords 0 0 0
 }
