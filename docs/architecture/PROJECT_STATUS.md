@@ -1458,3 +1458,130 @@ with two tasks from earlier sessions. The store loading is the stronger result.
 **Worth fixing separately:** the test world had no detection trigger in it, in a
 project whose detection components are among its oldest. That is why this gap
 could sit unnoticed. The three probes should stay in the world as fixtures.
+
+
+## Modularisation, phase 2: MCF React is a separate addon (2026-09-10)
+
+The first module actually left the addon. React was chosen because it is the
+cheapest possible proof: four scripts, one prefab, no vanilla override, and
+nothing else in MCF depends on it.
+
+```
+G:\MCF\addons\MCF_React\
+  addon.gproj                          GUID 6A50E40BA3B94B01
+  Prefabs\MCF_React_Recipe.et(.meta)   GUID 77EA9923B4F69728, unchanged
+  Scripts\Game\React\*.c               4 files
+```
+
+```
+GameProject {
+ ID "MCF_React"
+ GUID "6A50E40BA3B94B01"
+ TITLE "MCF React"
+ Dependencies {
+  "58D0FB3206B6F859"   // ArmaReforger
+  "6A50E40BA3B94A4F"   // MCF
+ }
+}
+```
+
+The prefab kept its `.meta`, so its GUID did not change and nothing that
+referenced it had to be edited.
+
+### Both halves measured
+
+**With the module.** Opening MCF_React (MCF comes in as a dependency):
+
+```
+FileSystem: Adding relative directory 'G:\MCF\addons\MCF_React' under name MCF_React
+FileSystem: Adding relative directory 'G:\MCF\addons\MCF'       under name MCF
+Module: Game; loaded 5746x files; 11271x classes
+```
+
+No `(E)`. 5746/11271 is exactly the pre-split figure, so nothing was lost in
+the move. The test world then opened and logged:
+
+```
+Init entity @"{77EA9923B4F69728}Prefabs/MCF_React_Recipe.et"
+```
+
+That entry lives in **Core's** `Configs/Editor/MCF_PlaceableEntities.conf` and
+resolved to a prefab in **another addon**. Cross-addon GUID resolution works,
+and the manifest pattern from section 2 of MODULARISATION.md holds in practice.
+
+**Without the module.** Opening MCF alone, with React physically gone from the
+addon but still named in Core's placeables manifest:
+
+```
+Module: Game; loaded 5742x files; 11257x classes
+```
+
+No `(E)`, and no `Wrong GUID/name` for the missing React entry. Four files and
+fourteen classes fewer -- exactly React's four scripts. **Core is installable
+without the module, and the dangling manifest entry costs nothing.**
+
+### The environment trap this cost an hour on
+
+**A `.gproj` the Workbench has never opened cannot be launched from the command
+line.** Every `-gproj G:\MCF\addons\MCF_React\addon.gproj` attempt died with:
+
+```
+ENGINE (E): Addon 'MCF_React' dependency '58D0FB3206B6F859' can't be added
+ENGINE (E): Game addon '58D0FB3206B6F859' not found
+ENGINE (E): Cannot initialize game project settings!
+```
+
+The reason is visible in the `Addon dirs:` block. A working launch lists the
+game's own addon directory:
+
+```
+dir: 'G:/MCF/addons/MCF/'
+dir: 'G:/SteamLibrary/steamapps/common/Arma Reforger/addons'      <- the game
+dir: 'C:/Program Files (x86)/.../Arma Reforger Tools/Workbench/addons'
+... every workshop addon ...
+dir: 'G:/SteamLibrary/steamapps/common/Arma Reforger/addons/data/'
+```
+
+A failing one has that slot filled with the literal string `./addons`, resolved
+against the process working directory:
+
+```
+dir: 'G:/MCF/addons/MCF_React/'
+dir: './addons'                                                    <- fallback
+dir: 'C:/Users/.../ArmaReforgerWorkbench/addons'
+```
+
+So the game data path is not discovered per launch; it comes from state the
+Workbench writes when a project is opened through its own UI. Things that do
+**not** fix it: setting the process working directory, and hand-editing
+`profile\.projectList_app1874910_user<id>.conf` (that file is the recent-project
+list for the picker, nothing more).
+
+**What does work: open the new project once through the Workbench itself.** The
+log then shows
+
+```
+DEFAULT : using additional addon: 6A50E40BA3B94B01 (G:/MCF/addons/MCF_React/addon.gproj)
+```
+
+and everything resolves. After that first open the project is registered and
+behaves like any other.
+
+Two consequences for the remaining six modules: **each new addon needs one
+manual open in the Workbench before any automated launch of it will work**, and
+the MCP's `wb_launch` on an unregistered project silently opened a *different*
+project instead (`Module: Game; loaded 5660x files` and a stream of
+`Failed to call not existing Net API function 'EMCP_WB_Ping'` -- the MCF
+handlers were not loaded at all). Always confirm the file/class count matches
+what you expect before trusting a session.
+
+### Still open
+
+- The test world lives in Core and places module prefabs, so Core would end up
+  depending on Objectives and Ops. It has to move to its own addon that depends
+  on everything -- and that addon becomes the development entry point.
+- GUID space: modules are being minted from `6A50E40BA3B94Bxx`. One documented
+  range per module, before two of them collide.
+- The split `modded class SCR_PlayerController` has still not been tested
+  *across* addons. React contains no such block. Ops, Dialogue and Subdue do,
+  and they are the ones that will answer it.

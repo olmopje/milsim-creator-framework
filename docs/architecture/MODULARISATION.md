@@ -1,8 +1,8 @@
 # MCF — Modularisation design
 
-Status: **phase 0 done, nothing extracted yet.** The seams have been cut inside
-the single addon; no module is a separate addon. Sections 1-4 are the design;
-section 5 records what has happened.
+Status: **phases 0 and 2 done.** The seams are cut and MCF React is a separate
+addon, proven in both directions. Six modules remain. Sections 1-4 are the
+design; section 5 records what has happened.
 
 Written 2026-09-10, against commit `4c17102`.
 
@@ -234,9 +234,20 @@ graph instead, and still has to be confirmed.
 component class from addon B, with B not loaded, observed at runtime on a
 dedicated server and packed to `.pak` — items (1) and (2) from §1.
 
-**Phase 2 — extract MCF React.** Four files, no vanilla overrides, one
-dependency, nothing else depends on it. The cheapest possible proof that
-`Dependencies { }` and cross-addon GUID resolution work as expected.
+**Phase 2 — DONE 2026-09-10. MCF React is a separate addon.**
+`G:\MCF\addons\MCF_React`, GUID `6A50E40BA3B94B01`, depending on MCF. Both
+halves measured: with the module loaded, `Module: Game; loaded 5746x files;
+11271x classes` (the pre-split figure exactly), no `(E)`, and Core's placeables
+manifest resolved `{77EA9923B4F69728}Prefabs/MCF_React_Recipe.et` across the
+addon boundary; without it, `5742x files; 11257x classes`, no `(E)`, and the
+dangling manifest entry cost nothing. Cross-addon GUID resolution and the
+manifest pattern both hold. Details and the launch trap in `PROJECT_STATUS.md`.
+
+**A new addon must be opened once through the Workbench UI before any
+command-line launch of it will work.** A `.gproj` the Workbench has never seen
+cannot find the game data addon and dies with
+`Game addon '58D0FB3206B6F859' not found`. Neither the working directory nor
+the recent-project list fixes it. Budget one manual open per module.
 
 **Phase 3 — the rest, one module per step**, in dependency order: Objectives,
 AI, Ambient, Subdue, Ops, Dialogue.

@@ -22,8 +22,9 @@ without scripting.
 | Thing | Where |
 |---|---|
 | Repository root | `G:\MCF` |
-| The addon | `G:\MCF\addons\MCF` |
-| Workbench project file | `G:\MCF\addons\MCF\addon.gproj` |
+| The Core addon | `G:\MCF\addons\MCF` |
+| The React addon | `G:\MCF\addons\MCF_React` (the first module extracted) |
+| Workbench project file | `G:\MCF\addons\MCF\addon.gproj`, or `MCF_React\addon.gproj` to get both |
 | Test world | `G:\MCF\addons\MCF\worlds\arland\MCFTestworld.ent` |
 | GitHub | `olmopje/milsim-creator-framework`, branch `main` |
 | Wiki | `.../wiki` — 11 pages, the public-facing documentation |
@@ -154,12 +155,15 @@ were placed. Keep them.
    runtime on a dedicated server, the same packed to `.pak`, and whether a
    **user action** naming a missing class behaves like a component
    (`Character_Base` carries six).
-2. **Phase 1 probe:** two addons both declaring `modded class SCR_PlayerController`.
-   Half-answered already — four such blocks in four files compile inside one
-   addon — but across addons the chain order comes from the dependency graph,
-   not the file scan.
-3. **Phase 2: extract MCF React** as the first real addon. Four files, no
-   vanilla overrides, nothing depends on it.
+2. **Move the test world out of Core into its own addon.** It places module
+   prefabs, so leaving it in Core makes Core depend on Objectives and Ops. That
+   addon becomes the development entry point. This blocks extracting Objectives
+   and Ops, so it comes first.
+3. **Extract the remaining modules**, in dependency order: Objectives, AI,
+   Ambient, Subdue, Ops, Dialogue. Ops, Dialogue and Subdue each carry a
+   `modded class SCR_PlayerController` block, so they are what finally answers
+   whether the chain merges *across* addons — React has no such block, so
+   phase 2 did not test it.
 4. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
 5. A one-clip animation graph for the restrained pose. Build it small — the
    crash is a size problem, not a concept problem. `arms_back` was the clip the
@@ -169,10 +173,21 @@ were placed. Keep them.
 
 ## Environment quirks that will otherwise cost you an hour
 
+**A brand-new addon cannot be launched from the command line.** A `.gproj` the
+Workbench has never opened dies with `Game addon '58D0FB3206B6F859' not found`
+— the game's own addon directory is missing from the `Addon dirs:` block and
+replaced by the literal `./addons`. Neither the process working directory nor
+the recent-project list fixes it. **Open the new project once through the
+Workbench UI**; after that the CLI works. Budget one manual open per module.
+
 **Launching the Workbench.** The project file is `addon.gproj`, not
 `MCF.gproj`, and the path must be `G:\MCF\addons\MCF` — passing `G:\MCF` gives
 `projectPath resolves outside every configured root`, after which the MCP tool
-may silently auto-launch its own `EnfusionMCP.gproj` instead. `wb_reload` is
+may silently auto-launch its own `EnfusionMCP.gproj` instead. `wb_launch` on an
+unregistered project did exactly that: it opened something else entirely
+(`loaded 5660x files` and endless `Failed to call not existing Net API function
+'EMCP_WB_Ping'`). **Always check the file/class count before trusting a
+session.** `wb_reload` is
 unreliable. The loop that works:
 
 ```

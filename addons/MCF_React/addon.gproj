@@ -1,0 +1,9 @@
+GameProject {
+ ID "MCF_React"
+ GUID "6A50E40BA3B94B01"
+ TITLE "MCF React"
+ Dependencies {
+  "58D0FB3206B6F859"
+  "6A50E40BA3B94A4F"
+ }
+}
