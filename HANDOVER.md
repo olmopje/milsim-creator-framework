@@ -74,14 +74,11 @@ If you learn something that cost time to discover, it belongs in
 - Shout → surrender → restrain → interrogate → escort, end to end.
 - `RplProp` on a ScriptComponent over a real wire, with `BumpMe()` sufficient.
 
-**Everything in that list was proven BEFORE the phase-0 refactor below, and
-nothing has been watched running since.** Treat it as "worked yesterday", not
-as "works".
+All of it was re-confirmed in a live session after the phase-0 refactor on
+2026-09-10.
 
 ### Not proven
 
-- **Phase 0 of the modularisation.** It compiles and the test world opens. No
-  behaviour has been observed. See the next section.
 - **Faction-scoped intel.** Implemented, needs two factions and two peers.
 - **Late-join replication** of Game Master intel edits. Built on `RplProp` and
   believed correct, never watched with a client joining late.
@@ -137,29 +134,34 @@ module game-mode components listening for them, and
 `MCF_PlayerControllerTasks.c` split four ways. Compiles clean at
 `Module: Game; loaded 5746x files; 11271x classes`.
 
-**Not done: watching any of it run.** The lifecycle rewrite changed the order
-in which the task store comes up relative to a player registering — the exact
-race that cost a session before. Confirm the host still receives its sample
-tasks before building anything on top.
+**Watched running, and it holds.** The listen-server race was caught
+happening: the host registered 100 ms before the game mode started, the
+deferral fired, the catch-up delivered. The faction re-push works, event
+validation passes, all four split `modded class` blocks work over the wire, and
+the three detection components register through the new base class
+(`notifying 3 registered watcher(s)`) and fire. Phase 0 is closed.
+
+One thing surfaced along the way: the test world contained **no detection
+trigger of any kind**, which is why the watcher registry could not be verified
+on the first pass — it only ever logged `notifying 0`. Three probe triggers
+were placed. Keep them.
 
 ### Next, in order
 
-1. **A play session that proves phase 0 did not break anything.** Cheapest
-   possible check: open the test world, confirm the sample tasks arrive.
-2. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
+1. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
    late-join replication and the audience filter — and can fold in the three
    remaining modularisation unknowns: the dropped-component behaviour at
    runtime on a dedicated server, the same packed to `.pak`, and whether a
    **user action** naming a missing class behaves like a component
    (`Character_Base` carries six).
-3. **Phase 1 probe:** two addons both declaring `modded class SCR_PlayerController`.
+2. **Phase 1 probe:** two addons both declaring `modded class SCR_PlayerController`.
    Half-answered already — four such blocks in four files compile inside one
    addon — but across addons the chain order comes from the dependency graph,
    not the file scan.
-4. **Phase 2: extract MCF React** as the first real addon. Four files, no
+3. **Phase 2: extract MCF React** as the first real addon. Four files, no
    vanilla overrides, nothing depends on it.
-5. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
-6. A one-clip animation graph for the restrained pose. Build it small — the
+4. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
+5. A one-clip animation graph for the restrained pose. Build it small — the
    crash is a size problem, not a concept problem. `arms_back` was the clip the
    user picked. Preview in `anims/workspaces/player/player_main.aw`.
 

@@ -58,21 +58,30 @@ PerceptionManager PerceptionManager : "{028DAEAD63E056BE}Prefabs/World/Game/Perc
 }
 SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Editor/GameMode_Editor_Full.et" {
  components {
+  MCF_AI_GameModeComponent "{6A515757B6739102}" {
+  }
   MCF_Core_GameLoopComponent "{6A515757BE2C9896}" {
   }
   MCF_Core_GameModeComponent "{6A515757B673907C}" {
   }
   MCF_Core_TickManagerComponent "{6A515757BD053812}" {
   }
-  MCF_UI_LineDisplayComponent "{6A52BC56BA384CD8}" {
+  MCF_Dialogue_GameModeComponent "{6A515757B6739101}" {
   }
   MCF_Ops_GameModeComponent "{6A515757B6739100}" {
    m_bCreateSampleTask 1
   }
-  MCF_Dialogue_GameModeComponent "{6A515757B6739101}" {
-  }
-  MCF_AI_GameModeComponent "{6A515757B6739102}" {
+  MCF_UI_LineDisplayComponent "{6A52BC56BA384CD8}" {
   }
  }
  coords 1891.659 11.326 1821.161
+}
+GenericEntity MCF_ConeProbe : "{2D283A489D1D8BCC}Prefabs/MCF_Obj_ConeDetectionTrigger.et" {
+ coords 1851 19 1840
+}
+GenericEntity MCF_SpottedProbe : "{6C5FE2CCB6B45596}Prefabs/MCF_Obj_SpottedByPlayer.et" {
+ coords 1848 19 1840
+}
+GenericEntity MCF_WatcherProbe : "{8A24F93EA862750C}Prefabs/MCF_Obj_ProximityTrigger.et" {
+ coords 1845 19 1840
 }

@@ -215,10 +215,13 @@ modules by name, and three new module game-mode components
 `Module: Game; loaded 5746x files; 11271x classes`, no `(E)`, and the test
 world opens with no `Unknown class` on the game mode.
 
-**Nothing was watched running.** Compiling proves nothing -- and the lifecycle
-rewrite changed the order in which the task store comes up relative to a player
-registering, which is precisely the race that cost a session before. The next
-play session must confirm the host still receives its sample tasks.
+**Watched running the same day, and it holds.** The listen-server race was
+caught happening -- the host registered 100 ms before the game mode started,
+the deferral fired, and the catch-up delivered the task. The faction re-push
+works, event validation passes, all four split `modded class` blocks work over
+the wire, and the three detection components register through the new base
+class (`notifying 3 registered watcher(s)`, then two of them firing). Details
+in `PROJECT_STATUS.md`.
 
 Half of the phase-1 chain probe was answered early as a side effect: four
 `modded class SCR_PlayerController` blocks in four files compile, with three of

@@ -1397,14 +1397,64 @@ than an untangling.
 three new module game-mode components. Milsim.et is now explicitly documented
 as a manifest.
 
-### What was verified, and what was not
+### What was verified
 
-Verified: a clean compile with no `(E)`, and the test world opens with no
-`Unknown class` on the game mode -- so all three module components resolve.
+Everything, in a live session on 2026-09-10 immediately after the refactor.
 
-**Not verified: that any of this still behaves.** Per the standing rule,
-compiling proves nothing. Nothing in this session was watched running. The
-lifecycle rewrite in particular changed the order in which the task store comes
-up relative to a player registering, which is exactly the race that cost a
-session before. The next play session has to confirm that the host still
-receives its sample tasks.
+**The race the rewrite was most likely to break, caught happening.** The host
+registered 100 ms *before* the game mode started, which is the normal ordering
+on a listen server and the thing that cost a session before:
+
+```
+01:19:30.224  player 1 registered before the task store was ready -- deferring their tasks
+01:19:30.324  GameMode start -- resetting per-mission state
+01:19:30.326  restored 1 authored conversation(s)          <- MCF_Dialogue_GameModeComponent
+01:19:30.326  TaskStore loaded 2 task(s)                   <- MCF_Ops_GameModeComponent
+01:19:30.326  IntelStore loaded 3 record(s)
+01:19:30.326  TaskStore ready -- catching up 1 already-connected player(s)
+01:19:30.327  sent 1 task(s) to player 1: t5
+01:19:30.329  Event validation passed
+```
+
+The deferral and the catch-up both work through the new event route, and
+`Event validation passed` confirms all four new event names have a registered
+publisher.
+
+**The faction re-push**, which is the other new event:
+
+```
+01:20:15.067  player 1 changed faction to US
+01:20:15.067  resending tasks to player 1 after a faction change
+01:20:15.068  sent 1 task(s) to player 1 (US): t5
+```
+
+**All four split `modded class SCR_PlayerController` blocks over the wire**, not
+merely compiling: the operations board opened and listed a persisted task
+(Ops), a conversation opened on a civilian (Dialogue), a Game Master wrote and
+assigned a conversation (Dialogue), and `shout keys bound` (Subdue).
+
+**The watcher registry.** This needed a second pass: the test world contained no
+detection triggers at all, so the first session only ever logged
+`notifying 0 registered watcher(s)`, which proves nothing. One of each of the
+three trigger types was placed and the session re-run:
+
+```
+01:24:21.500  Controllable spawned -- notifying 3 registered watcher(s)
+01:24:21.500  ProximityTrigger now watching 1 entities
+01:24:27.852  Controllable spawned -- notifying 3 registered watcher(s)
+01:24:27.852  ProximityTrigger now watching 3 entities
+01:24:27.985  ProximityTrigger FIRED, publishing MCF_Obj_ProximityDetected
+01:24:51.627  ConeDetection FIRED, publishing MCF_Obj_ConeDetected
+```
+
+All three registered through the new `MCF_Core_ControllableWatcherComponent`
+base class, the fan-out reached each overridden `OnControllableSpawned`, and
+two of them fired end to end.
+
+That the sample tasks did not appear is correct, not a failure:
+`CreateSampleTasks` skips when the store is not empty, and the store came back
+with two tasks from earlier sessions. The store loading is the stronger result.
+
+**Worth fixing separately:** the test world had no detection trigger in it, in a
+project whose detection components are among its oldest. That is why this gap
+could sit unnoticed. The three probes should stay in the world as fixtures.
