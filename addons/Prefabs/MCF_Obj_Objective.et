@@ -1,0 +1,19 @@
+GenericEntity {
+ ID "EE2F97C40CD99F15"
+ components {
+  MCF_Obj_ObjectiveComponent "{88E652F1B323BF59}" {
+  }
+  SCR_EditableEntityComponent "{4F6667EC6F5FD79F}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType SYSTEM
+   m_Flags {
+    PLACEABLE
+    VIRTUAL
+   }
+   m_UIInfo SCR_EditableEntityUIInfo "{4F6667EC6F5FD7A0}" {
+    Name "MCF Objective Node"
+   }
+  }
+  RplComponent "{EE2F97C40CD99F02}" {
+  }
+ }
+}

@@ -1,0 +1,19 @@
+GenericEntity {
+ ID "3C54A0573FF746FA"
+ components {
+  MCF_AI_SafeFallbackPointComponent "{BCD9AA22FA779721}" {
+  }
+  SCR_EditableEntityComponent "{A05DBCB281E7EFED}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType SYSTEM
+   m_Flags {
+    PLACEABLE
+    VIRTUAL
+   }
+   m_UIInfo SCR_EditableEntityUIInfo "{A05DBCB281E7EFEE}" {
+    Name "MCF Safe Fallback Point"
+   }
+  }
+  RplComponent "{3C54A0573FF71001}" {
+  }
+ }
+}

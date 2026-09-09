@@ -1,0 +1,19 @@
+GenericEntity {
+ ID "77EA9923B4F69728"
+ components {
+  MCF_React_RecipeComponent "{5B975E203CF3990E}" {
+  }
+  SCR_EditableEntityComponent "{9130131640A1B09B}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType SYSTEM
+   m_Flags {
+    PLACEABLE
+    VIRTUAL
+   }
+   m_UIInfo SCR_EditableEntityUIInfo "{9130131640A1B09C}" {
+    Name "MCF Recipe"
+   }
+  }
+  RplComponent "{77EA9923B4F61001}" {
+  }
+ }
+}
