@@ -11,9 +11,14 @@ GenericEntity {
    }
    m_UIInfo SCR_EditableEntityUIInfo "{964AA3464D21E88A}" {
     Name "MCF Spotted By Player"
+    m_aAuthoredLabels {
+     ENTITYTYPE_SYSTEM
+    }
    }
   }
   RplComponent "{6C5FE2CCB6B41001}" {
+  }
+  Hierarchy "{6C5FE2CCB6B41002}" {
   }
  }
 }

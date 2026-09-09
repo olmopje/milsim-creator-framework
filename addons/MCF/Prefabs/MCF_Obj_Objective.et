@@ -11,9 +11,14 @@ GenericEntity {
    }
    m_UIInfo SCR_EditableEntityUIInfo "{4F6667EC6F5FD7A0}" {
     Name "MCF Objective Node"
+    m_aAuthoredLabels {
+     ENTITYTYPE_SYSTEM
+    }
    }
   }
   RplComponent "{EE2F97C40CD99F02}" {
+  }
+  Hierarchy "{EE2F97C40CD99F03}" {
   }
  }
 }

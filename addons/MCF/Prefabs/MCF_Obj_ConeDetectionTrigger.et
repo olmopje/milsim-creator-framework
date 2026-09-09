@@ -12,9 +12,14 @@ GenericEntity {
    }
    m_UIInfo SCR_EditableEntityUIInfo "{4312B9826A9F9CF6}" {
     Name "MCF Cone Detection Trigger"
+    m_aAuthoredLabels {
+     ENTITYTYPE_SYSTEM
+    }
    }
   }
   RplComponent "{2D283A489D1D8001}" {
+  }
+  Hierarchy "{2D283A489D1D8002}" {
   }
  }
 }

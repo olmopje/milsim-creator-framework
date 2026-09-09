@@ -11,9 +11,14 @@ GenericEntity {
    }
    m_UIInfo SCR_EditableEntityUIInfo "{F2DBBBBCF2B824B2}" {
     Name "MCF Text Line"
+    m_aAuthoredLabels {
+     ENTITYTYPE_SYSTEM
+    }
    }
   }
   RplComponent "{152F65EF13B71001}" {
+  }
+  Hierarchy "{152F65EF13B71002}" {
   }
  }
 }

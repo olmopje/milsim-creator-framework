@@ -12,9 +12,14 @@ GenericEntity {
    }
    m_UIInfo SCR_EditableEntityUIInfo "{0BC17B3C3A86DEA0}" {
     Name "MCF Trigger Zone"
+    m_aAuthoredLabels {
+     ENTITYTYPE_SYSTEM
+    }
    }
   }
   RplComponent "{39A7C5F59B6CF001}" {
+  }
+  Hierarchy "{39A7C5F59B6CF002}" {
   }
  }
 }

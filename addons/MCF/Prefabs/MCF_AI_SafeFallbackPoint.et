@@ -11,9 +11,14 @@ GenericEntity {
    }
    m_UIInfo SCR_EditableEntityUIInfo "{A05DBCB281E7EFEE}" {
     Name "MCF Safe Fallback Point"
+    m_aAuthoredLabels {
+     ENTITYTYPE_SYSTEM
+    }
    }
   }
   RplComponent "{3C54A0573FF71001}" {
+  }
+  Hierarchy "{3C54A0573FF71002}" {
   }
  }
 }
