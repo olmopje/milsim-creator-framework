@@ -23,8 +23,6 @@ Thumbs.db
 # Local configuration that differs per contributor
 config.local.json
 
-HANDOVER.md
-
 enfusion-workbench-mcp/
 
 # Local dedicated-server setup: the launcher config carries machine-specific
