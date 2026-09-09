@@ -5,6 +5,48 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-09 - Game Master placeable-entity visibility fix
+After an extensive debugging session, resolved all 12 placeable prefabs not appearing in the
+Game Master Entity Browser despite compiling and loading with zero errors.
+
+### Fixed
+- All 12 prefabs .et.meta files had stale GUIDs in the Name field, out of sync with the
+  .et file's own internal ID -- Workbench resolves resource GUIDs from .meta, not from
+  the .et content
+- Prefabs/Editor/Modes/EditorModeEdit.et override was missing ~95% of vanilla content after
+  an earlier partial edit -- restored full content, keeping our MCF_PlaceableEntities.conf
+  registry addition
+- m_UIInfo used the generic SCR_UIInfo class instead of SCR_EditableEntityUIInfo
+- Configs/Editor/MCF_PlaceableEntities.conf had no .meta file at all
+- Removed a broken experimental Entity Catalog entry on GameMode_Editor_Full (unrelated
+  system to Placeable Registry, doesn't apply to SYSTEM-type entities)
+- Root cause, found by comparing three working vanilla System-type entities
+  (RestrictionZone, SpawnPoint, EffectModule_MineField) via game_duplicate + prefab inspect:
+  all 12 SCR_EditableEntityComponent blocks needed to (1) inherit from
+  Default_SCR_EditableEntityComponent.ct ({996046FE206C699A}) instead of being declared bare,
+  (2) set m_EntityType SYSTEM, (3) set flags to PLACEABLE VIRTUAL (+ HAS_AREA for
+  trigger/zone components), (4) include m_aAuthoredLabels { ENTITYTYPE_SYSTEM } inside
+  m_UIInfo -- a labels array separate from m_EntityType, which the Entity Browser filter
+  actually reads for categorization, and (5) include a Hierarchy component
+
+### Known non-fix
+- The native Create/Update Selected Editable Prefabs Workbench plugin (Ctrl+Shift+U) crashes
+  with a BadFloat assertion in EditablePrefabsLabel_Size.GetLabelValid when run against our
+  mesh-less logic prefabs (confirmed native engine bug, not addon-side). Use the manual
+  component pattern above instead of this plugin for zero-size prefabs.
+
+### Open follow-up
+- Placed MCF entities show "No properties" in Game Master's in-game edit panel, while vanilla
+  entities (e.g. Arsenal) show a configuration UI. This is a separate system (Editor Attributes,
+  likely SCR_AttributesManagerEditorComponent-adjacent) from Placeable Registry visibility and
+  has not yet been investigated. See HANDOVER.md for the recommended approach.
+
+### Tooling change
+- Switched from enfusion-mcp (Articulated7/npx) to enfusion-workbench-mcp (Goldwep,
+  112 tools) -- far more capable, notably prefab inspect (full inheritance-chain resolution),
+  game_duplicate, resolve_guid. Removed enfusion-mcp, arma-reforger-mcp, and
+  arma-reforger-api from the Claude Desktop MCP config.
+
 ## [0.2.0] - 2026-09-08 — Full roadmap implementation (Phases 0-14) + gap closures
 Implements the entire phased roadmap from ARCHITECTURE.md section 9, plus closes several "manual driver" gaps that were left open during initial implementation. Every file listed below is confirmed compiling clean in Workbench.
 

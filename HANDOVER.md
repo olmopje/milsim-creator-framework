@@ -1,41 +1,132 @@
-# MCF Handover — 2026-09-09
+# MCF — Handover voor nieuwe chatsessie (2026-09-09)
+
+**Lees dit eerst als je een nieuwe Claude-chat/project start voor dit project.**
 
 ## Wat is MCF?
-Milsim Creator Framework, prefix `MCF_`. Arma Reforger-mod voor missiemakers: herbruikbare bouwstenen (triggers, objectives, AI-hulpcomponenten, dialoog, sequenties) zodat je milsim-scenario's kunt bouwen zonder alles vanaf nul te scripten.
+Milsim Creator Framework — een Arma Reforger mod-framework (prefix `MCF_`) met herbruikbare
+bouwstenen voor missiemakers: triggers, objectives, AI-gedrag, hostility-systeem, interactie,
+voice-lines, "recipe"-scripting, squad-cohesie en AAR. Volledige architectuur en scope staan in
+`docs/architecture/ARCHITECTURE.md`.
 
-- **Repo:** `G:\MCF` (git, branch `main`), GitHub: https://github.com/olmopje/milsim-creator-framework.git
-- **Workbench-project:** `G:\MCF\addons\MCF\addon.gproj`, addon-GUID `6A50E40BA3B94A4F`
-- **Testwereld:** `G:\MCF\addons\MCF\worlds\arland\MCFTestworld.ent` (Arland, Game Master-modus)
-- **Volledige status:** `docs/architecture/PROJECT_STATUS.md` — lees dit eerst, met name de sectie "MAJOR UPDATE (2026-09-09 session)" bovenaan.
-- **Missiemakers-gids:** `docs/guides/MISSION_MAKER_GUIDE.md`
-- **Architectuur-overzicht:** `docs/architecture/ARCHITECTURE.md`
+- **Repo:** https://github.com/olmopje/milsim-creator-framework.git (branch `main`)
+- **Lokaal pad:** `G:\MCF`
+- **Workbench-project:** `G:\MCF\addons\MCF\addon.gproj` (addon-GUID `6A50E40BA3B94A4F`)
+- **Testwereld:** `G:\MCF\addons\MCF\worlds\arland\MCFTestworld.ent`
 
-## Grootste resultaat van de sessie van vandaag
-Na een zeer lang debugtraject: **live in-game Game Master-plaatsing van MCF-prefabs werkt nu volledig.** Alle 12 System-type prefabs zijn zichtbaar en plaatsbaar in de Entity Browser tijdens het spelen. Zie `PROJECT_STATUS.md` voor de exacte, stap-voor-stap bevestigde recept-structuur — dat is nu de te volgen sjabloon voor élk nieuw placeable prefab.
+## Status op dit moment
+Alle 14 fases van de architectuur zijn geïmplementeerd en compileren schoon (zie CHANGELOG.md
+v0.2.0). Alle 12 placeable prefabs zijn nu **zichtbaar en plaatsbaar in Game Master** — dit was
+het onderwerp van een zeer lange, diepgaande debug-sessie op 2026-09-09 (zie hieronder).
 
-**Kern van de fix (samengevat):** `SCR_EditableEntityComponent` moet erven van `Default_SCR_EditableEntityComponent.ct`, met `m_EntityType SYSTEM`, de juiste combinatie van `EEditableEntityFlag`s (`PLACEABLE|VIRTUAL[|HAS_AREA]`), een `SCR_EditableEntityUIInfo` met `m_aAuthoredLabels { ENTITYTYPE_SYSTEM }`, en een `Hierarchy`-component. Zonder ontbrekend stukje: **geen enkele foutmelding in de log**, maar het item verschijnt gewoon nooit — dat maakte dit zo moeilijk te vinden.
+## MCP-tooling — gebruik ALLEEN dit
+We zijn overgestapt op **`enfusion-workbench-mcp`** (Goldwep, github.com/Goldwep/enfusion-workbench-mcp),
+112 tools, veruit superieur aan alle eerder geprobeerde alternatieven (enfusion-mcp/Articulated7,
+arma-reforger-mcp, ReforgerForge — die zijn allemaal verwijderd uit de Claude Desktop-config).
 
-## Tooling-opzet (belangrijk voor nieuwe chat!)
-- **Gebruik uitsluitend `enfusion-workbench-mcp`** (Goldwep-fork, 112 tools) voor alle Enfusion/Workbench-taken. De oudere `enfusion-mcp`, `arma-reforger-mcp` en `arma-reforger-api` zijn verwijderd uit de Claude Desktop-config — gebruik ze niet, en stel niet voor ze terug te zetten.
-- Lokale build: `G:\enfusion-workbench-mcp` (npm-project, `dist/index.js`)
-- **Let op path-config:** `ENFUSION_PROJECT_PATH` staat nu op `G:\MCF\addons\MCF` (de addon-root zelf) voor de `project`-tool (read/write/browse). Voor `game_duplicate`/`wb_entity_duplicate` is dit verkeerd-om (die willen de bovenliggende map + `modName`) — check dit als die tools "addon not found" geven.
-- Workbench starten: `enfusion-workbench-mcp:wb_launch` met `gprojPath: "G:\MCF\addons\MCF\addon.gproj"` en `world: "worlds/arland/MCFTestworld.ent"`.
-- **Voor een écht verse test na bestandswijzigingen: gebruiker moet Workbench VOLLEDIG sluiten** (Taakbeheer checken) vóórdat je opnieuw `wb_launch` aanroept — "Already Running" reconnects zonder de boel echt te herladen, wat cruciaal bleek voor cache-gevoelige tests.
+Belangrijkste tools die je zult gebruiken:
+- `project` (action: browse/read/write) — bestanden in JOUW addon lezen/schrijven
+- `game_read` / `game_browse` / `asset_search` — vanilla basisspel-content lezen/doorzoeken
+- `prefab` (action: inspect) — **volledige overervingsketen tonen, inclusief class-level defaults**
+  — cruciaal om te zien wat een prefab ECHT bevat, niet alleen wat er letterlijk in het bestand staat
+- `game_duplicate` — vanilla prefab dupliceren met volledige overervingsketen geïnjecteerd
+- `wb_launch` — Workbench starten/verbinden (geef altijd `gprojPath` en `world` mee)
+- `wb_resources` (getInfo/register/rebuild) — LET OP: `getInfo` kan soms een fractie achterlopen
+  op zeer recente schrijfacties; vertrouw bij twijfel op een echte in-game test, niet alleen op getInfo
+- `wb_entity_modify` (setProperty/getProperty/listProperties/listArrayItems/removeArrayItem) —
+  properties op WERELD-entiteiten aanpassen via Workbench's eigen live API
+- `resolve_guid` — GUID opzoeken in de project-index
 
-## Open item voor volgende sessie
-**"Scenario properties"-paneel (instelbare waarden na plaatsing in Game Master)** — bijv. bij Arsenal kun je na plaatsen factie/loadout/wapens instellen; onze MCF-prefabs tonen "No properties, this entity has no properties to edit." Dit is een ander systeem dan wat we vandaag hebben opgelost (waarschijnlijk `SCR_AttributesManagerEditorComponent` + een attribuutlijst-config per component). Nog niet onderzocht.
+**Config-valkuil:** `ENFUSION_PROJECT_PATH` moet exact `G:\MCF\addons\MCF` zijn (de addon-root zelf,
+niet de bovenliggende map). Als je per ongeluk `G:\MCF\addons` instelt, schrijft `project` naar de
+verkeerde plek (`addons/Prefabs/...` in plaats van `addons/MCF/Prefabs/...`). `game_duplicate` wil
+juist wél de bovenliggende map + `modName` — deze twee tools zijn inconsistent hierin, wees alert.
 
-**Startpunt:** lees `Scripts/Game/Editor/Containers/Attributes/SCR_BaseEditorAttribute.c` via `game_read`, en zoek een simpel (niet-Arsenal) vanilla System-type prefab dat wél instelbare eigenschappen heeft na plaatsing — vergelijk zijn componentopbouw net zoals we vandaag deden voor de zichtbaarheids-fix (dupliceren via `game_duplicate`, inspecteren via `wb_resources getInfo`, vergelijken met onze eigen prefabs).
+**Workbench-herstart-discipline:** cache-problemen zijn hardnekkig. Bij twijfel: vraag de gebruiker
+om Workbench **volledig af te sluiten** (niet alleen "Reload Game" binnen de app) en gebruik dan
+`wb_launch` opnieuw. Een simpele "Reload Game" laadt de resource-database NIET opnieuw.
 
-## Werkwijze die vandaag goed werkte (herhaal dit patroon)
-1. Zoek een **bewezen werkend vanilla-voorbeeld** dat lijkt op wat je probeert te bouwen.
-2. Dupliceer het via `game_duplicate` naar `Prefabs/Test/...` in de mod.
-3. Inspecteer het volledig via `wb_resources` (`action: getInfo`) — dit toont de volledig opgeloste JSON-structuur.
-4. Vergelijk component-voor-component met je eigen prefab.
-5. Pas één verschil per keer toe, commit, en test met een **volledig verse Workbench-herstart** (niet alleen "Reload Game").
-6. Ruim testbestanden op zodra de fix bevestigd is.
+## DE GROTE DOORBRAAK: Game Master zichtbaarheid (2026-09-09)
+Dit kostte een buitengewoon lange sessie. Het probleem: 12 custom placeable prefabs (logica-only,
+geen mesh) verschenen niet in de Game Master Entity Browser, ondanks foutloze logs.
 
-## Overige losse technische lessen (zie PROJECT_STATUS.md voor details)
-- `.et.meta`-bestanden bevatten de GUID die Workbench daadwerkelijk gebruikt — niet het `ID`-veld in de `.et`-tekst zelf. Bij twijfel over "Wrong GUID"-foutmeldingen: check eerst de `.meta`.
-- Bij het overriden van een bestaand vanilla-bestand (zoals `EditorModeEdit.et`) in je addon: bewaar **altijd** de volledige originele inhoud, voeg alleen je eigen wijziging toe. Een gedeeltelijke override mist tientallen andere componenten en veroorzaakt catastrofale, moeilijk te herleiden crashes.
-- De "Create/Update Selected Editable Prefabs"-plugin crasht met een engine-assertion (`BadFloat` in `EditablePrefabsLabel_Size.GetLabelValid`) op mesh-loze entiteiten zonder fysieke afmeting — dit is een bevestigde native engine-bug, geen oplosbaar probleem via bestandsaanpassingen. Vermijd deze plugin voor pure logica-prefabs; gebruik de handmatige route uit de sectie hierboven.
+### Wat NIET de oorzaak was (maar wel gefixt moest worden onderweg)
+1. Verkeerde/verouderde GUID's in `.et.meta`-bestanden (Workbench resolvet resource-GUID's via het
+   `.meta`-bestand, NIET via het `ID`-veld in de `.et`-inhoud zelf!)
+2. Onvolledige `EditorModeEdit.et`-override (miste ~95% van de vanilla-inhoud na een eerdere
+   handmatige bewerking — override-bestanden moeten de VOLLEDIGE inhoud van het origineel bevatten)
+3. Verkeerde UIInfo-klasse (`SCR_UIInfo` i.p.v. `SCR_EditableEntityUIInfo`)
+4. Ontbrekend `.meta`-bestand voor onze eigen `MCF_PlaceableEntities.conf`
+5. Kapotte Entity Catalog-toevoeging (los systeem van Placeable Registry, hoort niet bij SYSTEM-type items)
+6. `Create/Update Selected Editable Prefabs`-plugin crasht native (BadFloat-assertion in
+   `EditablePrefabsLabel_Size.GetLabelValid`) op mesh-loze entiteiten — **vermijd deze plugin voor
+   pure logica-prefabs, gebruik de handmatige route hieronder**
+
+### De ECHTE, volledige oplossing (bevestigd werkend)
+Elke placeable prefab moet **exact dit patroon** volgen op zijn `SCR_EditableEntityComponent`:
+
+```
+SCR_EditableEntityComponent "{GUID}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+ m_EntityType SYSTEM
+ m_Flags {
+  PLACEABLE
+  VIRTUAL
+  HAS_AREA        // alleen voor trigger/zone-achtige entiteiten
+ }
+ m_UIInfo SCR_EditableEntityUIInfo "{GUID}" {
+  Name "Weergavenaam"
+  m_aAuthoredLabels {
+   ENTITYTYPE_SYSTEM
+  }
+ }
+}
+```
+
+Plus: een `Hierarchy`-component naast de andere componenten (RplComponent, etc.) op root-niveau.
+
+**De twee cruciale, niet-vanzelfsprekende stukjes waren:**
+1. **`m_aAuthoredLabels { ENTITYTYPE_SYSTEM }` binnen `m_UIInfo`** — dit is een LABELS-array,
+   apart van het `m_EntityType`-enum-veld. Dit is waarschijnlijk waar de Entity Browser-filter
+   daadwerkelijk op filtert. Gevonden door drie verschillende werkende vanilla System-entiteiten
+   te vergelijken (RestrictionZone, SpawnPoint, EffectModule_MineField) — alle drie hadden dit.
+2. **Erven van `Default_SCR_EditableEntityComponent.ct`** (GUID `{996046FE206C699A}`) i.p.v. het
+   component los te declareren — bevestigd via de officiële BI-wiki-tekst: "All editable entities
+   which use component prefab Default_SCR_EditableEntityComponent.ct are already flagged as PLACEABLE."
+
+### Werkwijze om dit te verifiëren/reproduceren
+1. `game_duplicate` een bekend-werkend vanilla System-item (bijv.
+   `{EF72FA7CD87618D5}PrefabsEditable/RestrictionZone/E_EditorRestrictionZoneSmall.et` of
+   `{CEA2B24051A44525}PrefabsEditable/SpawnPoints/E_SpawnPoint_US.et`)
+2. `prefab` (action: inspect, `include_raw: true`) erop om de RAUWE bestandsinhoud van elk niveau
+   in de overervingsketen te zien — dit toont het EXACTE patroon dat werkt
+3. Vergelijk met je eigen prefab en kopieer het patroon
+
+### Registry-koppeling (dit deel werkte na de hoofdfix meteen goed)
+- `Configs/Editor/MCF_PlaceableEntities.conf` (`SCR_PlaceableEntitiesRegistry`, GUID
+  `{20157029BFE49D1A}`, met `.meta`-bestand met `CONFResourceClass`-structuur) bevat de 12 prefab-paden
+- Toegevoegd aan `Prefabs/Editor/Modes/EditorModeEdit.et` (onze override) →
+  `SCR_PlacingEditorComponent.m_Registries` array
+- **Deze eigen, aparte registry-aanpak (i.p.v. een vanilla-bestand overschrijven) werkt nu prima**
+  — geen noodzaak om `Configs/Editor/PlaceableEntities/Systems/Systems.conf` te overriden
+
+## Volgende openstaande vraag: Editor Attributes (Scenario properties-paneel)
+Wanneer je in Game Master een geplaatst item selecteert en "Edit" kiest, toont vanilla-content
+(bijv. Arsenal) een configuratiepaneel ("Set faction", "Enable arsenal", etc.) — onze eigen
+prefabs tonen "No properties, this entity has no properties to edit."
+
+Dit is een **apart systeem** van wat we vandaag gefixt hebben (niet Placeable Registry, maar de
+"Editor Attributes"-laag, vermoedelijk gekoppeld via `SCR_AttributesManagerEditorComponent` /
+attribuutlijst-configs, zoals gezien in `EditorModeEdit.et`'s `m_AttributeLists`). Dit is **nog niet
+onderzocht** — dit is de logische volgende stap voor een nieuwe sessie. Onze scriptcomponenten
+hebben wél gewone `[Attribute(...)]`-tags (zichtbaar in Workbench's Object Properties), maar dat is
+blijkbaar een ander mechanisme dan wat dit specifieke in-game paneel gebruikt.
+
+**Aanbevolen aanpak voor de volgende sessie:** gebruik dezelfde bewezen methode als vandaag — zoek
+een simpel vanilla System-item met een WERKEND Editor Attributes-paneel, dupliceer het met
+`game_duplicate`, inspecteer met `prefab` (`include_raw: true`), en vergelijk met onze eigen
+componenten om het ontbrekende patroon te vinden.
+
+## Overige losse eindjes
+- `docs/architecture/PROJECT_STATUS.md` heeft nog niet alle bevindingen van vandaag verwerkt in
+  detail (deze handover is de primaire bron voor nu — kopieer relevante stukken over bij gelegenheid)
+- Enkele bekende, niet-blokkerende vanilla-foutmeldingen blijven verschijnen in de log
+  (Multiple map entities, verouderde vanilla vehicle-bestandssyntax) — genegeerd, niet MCF-gerelateerd
