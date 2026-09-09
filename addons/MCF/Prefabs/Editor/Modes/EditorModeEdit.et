@@ -53,32 +53,28 @@ SCR_EditorModeEntity : "{E56F54E533ACE527}Prefabs/Editor/Modes/EditorModeBase.et
      }
     }
     SCR_EditorContentBrowserSaveStateDataUI "{59C8978C18CD0C12}" {
-     m_iSavedLabels {
-      ENTITYTYPE_CHARACTER
+     m_iSavedLabels +{
      }
      m_BrowserStateUIInfo SCR_UIInfo "{59C8978C0ED0336C}" {
       Name "#AR-Editor_ContentBrowser_State_NoFilters"
      }
     }
     SCR_EditorContentBrowserSaveStateDataUI "{59C8978C1882BE28}" {
-     m_iSavedLabels {
-      ENTITYTYPE_GROUP
+     m_iSavedLabels +{
      }
      m_BrowserStateUIInfo SCR_UIInfo "{59C8978C0B878233}" {
       Name "#AR-Editor_ContentBrowser_State_NoFilters"
      }
     }
     SCR_EditorContentBrowserSaveStateDataUI "{59C8978C077E2978}" {
-     m_iSavedLabels {
-      ENTITYTYPE_VEHICLE
+     m_iSavedLabels +{
      }
      m_BrowserStateUIInfo SCR_UIInfo "{59C8978C32EB352D}" {
       Name "#AR-Editor_ContentBrowser_State_NoFilters"
      }
     }
    }
-   m_eBlackListedLabels {
-    STATIC_COMPOSITION
+   m_eBlackListedLabels +{
    }
   }
   SCR_ContextActionsEditorComponent "{518AEC2A62FE8325}" {
@@ -92,8 +88,6 @@ SCR_EditorModeEntity : "{E56F54E533ACE527}Prefabs/Editor/Modes/EditorModeBase.et
     SCR_EditorActionList "{FC88F4CE5F7B2C4B}Configs/Editor/ActionLists/Context/Tasks.conf" {
     }
    }
-  }
-  SCR_DynamicSimulationEditorComponent "{56FC7320C2B1F02C}" {
   }
   SCR_EntitiesManagerEditorComponent "{5114A04CD3438BF5}" {
    m_aFilters {
@@ -218,8 +212,7 @@ SCR_EditorModeEntity : "{E56F54E533ACE527}Prefabs/Editor/Modes/EditorModeBase.et
    m_Registries {
     SCR_PlaceableEntitiesRegistryFromCatalog "{605690885A3148C4}" {
      m_eEditorMode EDIT
-     m_CatalogTypes {
-      GROUP CHARACTER VEHICLE WEAPONS_TRIPOD
+     m_CatalogTypes +{
      }
     }
     SCR_PlaceableEntitiesRegistry "{6056ED165C293FAE}" : "{C9CD86AACFA7016F}Configs/Editor/PlaceableEntities/Groups/Groups.conf" {
