@@ -5,16 +5,14 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{51D0B5C71CA36324}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_EntityType SYSTEM
-   m_UIInfo SCR_EditableEntityUIInfo "{51D0B5C71CA36325}" {
-    Name "(MCF_Obj_ProximityTrigger)"
-    m_Image ""
-    m_aAuthoredLabels {
-    }
-    m_aAutoLabels {
-     ENTITYTYPE_SYSTEM SIZE_XL
-    }
+   m_Flags {
+    PLACEABLE
+    VIRTUAL
+    HAS_AREA
    }
-   m_Flags PLACEABLE
+   m_UIInfo SCR_EditableEntityUIInfo "{51D0B5C71CA36325}" {
+    Name "MCF Proximity Trigger"
+   }
   }
   RplComponent "{8A24F93EA8627001}" {
   }

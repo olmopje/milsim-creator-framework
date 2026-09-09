@@ -4,16 +4,14 @@ GenericEntity {
   MCF_Obj_LogicComponent "{23165388AC9E3E2A}" {
   }
   SCR_EditableEntityComponent "{5DC25F3B8C0B1A73}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_UIInfo SCR_EditableEntityUIInfo "{5DC25F3B8C0B1A74}" {
-    Name "(MCF_Obj_Logic)"
-    m_Image ""
-    m_aAuthoredLabels {
-    }
-    m_aAutoLabels {
-     ENTITYTYPE_OBJECT SIZE_XL
-    }
+   m_EntityType SYSTEM
+   m_Flags {
+    PLACEABLE
+    VIRTUAL
    }
-   m_Flags PLACEABLE
+   m_UIInfo SCR_EditableEntityUIInfo "{5DC25F3B8C0B1A74}" {
+    Name "MCF Logic Node"
+   }
   }
   RplComponent "{C50C4BFCD3BB3003}" {
   }

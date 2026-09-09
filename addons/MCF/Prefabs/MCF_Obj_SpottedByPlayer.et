@@ -4,16 +4,14 @@ GenericEntity {
   MCF_Obj_SpottedByPlayerComponent "{19EB8515EDE77882}" {
   }
   SCR_EditableEntityComponent "{964AA3464D21E889}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_UIInfo SCR_EditableEntityUIInfo "{964AA3464D21E88A}" {
-    Name "(MCF_Obj_SpottedByPlayer)"
-    m_Image ""
-    m_aAuthoredLabels {
-    }
-    m_aAutoLabels {
-     ENTITYTYPE_OBJECT SIZE_XL
-    }
+   m_EntityType SYSTEM
+   m_Flags {
+    PLACEABLE
+    VIRTUAL
    }
-   m_Flags PLACEABLE
+   m_UIInfo SCR_EditableEntityUIInfo "{964AA3464D21E88A}" {
+    Name "MCF Spotted By Player"
+   }
   }
   RplComponent "{6C5FE2CCB6B41001}" {
   }
