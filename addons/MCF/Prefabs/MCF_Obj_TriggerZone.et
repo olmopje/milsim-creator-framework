@@ -4,10 +4,16 @@ GenericEntity {
   MCF_Obj_TriggerZoneComponent "{81582E81BD212EAE}" {
   }
   SCR_EditableEntityComponent "{0BC17B3C3A86DE9F}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_Flags "PLACEABLE"
    m_UIInfo SCR_EditableEntityUIInfo "{0BC17B3C3A86DEA0}" {
-    Name "MCF Trigger Zone"
+    Name "(MCF_Obj_TriggerZone)"
+    m_Image ""
+    m_aAuthoredLabels {
+    }
+    m_aAutoLabels {
+     ENTITYTYPE_OBJECT SIZE_XL
+    }
    }
+   m_Flags PLACEABLE
   }
   RplComponent "{39A7C5F59B6CF001}" {
   }

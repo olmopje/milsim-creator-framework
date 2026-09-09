@@ -4,10 +4,16 @@ GenericEntity {
   MCF_AI_LifestylePOIComponent "{74192FA8E79EE265}" {
   }
   SCR_EditableEntityComponent "{829E94719428F3D6}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_Flags "PLACEABLE"
    m_UIInfo SCR_EditableEntityUIInfo "{829E94719428F3D7}" {
-    Name "MCF Lifestyle POI"
+    Name "(MCF_AI_LifestylePOI)"
+    m_Image ""
+    m_aAuthoredLabels {
+    }
+    m_aAutoLabels {
+     ENTITYTYPE_OBJECT SIZE_XL
+    }
    }
+   m_Flags PLACEABLE
   }
   RplComponent "{927A8ABC1DDA1001}" {
   }

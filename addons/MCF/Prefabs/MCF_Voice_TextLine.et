@@ -4,10 +4,16 @@ GenericEntity {
   MCF_Voice_TextLineComponent "{A15173E89394C918}" {
   }
   SCR_EditableEntityComponent "{F2DBBBBCF2B824B1}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_Flags "PLACEABLE"
    m_UIInfo SCR_EditableEntityUIInfo "{F2DBBBBCF2B824B2}" {
-    Name "MCF Text Line"
+    Name "(MCF_Voice_TextLine)"
+    m_Image ""
+    m_aAuthoredLabels {
+    }
+    m_aAutoLabels {
+     ENTITYTYPE_OBJECT SIZE_XL
+    }
    }
+   m_Flags PLACEABLE
   }
   RplComponent "{152F65EF13B71001}" {
   }

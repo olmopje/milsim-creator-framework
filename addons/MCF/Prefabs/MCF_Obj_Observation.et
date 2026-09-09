@@ -4,10 +4,16 @@ GenericEntity {
   MCF_Obj_ObservationNode "{EAE89DC71E3B6957}" {
   }
   SCR_EditableEntityComponent "{693AB6C198293918}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
-   m_Flags "PLACEABLE"
    m_UIInfo SCR_EditableEntityUIInfo "{693AB6C198293919}" {
-    Name "MCF Observation Node"
+    Name "(MCF_Obj_Observation)"
+    m_Image ""
+    m_aAuthoredLabels {
+    }
+    m_aAutoLabels {
+     ENTITYTYPE_OBJECT SIZE_XL
+    }
    }
+   m_Flags PLACEABLE
   }
   RplComponent "{B5F266B9FD450004}" {
   }
