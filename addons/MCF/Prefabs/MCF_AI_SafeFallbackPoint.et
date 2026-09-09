@@ -4,8 +4,7 @@ GenericEntity {
   MCF_AI_SafeFallbackPointComponent "{BCD9AA22FA779721}" {
   }
   SCR_EditableEntityComponent "{A05DBCB281E7EFED}" {
-   m_EditableEntityFlags "PLACEABLE"
-   m_sDisplayName "MCF Safe Fallback Point"
+   m_Flags "PLACEABLE"
   }
   RplComponent "{3C54A0573FF71001}" {
   }

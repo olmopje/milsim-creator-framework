@@ -4,8 +4,7 @@ GenericEntity {
   MCF_React_RecipeComponent "{5B975E203CF3990E}" {
   }
   SCR_EditableEntityComponent "{9130131640A1B09B}" {
-   m_EditableEntityFlags "PLACEABLE"
-   m_sDisplayName "MCF Recipe"
+   m_Flags "PLACEABLE"
   }
   RplComponent "{77EA9923B4F61001}" {
   }

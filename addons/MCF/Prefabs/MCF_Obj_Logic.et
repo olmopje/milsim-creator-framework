@@ -4,8 +4,7 @@ GenericEntity {
   MCF_Obj_LogicComponent "{23165388AC9E3E2A}" {
   }
   SCR_EditableEntityComponent "{5DC25F3B8C0B1A73}" {
-   m_EditableEntityFlags "PLACEABLE"
-   m_sDisplayName "MCF Logic Node"
+   m_Flags "PLACEABLE"
   }
   RplComponent "{C50C4BFCD3BB3003}" {
   }

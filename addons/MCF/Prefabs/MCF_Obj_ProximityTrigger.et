@@ -4,8 +4,7 @@ GenericEntity {
   MCF_Obj_ProximityTriggerComponent "{DD145B75DF0EDD51}" {
   }
   SCR_EditableEntityComponent "{51D0B5C71CA36324}" {
-   m_EditableEntityFlags "PLACEABLE"
-   m_sDisplayName "MCF Proximity Trigger"
+   m_Flags "PLACEABLE"
   }
   RplComponent "{8A24F93EA8627001}" {
   }

@@ -4,8 +4,7 @@ GenericEntity {
   MCF_Obj_TriggerZoneComponent "{81582E81BD212EAE}" {
   }
   SCR_EditableEntityComponent "{0BC17B3C3A86DE9F}" {
-   m_EditableEntityFlags "PLACEABLE"
-   m_sDisplayName "MCF Trigger Zone (Phase 0)"
+   m_Flags "PLACEABLE"
   }
   RplComponent "{39A7C5F59B6CF001}" {
   }

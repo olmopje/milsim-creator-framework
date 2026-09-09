@@ -4,8 +4,7 @@ GenericEntity {
   MCF_AI_LifestylePOIComponent "{74192FA8E79EE265}" {
   }
   SCR_EditableEntityComponent "{829E94719428F3D6}" {
-   m_EditableEntityFlags "PLACEABLE"
-   m_sDisplayName "MCF Lifestyle POI"
+   m_Flags "PLACEABLE"
   }
   RplComponent "{927A8ABC1DDA1001}" {
   }

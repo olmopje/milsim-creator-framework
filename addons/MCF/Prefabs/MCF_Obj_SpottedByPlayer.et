@@ -4,8 +4,7 @@ GenericEntity {
   MCF_Obj_SpottedByPlayerComponent "{19EB8515EDE77882}" {
   }
   SCR_EditableEntityComponent "{964AA3464D21E889}" {
-   m_EditableEntityFlags "PLACEABLE"
-   m_sDisplayName "MCF Spotted By Player"
+   m_Flags "PLACEABLE"
   }
   RplComponent "{6C5FE2CCB6B41001}" {
   }
