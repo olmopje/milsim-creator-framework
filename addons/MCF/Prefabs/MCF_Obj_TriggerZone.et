@@ -5,6 +5,9 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{0BC17B3C3A86DE9F}" {
    m_Flags "PLACEABLE"
+   m_UIInfo SCR_UIInfo "{0BC17B3C3A86DEA0}" {
+    Name "MCF Trigger Zone"
+   }
   }
   RplComponent "{39A7C5F59B6CF001}" {
   }

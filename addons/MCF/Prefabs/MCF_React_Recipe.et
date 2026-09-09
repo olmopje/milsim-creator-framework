@@ -5,6 +5,9 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{9130131640A1B09B}" {
    m_Flags "PLACEABLE"
+   m_UIInfo SCR_UIInfo "{9130131640A1B09C}" {
+    Name "MCF Recipe"
+   }
   }
   RplComponent "{77EA9923B4F61001}" {
   }

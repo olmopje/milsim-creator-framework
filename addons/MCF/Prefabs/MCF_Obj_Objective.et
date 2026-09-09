@@ -5,6 +5,9 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{4F6667EC6F5FD79F}" {
    m_Flags "PLACEABLE"
+   m_UIInfo SCR_UIInfo "{4F6667EC6F5FD7A0}" {
+    Name "MCF Objective Node"
+   }
   }
   RplComponent "{EE2F97C40CD99F02}" {
   }

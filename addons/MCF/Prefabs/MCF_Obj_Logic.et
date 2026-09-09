@@ -5,6 +5,9 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{5DC25F3B8C0B1A73}" {
    m_Flags "PLACEABLE"
+   m_UIInfo SCR_UIInfo "{5DC25F3B8C0B1A74}" {
+    Name "MCF Logic Node"
+   }
   }
   RplComponent "{C50C4BFCD3BB3003}" {
   }

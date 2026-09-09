@@ -5,6 +5,9 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{964AA3464D21E889}" {
    m_Flags "PLACEABLE"
+   m_UIInfo SCR_UIInfo "{964AA3464D21E88A}" {
+    Name "MCF Spotted By Player"
+   }
   }
   RplComponent "{6C5FE2CCB6B41001}" {
   }
