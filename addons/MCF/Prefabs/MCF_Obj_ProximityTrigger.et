@@ -4,6 +4,7 @@ GenericEntity {
   MCF_Obj_ProximityTriggerComponent "{DD145B75DF0EDD51}" {
   }
   SCR_EditableEntityComponent "{51D0B5C71CA36324}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType SYSTEM
    m_Flags "PLACEABLE"
    m_UIInfo SCR_EditableEntityUIInfo "{51D0B5C71CA36325}" {
     Name "MCF Proximity Trigger"
@@ -11,17 +12,5 @@ GenericEntity {
   }
   RplComponent "{8A24F93EA8627001}" {
   }
- }
- editor EntityEditorProps {
-  Style 2
-  DynamicBox 1
-  SizeMin "-0.5 -0.5 -0.5"
-  SizeMax "0.5 0.5 0.5"
-  Visible 1
-  Color "1 0 0 1"
-  Icon "{AC931A989866A2BA}system/wbdata/WorldEditor/EntityIcons/Rectangle/Rectangle_ground.et"
-  Billboard 1
-  Scale 1
-  Elevation 0
  }
 }
