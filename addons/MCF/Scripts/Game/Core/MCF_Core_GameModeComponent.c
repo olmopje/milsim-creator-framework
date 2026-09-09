@@ -14,11 +14,11 @@
 //! AI-controlled entities too, not only players.
 //!
 //! WHAT THIS COMPONENT NO LONGER DOES, AND WHY. Until 2026-09-10 it also
-//! booted the dialogue library, the hostility manager, the task store and the
-//! intel store by name, and pushed tasks and intel to each player itself. That
-//! made Core depend on three modules that are meant to be optional. It now
-//! publishes four lifecycle events instead, and each module's own game-mode
-//! component listens for the ones it cares about:
+//! booted the dialogue library, the task store and the intel store by name,
+//! and pushed tasks and intel to each player itself. That made Core depend on
+//! modules that are meant to be optional. It now publishes four lifecycle
+//! events instead, and each module's own game-mode component listens for the
+//! ones it cares about:
 //!
 //!   MCF_Core_PersistentStoreReady   server only, after $profile: is loaded.
 //!                                   Where a module loads its own slice.
@@ -73,6 +73,12 @@ class MCF_Core_GameModeComponent : SCR_BaseGameModeComponent
 	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Start the AAR/Debrief manager listening automatically.")]
 	protected bool m_bEnableAAR;
 
+	[Attribute(defvalue: "0", uiwidget: UIWidgets.CheckBox, desc: "Enable automatic Hostility decay.")]
+	protected bool m_bEnableHostilityDecay;
+
+	[Attribute(defvalue: "0.5", uiwidget: UIWidgets.EditBox, desc: "Hostility decay rate per second, if enabled above.")]
+	protected float m_fHostilityDecayRate;
+
 	static const string EVENT_STORE_READY = "MCF_Core_PersistentStoreReady";
 	static const string EVENT_MISSION_START = "MCF_Core_MissionStart";
 	static const string EVENT_PLAYER_REGISTERED = "MCF_Core_PlayerRegistered";
@@ -97,6 +103,9 @@ class MCF_Core_GameModeComponent : SCR_BaseGameModeComponent
 
 		if (m_bEnableAAR)
 			MCF_AAR_DebriefManager.GetInstance().StartListening();
+
+		if (m_bEnableHostilityDecay)
+			MCF_Hostility_Manager.GetInstance().StartAutoDecay(m_fHostilityDecayRate);
 
 		MCF_Core_EventManager.GetInstance().Publish(EVENT_MISSION_START, null);
 

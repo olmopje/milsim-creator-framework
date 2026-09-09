@@ -58,8 +58,6 @@ PerceptionManager PerceptionManager : "{028DAEAD63E056BE}Prefabs/World/Game/Perc
 }
 SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Editor/GameMode_Editor_Full.et" {
  components {
-  MCF_AI_GameModeComponent "{6A515757B6739102}" {
-  }
   MCF_Core_GameLoopComponent "{6A515757BE2C9896}" {
   }
   MCF_Core_GameModeComponent "{6A515757B673907C}" {

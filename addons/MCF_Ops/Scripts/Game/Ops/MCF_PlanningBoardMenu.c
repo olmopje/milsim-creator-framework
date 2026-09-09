@@ -681,8 +681,8 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 	//! lets anything happen.
 	protected string ViewerTag()
 	{
-		MCF_ETaskRole role = MCF_Task_Permissions.GetInstance().ResolveRole(GetLocalPlayerId());
-		return "      YOU: " + MCF_Task_Permissions.RoleLabel(role);
+		MCF_ERole role = MCF_Core_Roles.GetInstance().ResolveRole(GetLocalPlayerId());
+		return "      YOU: " + MCF_Core_Roles.RoleLabel(role);
 	}
 
 	protected string GetLocalFactionKey()

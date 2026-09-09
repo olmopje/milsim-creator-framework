@@ -1585,3 +1585,136 @@ what you expect before trusting a session.
 - The split `modded class SCR_PlayerController` has still not been tested
   *across* addons. React contains no such block. Ops, Dialogue and Subdue do,
   and they are the ones that will answer it.
+
+
+## Modularisation, phase 3: the whole framework is modular (2026-09-10)
+
+MCF is now eight addons. Everything loads, compiles clean, and resolves across
+addon boundaries.
+
+```
+MCF             6A50E40BA3B94A4F   24 scripts,  4 prefabs             Core
+MCF_Objectives  6A50E40BA3B94B02   11 scripts,  8 prefabs
+MCF_Ops         6A50E40BA3B94B03   18 scripts,  4 prefabs, 4 layouts
+MCF_Dialogue    6A50E40BA3B94B04   13 scripts,  1 prefab,  2 layouts
+MCF_Subdue      6A50E40BA3B94B05    8 scripts
+MCF_Ambient     6A50E40BA3B94B06    8 scripts,  2 prefabs
+MCF_React       6A50E40BA3B94B01    4 scripts,  1 prefab
+MCF_Dev         6A50E40BA3B94B07   the test world and the missions
+```
+
+86 scripts, the same count as before the split. Every module depends on Core
+and on nothing else. `MCF_Dev` depends on all of them and is the development
+entry point; it is never published.
+
+### Three boundaries that moved after a second look
+
+**Disposition and hostility went into Core, not into a module of their own.**
+The earlier plan had an `MCF_AI` module holding `MCF_Hostility_Manager` and
+`MCF_AI_DispositionComponent`. Nobody would ever install that for itself -- it
+only ever appears as a dependency of Dialogue, Subdue and Ambient. Something
+that exists only as a dependency is a library, and libraries belong in Core.
+Moving it removed an entire addon and three dependency edges, and it makes the
+disposition component named in Core's `Character_Base` manifest always
+resolvable. The hostility decay attributes went back onto
+`MCF_Core_GameModeComponent` and `MCF_AI_GameModeComponent` was deleted.
+
+**`MCF_Task_Permissions` was two things wearing one name.** Resolving a
+player's command tier -- Game Master rights, faction commander, group leader,
+all read out of vanilla -- has nothing to do with tasks. It was the only reason
+the dialogue module depended on the operations board: "only a Game Master may
+write a conversation" was asking the task board for an answer. That half is now
+`MCF_Core_Roles` in Core, with the enum renamed `MCF_ETaskRole` -> `MCF_ERole`.
+What stayed in Ops is the part that really is about tasks: the table saying
+which tier may READ/ACCEPT/EDIT/CREATE/PUBLISH. **That was the last remaining
+cross-module reference in the whole framework.**
+
+**Squad cohesion moved from Ambient to Ops.** It is about player squads --
+position sharing, a muster gate, a radio respawn hint -- not about ambient AI.
+Ops is the command-and-control module; that is where it belongs.
+
+### Measured
+
+Opening `MCF_Dev` with all seven other addons:
+
+```
+using additional addon: 6A50E40BA3B94B06 (G:/MCF/addons/MCF_Ambient/addon.gproj)
+using additional addon: 6A50E40BA3B94B07 (G:/MCF/addons/MCF_Dev/addon.gproj)
+... all eight ...
+Module: Game; loaded 5746x files; 11270x classes
+```
+
+No `(E)`. 5746 files is the pre-split figure exactly; 11270 classes is one
+fewer than before, which is right to the class: `MCF_AI_GameModeComponentClass`
+and `MCF_AI_GameModeComponent` gone (-2), `MCF_Core_Roles` added (+1),
+`MCF_ERole` replacing `MCF_ETaskRole` (0).
+
+The test world -- which lives in `MCF_Dev` -- then opened and initialised
+prefabs from four different addons:
+
+```
+[MCF] ConeDetection init      {2D283A489D1D8BCC}Prefabs/MCF_Obj_ConeDetectionTrigger.et   MCF_Objectives
+[MCF] SpottedByPlayer init    {6C5FE2CCB6B45596}Prefabs/MCF_Obj_SpottedByPlayer.et        MCF_Objectives
+[MCF] ProximityTrigger init   {8A24F93EA862750C}Prefabs/MCF_Obj_ProximityTrigger.et       MCF_Objectives
+[MCF] operations board registered  {6A1C4F0B39D27E10}Prefabs/MCF_Task_Board.et            MCF_Ops
+[MCF] Recipe init                                                                        MCF_React
+[MCF] TextLine init, LineDisplay init                                                    MCF
+```
+
+The only errors in the whole session are the pre-existing
+`Multiple map entities present!` pair, which predates the split.
+
+### The manifest pattern, seen failing safely one more time
+
+In an intermediate session where `MCF_Ops` and `MCF_Dialogue` were not yet
+loaded, Core's `chimeraMenus.conf` produced exactly five lines:
+
+```
+RESOURCES (E): Wrong GUID/name for resource @"{...}UI/layouts/MCF/MCF_PlanningBoard.layout" in property "Layout"
+RESOURCES (E): ... MCF_IntelViewer.layout ... MCF_IntelEditor.layout
+RESOURCES (E): ... MCF_Dialogue.layout ... MCF_DialogueEditor.layout
+```
+
+The config still loaded and the rest of the presets were unaffected. Five menu
+presets in Core naming layouts that live in absent addons cost five log lines
+and nothing else -- the same shape as the component and placeable cases.
+
+### How a new addon actually gets loaded, corrected
+
+The earlier note said "budget one manual open per module". That was not quite
+right, and the real mechanism matters:
+
+- **`-gproj` on a project the Workbench has never seen never works.** Stage 1 of
+  the launcher always ends in `Game addon '58D0FB3206B6F859' not found` and
+  `Cannot initialize game project settings!` -- *including on launches that
+  then succeed*. That message is not the failure; it is normal. What matters is
+  whether stage 2 follows, which is the real Workbench with the full
+  `Addon dirs:` block including
+  `G:/SteamLibrary/steamapps/common/Arma Reforger/addons`.
+- **The launcher's addon list is populated from**
+  `Documents\My Games\ArmaReforgerWorkbench\profile\.projectList_app1874910_user<id>.conf`.
+  A new addon has to be in that file to be tickable. Writing it there by hand
+  works for making it *selectable*; it does not by itself make `-gproj` work.
+- **The addons are then selected in the launcher UI and the project opened
+  there**, which logs `using additional addon: <GUID> (<path>)` per addon.
+
+So the workflow for a new module addon is: create the folder and `addon.gproj`,
+add it to the project list file, then open the project once through the
+launcher with the addon ticked. Rewriting the project list while the launcher
+is waiting makes it wait longer -- do it with the Workbench closed.
+
+Also worth remembering: `wb_launch` on an unregistered project silently opened
+a completely different project (`loaded 5660x files`, and a stream of
+`Failed to call not existing Net API function 'EMCP_WB_Ping'` because the MCF
+handlers were not loaded at all). **Check the file and class count before
+trusting any session.**
+
+### Not verified
+
+Nothing has been watched running since the split. The refactor moved
+`MCF_Task_Permissions.ResolveRole` to `MCF_Core_Roles` and every dialogue
+Game-Master check with it, and folded the hostility decay setting back into
+Core's game mode component. A play session still has to confirm the board, a
+conversation, and a shout all behave. And the split `modded class
+SCR_PlayerController` now genuinely spans four addons -- Core, Ops, Dialogue
+and Subdue -- which compiles, but has not been exercised over a wire since.

@@ -8,7 +8,7 @@ in the repository root, which is tracked in git (it was gitignored until
 `f80bff5`; the older text saying otherwise is stale). When you update one,
 update the other.
 
-Last updated: 2026-09-10, after the modularisation phase-0 session.
+Last updated: 2026-09-10, after the modularisation was completed.
 
 ---
 
@@ -22,10 +22,9 @@ without scripting.
 | Thing | Where |
 |---|---|
 | Repository root | `G:\MCF` |
-| The Core addon | `G:\MCF\addons\MCF` |
-| The React addon | `G:\MCF\addons\MCF_React` (the first module extracted) |
-| Workbench project file | `G:\MCF\addons\MCF\addon.gproj`, or `MCF_React\addon.gproj` to get both |
-| Test world | `G:\MCF\addons\MCF\worlds\arland\MCFTestworld.ent` |
+| The addons | `G:\MCF\addons\` — `MCF` (Core), `MCF_Objectives`, `MCF_Ops`, `MCF_Dialogue`, `MCF_Subdue`, `MCF_Ambient`, `MCF_React`, `MCF_Dev` |
+| Workbench project | open **`MCF_Dev`** with every `MCF*` addon ticked — it depends on all of them and holds the test world |
+| Test world | `G:\MCF\addons\MCF_Dev\worlds\arland\MCFTestworld.ent` |
 | GitHub | `olmopje/milsim-creator-framework`, branch `main` |
 | Wiki | `.../wiki` — 11 pages, the public-facing documentation |
 
@@ -102,83 +101,80 @@ All of it was re-confirmed in a live session after the phase-0 refactor on
 
 ---
 
-## The modularisation, which is the current thread
+## The modularisation — done
 
-The goal: MCF splittable into separate addons, so someone can install Core
-alone, or Core plus a module, and adding or removing one breaks nothing. The
-full design is `docs/architecture/MODULARISATION.md`. The three things worth
-carrying in your head:
+MCF is eight addons. Every module depends on Core and on nothing else. The full
+design and every measurement is `docs/architecture/MODULARISATION.md`; the
+chronology is in `PROJECT_STATUS.md`. What to carry in your head:
 
-**The measured fact everything rests on.** A prefab that names a script class
-from an addon that is not loaded still loads. The unresolvable component is
-dropped, the rest of the entity is intact, and it costs one `WORLD (E)` line.
-Measured 2026-09-10 with a throwaway prefab. This is why the design works at
-all.
+**The measured fact it all rests on.** A prefab that names a script class from
+an addon that is not loaded still loads: the unresolvable component is dropped,
+the rest of the entity is intact, and it costs one `WORLD (E)` line. The same
+holds for a config entry naming a missing class (silent) and a menu preset
+naming a missing layout (one `RESOURCES (E)`, config still loads).
 
 **The rule.** Exactly one MCF addon may override a vanilla GUID, and that addon
-is Core. There are four such overrides — `Character_Base.et`,
-`EditorModeEdit.et`, `chimeraMenus.conf`, `chimeraInputCommon.conf` — and each
-becomes a manifest naming every module's contribution whether or not that
-module is installed. Modules never override vanilla.
+is Core. There are four — `Character_Base.et`, `EditorModeEdit.et`,
+`chimeraMenus.conf`, `chimeraInputCommon.conf` — and each is a **manifest**
+naming every module's contribution whether or not that module is installed.
+Core's editor configs (attributes, context actions, placeables) work the same
+way. Modules never override vanilla.
 
-**The eight modules.** Core (which now also holds the line/voice primitive and
-the AAR manager), Objectives, AI, Subdue, Ambient, Ops (tasks *and* intel — they
-are one product, splitting them is circular), Dialogue, React.
-`Scripts/Game/` already has one folder per module, so extracting one is a
-folder move.
+**What is Core, and why.** Core holds what more than one module needs, plus
+what can only live in a vanilla manifest: the event bus, logging, tick and game
+loop, budget, persistent store, validation registry, tags and identity,
+factions, the line/HUD channel, the player-controller message channel,
+`MCF_Core_Roles` (who is in the chain of command), hostility and disposition,
+and the AAR manager. A thing that only ever exists as somebody's dependency is
+a library, and libraries go in Core.
 
-### Where phase 0 got to
+**Verified end to end.** All eight addons loaded:
+`Module: Game; loaded 5746x files; 11270x classes`, no `(E)`, and the test
+world in `MCF_Dev` initialised prefabs from four different addons.
 
-Done: all eight cross-module back-edges cut, the folder reorganisation, Core's
-game-mode component reduced to publishing four lifecycle events, three new
-module game-mode components listening for them, and
-`MCF_PlayerControllerTasks.c` split four ways. Compiles clean at
-`Module: Game; loaded 5746x files; 11271x classes`.
+### Not verified
 
-**Watched running, and it holds.** The listen-server race was caught
-happening: the host registered 100 ms before the game mode started, the
-deferral fired, the catch-up delivered. The faction re-push works, event
-validation passes, all four split `modded class` blocks work over the wire, and
-the three detection components register through the new base class
-(`notifying 3 registered watcher(s)`) and fire. Phase 0 is closed.
-
-One thing surfaced along the way: the test world contained **no detection
-trigger of any kind**, which is why the watcher registry could not be verified
-on the first pass — it only ever logged `notifying 0`. Three probe triggers
-were placed. Keep them.
+Nothing has been watched running since the final split. The last step moved
+`ResolveRole` out of `MCF_Task_Permissions` into `MCF_Core_Roles` — every
+dialogue Game-Master check goes through it — and folded the hostility decay
+setting back into Core's game mode component. And the split
+`modded class SCR_PlayerController` now spans four addons (Core, Ops, Dialogue,
+Subdue); it compiles, but has not been exercised over a wire.
 
 ### Next, in order
 
-1. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
-   late-join replication and the audience filter — and can fold in the three
+1. **A play session that proves the split did not break anything.** Open the
+   board, talk to somebody, shout at somebody. That also finally answers
+   whether the `modded class` chain merges across addons at runtime.
+2. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
+   late-join replication and the audience filter — and can fold in the two
    remaining modularisation unknowns: the dropped-component behaviour at
-   runtime on a dedicated server, the same packed to `.pak`, and whether a
-   **user action** naming a missing class behaves like a component
-   (`Character_Base` carries six).
-2. **Move the test world out of Core into its own addon.** It places module
-   prefabs, so leaving it in Core makes Core depend on Objectives and Ops. That
-   addon becomes the development entry point. This blocks extracting Objectives
-   and Ops, so it comes first.
-3. **Extract the remaining modules**, in dependency order: Objectives, AI,
-   Ambient, Subdue, Ops, Dialogue. Ops, Dialogue and Subdue each carry a
-   `modded class SCR_PlayerController` block, so they are what finally answers
-   whether the chain merges *across* addons — React has no such block, so
-   phase 2 did not test it.
+   runtime on a dedicated server, and the same packed to `.pak`.
+3. **Decide what gets published and how.** Eight addons is a lot for a user to
+   install. Worth checking whether a Workshop dependency chain does the work,
+   or whether a bundle is needed.
 4. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
 5. A one-clip animation graph for the restrained pose. Build it small — the
    crash is a size problem, not a concept problem. `arms_back` was the clip the
    user picked. Preview in `anims/workspaces/player/player_main.aw`.
 
----
-
 ## Environment quirks that will otherwise cost you an hour
 
-**A brand-new addon cannot be launched from the command line.** A `.gproj` the
-Workbench has never opened dies with `Game addon '58D0FB3206B6F859' not found`
-— the game's own addon directory is missing from the `Addon dirs:` block and
-replaced by the literal `./addons`. Neither the process working directory nor
-the recent-project list fixes it. **Open the new project once through the
-Workbench UI**; after that the CLI works. Budget one manual open per module.
+**A brand-new addon cannot be launched from the command line, and stage 1
+always looks like a failure.** `-gproj` on a project the Workbench has never
+opened ends in `Game addon '58D0FB3206B6F859' not found` /
+`Cannot initialize game project settings!`. That message also appears on
+launches that then succeed — it is the launcher stub, and what matters is
+whether a second session follows with the full `Addon dirs:` block including
+`G:/SteamLibrary/steamapps/common/Arma Reforger/addons`.
+
+To make a new addon usable: add it to
+`Documents\My Games\ArmaReforgerWorkbench\profile\.projectList_app1874910_user<id>.conf`
+(that file populates the launcher's addon list), then open the project through
+the launcher with the addon ticked. The log confirms it with
+`using additional addon: <GUID> (<path>)` per addon. Edit that file with the
+Workbench closed — rewriting it while the launcher is waiting just makes it
+wait longer.
 
 **Launching the Workbench.** The project file is `addon.gproj`, not
 `MCF.gproj`, and the path must be `G:\MCF\addons\MCF` — passing `G:\MCF` gives

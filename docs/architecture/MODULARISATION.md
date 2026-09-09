@@ -1,8 +1,8 @@
 # MCF — Modularisation design
 
-Status: **phases 0 and 2 done.** The seams are cut and MCF React is a separate
-addon, proven in both directions. Six modules remain. Sections 1-4 are the
-design; section 5 records what has happened.
+Status: **done.** MCF is eight addons. Every module depends on Core and on
+nothing else. Sections 1-4 are the design as it ended up; section 5 records how
+it got there. Nothing has been watched running since the final split.
 
 Written 2026-09-10, against commit `4c17102`.
 
@@ -144,15 +144,34 @@ asks for.
 
 ### Layer 1 — the modules
 
-| Module | Contents | Depends on |
-|---|---|---|
-| **MCF Objectives** | Logic, Objective, ProximityTrigger, ConeDetectionTrigger, TriggerZone, AlarmTrigger, SpottedByPlayer, ObservationNode, Infra_Node, 2 editor attributes | Core |
-| **MCF AI** | Hostility_Manager, DispositionComponent | Core |
-| **MCF Subdue** | Shout, ShoutInput, Compliance, SubjectControl, SubdueActions, MarchBehavior | Core, AI |
-| **MCF Ambient** | SimpleMover, EventToWaypoint, AmbientActor, LifestylePOI, WaypointAnimation, CommandWatchdog, FallbackPointRegistry, CivilianBehaviorHook, Squad_Cohesion | Core, AI |
-| **MCF Ops** | Task, Task_Permissions, TaskStore, BoardComponent, BoardActions, PlanningBoardMenu, Intel, Intel_Record, IntelStore, CarrierComponent, SourceComponent, ReadAction, IntelEditorMenu, IntelViewerMenu, IntelEditContextAction | Core |
-| **MCF Dialogue** | Dialogue_Data, Library, Script, View, Component, AssignComponent, Menu, EditorMenu, EditContextAction, editor attributes, TalkAction | Core, AI, Ops |
-| **MCF React** | Recipe, SequencePlayback, SequenceRecorder, StepRunner | Core |
+| Module | GUID | Contents | Depends on |
+|---|---|---|---|
+| **MCF Objectives** | `…4B02` | Logic, Objective, ProximityTrigger, ConeDetectionTrigger, TriggerZone, AlarmTrigger, SpottedByPlayer, ObservationNode, Infra_Node, 2 editor attributes | Core |
+| **MCF Ops** | `…4B03` | Task, Task_Permissions, TaskStore, BoardComponent, BoardActions, PlanningBoardMenu, Intel, Intel_Record, IntelStore, CarrierComponent, SourceComponent, ReadAction, IntelEditorMenu, IntelViewerMenu, IntelEditContextAction, Squad_Cohesion | Core |
+| **MCF Dialogue** | `…4B04` | Dialogue_Data, Library, Script, View, Component, AssignComponent, Menu, EditorMenu, EditContextAction, editor attributes, TalkAction | Core |
+| **MCF Subdue** | `…4B05` | Shout, ShoutInput, Compliance, SubjectControl, SubdueActions, MarchBehavior, RestraintPoseEditorAttribute | Core |
+| **MCF Ambient** | `…4B06` | SimpleMover, EventToWaypoint, AmbientActor, LifestylePOI, WaypointAnimation, CommandWatchdog, FallbackPointRegistry, CivilianBehaviorHook | Core |
+| **MCF React** | `…4B01` | Recipe, SequencePlayback, SequenceRecorder, StepRunner | Core |
+| **MCF Dev** | `…4B07` | the test world and the missions — depends on everything, never published | all |
+
+### Three boundaries that moved after a second look
+
+**Disposition and hostility are Core, not a module.** They only ever appear as
+a dependency of Dialogue, Subdue and Ambient; nobody installs them for
+themselves. Something that exists only as a dependency is a library, and
+libraries belong in Core. This removed a whole addon and three dependency
+edges, and makes the disposition component named in Core's `Character_Base`
+manifest always resolvable.
+
+**`MCF_Core_Roles` is Core; task permissions are Ops.** Resolving a player's
+command tier out of vanilla has nothing to do with tasks, and it was the only
+reason Dialogue depended on Ops. The role half moved to Core (`MCF_ERole`); the
+table saying which tier may do what to a task stayed in Ops. That was the last
+cross-module reference in the framework.
+
+**Squad cohesion is Ops, not Ambient.** It is about player squads — position
+sharing, muster, radio respawn — not about ambient AI. Ops is the
+command-and-control module.
 
 ### Why tasks and intel are one module and not two
 

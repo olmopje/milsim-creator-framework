@@ -6,9 +6,8 @@
 // the rest of the entity is untouched. Measured 2026-09-10, see
 // docs/architecture/MODULARISATION.md.
 //
-// So: install Core alone and the three MCF_* module components below simply
-// are not there. Install the modules and they wake up. Nothing in between
-// breaks.
+// So: install Core alone and the two module components below simply are not
+// there. Install the modules and they wake up. Nothing in between breaks.
 GenericEntity : "{1B76F75A3175E85C}Prefabs/MP/Modes/Plain/GameMode_Plain.et" {
  ID "11E9F79B11B9117E"
  components {
@@ -21,8 +20,6 @@ GenericEntity : "{1B76F75A3175E85C}Prefabs/MP/Modes/Plain/GameMode_Plain.et" {
   MCF_Ops_GameModeComponent "{6A1C4F0B39D2A300}" {
   }
   MCF_Dialogue_GameModeComponent "{6A1C4F0B39D2A301}" {
-  }
-  MCF_AI_GameModeComponent "{6A1C4F0B39D2A302}" {
   }
  }
 }

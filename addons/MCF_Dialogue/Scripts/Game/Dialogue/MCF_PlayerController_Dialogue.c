@@ -197,7 +197,7 @@ modded class SCR_PlayerController
 
 		int playerId = GetPlayerId();
 
-		if (MCF_Task_Permissions.GetInstance().ResolveRole(playerId) != MCF_ETaskRole.COMMANDER)
+		if (MCF_Core_Roles.GetInstance().ResolveRole(playerId) != MCF_ERole.COMMANDER)
 		{
 			MCF_SendMessage("Only a Game Master may write conversations.");
 			return;
@@ -249,7 +249,7 @@ modded class SCR_PlayerController
 		if (!Replication.IsServer())
 			return;
 
-		if (MCF_Task_Permissions.GetInstance().ResolveRole(GetPlayerId()) != MCF_ETaskRole.COMMANDER)
+		if (MCF_Core_Roles.GetInstance().ResolveRole(GetPlayerId()) != MCF_ERole.COMMANDER)
 			return;
 
 		array<string> ids = {};
@@ -291,7 +291,7 @@ modded class SCR_PlayerController
 		if (!Replication.IsServer())
 			return;
 
-		if (MCF_Task_Permissions.GetInstance().ResolveRole(GetPlayerId()) != MCF_ETaskRole.COMMANDER)
+		if (MCF_Core_Roles.GetInstance().ResolveRole(GetPlayerId()) != MCF_ERole.COMMANDER)
 		{
 			MCF_SendMessage("Only a Game Master may do that.");
 			return;
@@ -327,7 +327,7 @@ modded class SCR_PlayerController
 		if (!Replication.IsServer())
 			return;
 
-		if (MCF_Task_Permissions.GetInstance().ResolveRole(GetPlayerId()) != MCF_ETaskRole.COMMANDER)
+		if (MCF_Core_Roles.GetInstance().ResolveRole(GetPlayerId()) != MCF_ERole.COMMANDER)
 			return;
 
 		MCF_Dialogue_Conversation conversation = MCF_Dialogue_Library.GetInstance().Find(conversationId);
@@ -360,7 +360,7 @@ modded class SCR_PlayerController
 		if (!Replication.IsServer())
 			return;
 
-		if (MCF_Task_Permissions.GetInstance().ResolveRole(GetPlayerId()) != MCF_ETaskRole.COMMANDER)
+		if (MCF_Core_Roles.GetInstance().ResolveRole(GetPlayerId()) != MCF_ERole.COMMANDER)
 		{
 			MCF_SendMessage("Only a Game Master may do that.");
 			return;
