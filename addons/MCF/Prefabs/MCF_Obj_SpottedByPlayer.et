@@ -5,14 +5,11 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{964AA3464D21E889}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_EntityType SYSTEM
-   m_Flags {
-    PLACEABLE
-    VIRTUAL
-   }
    m_UIInfo SCR_EditableEntityUIInfo "{964AA3464D21E88A}" {
     Name "MCF Spotted By Player"
     m_aAuthoredLabels {
      ENTITYTYPE_SYSTEM
+     CONTENT_MODDED
     }
    }
   }

@@ -89,6 +89,11 @@ class MCF_Core_BudgetConfigComponent : ScriptComponent
 	[Attribute(desc: "Budget entries, formatted as \"category:max\", e.g. \"AIGroup:20\".")]
 	protected ref array<string> m_aLimits;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		if (!m_aLimits)

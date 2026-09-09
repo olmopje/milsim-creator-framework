@@ -1,0 +1,22 @@
+GenericEntity {
+ ID "B5F266B9FD4501E0"
+ components {
+  MCF_Dialogue_AssignComponent "{EAE89DC71E3B6A80}" {
+  }
+  SCR_EditableEntityComponent "{693AB6C198293A30}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType SYSTEM
+   m_UIInfo SCR_EditableEntityUIInfo "{693AB6C198293A31}" {
+    Name "MCF Dialogue Assign"
+    Description "Gives everybody within the radius a conversation from the library. Place it in a village and its people can be spoken to."
+    m_aAuthoredLabels {
+     ENTITYTYPE_SYSTEM
+     CONTENT_MODDED
+    }
+   }
+  }
+  RplComponent "{B5F266B9FD4500E1}" {
+  }
+  Hierarchy "{B5F266B9FD4500E2}" {
+  }
+ }
+}

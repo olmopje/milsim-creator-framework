@@ -28,6 +28,11 @@ class MCF_AI_WaypointAnimationComponent : ScriptComponent
 	[Attribute(defvalue: "MCF_AI_WaypointAnimationRequested", uiwidget: UIWidgets.EditBox, desc: "Event name published on arrival.")]
 	protected string m_sEventName;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher(m_sEventName);

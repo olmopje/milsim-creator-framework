@@ -35,6 +35,11 @@ class MCF_AI_CommandWatchdogComponent : ScriptComponent
 	protected IEntity m_Owner;
 	protected ScriptInvoker m_TickInvoker;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_Owner = owner;

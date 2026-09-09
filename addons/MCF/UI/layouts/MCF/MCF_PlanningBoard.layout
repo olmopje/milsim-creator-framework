@@ -1,0 +1,419 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D2A101}" {
+   Name "Background"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A102}" {
+    Anchor 0 0 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX -1820
+    OffsetRight 0
+    SizeY -1050
+    OffsetBottom 0
+   }
+   Color 0.04 0.045 0.05 0.96
+  }
+  TextWidgetClass "{6A1C4F0B39D2A103}" {
+   Name "Title"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A104}" {
+    Anchor 0.05 0.04 0.95 0.10
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "OPERATIONS BOARD"
+   "Font Size" 30
+   "Min Font Size" 30
+  }
+  TextWidgetClass "{6A1C4F0B39D2A105}" {
+   Name "Status"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A106}" {
+    Anchor 0.05 0.10 0.95 0.14
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 16
+   "Min Font Size" 16
+  }
+  HorizontalLayoutWidgetClass "{6A1C4F0B39D2A10B}" {
+   Name "ModeTabs"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A10C}" {
+    Anchor 0.05 0.145 0.36 0.19
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+    ButtonWidgetClass "{6A1C4F0B39D2A150}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonModeTasks"
+     Slot LayoutSlot "{6A1C4F0B39D2A151}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A152}" {
+       m_bCanBeToggled 1
+       m_sText "TASKINGS"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A153}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonModeIntel"
+     Slot LayoutSlot "{6A1C4F0B39D2A154}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A155}" {
+       m_bCanBeToggled 1
+       m_sText "INTEL"
+      }
+     }
+    }
+   }
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2A107}" {
+   Name "TaskScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A108}" {
+    Anchor 0.05 0.195 0.36 0.85
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2A10D}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2A109}" {
+     Name "TaskList"
+     Slot AlignableSlot "{6A1C4F0B39D2A10A}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D2A10E}" {
+   Name "DetailHeader"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A10F}" {
+    Anchor 0.39 0.15 0.95 0.19
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "OPERATION ORDER"
+   "Font Size" 18
+   "Min Font Size" 18
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2A110}" {
+   Name "DetailScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A111}" {
+    Anchor 0.39 0.195 0.95 0.85
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2A112}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2A113}" {
+     Name "DetailColumn"
+     Slot AlignableSlot "{6A1C4F0B39D2A114}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+     {
+      RichTextWidgetClass "{6A1C4F0B39D2A115}" {
+       Name "DetailBody"
+       Slot LayoutSlot "{6A1C4F0B39D2A116}" {
+        HorizontalAlign 3
+        Padding 8 4 8 8
+        SizeMode Fill
+       }
+       Text "Select a tasking."
+       "Font Size" 17
+       "Min Font Size" 17
+      }
+      VerticalLayoutWidgetClass "{6A1C4F0B39D2A140}" {
+       Name "EditPane"
+       Slot LayoutSlot "{6A1C4F0B39D2A141}" {
+        HorizontalAlign 3
+        SizeMode Fill
+       }
+       "Is Visible" 0
+       {
+        ButtonWidgetClass "{6A1C4F0B39D2A130}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+         Name "EditTitle"
+         Slot LayoutSlot "{6A1C4F0B39D2A131}" {
+          Padding 4 2 4 2
+          SizeMode Fill
+         }
+         components {
+          SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+           m_bMouseOverToFocus 1
+           m_sLabel "SUBJECT"
+          }
+         }
+        }
+        ButtonWidgetClass "{6A1C4F0B39D2A132}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+         Name "EditSituation"
+         Slot LayoutSlot "{6A1C4F0B39D2A133}" {
+          Padding 4 2 4 2
+          SizeMode Fill
+         }
+         components {
+          SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+           m_bMouseOverToFocus 1
+           m_sLabel "1. SITUATION"
+          }
+         }
+        }
+        ButtonWidgetClass "{6A1C4F0B39D2A134}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+         Name "EditMission"
+         Slot LayoutSlot "{6A1C4F0B39D2A135}" {
+          Padding 4 2 4 2
+          SizeMode Fill
+         }
+         components {
+          SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+           m_bMouseOverToFocus 1
+           m_sLabel "2. MISSION"
+          }
+         }
+        }
+        ButtonWidgetClass "{6A1C4F0B39D2A136}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+         Name "EditExecution"
+         Slot LayoutSlot "{6A1C4F0B39D2A137}" {
+          Padding 4 2 4 2
+          SizeMode Fill
+         }
+         components {
+          SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+           m_bMouseOverToFocus 1
+           m_sLabel "3. EXECUTION"
+          }
+         }
+        }
+        ButtonWidgetClass "{6A1C4F0B39D2A138}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+         Name "EditAdmin"
+         Slot LayoutSlot "{6A1C4F0B39D2A139}" {
+          Padding 4 2 4 2
+          SizeMode Fill
+         }
+         components {
+          SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+           m_bMouseOverToFocus 1
+           m_sLabel "4. SERVICE SUPPORT"
+          }
+         }
+        }
+        ButtonWidgetClass "{6A1C4F0B39D2A13A}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+         Name "EditSignal"
+         Slot LayoutSlot "{6A1C4F0B39D2A13B}" {
+          Padding 4 2 4 2
+          SizeMode Fill
+         }
+         components {
+          SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+           m_bMouseOverToFocus 1
+           m_sLabel "5. COMMAND & SIGNAL"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  HorizontalLayoutWidgetClass "{6A1C4F0B39D2A117}" {
+   Name "Footer"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A118}" {
+    Anchor 0.05 0.87 0.95 0.93
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+    ButtonWidgetClass "{6A1C4F0B39D2A11F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonNew"
+     Slot LayoutSlot "{6A1C4F0B39D2A120}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A121}" {
+       m_bCanBeToggled 0
+       m_sText "NEW ORDER"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A142}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonEdit"
+     Slot LayoutSlot "{6A1C4F0B39D2A143}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A144}" {
+       m_bCanBeToggled 0
+       m_sText "AMEND"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A122}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonSave"
+     Slot LayoutSlot "{6A1C4F0B39D2A123}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A124}" {
+       m_bCanBeToggled 0
+       m_sText "RECORD"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A119}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonAccept"
+     Slot LayoutSlot "{6A1C4F0B39D2A11A}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A11B}" {
+       m_bCanBeToggled 0
+       m_sText "ACCEPT TASKING"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A145}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonComplete"
+     Slot LayoutSlot "{6A1C4F0B39D2A146}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A147}" {
+       m_bCanBeToggled 0
+       m_sText "MARK COMPLETE"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A148}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonCancel"
+     Slot LayoutSlot "{6A1C4F0B39D2A149}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A14A}" {
+       m_bCanBeToggled 0
+       m_sText "CANCEL ORDER"
+      }
+     }
+    }    ButtonWidgetClass "{6A1C4F0B39D2A11C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonPublish"
+     Slot LayoutSlot "{6A1C4F0B39D2A11D}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A11E}" {
+       m_bCanBeToggled 0
+       m_sText "ISSUE ORDER"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A156}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonDraftFromIntel"
+     Slot LayoutSlot "{6A1C4F0B39D2A157}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A158}" {
+       m_bCanBeToggled 0
+       m_sText "DRAFT ORDER"
+      }
+     }
+    }    ButtonWidgetClass "{6A1C4F0B39D2A14B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonDelete"
+     Slot LayoutSlot "{6A1C4F0B39D2A14C}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A14D}" {
+       m_bCanBeToggled 0
+       m_sText "REMOVE"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A159}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonClose"
+     Slot LayoutSlot "{6A1C4F0B39D2A15A}" {
+      Padding 0 0 8 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2A15B}" {
+       m_bCanBeToggled 0
+       m_sText "CLOSE"
+      }
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D2A125}" {
+   Name "Hint"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A126}" {
+    Anchor 0.05 0.94 0.95 0.98
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "CLOSE leaves the board."
+   "Font Size" 15
+   "Min Font Size" 15
+  }
+ }
+}

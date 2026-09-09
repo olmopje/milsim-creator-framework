@@ -26,6 +26,11 @@ class MCF_Core_TickManagerComponent : ScriptComponent
 	protected float m_fCriticalAccumulator;
 	protected float m_fCosmeticAccumulator;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher("MCF_Core_TickCritical");

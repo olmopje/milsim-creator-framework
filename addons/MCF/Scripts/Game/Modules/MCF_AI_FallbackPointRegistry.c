@@ -75,6 +75,11 @@ class MCF_AI_SafeFallbackPointComponentClass : ScriptComponentClass
 
 class MCF_AI_SafeFallbackPointComponent : ScriptComponent
 {
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		MCF_AI_FallbackPointRegistry.GetInstance().Register(owner);

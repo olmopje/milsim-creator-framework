@@ -13,6 +13,10 @@
 //! follow-up once a Tick Manager exists to schedule them. Step encoding
 //! and execution live in MCF_React_StepRunner, shared with
 //! MCF_React_SequencePlaybackComponent.
+//!
+//! NOTE on OnPostInit: EOnInit only fires if EntityEvent.INIT is in the
+//! entity's event mask, set from OnPostInit. Without it this component
+//! never subscribes to its trigger event on a placed entity.
 
 class MCF_React_Step
 {
@@ -39,14 +43,36 @@ class MCF_React_RecipeComponent : ScriptComponent
 
 	protected ScriptInvoker m_TriggerInvoker;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
-		if (m_sTriggerEvent.IsEmpty())
+		// Reaction and logic nodes are server-side, like the detection nodes
+		// that feed them. On a client these would subscribe to events that
+		// never fire there -- harmless today, but it leaves the client holding
+		// framework state it should not have, and if anything ever did publish
+		// locally the two machines would diverge.
+		if (!Replication.IsServer())
 			return;
+
+		if (m_sTriggerEvent.IsEmpty())
+		{
+			MCF_Core_Log.Debug("Recipe init but no trigger event set -- inactive");
+			return;
+		}
 
 		m_TriggerInvoker = MCF_Core_EventManager.GetInstance().GetInvoker(m_sTriggerEvent);
 		m_TriggerInvoker.Insert(OnTrigger);
 		MCF_Core_ValidationRegistry.GetInstance().RegisterConsumer(m_sTriggerEvent, "MCF_React_RecipeComponent (trigger event)");
+
+		int stepCount = 0;
+		if (m_aSteps)
+			stepCount = m_aSteps.Count();
+
+		MCF_Core_Log.Debug("Recipe init, listening for " + m_sTriggerEvent + " with " + stepCount.ToString() + " steps");
 	}
 
 	override void OnDelete(IEntity owner)
@@ -57,6 +83,7 @@ class MCF_React_RecipeComponent : ScriptComponent
 
 	protected void OnTrigger(Managed payload)
 	{
+		MCF_Core_Log.Debug("Recipe TRIGGERED by " + m_sTriggerEvent);
 		RunSteps();
 	}
 
@@ -67,6 +94,9 @@ class MCF_React_RecipeComponent : ScriptComponent
 			return;
 
 		foreach (string rawStep : m_aSteps)
+		{
+			MCF_Core_Log.Debug("Recipe running step: " + rawStep);
 			MCF_React_StepRunner.RunStep(rawStep);
+		}
 	}
 }

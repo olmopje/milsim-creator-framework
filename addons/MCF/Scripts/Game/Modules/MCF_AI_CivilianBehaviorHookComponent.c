@@ -25,6 +25,11 @@ class MCF_AI_CivilianBehaviorHookComponent : ScriptComponent
 
 	protected ScriptInvoker m_HostilityInvoker;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_HostilityInvoker = MCF_Core_EventManager.GetInstance().GetInvoker("Hostility_Changed");

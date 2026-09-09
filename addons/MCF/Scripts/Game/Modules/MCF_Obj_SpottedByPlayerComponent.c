@@ -41,6 +41,11 @@ class MCF_Obj_SpottedByPlayerComponent : ScriptComponent
 	protected IEntity m_Owner;
 	protected ScriptInvoker m_TickInvoker;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_Owner = owner;
@@ -48,10 +53,21 @@ class MCF_Obj_SpottedByPlayerComponent : ScriptComponent
 
 		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher(m_sSpottedEvent);
 
+		// Detection is authoritative and runs on the server only. Without
+		// this guard every client evaluates its own copy against its own
+		// view of the world, publishes its own events and keeps its own
+		// trigger-once state -- so "fires once" would mean once per machine,
+		// and clients could disagree about whether it fired at all.
+		// See docs/research/multiplayer-and-audience.md.
+		if (!Replication.IsServer())
+			return;
+
 		m_TickInvoker = MCF_Core_EventManager.GetInstance().GetInvoker("MCF_Core_TickCritical");
 		m_TickInvoker.Insert(OnTickCritical);
 
 		MCF_Core_AutoWatcherRegistry.GetInstance().RegisterSpottedTrigger(this);
+
+		MCF_Core_Log.Debug("SpottedByPlayer init, range=" + m_fMaxRange.ToString() + " event=" + m_sSpottedEvent);
 	}
 
 	override void OnDelete(IEntity owner)
@@ -100,6 +116,7 @@ class MCF_Obj_SpottedByPlayerComponent : ScriptComponent
 			if (angleDegrees <= m_fViewHalfAngleDegrees)
 			{
 				m_bHasTriggered = true;
+				MCF_Core_Log.Debug("SpottedByPlayer FIRED, publishing " + m_sSpottedEvent);
 				MCF_Core_EventManager.GetInstance().Publish(m_sSpottedEvent, this);
 				return;
 			}

@@ -1,0 +1,257 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D2E001}" {
+   Name "Panel"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2E002}" {
+    Anchor 0.24 0.16 0.76 0.86
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.07 0.075 0.08 0.97
+  }
+  TextWidgetClass "{6A1C4F0B39D2E003}" {
+   Name "Title"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2E004}" {
+    Anchor 0.26 0.18 0.74 0.225
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "EDIT INTEL OBJECT"
+   "Font Size" 24
+   "Min Font Size" 24
+  }
+  TextWidgetClass "{6A1C4F0B39D2E005}" {
+   Name "Status"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2E006}" {
+    Anchor 0.26 0.228 0.74 0.265
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 14
+   "Min Font Size" 14
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2E007}" {
+   Name "EntryScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2E008}" {
+    Anchor 0.26 0.275 0.42 0.755
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2E009}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2E00A}" {
+     Name "EntryList"
+     Slot AlignableSlot "{6A1C4F0B39D2E00B}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2E00C}" {
+   Name "FieldScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2E00D}" {
+    Anchor 0.435 0.275 0.74 0.755
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2E00E}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2E00F}" {
+     Name "FieldColumn"
+     Slot AlignableSlot "{6A1C4F0B39D2E010}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+     {
+      ButtonWidgetClass "{6A1C4F0B39D2E011}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditDevice"
+       Slot LayoutSlot "{6A1C4F0B39D2E012}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "OBJECT NAME"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2E013}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditHeading"
+       Slot LayoutSlot "{6A1C4F0B39D2E014}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "HEADING"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2E015}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditStamp"
+       Slot LayoutSlot "{6A1C4F0B39D2E016}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "DATE / TIME"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2E017}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditBody"
+       Slot LayoutSlot "{6A1C4F0B39D2E018}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "TEXT"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  HorizontalLayoutWidgetClass "{6A1C4F0B39D2E019}" {
+   Name "Footer"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2E01A}" {
+    Anchor 0.26 0.765 0.74 0.805
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+    ButtonWidgetClass "{6A1C4F0B39D2E01B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonView"
+     Slot LayoutSlot "{6A1C4F0B39D2E01C}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2E01D}" {
+       m_bCanBeToggled 0
+       m_sText "VIEW: DOCUMENT"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2E01E}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonAddEntry"
+     Slot LayoutSlot "{6A1C4F0B39D2E01F}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2E020}" {
+       m_bCanBeToggled 0
+       m_sText "ADD PAGE"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2E021}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonRemoveEntry"
+     Slot LayoutSlot "{6A1C4F0B39D2E022}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2E023}" {
+       m_bCanBeToggled 0
+       m_sText "REMOVE PAGE"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2E024}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonApply"
+     Slot LayoutSlot "{6A1C4F0B39D2E025}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2E026}" {
+       m_bCanBeToggled 0
+       m_sText "APPLY"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2E027}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonClose"
+     Slot LayoutSlot "{6A1C4F0B39D2E028}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2E029}" {
+       m_bCanBeToggled 0
+       m_sText "CLOSE"
+      }
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D2E02A}" {
+   Name "Hint"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2E02B}" {
+    Anchor 0.26 0.81 0.74 0.85
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "Pick a page on the left, type, then APPLY."
+   "Font Size" 13
+   "Min Font Size" 13
+  }
+ }
+}

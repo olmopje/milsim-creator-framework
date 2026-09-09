@@ -1,0 +1,161 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D2C001}" {
+   Name "Background"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2C002}" {
+    Anchor 0 0 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX -1820
+    OffsetRight 0
+    SizeY -1050
+    OffsetBottom 0
+   }
+   Color 0.03 0.035 0.04 0.97
+  }
+  TextWidgetClass "{6A1C4F0B39D2C003}" {
+   Name "DeviceName"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2C004}" {
+    Anchor 0.12 0.06 0.88 0.12
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "DOCUMENT"
+   "Font Size" 28
+   "Min Font Size" 28
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2C005}" {
+   Name "EntryScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2C006}" {
+    Anchor 0.12 0.15 0.36 0.86
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2C007}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2C008}" {
+     Name "EntryList"
+     Slot AlignableSlot "{6A1C4F0B39D2C009}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2C00A}" {
+   Name "BodyScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2C00B}" {
+    Anchor 0.39 0.15 0.88 0.86
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2C00C}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2C00D}" {
+     Name "BodyColumn"
+     Slot AlignableSlot "{6A1C4F0B39D2C00E}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+     {
+      RichTextWidgetClass "{6A1C4F0B39D2C00F}" {
+       Name "BodyText"
+       Slot LayoutSlot "{6A1C4F0B39D2C010}" {
+        HorizontalAlign 3
+        Padding 12 8 12 8
+        SizeMode Fill
+       }
+       Text ""
+       "Font Size" 19
+       "Min Font Size" 19
+      }
+     }
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D2C013}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonLog"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2C014}" {
+    Anchor 0.39 0.875 0.62 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D2C015}" {
+     m_bCanBeToggled 0
+     m_sText "ENTER ON BOARD"
+    }
+   }
+  }  ButtonWidgetClass "{6A1C4F0B39D2C016}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonClose"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2C017}" {
+    Anchor 0.64 0.875 0.88 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D2C018}" {
+     m_bCanBeToggled 0
+     m_sText "PUT IT DOWN"
+    }
+   }
+  }  TextWidgetClass "{6A1C4F0B39D2C011}" {
+   Name "Hint"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2C012}" {
+    Anchor 0.12 0.88 0.88 0.94
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "Entering it on the board shares it with the force."
+   "Font Size" 15
+   "Min Font Size" 15
+  }
+ }
+}

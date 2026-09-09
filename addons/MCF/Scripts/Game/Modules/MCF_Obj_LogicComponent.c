@@ -53,8 +53,21 @@ class MCF_Obj_LogicComponent : ScriptComponent
 	protected bool m_bAndInput3Fired;
 	protected bool m_bAndInput4Fired;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
+		// Reaction and logic nodes are server-side, like the detection nodes
+		// that feed them. On a client these would subscribe to events that
+		// never fire there -- harmless today, but it leaves the client holding
+		// framework state it should not have, and if anything ever did publish
+		// locally the two machines would diverge.
+		if (!Replication.IsServer())
+			return;
+
 		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher(m_sOutputEvent);
 
 		if (m_sMode == "AND")
@@ -140,6 +153,7 @@ class MCF_Obj_LogicComponent : ScriptComponent
 
 	protected void CheckAndCondition()
 	{
+		MCF_Core_Log.Debug("Logic AND state: 1=" + m_bAndInput1Fired.ToString() + " 2=" + m_bAndInput2Fired.ToString() + " 3=" + m_bAndInput3Fired.ToString() + " 4=" + m_bAndInput4Fired.ToString());
 		if (m_bTriggered)
 			return;
 
@@ -153,6 +167,7 @@ class MCF_Obj_LogicComponent : ScriptComponent
 			return;
 
 		m_bTriggered = true;
+		MCF_Core_Log.Debug("Logic AND satisfied, publishing " + m_sOutputEvent);
 		MCF_Core_EventManager.GetInstance().Publish(m_sOutputEvent, this);
 	}
 
@@ -172,6 +187,7 @@ class MCF_Obj_LogicComponent : ScriptComponent
 		if (conditionMet)
 		{
 			m_bTriggered = true;
+			MCF_Core_Log.Debug("Logic " + m_sMode + " satisfied, publishing " + m_sOutputEvent);
 			MCF_Core_EventManager.GetInstance().Publish(m_sOutputEvent, this);
 		}
 	}

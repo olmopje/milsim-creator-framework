@@ -1,0 +1,42 @@
+GenericEntity : "{B8BBA7227B4433B6}Prefabs/Props/Furniture/TableWorkshop_01.et" {
+ ID "6A1C4F0B39D27E10"
+ components {
+  MCF_Task_BoardComponent "{6A1C4F0B39D27E20}" {
+   m_fUseRange 6
+  }  ActionsManagerComponent "{6A1C4F0B39D27E11}" {
+   Enabled 1
+   ActionContexts {
+    UserActionContext "{6A1C4F0B39D27E12}" {
+     ContextName "MCF_TaskBoard"
+     Position PointInfo "{6A1C4F0B39D27E19}" {
+      Offset 0 0.9 0
+     }
+     Radius 2
+    }
+   }
+   additionalActions {
+    MCF_Task_OpenBoardAction "{6A1C4F0B39D27E13}" {
+     ParentContextList {
+      "MCF_TaskBoard"
+     }
+     UIInfo UIInfo "{6A1C4F0B39D27E1A}" {
+      Name "Enter planning board"
+     }
+     VisibilityRange 3
+    }
+   }
+  }
+  SCR_EditableEntityComponent "{6A1C4F0B39D27E16}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType OBJECT
+   m_UIInfo SCR_EditableEntityUIInfo "{6A1C4F0B39D27E17}" {
+    Name "MCF Task Board"
+    m_aAuthoredLabels {
+     ENTITYTYPE_OBJECT
+     CONTENT_MODDED
+    }
+   }
+  }
+  Hierarchy "{6A1C4F0B39D27E18}" {
+  }
+ }
+}

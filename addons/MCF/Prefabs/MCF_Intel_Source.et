@@ -1,0 +1,22 @@
+GenericEntity {
+ ID "B5F266B9FD4501DF"
+ components {
+  MCF_Intel_SourceComponent "{EAE89DC71E3B6A70}" {
+  }
+  SCR_EditableEntityComponent "{693AB6C198293A20}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType SYSTEM
+   m_UIInfo SCR_EditableEntityUIInfo "{693AB6C198293A21}" {
+    Name "MCF Intel Source"
+    Description "Produces intel when an MCF event fires. DROP puts a document in the world for somebody to carry to the board; SIGNAL enters it on a faction's board directly."
+    m_aAuthoredLabels {
+     ENTITYTYPE_SYSTEM
+     CONTENT_MODDED
+    }
+   }
+  }
+  RplComponent "{B5F266B9FD4500DF}" {
+  }
+  Hierarchy "{B5F266B9FD4500E0}" {
+  }
+ }
+}

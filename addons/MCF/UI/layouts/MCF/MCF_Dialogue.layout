@@ -1,0 +1,144 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D2F001}" {
+   Name "Scrim"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F002}" {
+    Anchor 0 0.58 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.02 0.025 0.03 0.82
+  }
+  TextWidgetClass "{6A1C4F0B39D2F003}" {
+   Name "Speaker"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F004}" {
+    Anchor 0.06 0.600 0.94 0.645
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "Civilian"
+   "Font Size" 18
+   "Min Font Size" 18
+   Color 0.78 0.72 0.55 1
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2F005}" {
+   Name "BodyScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F006}" {
+    Anchor 0.06 0.650 0.94 0.775
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2F007}" {
+    }
+   }
+   style Small
+   {
+    RichTextWidgetClass "{6A1C4F0B39D2F008}" {
+     Name "BodyText"
+     Slot AlignableSlot "{6A1C4F0B39D2F009}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+     Text "..."
+     "Font Size" 17
+     "Min Font Size" 17
+    }
+   }
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2F00A}" {
+   Name "ChoiceScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F00B}" {
+    Anchor 0.06 0.790 0.80 0.930
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2F00C}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2F00D}" {
+     Name "ChoiceList"
+     Slot AlignableSlot "{6A1C4F0B39D2F00E}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  HorizontalLayoutWidgetClass "{6A1C4F0B39D2F00F}" {
+   Name "Footer"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F010}" {
+    Anchor 0.855 0.855 0.945 0.910
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+    ButtonWidgetClass "{6A1C4F0B39D2F011}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonClose"
+     Slot LayoutSlot "{6A1C4F0B39D2F012}" {
+      Padding 0 0 0 0
+      SizeMode Fill
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2F013}" {
+       m_bCanBeToggled 0
+       m_sText "WALK AWAY"
+      }
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D2F014}" {
+   Name "Hint"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F015}" {
+    Anchor 0.06 0.940 0.80 0.980
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 13
+   "Min Font Size" 13
+   Color 0.6 0.6 0.6 1
+  }
+ }
+}

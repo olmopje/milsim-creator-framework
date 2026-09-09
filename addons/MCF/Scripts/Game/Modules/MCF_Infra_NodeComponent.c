@@ -30,6 +30,11 @@ class MCF_Infra_NodeComponent : ScriptComponent
 	protected bool m_bNodeActive;
 	protected ref map<string, bool> m_mDependencyActive;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_bSelfActive = true;

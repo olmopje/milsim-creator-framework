@@ -21,6 +21,11 @@ class MCF_AI_AmbientActorComponent : ScriptComponent
 	protected int m_iCurrentIndex;
 	protected MCF_AI_SimpleMoverComponent m_Mover;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_iCurrentIndex = -1;

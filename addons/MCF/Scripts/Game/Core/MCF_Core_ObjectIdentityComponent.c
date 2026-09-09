@@ -16,6 +16,11 @@ class MCF_Core_ObjectIdentityComponent : ScriptComponent
 	[Attribute(defvalue: "", uiwidget: UIWidgets.EditBox, desc: "Unique tag used by other MCF nodes/modules to reference this entity instead of a hard entity reference. Leave empty if this entity does not need to be looked up by tag.")]
 	protected string m_sTag;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		if (!m_sTag.IsEmpty())

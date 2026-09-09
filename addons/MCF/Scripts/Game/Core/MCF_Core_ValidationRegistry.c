@@ -7,10 +7,13 @@
 //! in its own EOnInit. RunValidation() then reports any consumed event
 //! that has no registered publisher.
 //!
-//! Not yet wired to an automatic mission-start trigger -- no game mode
-//! component exists yet to call it at the right time. Call it manually
-//! for now; a future game mode component will call it automatically once
-//! all entities have initialized.
+//! Called automatically from MCF_Core_GameModeComponent.OnGameModeStart(),
+//! which fires after every entity has run its EOnInit -- so by then every
+//! node has registered what it publishes and what it listens for.
+//!
+//! This is the safety net for the single most common mission-authoring
+//! mistake: a mismatched event name between two nodes. Without it the
+//! downstream node simply never fires and nothing says why.
 
 class MCF_Core_ValidationRegistry
 {
@@ -71,7 +74,7 @@ class MCF_Core_ValidationRegistry
 			ref array<string> descriptions = m_mConsumers.GetElement(i);
 			foreach (string description : descriptions)
 			{
-				Print(string.Format("MCF Validation (W): event \"%1\" is never published, but is expected by %2", eventName, description));
+				MCF_Core_Log.Warn(string.Format("event \"%1\" is never published, but is expected by %2", eventName, description));
 				warningCount++;
 			}
 		}

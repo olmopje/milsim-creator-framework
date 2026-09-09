@@ -1,20 +1,23 @@
-//! Compliance/ROE node (ARCHITECTURE.md 5.7). Represents an NPC that can
-//! be forced into compliance at gunpoint: "drop weapon" (armed NPCs) or
-//! "stand back" (unarmed NPCs).
+//! Whether somebody does as they are told when a player shouts at them.
 //!
-//! Aim detection (IsBeingAimedAt) is a self-built distance+angle
-//! approximation, not a true line-of-sight raycast -- we could not
-//! confirm a raycast API without guessing, so this checks "is the NPC
-//! within range and within a cone in front of the player" using plain
-//! vector math instead. It will not detect a wall between player and
-//! NPC; that is an accepted limitation, not an oversight.
+//! THIS COMPONENT WAS UNREACHABLE FOR MOST OF ITS LIFE. It shipped early,
+//! knew whether a person was armed, rolled against a compliance chance and
+//! penalised the area's hostility when a player pointed a rifle at a civilian
+//! for no reason -- and nothing ever called any of it. No action, no key, no
+//! trigger. It was finally connected when shouting was built, and the roll it
+//! had been carrying all along (AttemptCompliance) was replaced by
+//! WillSurrender below rather than kept beside it: two rolls that disagree are
+//! how you end up debugging the wrong one.
 //!
-//! Compliance chance and consequence hooks are simplified: base chance is
-//! an attribute, no morale/threat-state modifiers yet (ARCHITECTURE.md
-//! 5.3's threat-state concept isn't built). Consequence coupling to the
-//! Hostility manager covers the two documented cases: correct use is a
-//! no-op (neutral), incorrect use against an unarmed non-threat is a
-//! hostility penalty.
+//! EVERY TERM IS A DIAL. "Civilians give up sooner than soldiers" is a mission
+//! maker's decision, not a rule of the framework, so it is expressed as
+//! numbers on the person rather than as a branch in here.
+//!
+//! Aim detection (IsBeingAimedAt) is a distance-and-angle approximation, not a
+//! line-of-sight raycast -- it will not notice a wall between the player and
+//! the person. Accepted limitation, not an oversight. It is currently used by
+//! nothing: the shout resolves by radius, and this is left as the hook for the
+//! day someone wants "only who I am actually pointing at".
 
 [ComponentEditorProps(category: "MCF/AI", description: "Can be forced into compliance at gunpoint (drop weapon / stand back).")]
 class MCF_AI_ComplianceComponentClass : ScriptComponentClass
@@ -41,7 +44,92 @@ class MCF_AI_ComplianceComponent : ScriptComponent
 	[Attribute(defvalue: "20", uiwidget: UIWidgets.EditBox, desc: "Maximum angle (degrees) between the player's aim direction and this NPC for the player to be considered \"aiming at\" it.")]
 	protected float m_fMaxAimAngleDegrees;
 
+	[Attribute(defvalue: "0.5", uiwidget: UIWidgets.Slider, params: "0 1 0.05", desc: "How much of this person's fear counts towards giving up. A frightened man surrenders sooner.")]
+	protected float m_fFearWeight;
+
+	[Attribute(defvalue: "0.3", uiwidget: UIWidgets.Slider, params: "0 1 0.05", desc: "How much less likely an ARMED person is to give up. Set high for soldiers, irrelevant for civilians.")]
+	protected float m_fArmedResistance;
+
+	[Attribute(defvalue: "0.25", uiwidget: UIWidgets.Slider, params: "0 1 0.05", desc: "How much a raised weapon adds. This is the difference between shouting and threatening.")]
+	protected float m_fWeaponRaisedWeight;
+
+	[Attribute(defvalue: "25", uiwidget: UIWidgets.Slider, params: "0 100 5", desc: "How much fear giving up puts into somebody.")]
+	protected float m_fFearOnSurrender;
+
+	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Whether shouting at this person without cause raises the area's hostility. Off for anybody who is fair game.")]
+	protected bool m_bPunishUnjustified;
+
 	protected bool m_bCompliant;
+
+	float GetFearOnSurrender()
+	{
+		return m_fFearOnSurrender;
+	}
+
+	//! Whether this person does as they are told when somebody shouts.
+	//!
+	//! EVERY TERM IS A DIAL, because "civilians more likely than enemies" is a
+	//! mission maker's decision and not a rule of the framework. A civilian
+	//! prefab leaves m_bArmed off and keeps the resistance term at zero; a
+	//! soldier turns it up and drops the base chance.
+	//!
+	//! FEAR CUTS BOTH WAYS and that is deliberate. A frightened man gives up
+	//! sooner -- and once he has, the interrogation system finds him nearly
+	//! useless, because a frightened person tells you what he thinks you want
+	//! to hear. The fast way to make somebody comply is the slow way to learn
+	//! anything from him.
+	//!
+	//! \param distance How far the shouter is.
+	//! \param weaponRaised Whether the shouter meant it.
+	//! \param fear The subject's current fear, 0-100.
+	bool WillSurrender(float distance, bool weaponRaised, float fear)
+	{
+		if (m_bCompliant)
+			return true;
+
+		if (distance > m_fMaxCommandDistance)
+			return false;
+
+		float chance = m_fBaseComplianceChance;
+
+		chance = chance + (fear * 0.01) * m_fFearWeight;
+
+		if (weaponRaised)
+			chance = chance + m_fWeaponRaisedWeight;
+
+		if (m_bArmed)
+			chance = chance - m_fArmedResistance;
+
+		// Close range is more frightening than shouting from across a field.
+		// Linear from nothing at maximum range to a tenth in their face.
+		float closeness = 1 - (distance / m_fMaxCommandDistance);
+		chance = chance + closeness * 0.1;
+
+		chance = Math.Clamp(chance, 0, 1);
+
+		bool complied = Math.RandomFloat01() < chance;
+
+		if (complied)
+		{
+			m_bCompliant = true;
+			MCF_Core_EventManager.GetInstance().Publish("MCF_AI_ComplianceGranted", this);
+		}
+
+		MCF_Core_Log.Debug("shout answered: chance=" + chance.ToString() + " complied=" + complied.ToString());
+		return complied;
+	}
+
+	//! The cost of pointing a rifle at somebody who was not a threat.
+	//!
+	//! Split out from the roll because it applies whether or not they did as
+	//! they were told -- the village saw you do it either way.
+	void PunishIfUnjustified()
+	{
+		if (!m_bPunishUnjustified || m_bArmed || m_sHostilityAreaKey.IsEmpty())
+			return;
+
+		MCF_Hostility_Manager.GetInstance().AddImpact(m_sHostilityAreaKey, m_fUnjustifiedPenalty);
+	}
 
 	//! Approximates "is playerEntity aiming at this NPC" using distance
 	//! plus angle between aimDirection and the direction toward this NPC --
@@ -70,28 +158,6 @@ class MCF_AI_ComplianceComponent : ScriptComponent
 		return angleDegrees <= m_fMaxAimAngleDegrees;
 	}
 
-	//! Attempts to force this NPC into compliance. isJustified reflects
-	//! whether the NPC was an actual threat (drop weapon on an armed
-	//! hostile) vs not (stand back on a non-threatening civilian) -- the
-	//! caller decides that; this component only applies the consequence.
-	//! Returns true if the NPC complied.
-	bool AttemptCompliance(bool isJustified)
-	{
-		if (m_bCompliant)
-			return true;
-
-		bool complied = Math.RandomFloat01() < m_fBaseComplianceChance;
-		if (complied)
-		{
-			m_bCompliant = true;
-			MCF_Core_EventManager.GetInstance().Publish("MCF_AI_ComplianceGranted", this);
-		}
-
-		if (!isJustified && !m_sHostilityAreaKey.IsEmpty())
-			MCF_Hostility_Manager.GetInstance().AddImpact(m_sHostilityAreaKey, m_fUnjustifiedPenalty);
-
-		return complied;
-	}
 
 	bool IsArmed()
 	{

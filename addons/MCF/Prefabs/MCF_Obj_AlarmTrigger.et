@@ -5,14 +5,11 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{A7A858DAB2F73604}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_EntityType SYSTEM
-   m_Flags {
-    PLACEABLE
-    VIRTUAL
-   }
    m_UIInfo SCR_EditableEntityUIInfo "{A7A858DAB2F73605}" {
     Name "MCF Alarm Trigger"
     m_aAuthoredLabels {
      ENTITYTYPE_SYSTEM
+     CONTENT_MODDED
     }
    }
   }

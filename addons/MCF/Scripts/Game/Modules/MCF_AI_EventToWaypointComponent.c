@@ -30,6 +30,11 @@ class MCF_AI_EventToWaypointComponent : ScriptComponent
 
 	protected ScriptInvoker m_TriggerInvoker;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		if (m_sTriggerEvent.IsEmpty())

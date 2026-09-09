@@ -35,6 +35,11 @@ class MCF_Squad_CohesionComponent : ScriptComponent
 
 	protected ref array<IEntity> m_aMembers;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_aMembers = new array<IEntity>();

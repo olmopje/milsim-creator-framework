@@ -13,6 +13,11 @@ class MCF_Core_GameLoopComponent : ScriptComponent
 {
 	protected MCF_Core_TickManagerComponent m_TickManager;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_TickManager = MCF_Core_TickManagerComponent.Cast(owner.FindComponent(MCF_Core_TickManagerComponent));

@@ -1,0 +1,637 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D2F101}" {
+   Name "Panel"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F102}" {
+    Anchor 0.06 0.10 0.94 0.92
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.07 0.075 0.08 0.97
+  }
+  TextWidgetClass "{6A1C4F0B39D2F103}" {
+   Name "Title"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F104}" {
+    Anchor 0.08 0.115 0.92 0.155
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "EDIT CONVERSATION"
+   "Font Size" 24
+   "Min Font Size" 24
+  }
+  TextWidgetClass "{6A1C4F0B39D2F105}" {
+   Name "Status"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F106}" {
+    Anchor 0.08 0.158 0.92 0.19
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 14
+   "Min Font Size" 14
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2F107}" {
+   Name "HeaderScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F108}" {
+    Anchor 0.08 0.195 0.92 0.275
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2F109}" {
+    }
+   }
+   style Small
+   {
+    HorizontalLayoutWidgetClass "{6A1C4F0B39D2F10A}" {
+     Name "HeaderRow"
+     Slot AlignableSlot "{6A1C4F0B39D2F10B}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     {
+      ButtonWidgetClass "{6A1C4F0B39D2F10C}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditId"
+       Slot LayoutSlot "{6A1C4F0B39D2F10D}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "CONVERSATION NAME"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F10E}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditSpeaker"
+       Slot LayoutSlot "{6A1C4F0B39D2F10F}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "WHO THEY ARE"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F110}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditVerb"
+       Slot LayoutSlot "{6A1C4F0B39D2F111}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "PROMPT VERB"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D2F160}" {
+   Name "LibraryHeader"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F161}" {
+    Anchor 0.08 0.285 0.205 0.32
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "LIBRARY"
+   "Font Size" 16
+   "Min Font Size" 16
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2F162}" {
+   Name "LibraryScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F163}" {
+    Anchor 0.08 0.325 0.205 0.63
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2F164}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2F165}" {
+     Name "LibraryList"
+     Slot AlignableSlot "{6A1C4F0B39D2F166}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  VerticalLayoutWidgetClass "{6A1C4F0B39D2F167}" {
+   Name "LibraryButtons"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F168}" {
+    Anchor 0.08 0.64 0.205 0.72
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+    ButtonWidgetClass "{6A1C4F0B39D2F169}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonNew"
+     Slot LayoutSlot "{6A1C4F0B39D2F16A}" {
+      Padding 4 2 4 2
+      SizeMode Fill
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2F16B}" {
+       m_bCanBeToggled 0
+       m_sText "NEW"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2F16C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonDelete"
+     Slot LayoutSlot "{6A1C4F0B39D2F16D}" {
+      Padding 4 2 4 2
+      SizeMode Fill
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2F16E}" {
+       m_bCanBeToggled 0
+       m_sText "DELETE"
+      }
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D2F112}" {
+   Name "NodeHeader"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F113}" {
+    Anchor 0.215 0.285 0.40 0.32
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "WHAT THEY SAY"
+   "Font Size" 16
+   "Min Font Size" 16
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2F114}" {
+   Name "NodeScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F115}" {
+    Anchor 0.215 0.325 0.40 0.72
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2F116}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2F117}" {
+     Name "NodeList"
+     Slot AlignableSlot "{6A1C4F0B39D2F118}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2F119}" {
+   Name "NodeFieldScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F11A}" {
+    Anchor 0.41 0.325 0.615 0.72
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2F11B}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2F11C}" {
+     Name "NodeFieldColumn"
+     Slot AlignableSlot "{6A1C4F0B39D2F11D}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+     {
+      ButtonWidgetClass "{6A1C4F0B39D2F11E}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditNodeId"
+       Slot LayoutSlot "{6A1C4F0B39D2F11F}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "STEP NAME"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F120}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditNodeText"
+       Slot LayoutSlot "{6A1C4F0B39D2F121}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "THEY SAY"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F122}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+       Name "ButtonAddNode"
+       Slot LayoutSlot "{6A1C4F0B39D2F123}" {
+        Padding 4 6 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_ButtonTextComponent "{6A1C4F0B39D2F124}" {
+         m_bCanBeToggled 0
+         m_sText "ADD STEP"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F125}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+       Name "ButtonRemoveNode"
+       Slot LayoutSlot "{6A1C4F0B39D2F126}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_ButtonTextComponent "{6A1C4F0B39D2F127}" {
+         m_bCanBeToggled 0
+         m_sText "REMOVE STEP"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D2F128}" {
+   Name "ChoiceHeader"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F129}" {
+    Anchor 0.625 0.285 0.92 0.32
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "WHAT YOU CAN SAY BACK"
+   "Font Size" 16
+   "Min Font Size" 16
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2F12A}" {
+   Name "ChoiceScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F12B}" {
+    Anchor 0.625 0.325 0.92 0.435
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2F12C}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2F12D}" {
+     Name "ChoiceList"
+     Slot AlignableSlot "{6A1C4F0B39D2F12E}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D2F12F}" {
+   Name "ChoiceFieldScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F130}" {
+    Anchor 0.625 0.44 0.92 0.72
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D2F131}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D2F132}" {
+     Name "ChoiceFieldColumn"
+     Slot AlignableSlot "{6A1C4F0B39D2F133}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+     {
+      ButtonWidgetClass "{6A1C4F0B39D2F134}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceText"
+       Slot LayoutSlot "{6A1C4F0B39D2F135}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "YOU SAY"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F136}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceNext"
+       Slot LayoutSlot "{6A1C4F0B39D2F137}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "LEADS TO STEP"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F138}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceEvent"
+       Slot LayoutSlot "{6A1C4F0B39D2F139}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "FIRES EVENT"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F13A}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceTrust"
+       Slot LayoutSlot "{6A1C4F0B39D2F13B}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "TRUST CHANGE"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F13C}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceFear"
+       Slot LayoutSlot "{6A1C4F0B39D2F13D}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "FEAR CHANGE"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F13E}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceMinTrust"
+       Slot LayoutSlot "{6A1C4F0B39D2F13F}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "NEEDS TRUST"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F140}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceMaxFear"
+       Slot LayoutSlot "{6A1C4F0B39D2F141}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "FEAR AT MOST"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F170}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceNeedsFlag"
+       Slot LayoutSlot "{6A1C4F0B39D2F171}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "ONLY AFTER"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F172}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceSetsFlag"
+       Slot LayoutSlot "{6A1C4F0B39D2F173}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "REMEMBERS"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F174}" : "{0022F0B45ADBC5AC}UI/layouts/WidgetLibrary/EditBox/WLib_EditBox.layout" {
+       Name "EditChoiceLocked"
+       Slot LayoutSlot "{6A1C4F0B39D2F175}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_EditBoxComponent "{547290FFBD5B33E9}" {
+         m_bMouseOverToFocus 1
+         m_sLabel "WHY NOT (greyed text)"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F142}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+       Name "ButtonAddChoice"
+       Slot LayoutSlot "{6A1C4F0B39D2F143}" {
+        Padding 4 6 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_ButtonTextComponent "{6A1C4F0B39D2F144}" {
+         m_bCanBeToggled 0
+         m_sText "ADD REPLY"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D2F145}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+       Name "ButtonRemoveChoice"
+       Slot LayoutSlot "{6A1C4F0B39D2F146}" {
+        Padding 4 2 4 2
+        SizeMode Fill
+       }
+       components {
+        SCR_ButtonTextComponent "{6A1C4F0B39D2F147}" {
+         m_bCanBeToggled 0
+         m_sText "REMOVE REPLY"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  HorizontalLayoutWidgetClass "{6A1C4F0B39D2F148}" {
+   Name "Footer"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F149}" {
+    Anchor 0.08 0.735 0.92 0.78
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+    ButtonWidgetClass "{6A1C4F0B39D2F14A}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonSave"
+     Slot LayoutSlot "{6A1C4F0B39D2F14B}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2F14C}" {
+       m_bCanBeToggled 0
+       m_sText "SAVE AND GIVE TO THIS PERSON"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2F14D}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonSaveNew"
+     Slot LayoutSlot "{6A1C4F0B39D2F14E}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2F14F}" {
+       m_bCanBeToggled 0
+       m_sText "SAVE AS A COPY"
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2F150}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+     Name "ButtonClose"
+     Slot LayoutSlot "{6A1C4F0B39D2F151}" {
+      Padding 0 0 6 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D2F152}" {
+       m_bCanBeToggled 0
+       m_sText "CLOSE"
+      }
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D2F153}" {
+   Name "Hint"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2F154}" {
+    Anchor 0.08 0.785 0.92 0.83
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "No LEADS TO ends the conversation. FIRES EVENT is how a reply causes something. REMEMBERS names what this reply proves; ONLY AFTER requires that name, so a question can open up once they have admitted something."
+   "Font Size" 13
+   "Min Font Size" 13
+  }
+ }
+}

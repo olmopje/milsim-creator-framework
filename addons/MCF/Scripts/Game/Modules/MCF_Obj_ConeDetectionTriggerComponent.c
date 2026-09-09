@@ -33,6 +33,11 @@ class MCF_Obj_ConeDetectionTriggerComponent : ScriptComponent
 	protected IEntity m_Owner;
 	protected ScriptInvoker m_TickInvoker;
 
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_Owner = owner;
@@ -40,14 +45,31 @@ class MCF_Obj_ConeDetectionTriggerComponent : ScriptComponent
 
 		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher(m_sTriggeredEvent);
 
+		// Detection is authoritative and runs on the server only. Without
+		// this guard every client evaluates its own copy against its own
+		// view of the world, publishes its own events and keeps its own
+		// trigger-once state -- so "fires once" would mean once per machine,
+		// and clients could disagree about whether it fired at all.
+		// See docs/research/multiplayer-and-audience.md.
+		if (!Replication.IsServer())
+			return;
+
 		m_TickInvoker = MCF_Core_EventManager.GetInstance().GetInvoker("MCF_Core_TickCritical");
 		m_TickInvoker.Insert(OnTickCritical);
+
+		// Without this the trigger ticks forever over an empty watch list and
+		// can never fire. It was missing until 2026-09-09.
+		MCF_Core_AutoWatcherRegistry.GetInstance().RegisterConeTrigger(this);
+
+		MCF_Core_Log.Debug("ConeDetection init, radius=" + m_fRadius.ToString() + " halfAngle=" + m_fHalfAngleDegrees.ToString() + " event=" + m_sTriggeredEvent);
 	}
 
 	override void OnDelete(IEntity owner)
 	{
 		if (m_TickInvoker)
 			m_TickInvoker.Remove(OnTickCritical);
+
+		MCF_Core_AutoWatcherRegistry.GetInstance().UnregisterConeTrigger(this);
 	}
 
 	void RegisterWatchedEntity(IEntity entity)
@@ -87,6 +109,7 @@ class MCF_Obj_ConeDetectionTriggerComponent : ScriptComponent
 			if (angleDegrees <= m_fHalfAngleDegrees)
 			{
 				m_bHasTriggered = true;
+				MCF_Core_Log.Debug("ConeDetection FIRED, publishing " + m_sTriggeredEvent);
 				MCF_Core_EventManager.GetInstance().Publish(m_sTriggeredEvent, this);
 				return;
 			}

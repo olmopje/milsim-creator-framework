@@ -7,6 +7,12 @@
 //! MCF_Core_AutoWatcherRegistry, which MCF_Core_GameModeComponent uses to
 //! auto-add every newly spawned controllable entity (see that file for
 //! the "not player-only yet" caveat).
+//!
+//! NOTE on OnPostInit: EOnInit only fires if EntityEvent.INIT is in the
+//! entity's event mask, and that mask has to be set from OnPostInit. Without
+//! it EOnInit never runs on a plain placed entity, so the component never
+//! registers its tick and silently does nothing. Confirmed against vanilla
+//! SCR_BaseAreaMeshComponent, which sets the mask the same way.
 
 [ComponentEditorProps(category: "MCF/Objective", description: "Fires an event when a registered entity comes within range.")]
 class MCF_Obj_ProximityTriggerComponentClass : ScriptComponentClass
@@ -30,6 +36,37 @@ class MCF_Obj_ProximityTriggerComponent : ScriptComponent
 	protected IEntity m_Owner;
 	protected ScriptInvoker m_TickInvoker;
 
+	//! \return Detection radius in metres.
+	float GetRadius()
+	{
+		return m_fRadius;
+	}
+
+	//! Sets the detection radius in metres.
+	//! \param radius New detection radius in metres.
+	void SetRadius(float radius)
+	{
+		m_fRadius = radius;
+	}
+
+	//! \return True if the trigger only fires once.
+	bool GetTriggerOnce()
+	{
+		return m_bTriggerOnce;
+	}
+
+	//! Sets whether the trigger only fires once.
+	//! \param triggerOnce New trigger-once state.
+	void SetTriggerOnce(bool triggerOnce)
+	{
+		m_bTriggerOnce = triggerOnce;
+	}
+
+	override void OnPostInit(IEntity owner)
+	{
+		SetEventMask(owner, EntityEvent.INIT);
+	}
+
 	override void EOnInit(IEntity owner)
 	{
 		m_Owner = owner;
@@ -38,10 +75,21 @@ class MCF_Obj_ProximityTriggerComponent : ScriptComponent
 
 		MCF_Core_ValidationRegistry.GetInstance().RegisterPublisher(m_sTriggeredEvent);
 
+		// Detection is authoritative and runs on the server only. Without
+		// this guard every client evaluates its own copy against its own
+		// view of the world, publishes its own events and keeps its own
+		// trigger-once state -- so "fires once" would mean once per machine,
+		// and clients could disagree about whether it fired at all.
+		// See docs/research/multiplayer-and-audience.md.
+		if (!Replication.IsServer())
+			return;
+
 		m_TickInvoker = MCF_Core_EventManager.GetInstance().GetInvoker("MCF_Core_TickCritical");
 		m_TickInvoker.Insert(OnTickCritical);
 
 		MCF_Core_AutoWatcherRegistry.GetInstance().RegisterProximityTrigger(this);
+
+		MCF_Core_Log.Debug("ProximityTrigger init, radius=" + m_fRadius.ToString() + " event=" + m_sTriggeredEvent);
 	}
 
 	override void OnDelete(IEntity owner)
@@ -59,6 +107,7 @@ class MCF_Obj_ProximityTriggerComponent : ScriptComponent
 		{
 			m_aWatchedEntities.Insert(entity);
 			m_aWasInRange.Insert(false);
+			MCF_Core_Log.Debug("ProximityTrigger now watching " + m_aWatchedEntities.Count().ToString() + " entities");
 		}
 	}
 
@@ -101,6 +150,7 @@ class MCF_Obj_ProximityTriggerComponent : ScriptComponent
 	protected void Fire()
 	{
 		m_bHasTriggered = true;
+		MCF_Core_Log.Debug("ProximityTrigger FIRED, publishing " + m_sTriggeredEvent);
 		MCF_Core_EventManager.GetInstance().Publish(m_sTriggeredEvent, this);
 	}
 }

@@ -1,0 +1,6 @@
+SCR_SpawnPoint : "{5A2220DD0C16958B}Prefabs/MP/Spawning/SpawnPoint_US.et" {
+ coords 1839.095 19.162 1837.675
+}
+GenericEntity : "{6A1C4F0B39D27E10}Prefabs/MCF_Task_Board.et" {
+ coords 1888.194 13.594 1838.171
+}

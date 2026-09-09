@@ -1,4 +1,4 @@
-# Workbench/Enfusion build- en cache-artefacten
+# Workbench / Enfusion build and cache artefacts
 *.bin
 *.c.bak
 *.rdb
@@ -6,22 +6,28 @@
 /build/
 /.workbench/
 
-# Tijdelijke enfusion-mcp NET API-handlerscripts -- worden door de tool zelf
-# in de mod gekopieerd om Workbench aan te sturen, horen niet in git en
-# moeten voor publicatie verwijderd worden via wb_cleanup
+# Temporary enfusion-mcp .NET API handler scripts. The tool copies these into
+# the addon itself to drive the Workbench; they do not belong in git and must
+# be removed before publishing via wb_cleanup.
 addons/MCF/Scripts/WorkbenchGame/
 addons/MCF/EnfusionMCP/
 
-# OS/editor ruis
+# OS / editor noise
 .DS_Store
 Thumbs.db
 *.swp
+*.bak
 .vscode/
 .idea/
 
-# Lokale configuratie die per contributor verschilt
+# Local configuration that differs per contributor
 config.local.json
 
 HANDOVER.md
 
 enfusion-workbench-mcp/
+
+# Local dedicated-server setup: the launcher config carries machine-specific
+# addresses and an admin password, and the profile folder is pure runtime
+# output (logs, saves). Neither belongs in the repository.
+server/

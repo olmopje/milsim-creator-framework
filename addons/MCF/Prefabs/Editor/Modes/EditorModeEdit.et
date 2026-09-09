@@ -16,6 +16,8 @@ SCR_EditorModeEntity : "{E56F54E533ACE527}Prefabs/Editor/Modes/EditorModeBase.et
    m_AttributeLists {
     SCR_EditorAttributeList "{5606E7C45FE427EF}" : "{F3D6C6D25642352C}Configs/Editor/AttributeLists/Edit.conf" {
     }
+    SCR_EditorAttributeList "{A7B5DF555E07FCFF}" : "{D1297B1F0C2377E2}Configs/Editor/MCF_EditorAttributes.conf" {
+    }
    }
    m_MenuPreset EditorAttributesDialog
   }
@@ -82,6 +84,8 @@ SCR_EditorModeEntity : "{E56F54E533ACE527}Prefabs/Editor/Modes/EditorModeBase.et
     SCR_EditorActionList "{54B2A6144BDB41FE}" : "{F849BB1343DB2CA5}Configs/Editor/ActionLists/Context/Shared.conf" {
     }
     SCR_EditorActionList "{54B2AA71F2ECD6D7}" : "{2C1D87DE93C77A27}Configs/Editor/ActionLists/Context/TempEdit.conf" {
+    }
+    SCR_EditorActionList "{6A1C4F0B39D2E102}" : "{6A1C4F0B39D2E0F0}Configs/Editor/MCF_ContextActions.conf" {
     }
     SCR_EditorActionList "{54B2AA71F32674BE}" : "{FC88F4CE5F7B2C4B}Configs/Editor/ActionLists/Context/Tasks.conf" {
     }
