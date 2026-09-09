@@ -5,7 +5,7 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{693AB6C198293918}" {
    m_Flags "PLACEABLE"
-   m_UIInfo SCR_UIInfo "{693AB6C198293919}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{693AB6C198293919}" {
     Name "MCF Observation Node"
    }
   }

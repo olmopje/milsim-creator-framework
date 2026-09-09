@@ -5,7 +5,7 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{4312B9826A9F9CF5}" {
    m_Flags "PLACEABLE"
-   m_UIInfo SCR_UIInfo "{4312B9826A9F9CF6}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{4312B9826A9F9CF6}" {
     Name "MCF Cone Detection Trigger"
    }
   }

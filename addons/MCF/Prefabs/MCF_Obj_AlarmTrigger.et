@@ -5,7 +5,7 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{A7A858DAB2F73604}" {
    m_Flags "PLACEABLE"
-   m_UIInfo SCR_UIInfo "{A7A858DAB2F73605}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{A7A858DAB2F73605}" {
     Name "MCF Alarm Trigger"
    }
   }

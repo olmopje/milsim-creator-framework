@@ -5,7 +5,7 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{F2DBBBBCF2B824B1}" {
    m_Flags "PLACEABLE"
-   m_UIInfo SCR_UIInfo "{F2DBBBBCF2B824B2}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{F2DBBBBCF2B824B2}" {
     Name "MCF Text Line"
    }
   }

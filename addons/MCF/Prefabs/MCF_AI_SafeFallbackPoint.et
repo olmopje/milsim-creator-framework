@@ -5,7 +5,7 @@ GenericEntity {
   }
   SCR_EditableEntityComponent "{A05DBCB281E7EFED}" {
    m_Flags "PLACEABLE"
-   m_UIInfo SCR_UIInfo "{A05DBCB281E7EFEE}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{A05DBCB281E7EFEE}" {
     Name "MCF Safe Fallback Point"
    }
   }
