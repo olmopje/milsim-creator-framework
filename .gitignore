@@ -21,3 +21,7 @@ Thumbs.db
 
 # Lokale configuratie die per contributor verschilt
 config.local.json
+
+HANDOVER.md
+
+enfusion-workbench-mcp/
