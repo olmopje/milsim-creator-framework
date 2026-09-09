@@ -3,7 +3,7 @@ GenericEntity {
  components {
   MCF_Obj_ProximityTriggerComponent "{DD145B75DF0EDD51}" {
   }
-  SCR_EditableEntityComponent "{51D0B5C71CA36324}" {
+  SCR_EditableEntityComponent "{51D0B5C71CA36324}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_Flags "PLACEABLE"
    m_UIInfo SCR_EditableEntityUIInfo "{51D0B5C71CA36325}" {
     Name "MCF Proximity Trigger"

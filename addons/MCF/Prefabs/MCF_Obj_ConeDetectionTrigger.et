@@ -3,7 +3,7 @@ GenericEntity {
  components {
   MCF_Obj_ConeDetectionTriggerComponent "{5C5A19B9A0201973}" {
   }
-  SCR_EditableEntityComponent "{4312B9826A9F9CF5}" {
+  SCR_EditableEntityComponent "{4312B9826A9F9CF5}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_Flags "PLACEABLE"
    m_UIInfo SCR_EditableEntityUIInfo "{4312B9826A9F9CF6}" {
     Name "MCF Cone Detection Trigger"

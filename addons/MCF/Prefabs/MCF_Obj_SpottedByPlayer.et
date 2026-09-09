@@ -3,7 +3,7 @@ GenericEntity {
  components {
   MCF_Obj_SpottedByPlayerComponent "{19EB8515EDE77882}" {
   }
-  SCR_EditableEntityComponent "{964AA3464D21E889}" {
+  SCR_EditableEntityComponent "{964AA3464D21E889}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_Flags "PLACEABLE"
    m_UIInfo SCR_EditableEntityUIInfo "{964AA3464D21E88A}" {
     Name "MCF Spotted By Player"
