@@ -18,8 +18,10 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     ItemPhysAttributes ItemPhysicalAttributes PhysicalAttributes {
      Weight 0.1
      SizeSetupStrategy Manual
-     ItemDimensions 8 12 3
-     ItemVolume 120
+     // Inventory cells, not centimetres. A 1x1 item is 1 1 1 with a volume
+     // of 1, which is what m_Size SLOT_1x1 below already says it is.
+     ItemDimensions 1 1 1
+     ItemVolume 1
      DimensionScaler 1
     }
     m_Size SLOT_1x1
