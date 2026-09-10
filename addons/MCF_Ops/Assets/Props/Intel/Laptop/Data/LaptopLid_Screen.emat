@@ -1,2 +1,7 @@
 MatPBRBasic {
+ Color 1 1 1 1
+ RoughnessScale 0.15
+ MetalnessScale 0
+ Emissive 0.35 0.35 0.35 1
+ BCRMap "{D401B292E2E9B242}Assets/Props/Intel/Laptop/Data/Laptop_Screen_BCR.edds"
 }

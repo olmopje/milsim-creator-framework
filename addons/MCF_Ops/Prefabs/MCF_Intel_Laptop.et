@@ -108,9 +108,9 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
      RuntimeOnly 1
     }
     Hierarchy "{6A1C4F0B39D2D058}" {
-     PivotID "socket_LaptopLid"
     }
    }
+   coords 0.1654 0.021 -0.1138
   }
  }
 }

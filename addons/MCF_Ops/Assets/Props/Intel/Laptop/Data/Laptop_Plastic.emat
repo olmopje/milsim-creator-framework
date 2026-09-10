@@ -1,2 +1,5 @@
 MatPBRBasic {
+ Color 0.20 0.20 0.21 1
+ RoughnessScale 0.62
+ MetalnessScale 0
 }
