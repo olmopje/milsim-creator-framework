@@ -55,6 +55,18 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	[Attribute(defvalue: "", uiwidget: UIWidgets.ResourceNamePicker, params: "et", desc: "Prefab whose model is rendered behind the screen. Empty draws a plain panel instead.")]
 	protected ResourceName m_sPreviewPrefab;
 
+	//! How big that model really is, in metres.
+	//!
+	//! THE SHELL CANNOT GUESS THIS AND MUST NOT. It shapes the preview box to
+	//! the model's proportions and asks the preview where the model's corners
+	//! landed; both need real dimensions. Hard-coding a phone's would be the
+	//! one line that stops a laptop from reusing the same screen.
+	//!
+	//! X is across the face, Z along its length, Y its thickness -- the axes as
+	//! the model is built, lying flat.
+	[Attribute(defvalue: "0.07 0.009 0.149", desc: "Size of the preview model in metres: across the face, thickness, along its length.")]
+	protected vector m_vPreviewSize;
+
 	//! The runtime override, empty until a Game Master edits this object.
 	//!
 	//! WHY A REPLICATED PROPERTY AND NOT AN RPC: an edit sent as a broadcast
@@ -80,6 +92,11 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	ResourceName GetPreviewPrefab()
 	{
 		return m_sPreviewPrefab;
+	}
+
+	vector GetPreviewSize()
+	{
+		return m_vPreviewSize;
 	}
 
 	string GetActionVerb()

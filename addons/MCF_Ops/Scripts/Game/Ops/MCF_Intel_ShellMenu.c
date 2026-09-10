@@ -37,12 +37,6 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_READ_SCROLL = "ReadScroll";
 	protected static const string W_READ_COLUMN = "ReadColumn";
 	protected static const string W_READ_BODY = "ReadBody";
-	protected static const string W_LIST_WIDTH = "ListWidth";
-	protected static const string W_READ_WIDTH = "ReadWidth";
-
-	//! How much of the glass the text columns use. The rest is the margin you
-	//! would expect down each side of a phone screen.
-	protected static const float TEXT_WIDTH = 0.90;
 	protected static const string W_READ_HEADING = "ReadHeading";
 	protected static const string W_READ_TIMESTAMP = "ReadTimestamp";
 	protected static const string W_BUTTON_BACK = "ButtonBack";
@@ -55,28 +49,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_APP_LABEL_PREFIX = "AppLabel";
 	protected static const string W_CLOCK_TIME = "ClockTime";
 	protected static const string W_CLOCK_DATE = "ClockDate";
-	protected static const string W_MODEL = "Model";
-	protected static const string W_BODY = "Body";
-	protected static const string W_SCREEN_AREA = "ScreenArea";
 
-	//! The phone's own proportions, and how much of its face is glass. Two
-	//! constants and a measurement are all it takes to put the controls on the
-	//! display at any resolution -- see FitScreenToModel.
-	protected static const float PHONE_ASPECT = 0.4698;
-	//! At 0.92 x 0.94 the glass covered the phone almost edge to edge, and what
-	//! was left of the body read as a glow around a panel rather than as a
-	//! phone. A visible bezel is what makes it look held rather than overlaid.
-	protected static const float GLASS_X = 0.86;
-	protected static const float GLASS_Y = 0.90;
-
-	//! How tall the preview box is, as a fraction of the screen.
-	protected static const float PHONE_SCREEN_HEIGHT = 0.95;
-
-	//! Half the model, in metres, from MCF_Devices_Phone.et's own dimensions:
-	//! 7.0 x 14.9 x 0.9 cm, lying flat, long axis forward.
-	protected static const float PHONE_HALF_X = 0.035;
-	protected static const float PHONE_HALF_Z = 0.0745;
-
+	//! Tiles on the home screen. The layout has this many App/AppLabel pairs;
+	//! the presenter decides which of them are used.
 	protected static const int APP_SLOTS = 9;
 
 	protected static MCF_Intel_CarrierComponent s_PendingCarrier;
@@ -90,7 +65,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected bool m_bOnHome = true;
 	protected bool m_bOnList;
 
-	protected ref array<MCF_Intel_Entry> m_aEntries = {};
+	//! What is on the device and in what order. Knows nothing about widgets --
+	//! see MCF_Device_Presenter.
+	protected ref MCF_Device_Presenter m_Content = new MCF_Device_Presenter();
 
 	//! The apps that actually have something in them, in enum order. An empty
 	//! app is not drawn at all: a phone with a Photos icon that opens on
@@ -132,8 +109,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected bool m_bPageMode;
 	protected SCR_ButtonTextComponent m_ButtonClose;
 
-	protected ItemPreviewWidget m_wModel;
-	protected Widget m_wBody;
+	//! Everything about where the device sits on screen and where its glass is.
+	//! Owns no intel and knows no apps -- see MCF_Device_Layout.
+	protected ref MCF_Device_Layout m_Geometry;
 	protected int m_iFitFrame;
 
 	//! Opens the skin this object's view calls for.
@@ -251,10 +229,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		ShowModel(root);
 
-		m_Carrier.GetEntries(m_aEntries);
+		m_Content.Bind(m_Carrier);
 
 		if (m_wDeviceName)
-			m_wDeviceName.SetText(m_Carrier.GetDeviceName());
+			m_wDeviceName.SetText(m_Content.DeviceName());
 
 		if (m_wStatusBar)
 			m_wStatusBar.SetText(StatusLine());
@@ -264,11 +242,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_bPageMode)
 		{
 			// Everything is one stack of pages. No apps, no index.
-			m_aVisible.Clear();
-			foreach (MCF_Intel_Entry e : m_aEntries)
-			{
-				m_aVisible.Insert(e);
-			}
+			m_Content.GetAllItems(m_aVisible);
 
 			if (m_aVisible.IsEmpty())
 				SetHint("Nothing legible.");
@@ -277,11 +251,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		}
 		else
 		{
-			CollectApps();
+			m_Content.GetApps(m_aApps);
 			ShowHome();
 		}
 
-		MCF_Core_Log.Debug("device shell showing '" + m_Carrier.GetDeviceName() + "' with " + m_aEntries.Count().ToString() + " entrie(s) across " + m_aApps.Count().ToString() + " app(s)");
+		MCF_Core_Log.Debug("device shell showing '" + m_Content.DeviceName() + "' with " + m_Content.TotalItems().ToString() + " item(s) across " + m_aApps.Count().ToString() + " app(s)");
 	}
 
 	//! Puts the object's own model behind the screen.
@@ -299,16 +273,14 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! same rule as the lock: degrade where the mission maker can see it.
 	protected void ShowModel(notnull Widget root)
 	{
-		m_wModel = ItemPreviewWidget.Cast(root.FindAnyWidget(W_MODEL));
-		m_wBody = root.FindAnyWidget(W_BODY);
+		m_Geometry = new MCF_Device_Layout();
 
-		if (m_wModel)
-			m_wModel.SetVisible(false);
+		if (!m_Geometry.Attach(root, PreviewSize()))
+			return;
 
-		if (m_wBody)
-			m_wBody.SetVisible(true);
+		m_Geometry.ShowFallbackBody(true);
 
-		if (!m_wModel || !m_Carrier)
+		if (!m_Carrier)
 			return;
 
 		ResourceName prefab = m_Carrier.GetPreviewPrefab();
@@ -326,206 +298,32 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			return;
 		}
 
-		manager.SetPreviewItemFromPrefab(m_wModel, prefab);
-
-		m_wModel.SetVisible(true);
+		manager.SetPreviewItemFromPrefab(m_Geometry.GetModelWidget(), prefab);
+		m_Geometry.ShowFallbackBody(false);
 
 		// Not here: a widget has no screen size until the layout has been
 		// through a frame, and asking during OnMenuOpen returns 0x0.
 		m_iFitFrame = 0;
-
-		if (m_wBody)
-			m_wBody.SetVisible(false);
 	}
 
-	//! Sizes the preview box to the phone's own proportions, then puts the
-	//! glass on it.
-	//!
-	//! WHY THE BOX IS RESHAPED AND NOT JUST MEASURED. The first attempt kept a
-	//! box of whatever shape the layout gave it and multiplied its height by a
-	//! measured "how much of it the model fills" constant. That constant is not
-	//! constant: widening the box from 280 to 600 pixels, at the same height,
-	//! made the rendered phone SMALLER -- 519 pixels tall became 440. Whatever
-	//! the preview camera is fitting, it is not the box's height alone, so any
-	//! number measured in one box shape is wrong in another.
-	//!
-	//! Giving the box the model's own 7.0 x 14.9 proportions removes the
-	//! variable instead of trying to calibrate it: there is only one shape the
-	//! box is ever in, so there is only one thing to tune -- the camera
-	//! distance on the prefab, until the phone fills it.
-	//!
-	//! Units: GetScreenSize and GetWidth report physical pixels while FrameSlot
-	//! works in the reference resolution, so DPIUnscale is what converts.
-	protected void FitScreenToModel(notnull Widget root)
+	//! How big the device really is, in metres. The object says so rather than
+	//! the shell assuming it -- which is the whole reason a laptop can use this
+	//! screen's machinery without a line of it changing.
+	protected vector PreviewSize()
 	{
-		if (!m_wModel)
-			return;
+		if (m_Carrier)
+			return m_Carrier.GetPreviewSize();
 
-		Widget screenArea = root.FindAnyWidget(W_SCREEN_AREA);
-		if (!screenArea)
-			return;
-
-		WorkspaceWidget workspace = GetGame().GetWorkspace();
-		if (!workspace)
-			return;
-
-		float screenHeight = workspace.DPIUnscale(workspace.GetHeight());
-		if (screenHeight <= 0)
-			return;
-
-		float boxH = screenHeight * PHONE_SCREEN_HEIGHT;
-		float boxW = boxH * PHONE_ASPECT;
-
-		PlaceCentred(m_wModel, boxW, boxH);
-		PlaceCentred(screenArea, boxW * GLASS_X, boxH * GLASS_Y);
-		CapTextWidth(root, boxW * GLASS_X);
-	}
-
-	//! Tells the two scrolling columns how wide they are allowed to be.
-	//!
-	//! WITHOUT THIS NOTHING WRAPS. Text with Clipping False grows to whatever
-	//! width it is offered, and a scroll offers as much as is asked for -- so a
-	//! long sentence does not fold onto a second line, it draws sideways out of
-	//! the phone. The SizeLayoutWidget in each scroll is the cap, and the cap
-	//! can only be known once the glass has been measured, which is here.
-	protected void CapTextWidth(notnull Widget root, float glassWidth)
-	{
-		CapOne(root, W_LIST_WIDTH, glassWidth);
-		CapOne(root, W_READ_WIDTH, glassWidth);
-	}
-
-	protected void CapOne(notnull Widget root, string name, float glassWidth)
-	{
-		SizeLayoutWidget sizer = SizeLayoutWidget.Cast(root.FindAnyWidget(name));
-		if (!sizer)
-			return;
-
-		sizer.EnableWidthOverride(true);
-		sizer.SetWidthOverride(glassWidth * TEXT_WIDTH);
-	}
-
-	//! Asks the preview where the phone actually ended up, and puts the glass
-	//! there.
-	//!
-	//! WHY THIS EXISTS AT ALL. Everything above still assumes the model fills
-	//! the box it is given, and it does not -- at the camera distance the
-	//! prefab asks for it fills about three quarters of it. That could be tuned
-	//! by hand, but it would have to be retuned for every new model and after
-	//! every change to the camera, and each round of that costs a restart.
-	//!
-	//! TryGetItemNodePositionInWidgetSpace answers the question directly: give
-	//! it a point on the model and it returns where that point landed in the
-	//! widget. Four corners of the model's own bounding box are enough to know
-	//! exactly how big the phone is on screen, whatever the camera is doing.
-	//!
-	//! \return True if the preview answered and the glass was placed from it.
-	protected bool FitScreenToPhone(notnull Widget root)
-	{
-		Widget screenArea = root.FindAnyWidget(W_SCREEN_AREA);
-		if (!m_wModel || !screenArea)
-			return false;
-
-		WorkspaceWidget workspace = GetGame().GetWorkspace();
-		if (!workspace)
-			return false;
-
-		float left, right, top, bottom;
-		if (!NodePoint(-PHONE_HALF_X, 0, left, top))
-			return false;
-
-		float unusedY;
-		if (!NodePoint(PHONE_HALF_X, 0, right, unusedY))
-			return false;
-
-		float unusedX;
-		if (!NodePoint(0, PHONE_HALF_Z, unusedX, top))
-			return false;
-
-		if (!NodePoint(0, -PHONE_HALF_Z, unusedX, bottom))
-			return false;
-
-		float phoneW = right - left;
-		float phoneH = bottom - top;
-
-		// Signs depend on which way the camera looks at it; only the extent
-		// matters here.
-		if (phoneW < 0)
-			phoneW = -phoneW;
-		if (phoneH < 0)
-			phoneH = -phoneH;
-
-		float boxW, boxH;
-		m_wModel.GetScreenSize(boxW, boxH);
-
-		MCF_Core_Log.Debug("phone in widget space: " + phoneW.ToString() + "x" + phoneH.ToString()
-			+ " against a box of " + boxW.ToString() + "x" + boxH.ToString());
-
-		// A preview that has not drawn yet answers with a degenerate box.
-		if (phoneW < 8 || phoneH < 8)
-			return false;
-
-		// THE ANSWER IS NOT ALWAYS IN THE SAME UNITS AS THE WIDGET, and that is
-		// what this guard is for. Measured on the same build, the same phone
-		// came back as 399.7 x 850.6 both in a 1101 x 615 Workbench viewport
-		// and at 1920 x 1080 fullscreen -- an unchanging number, so it is in
-		// the reference resolution, not in the widget's own. Fullscreen those
-		// coincide and the placement is exact. In a viewport they do not, and
-		// the phone is reported taller than the box that contains it, which
-		// cannot be true.
-		//
-		// So: believe the answer only when it fits inside the box. Otherwise
-		// keep the box-relative placement, which is a little generous but stays
-		// on the screen. Fullscreen -- the case that ships -- gets the exact
-		// one; the Workbench viewport gets the approximation.
-		if (boxH > 0 && phoneH > boxH * 1.05)
-		{
-			MCF_Core_Log.Debug("preview answered in a different coordinate space than the widget -- keeping the box-relative fit");
-			return false;
-		}
-
-		PlaceCentred(screenArea, phoneW * GLASS_X, phoneH * GLASS_Y);
-		CapTextWidth(root, phoneW * GLASS_X);
-		return true;
-	}
-
-	//! One point on the model, in the model's own space, as a position in the
-	//! widget. The transform is the identity with the point in its last row --
-	//! Enfusion passes transforms as four vectors and the fourth is the
-	//! translation.
-	protected bool NodePoint(float x, float z, out float outX, out float outY)
-	{
-		vector offset[4];
-		Math3D.MatrixIdentity4(offset);
-		offset[3] = Vector(x, 0, z);
-
-		vector inWidget;
-		if (!m_wModel.TryGetItemNodePositionInWidgetSpace(-1, offset, inWidget))
-			return false;
-
-		outX = inWidget[0];
-		outY = inWidget[1];
-		return true;
-	}
-
-	//! Pins a widget to the middle of the screen at an exact size.
-	//!
-	//! The anchors have to collapse to a point first. A slot whose anchors are
-	//! stretched takes its size from them and ignores SetSize entirely, which
-	//! fails silently and looks like the call did nothing.
-	protected void PlaceCentred(notnull Widget widget, float width, float height)
-	{
-		FrameSlot.SetAnchor(widget, 0.5, 0.5);
-		FrameSlot.SetSize(widget, width, height);
-		FrameSlot.SetPos(widget, -width * 0.5, -height * 0.5);
+		return vector.Zero;
 	}
 
 	//! Prints what the screen is actually made of, in real pixels.
 	//!
 	//! WHY THIS IS WORTH KEEPING. Lining the controls up with the rendered
-	//! phone was done for three rounds by measuring screenshots, and it failed
+	//! device was done for three rounds by measuring screenshots, and it failed
 	//! every time for the same reason: a screenshot arrives cropped and scaled
 	//! by an unknown amount, so a size read off it is a size in unknown units.
-	//! Two numbers from the game itself settle it -- and because ScreenArea's
+	//! Two numbers from the game itself settle it -- and because the glass's
 	//! size is logged too, any later screenshot can be scaled correctly by
 	//! comparing the panel in the picture against the panel in this line.
 	protected void LogGeometry(notnull Widget root)
@@ -534,67 +332,22 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (!workspace)
 			return;
 
-		float modelW, modelH, screenW, screenH, modelX, modelY;
-		m_wModel.GetScreenSize(modelW, modelH);
-		m_wModel.GetScreenPos(modelX, modelY);
+		float modelW, modelH, glassW, glassH;
 
-		Widget screenArea = root.FindAnyWidget("ScreenArea");
-		if (screenArea)
-			screenArea.GetScreenSize(screenW, screenH);
+		Widget model = root.FindAnyWidget(MCF_Device_Layout.W_MODEL);
+		if (model)
+			model.GetScreenSize(modelW, modelH);
+
+		Widget glass = root.FindAnyWidget(MCF_Device_Layout.W_SCREEN_AREA);
+		if (glass)
+			glass.GetScreenSize(glassW, glassH);
 
 		MCF_Core_Log.Debug("shell geometry: workspace " + workspace.GetWidth().ToString() + "x" + workspace.GetHeight().ToString()
-			+ " | Model " + modelW.ToString() + "x" + modelH.ToString() + " at " + modelX.ToString() + "," + modelY.ToString()
-			+ " | ScreenArea " + screenW.ToString() + "x" + screenH.ToString());
+			+ " | Model " + modelW.ToString() + "x" + modelH.ToString()
+			+ " | ScreenArea " + glassW.ToString() + "x" + glassH.ToString());
 	}
 
 	// ----------------------------------------------------------- the apps
-
-	//! What is on the home screen.
-	//!
-	//! A FIXED SET, AND EMPTY ONES STAY. The first version listed only the apps
-	//! that had something in them, on the reasoning that an icon opening on
-	//! nothing is worse than no icon. That reasoning was wrong about what the
-	//! object is: a phone found in a field has Settings and a call log whether
-	//! or not this particular one has been used, and a home screen that changes
-	//! shape per device reads as a menu that happens to be phone-coloured.
-	//!
-	//! An empty app opens and says so. That is also information -- a phone with
-	//! no contacts and no call history is a phone somebody was careful with.
-	//!
-	//! Order is the order they appear, left to right, and is deliberate:
-	//! the three that carry conversation first, then what was written down,
-	//! then the device itself.
-	protected void CollectApps()
-	{
-		m_aApps.Clear();
-
-		m_aApps.Insert(MCF_EIntelApp.MESSAGES);
-		m_aApps.Insert(MCF_EIntelApp.CALLS);
-		m_aApps.Insert(MCF_EIntelApp.CONTACTS);
-		m_aApps.Insert(MCF_EIntelApp.EMAIL);
-		m_aApps.Insert(MCF_EIntelApp.NOTES);
-		m_aApps.Insert(MCF_EIntelApp.PHOTOS);
-		m_aApps.Insert(MCF_EIntelApp.FILES);
-		m_aApps.Insert(MCF_EIntelApp.SETTINGS);
-
-		// GENERAL is not an app, it is "no app named" -- what every entry
-		// written before apps existed reads as. It earns a tile only when
-		// something is actually filed there, so old content stays reachable
-		// without putting a nameless icon on every phone.
-		if (HasEntriesFor(MCF_EIntelApp.GENERAL))
-			m_aApps.Insert(MCF_EIntelApp.GENERAL);
-	}
-
-	protected bool HasEntriesFor(int app)
-	{
-		foreach (MCF_Intel_Entry entry : m_aEntries)
-		{
-			if (entry.m_eApp == app)
-				return true;
-		}
-
-		return false;
-	}
 
 	protected void ShowHome()
 	{
@@ -620,7 +373,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_aAppLabels[i].SetVisible(used);
 
 			if (used)
-				m_aAppLabels[i].SetText(AppLabel(m_aApps[i]));
+				m_aAppLabels[i].SetText(m_Content.AppLabel(m_aApps[i]));
 		}
 
 		ShowClock(true);
@@ -652,40 +405,23 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		SetScreens(false, true, false);
 
-		m_aVisible.Clear();
 		m_aRowButtons.Clear();
 
 		if (m_wEntryList)
 			ClearChildren(m_wEntryList);
 
-		foreach (MCF_Intel_Entry entry : m_aEntries)
+		// Ask what is in there, then draw it. The presenter decides whether an
+		// empty app has anything to say for itself; this only puts rows on the
+		// screen.
+		m_Content.GetItems(app, m_aVisible);
+
+		foreach (MCF_Intel_Entry entry : m_aVisible)
 		{
-			if (entry.m_eApp != app)
-				continue;
-
-			m_aVisible.Insert(entry);
-
-			if (!m_wEntryList)
-				continue;
-
-			Widget row = GetGame().GetWorkspace().CreateWidgets(ROW_LAYOUT, m_wEntryList);
-			if (!row)
-				continue;
-
-			SCR_ButtonTextComponent rowButton = SCR_ButtonTextComponent.FindButtonTextComponent(row);
-			if (!rowButton)
-				continue;
-
-			rowButton.SetText(entry.DescribeShort());
-			rowButton.m_OnClicked.Insert(OnRowClicked);
-			m_aRowButtons.Insert(rowButton);
+			AddRow(entry);
 		}
 
-		if (m_aVisible.IsEmpty())
-			ShowEmptyApp(app);
-
 		if (m_wDeviceName)
-			m_wDeviceName.SetText(AppLabel(app));
+			m_wDeviceName.SetText(m_Content.AppLabel(app));
 
 		if (m_ButtonBack)
 			m_ButtonBack.SetText("HOME");
@@ -693,32 +429,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		UpdateLogButton();
 
 		if (m_aVisible.IsEmpty())
-			SetHint(EmptyText(app));
+			SetHint(m_Content.EmptyText(app));
 		else
 			SetHint(m_aVisible.Count().ToString() + " item(s)");
 	}
 
-	//! Settings is the one app that has something to say about a device nobody
-	//! has written anything into: what it is, and whether it was locked. A
-	//! mission maker who files real entries under SETTINGS -- a joined network,
-	//! an account, a registered number -- replaces this entirely.
-	protected void ShowEmptyApp(int app)
+	protected void AddRow(notnull MCF_Intel_Entry entry)
 	{
-		if (app != MCF_EIntelApp.SETTINGS || !m_Carrier)
-			return;
-
-		AddSyntheticRow("Device", m_Carrier.GetDeviceName());
-		AddSyntheticRow("Security", "Screen lock was in use");
-		AddSyntheticRow("Storage", m_aEntries.Count().ToString() + " item(s) on this device");
-	}
-
-	protected void AddSyntheticRow(string heading, string body)
-	{
-		MCF_Intel_Entry entry = new MCF_Intel_Entry();
-		entry.m_sHeading = heading;
-		entry.m_sBody = body;
-		m_aVisible.Insert(entry);
-
 		if (!m_wEntryList)
 			return;
 
@@ -733,24 +450,6 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		rowButton.SetText(entry.DescribeShort());
 		rowButton.m_OnClicked.Insert(OnRowClicked);
 		m_aRowButtons.Insert(rowButton);
-	}
-
-	//! Said in the app's own terms rather than as one blank "nothing here",
-	//! because which drawer is empty is itself worth knowing.
-	protected string EmptyText(int app)
-	{
-		switch (app)
-		{
-			case MCF_EIntelApp.MESSAGES: return "No messages.";
-			case MCF_EIntelApp.CALLS:    return "No calls in the log.";
-			case MCF_EIntelApp.CONTACTS: return "No contacts saved.";
-			case MCF_EIntelApp.EMAIL:    return "No mail.";
-			case MCF_EIntelApp.NOTES:    return "No notes.";
-			case MCF_EIntelApp.PHOTOS:   return "No photos.";
-			case MCF_EIntelApp.FILES:    return "No files.";
-		}
-
-		return "Nothing here.";
 	}
 
 	protected void OnRowClicked(SCR_ButtonTextComponent button)
@@ -945,14 +644,17 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// GetScreenSize reports what the last layout pass produced -- asking in
 		// the same frame reports the size from before the change, which read
 		// as "the call did nothing" for two rounds.
+		if (!m_Geometry)
+			return;
+
 		if (m_iFitFrame == 1)
-			FitScreenToModel(root);
+			m_Geometry.FitToBox();
 		else if (m_iFitFrame == 3)
 		{
-			// The preview has drawn by now, so it can be asked where the phone
-			// really is. If it cannot answer, the box-relative guess above
-			// stays, which is wrong by a known amount rather than broken.
-			FitScreenToPhone(root);
+			// The preview has drawn by now, so it can be asked where the device
+			// really is. If it cannot answer, the box-relative placement stays,
+			// which is wrong by a known amount rather than broken.
+			m_Geometry.FitToDevice();
 			LogGeometry(root);
 		}
 	}
@@ -1061,23 +763,6 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			return "MCF          AC POWER";
 
 		return "MCF          LTE          100%";
-	}
-
-	protected string AppLabel(int app)
-	{
-		switch (app)
-		{
-			case MCF_EIntelApp.MESSAGES: return "MESSAGES";
-			case MCF_EIntelApp.CALLS:    return "PHONE";
-			case MCF_EIntelApp.CONTACTS: return "CONTACTS";
-			case MCF_EIntelApp.EMAIL:    return "MAIL";
-			case MCF_EIntelApp.NOTES:    return "NOTES";
-			case MCF_EIntelApp.PHOTOS:   return "PHOTOS";
-			case MCF_EIntelApp.FILES:    return "FILES";
-			case MCF_EIntelApp.SETTINGS: return "SETTINGS";
-		}
-
-		return "INBOX";
 	}
 
 	protected int LocalPlayerId()
