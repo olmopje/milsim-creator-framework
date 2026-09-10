@@ -109,6 +109,18 @@ class MCF_Device_Layout
 	protected float m_fGlassWidth;
 	protected float m_fGlassHeight;
 
+	//! The screen's four corners in the model's OWN space, engine axes.
+	//!
+	//! WHY A QUAD AND NOT TWO FRACTIONS. Fractions of a bounding box work for a
+	//! device that is all screen -- a phone, a sheet of paper. A laptop is a
+	//! screen standing on a keyboard at an angle, so no fraction of its
+	//! silhouette is its screen, and every attempt to guess one was wrong in a
+	//! different way. Four points read off the mesh are not a guess, and they
+	//! survive any camera: they are projected through the same preview the
+	//! player is looking at, so wherever the laptop ends up on screen, the
+	//! glass ends up on its screen.
+	protected ref array<vector> m_aScreenQuad;
+
 	//! Binds to a layout and to the object being drawn.
 	//! \param size The model's real size in metres. X across the face, Z along
 	//!             its length. Y -- its thickness -- is not used.
@@ -134,6 +146,13 @@ class MCF_Device_Layout
 		}
 
 		return m_wModel != null;
+	}
+
+	//! Tells the layout exactly where this device's glass is, in the model's own
+	//! coordinates. Leave it unset for a device whose whole face is screen.
+	void SetScreenQuad(notnull array<vector> corners)
+	{
+		m_aScreenQuad = corners;
 	}
 
 	ItemPreviewWidget GetModelWidget()
@@ -219,6 +238,9 @@ class MCF_Device_Layout
 		if (!m_wModel || !m_wScreenArea)
 			return false;
 
+		if (m_aScreenQuad && m_aScreenQuad.Count() >= 3)
+			return FitToScreenQuad();
+
 		float halfX = m_fSizeX * 0.5;
 		float halfZ = m_fSizeZ * 0.5;
 
@@ -259,6 +281,78 @@ class MCF_Device_Layout
 		}
 
 		PlaceGlass(deviceW, deviceH);
+		return true;
+	}
+
+	//! Puts the glass exactly where the screen is, by projecting the screen's
+	//! own corners through the preview the player is looking at.
+	protected bool FitToScreenQuad()
+	{
+		float boxW, boxH;
+		m_wModel.GetScreenSize(boxW, boxH);
+		if (boxW <= 0 || boxH <= 0)
+			return false;
+
+		float minX, minY, maxX, maxY;
+		bool first = true;
+
+		foreach (vector corner : m_aScreenQuad)
+		{
+			float px, py;
+			if (!NodeAt(corner, px, py))
+				return false;
+
+			if (first)
+			{
+				minX = px;
+				maxX = px;
+				minY = py;
+				maxY = py;
+				first = false;
+				continue;
+			}
+
+			if (px < minX)
+				minX = px;
+			if (px > maxX)
+				maxX = px;
+			if (py < minY)
+				minY = py;
+			if (py > maxY)
+				maxY = py;
+		}
+
+		float w = maxX - minX;
+		float h = maxY - minY;
+
+		float midX = (minX + maxX) * 0.5;
+		float midY = (minY + maxY) * 0.5;
+
+		MCF_Core_Log.Debug("screen quad in widget space: " + w.ToString() + "x" + h.ToString()
+			+ " centred at " + midX.ToString() + "," + midY.ToString()
+			+ " in a box of " + boxW.ToString() + "x" + boxH.ToString());
+
+		if (w < MIN_SENSIBLE_PIXELS || h < MIN_SENSIBLE_PIXELS)
+			return false;
+
+		// The same units guard as below: an answer bigger than the box that
+		// contains it is not a measurement in this widget.
+		if (w > boxW * 1.05 || h > boxH * 1.05)
+		{
+			MCF_Core_Log.Debug("preview answered in a different coordinate space than the widget -- keeping the box-relative fit");
+			return false;
+		}
+
+		m_fGlassWidth = w * m_fGlassX;
+		m_fGlassHeight = h * m_fGlassY;
+
+		// Widget space runs from the widget's top-left corner, and the preview
+		// widget is placed centred, so the glass moves by how far the screen's
+		// middle is from the widget's middle.
+		PlaceCentred(m_wScreenArea, m_fGlassWidth, m_fGlassHeight, midY - boxH * 0.5, midX - boxW * 0.5);
+
+		CapWidth(W_LIST_WIDTH, m_fGlassWidth);
+		CapWidth(W_READ_WIDTH, m_fGlassWidth);
 		return true;
 	}
 
@@ -315,11 +409,11 @@ class MCF_Device_Layout
 	//!
 	//! The anchors collapse to a point first. A slot whose anchors are stretched
 	//! takes its size from them and ignores SetSize, silently.
-	protected void PlaceCentred(notnull Widget widget, float width, float height, float shiftY = 0)
+	protected void PlaceCentred(notnull Widget widget, float width, float height, float shiftY = 0, float shiftX = 0)
 	{
 		FrameSlot.SetAnchor(widget, 0.5, 0.5);
 		FrameSlot.SetSize(widget, width, height);
-		FrameSlot.SetPos(widget, -width * 0.5, -height * 0.5 + shiftY);
+		FrameSlot.SetPos(widget, -width * 0.5 + shiftX, -height * 0.5 + shiftY);
 	}
 
 	//! One point on the model, in the model's own space, as a position in the
@@ -327,9 +421,17 @@ class MCF_Device_Layout
 	//! translation, so the point goes in the last row of an identity.
 	protected bool NodePoint(float x, float z, out float outX, out float outY)
 	{
+		return NodeAt(Vector(x, 0, z), outX, outY);
+	}
+
+	//! Any point on the model, in the model's own space, as a position in the
+	//! widget. Enfusion passes transforms as four vectors and the fourth is the
+	//! translation, so the point goes in the last row of an identity.
+	protected bool NodeAt(vector point, out float outX, out float outY)
+	{
 		vector offset[4];
 		Math3D.MatrixIdentity4(offset);
-		offset[3] = Vector(x, 0, z);
+		offset[3] = point;
 
 		vector inWidget;
 		if (!m_wModel.TryGetItemNodePositionInWidgetSpace(-1, offset, inWidget))

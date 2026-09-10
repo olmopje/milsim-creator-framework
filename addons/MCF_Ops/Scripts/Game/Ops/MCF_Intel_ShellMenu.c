@@ -73,22 +73,28 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! A laptop lid fills less of the screen's height than a phone does, and
 	//! nearly all of its face is glass -- there is no bezel worth drawing on a
 	//! screen that is already only a screen.
-	//! MEASURED OFF THE MESH, not guessed. LaptopOpen.xob in engine axes is
-	//! 0.3608 across, 0.2274 tall, 0.3514 deep; the base is 0.0282 of that
-	//! height, so the lid's own vertical extent is 0.199 -- 87% of the
-	//! silhouette, sitting at the top of it. Its centre is 56.3% of the way up,
-	//! not 50%, hence the last number.
-	//!
-	//!   X   0.88  the lid spans the full width; the rest is bezel
-	//!   Y   0.87 x 0.88 = 0.77
-	//!   up  0.563 - 0.5 = 0.063
-	//!
-	//! At 0.94 x 0.94 centred, the glass was bigger than the laptop drawn
-	//! behind it and hid the whole thing.
+	//! A laptop does not get its glass from a fraction of its silhouette -- see
+	//! MCF_Device_Layout.SetScreenQuad. These are a shade under 1 only so the
+	//! bezel shows as a hairline rather than the UI running to the very edge of
+	//! the panel.
 	protected static const float LAPTOP_HEIGHT = 0.78;
-	protected static const float LAPTOP_GLASS_X = 0.88;
-	protected static const float LAPTOP_GLASS_Y = 0.77;
-	protected static const float LAPTOP_GLASS_UP = 0.063;
+	protected static const float LAPTOP_GLASS_X = 0.99;
+	protected static const float LAPTOP_GLASS_Y = 0.99;
+
+	//! The LCD's four corners in the model's own space, engine axes, read off
+	//! the LaptopOpen_Screen material -- one quad, eight vertices, so these are
+	//! the corners themselves and not an estimate of them. The panel is 0.345
+	//! across and 0.195 down its own face, which is 16:9, and it leans back 28
+	//! degrees from vertical.
+	protected static ref array<vector> LaptopScreenQuad()
+	{
+		return {
+			Vector(-0.1725, 0.0485, 0.1330),
+			Vector( 0.1725, 0.0485, 0.1330),
+			Vector(-0.1725, 0.2207, 0.2246),
+			Vector( 0.1725, 0.2207, 0.2246)
+		};
+	}
 
 	protected static MCF_Intel_CarrierComponent s_PendingCarrier;
 	protected static MCF_EIntelView s_PendingView;
@@ -449,7 +455,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// everything else about the placement is identical, which is the whole
 		// point of these being two numbers rather than two classes.
 		if (m_eView == MCF_EIntelView.LAPTOP)
-			m_Geometry.Configure(LAPTOP_HEIGHT, LAPTOP_GLASS_X, LAPTOP_GLASS_Y, LAPTOP_GLASS_UP);
+		{
+			m_Geometry.Configure(LAPTOP_HEIGHT, LAPTOP_GLASS_X, LAPTOP_GLASS_Y);
+			m_Geometry.SetScreenQuad(LaptopScreenQuad());
+		}
 
 		if (!m_Geometry.Attach(root, PreviewSize()))
 			return;
