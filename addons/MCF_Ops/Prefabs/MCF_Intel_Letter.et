@@ -2,7 +2,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
  ID "6A1C4F0B39D2D010"
  components {
   MeshObject "{6A1C4F0B39D2D011}" {
-   Object "{789311902B5FF0FF}Assets/Props/Civilian/Notebook_01/Notebook_01_Single.xob"
+   Object "{ECE41C3BF2CF1A75}Assets/Props/Intel/Letter/Letter.xob"
   }
   RigidBody "{6A1C4F0B39D2D012}" {
    Mass 0.2
