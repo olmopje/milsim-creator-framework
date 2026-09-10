@@ -209,11 +209,20 @@ export([body, body_box, socket], os.path.join(OUT, 'Laptop_Body.fbx'))
 # two objects of that name -- the second silently becomes LOD0.001, which the
 # .meta then fails to find. So the body leaves the scene before the lid is
 # renamed.
+dead = [body.data, body_box.data]
 for o in (body, body_box, socket):
     bpy.data.objects.remove(o, do_unlink=True)
 
+# The mesh DATABLOCK has to go too, not just the object. An orphaned datablock
+# still called LOD0 keeps the name taken, so the lid's mesh becomes LOD0.001 --
+# and Enfusion matches MeshParam on the geometry name, so it built nothing at
+# all and said nothing about why.
+for m in dead:
+    bpy.data.meshes.remove(m)
+
 lid.name = 'LOD0'
 lid.data.name = 'LOD0'
+
 export([lid, lid_box], os.path.join(OUT, 'Laptop_Lid.fbx'))
 
 

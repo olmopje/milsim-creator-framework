@@ -2,7 +2,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
  ID "6A1C4F0B39D2D060"
  components {
   MeshObject "{6A1C4F0B39D2D031}" {
-   Object "{6A1C4F0B39D2D06B}Assets/Props/Intel/Laptop/Laptop_Body.xob"
+   Object "{45F5FEABF5F2BF90}Assets/Props/Intel/Laptop/Laptop_Body.xob"
   }
   RigidBody "{6A1C4F0B39D2D032}" {
    Mass 2.2
@@ -77,7 +77,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    ID "6A1C4F0B39D2D050"
    components {
     MeshObject "{6A1C4F0B39D2D051}" {
-     Object "{6A1C4F0B39D2D06C}Assets/Props/Intel/Laptop/Laptop_Lid.xob"
+     Object "{A5341DF1ACA685FD}Assets/Props/Intel/Laptop/Laptop_Lid.xob"
     }
     DoorComponent "{6A1C4F0B39D2D052}" {
      DoorAction SCR_DoorUserAction "{6A1C4F0B39D2D053}" {

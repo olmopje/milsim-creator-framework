@@ -1,0 +1,65 @@
+MetaFileClass {
+ Name "{45F5FEABF5F2BF90}Assets/Props/Intel/Laptop/Laptop_Body.xob"
+ Configurations {
+  FBXResourceClass PC {
+   MaterialAssigns {
+    MaterialAssignClass "{6A54E826A6BBD626}" {
+     SourceMaterial "Laptop_Keys"
+     AssignedMaterial "{FD6F260017B84E04}Assets/Props/Intel/Laptop/Data/Laptop_Keys.emat"
+    }
+    MaterialAssignClass "{6A54E826A6BBD612}" {
+     SourceMaterial "Laptop_Leather"
+     AssignedMaterial "{563C7D2AA4150CFF}Assets/Props/Intel/Laptop/Data/Laptop_Leather.emat"
+    }
+    MaterialAssignClass "{6A54E826A6BBD611}" {
+     SourceMaterial "Laptop_Plastic"
+     AssignedMaterial "{DB617CEEF19D7043}Assets/Props/Intel/Laptop/Data/Laptop_Plastic.emat"
+    }
+    MaterialAssignClass "{6A54E826A6BBD617}" {
+     SourceMaterial "Laptop_Trim"
+     AssignedMaterial "{9DAA2D2ED7FB0765}Assets/Props/Intel/Laptop/Data/Laptop_Trim.emat"
+    }
+    MaterialAssignClass "{6A54E826A6BBD615}" {
+     SourceMaterial "Laptop_Rubber"
+     AssignedMaterial "{D3BA2ADB0032AD35}Assets/Props/Intel/Laptop/Data/Laptop_Rubber.emat"
+    }
+   }
+   MeshParams {
+    MeshParam LOD0 {
+    }
+   }
+   GeometryParams {
+    GeometryParam UBX_Laptop_Body {
+
+     Mass 0
+     Margin 0
+    }
+   }
+   Common TXOCommonClass "{6A54E826A080887D}" : "{0877E7C4BB2B2C9A}Configs/System/ResourceTypes/PC/MeshObjectCommon.conf" {
+   }
+   ApplicationVendor "Blender Foundation"
+   ApplicationName "Blender (stable FBX IO)"
+   ApplicationVersion "5.2.1 LTS"
+  }
+  FBXResourceClass XBOX_ONE : PC {
+   Common TXOCommonClass "{6A54E826A08094C0}" : "{9D5B6207F7628CE2}Configs/System/ResourceTypes/XBOX_ONE/MeshObjectCommon.conf" {
+   }
+  }
+  FBXResourceClass XBOX_SERIES : PC {
+   Common TXOCommonClass "{6A54E826A0809752}" : "{DD9F02115C764647}Configs/System/ResourceTypes/XBOX_SERIES/MeshObjectCommon.conf" {
+   }
+  }
+  FBXResourceClass PS4 : PC {
+   Common TXOCommonClass "{6A54E826A0809714}" : "{53EC476BC921D99A}Configs/System/ResourceTypes/PS4/MeshObjectCommon.conf" {
+   }
+  }
+  FBXResourceClass PS5 : PC {
+   Common TXOCommonClass "{6A54E826A08097DE}" : "{F62AA8E7B8EA9D26}Configs/System/ResourceTypes/PS5/MeshObjectCommon.conf" {
+   }
+  }
+  FBXResourceClass HEADLESS : PC {
+   Common TXOCommonClass "{6A54E826A08097A1}" : "{3A5B3356978039E8}Configs/System/ResourceTypes/HEADLESS/MeshObjectCommon.conf" {
+   }
+  }
+ }
+}
