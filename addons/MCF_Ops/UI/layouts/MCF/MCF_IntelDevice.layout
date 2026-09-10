@@ -914,7 +914,6 @@ FrameWidgetClass {
      Text "Click anywhere to close"
      "Font Size" 13
      "Min Font Size" 13
-     "Text Horizontal Align" 1
      Color 0.7 0.7 0.7 1
     }
    }

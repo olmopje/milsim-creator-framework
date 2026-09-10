@@ -108,7 +108,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 13
       "Min Font Size" 13
-      "Text Horizontal Align" 2
      }
      TextWidgetClass "{6A1C4F0B39D3700D}" {
       Name "ClockDate"
@@ -126,7 +125,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 11
       "Min Font Size" 11
-      "Text Horizontal Align" 2
       Color 0.6 0.6 0.6 1
      }
      TextWidgetClass "{6A1C4F0B39D3700F}" {
@@ -182,7 +180,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D37017}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "App1"
@@ -220,7 +217,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D3701C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "App2"
@@ -258,7 +254,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D37021}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "App3"
@@ -296,7 +291,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D37026}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "App4"
@@ -334,7 +328,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D3702B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "App5"
@@ -372,7 +365,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D37030}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "App6"
@@ -410,7 +402,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D37035}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "App7"
@@ -448,7 +439,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D3703A}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "App8"
@@ -486,7 +476,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 12
       "Min Font Size" 12
-      "Text Horizontal Align" 1
      }
      ScrollLayoutWidgetClass "{6A1C4F0B39D37042}" {
       Name "ListScroll"
@@ -504,15 +493,11 @@ FrameWidgetClass {
       {
        SizeLayoutWidgetClass "{6A1C4F0B39D3703E}" {
         Name "ListWidth"
-        Slot ScrollLayoutSlot "{6A1C4F0B39D3703F}" {
-        }
         AllowWidthOverride 1
         WidthOverride 600
         {
          VerticalLayoutWidgetClass "{6A1C4F0B39D37040}" {
           Name "EntryList"
-          Slot SizeLayoutSlot "{6A1C4F0B39D37041}" {
-          }
          }
         }
        }
@@ -534,15 +519,11 @@ FrameWidgetClass {
       {
        SizeLayoutWidgetClass "{6A1C4F0B39D37044}" {
         Name "ReadWidth"
-        Slot ScrollLayoutSlot "{6A1C4F0B39D37045}" {
-        }
         AllowWidthOverride 1
         WidthOverride 600
         {
          VerticalLayoutWidgetClass "{6A1C4F0B39D37046}" {
           Name "ReadColumn"
-          Slot SizeLayoutSlot "{6A1C4F0B39D37047}" {
-          }
           {
            RichTextWidgetClass "{6A1C4F0B39D37048}" {
             Name "ReadHeading"
@@ -566,7 +547,7 @@ FrameWidgetClass {
            }
            ButtonWidgetClass "{6A1C4F0B39D3704C}" {
             Name "ReadImageButton"
-            Slot AlignableSlot "{6A1C4F0B39D3704D}" { HorizontalAlign 0 VerticalAlign 0 SizeToContent 1 }
+            Slot AlignableSlot "{6A1C4F0B39D3704D}" { HorizontalAlign 0 VerticalAlign 0 }
             "Is Visible" 0
             {
              ImageWidgetClass "{6A1C4F0B39D3704E}" {
@@ -660,7 +641,6 @@ FrameWidgetClass {
       Text ""
       "Font Size" 13
       "Min Font Size" 13
-      "Text Horizontal Align" 1
      }
      ButtonWidgetClass "{6A1C4F0B39D3705F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
       Name "ButtonNext"
@@ -903,7 +883,6 @@ FrameWidgetClass {
       Text "Click anywhere to close"
       "Font Size" 15
       "Min Font Size" 15
-      "Text Horizontal Align" 1
       Color 0.7 0.7 0.7 1
      }
    }
