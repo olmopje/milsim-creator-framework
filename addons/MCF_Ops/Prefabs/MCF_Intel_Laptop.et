@@ -66,6 +66,11 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    AngularDamping 0.5
    ModelGeometry 1
   }
+  // The lid is a child ENTITY, and a stored item only hides itself -- see
+  // MCF_Devices_StowChildrenComponent.c. Without this the lid stayed drawn at
+  // the carrier's origin and floated around the player's feet.
+  MCF_Devices_StowChildrenComponent "{6A1C4F0B39D2D0B0}" {
+  }
   MCF_Devices_LockComponent "{6A1C4F0B39D2D070}" {
    m_bSecured 1
    m_iDifficulty 2
