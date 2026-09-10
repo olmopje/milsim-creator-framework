@@ -33,5 +33,10 @@ modded enum ChimeraMenuPreset
 
 	//! Where a Game Master writes a conversation. Opened from the right-click
 	//! menu on the person it is being written for.
-	MCF_DialogueEditor
+	MCF_DialogueEditor,
+
+	//! Breaking into a locked device. Opened by the break-in action on the
+	//! phone or laptop itself. Lives in the MCF_Devices module; the name is
+	//! declared here because the preset it pairs with is in Core's manifest.
+	MCF_DeviceHack
 }

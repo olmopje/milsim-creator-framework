@@ -1,0 +1,288 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D30001}" {
+   Name "Background"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30002}" {
+    Anchor 0 0 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.02 0.03 0.03 0.98
+  }
+  TextWidgetClass "{6A1C4F0B39D30003}" {
+   Name "Title"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30004}" {
+    Anchor 0.30 0.10 0.70 0.16
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "SECURED DEVICE"
+   "Font Size" 28
+   "Min Font Size" 28
+  }
+  TextWidgetClass "{6A1C4F0B39D30005}" {
+   Name "Status"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30006}" {
+    Anchor 0.30 0.17 0.70 0.23
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "WATCH"
+   "Font Size" 22
+   "Min Font Size" 22
+  }
+  TextWidgetClass "{6A1C4F0B39D30007}" {
+   Name "Timer"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30008}" {
+    Anchor 0.30 0.76 0.70 0.82
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 26
+   "Min Font Size" 26
+  }
+  ButtonWidgetClass "{6A1C4F0B39D30009}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell0"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3000A}" {
+    Anchor 0.365 0.280 0.450 0.410
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3000B}" {
+     m_bCanBeToggled 1
+     m_sText "1"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3000C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell1"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3000D}" {
+    Anchor 0.460 0.280 0.545 0.410
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3000E}" {
+     m_bCanBeToggled 1
+     m_sText "2"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3000F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell2"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30010}" {
+    Anchor 0.555 0.280 0.640 0.410
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D30011}" {
+     m_bCanBeToggled 1
+     m_sText "3"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D30012}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell3"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30013}" {
+    Anchor 0.365 0.430 0.450 0.560
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D30014}" {
+     m_bCanBeToggled 1
+     m_sText "4"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D30015}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell4"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30016}" {
+    Anchor 0.460 0.430 0.545 0.560
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D30017}" {
+     m_bCanBeToggled 1
+     m_sText "5"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D30018}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell5"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30019}" {
+    Anchor 0.555 0.430 0.640 0.560
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3001A}" {
+     m_bCanBeToggled 1
+     m_sText "6"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3001B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell6"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3001C}" {
+    Anchor 0.365 0.580 0.450 0.710
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3001D}" {
+     m_bCanBeToggled 1
+     m_sText "7"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3001E}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell7"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3001F}" {
+    Anchor 0.460 0.580 0.545 0.710
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D30020}" {
+     m_bCanBeToggled 1
+     m_sText "8"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D30021}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "Cell8"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30022}" {
+    Anchor 0.555 0.580 0.640 0.710
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D30023}" {
+     m_bCanBeToggled 1
+     m_sText "9"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D30024}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonClose"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30025}" {
+    Anchor 0.40 0.85 0.60 0.91
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D30026}" {
+     m_bCanBeToggled 0
+     m_sText "STOP"
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D30027}" {
+   Name "Hint"
+   Slot FrameWidgetSlot "{6A1C4F0B39D30028}" {
+    Anchor 0.20 0.92 0.80 0.97
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text "Watch the sequence, then repeat it before the timer runs out."
+   "Font Size" 15
+   "Min Font Size" 15
+  }
+ }
+}
