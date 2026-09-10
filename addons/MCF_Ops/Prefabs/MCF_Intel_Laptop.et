@@ -77,7 +77,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    ID "6A1C4F0B39D2D050"
    components {
     MeshObject "{6A1C4F0B39D2D051}" {
-     Object "{A5341DF1ACA685FD}Assets/Props/Intel/Laptop/LaptopLid.xob"
+     Object "{CE30CC6B7543D9DA}Assets/Props/Intel/Laptop/LaptopLid.xob"
     }
     DoorComponent "{6A1C4F0B39D2D052}" {
      DoorAction SCR_DoorUserAction "{6A1C4F0B39D2D053}" {
