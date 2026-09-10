@@ -1,6 +1,26 @@
+GenericEntity MCF_ConeProbe : "{2D283A489D1D8BCC}Prefabs/MCF_Obj_ConeDetectionTrigger.et" {
+ coords 1377.158 39.019 2236.94
+}
 SCR_SpawnPoint : "{5A2220DD0C16958B}Prefabs/MP/Spawning/SpawnPoint_US.et" {
- coords 1839.095 19.162 1837.675
+ coords 1394.715 39.019 2246.12
 }
 GenericEntity : "{6A1C4F0B39D27E10}Prefabs/MCF_Task_Board.et" {
- coords 1888.194 13.594 1838.171
+ coords 1393.542 39.019 2231.412
+}
+GenericEntity : "{6A1C4F0B39D2D010}Prefabs/MCF_Intel_Letter.et" {
+ coords 1390.791 39.919 2231.814
+ angles 0 -126.341 0
+}
+GenericEntity : "{6A1C4F0B39D2D020}Prefabs/MCF_Intel_Notebook.et" {
+ coords 1390.166 39.919 2231.748
+ angles 0 160.473 0
+}
+GenericEntity MCF_SpottedProbe : "{6C5FE2CCB6B45596}Prefabs/MCF_Obj_SpottedByPlayer.et" {
+ coords 1370.23 39 2229.099
+}
+GenericEntity MCF_WatcherProbe : "{8A24F93EA862750C}Prefabs/MCF_Obj_ProximityTrigger.et" {
+ coords 1374.211 38.999 2234.979
+}
+GenericEntity : "{B94D11DD03097D5E}PrefabsEditable/Auto/Props/Military/Furniture/E_TableMilitary_US_01.et" {
+ coords 1390.554 39.019 2231.62
 }

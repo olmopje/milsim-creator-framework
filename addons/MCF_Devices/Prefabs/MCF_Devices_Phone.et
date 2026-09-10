@@ -1,0 +1,117 @@
+// A phone you have to break into before you can read it.
+//
+// PLACEHOLDER MODEL. This points at the notepad mesh from MCF_Ops until the
+// smartphone in art/Devices is imported -- swapping it is one line. Everything
+// else about the object is final.
+//
+// WHAT MAKES IT A DEVICE. Three components, from two different addons:
+//
+//   MCF_Intel_CarrierComponent   Ops       what it knows
+//   MCF_Devices_LockComponent    Devices   whether you may look
+//   RplComponent                 vanilla   so the server can be told which one
+//                                        -- inherited from Item_Base, NOT
+//                                        declared here: a second one would
+//                                        replicate nothing and the lock would
+//                                        never reach a client.
+//
+// The actions manager below overrides Item_Base's own by GUID rather than
+// adding a second component. Declaring a fresh one leaves two managers on the
+// entity and the interaction system only looks at one of them, so the prompt
+// silently never appears.
+//
+// Two actions that are never both visible: the break-in prompt while it is
+// locked, and Ops' plain read prompt afterwards. MCF_Devices_ReadGate.c is what
+// hides the second one, and it lives in the Devices module, so removing that
+// module leaves a phone that simply reads -- see the note in
+// MCF_Devices_LockComponent.c about why unlocked is the right way to fail.
+GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
+ ID "6A1C4F0B39D30100"
+ components {
+  MeshObject "{6A1C4F0B39D30101}" {
+   Object "{D70CC5B0CF5A8C30}Assets/Props/Intel/Notepad/Notepad.xob"
+  }
+  RigidBody "{6A1C4F0B39D30102}" {
+   Mass 0.2
+   LinearDamping 0.5
+   AngularDamping 0.5
+   ModelGeometry 1
+  }
+  InventoryItemComponent "{5222EB4D0C73006B}" {
+   Attributes SCR_ItemAttributeCollection "{5222EB4D0A2B466B}" {
+    ItemDisplayName UIInfo "{5222EB4D07D865FA}" {
+     Name "Mobile phone"
+    }
+    ItemPhysAttributes ItemPhysicalAttributes PhysicalAttributes {
+     Weight 0.15
+     SizeSetupStrategy Manual
+     ItemDimensions 5 5 2
+     ItemVolume 50
+     DimensionScaler 1
+    }
+    m_Size SLOT_1x1
+    m_SlotType SLOT_LOADOUT_STORAGE
+   }
+  }
+  MCF_Intel_CarrierComponent "{6A1C4F0B39D30106}" {
+   m_sDeviceName "Mobile phone"
+   m_eView DEVICE
+   m_sActionVerb "Search"
+   m_aEntries {
+    MCF_Intel_Entry "{6A1C4F0B39D30107}" {
+     m_sHeading "M. - 02:14"
+     m_sTimestamp "14 MAR"
+     m_sBody "Truck is loaded. We move at first light, not before. Tell your cousin to keep the dogs in."
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D30108}" {
+     m_sHeading "Unknown number - 09:40"
+     m_sTimestamp "15 MAR"
+     m_sBody "Do not use this number again. The mill is watched."
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D30109}" {
+     m_sHeading "Draft, not sent"
+     m_sTimestamp "15 MAR"
+     m_sBody "If anything happens to me the papers are behind the stove at my mother's."
+    }
+   }
+  }
+  MCF_Devices_LockComponent "{6A1C4F0B39D3010A}" {
+   m_bSecured 1
+   m_iDifficulty 2
+   m_sBreakInVerb "Break into"
+  }
+  ActionsManagerComponent "{508AB5952B584B2E}" {
+   additionalActions +{
+    MCF_Devices_HackAction "{6A1C4F0B39D3010D}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{6A1C4F0B39D3010E}" {
+      Name "Break into"
+     }
+     VisibilityRange 3
+     Duration 0
+    }
+    MCF_Intel_ReadAction "{6A1C4F0B39D3010F}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{6A1C4F0B39D30110}" {
+      Name "Search"
+     }
+     VisibilityRange 3
+     Duration 2
+    }
+   }
+  }
+  SCR_EditableEntityComponent "{6A1C4F0B39D30111}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType OBJECT
+   m_UIInfo SCR_EditableEntityUIInfo "{6A1C4F0B39D30112}" {
+    Name "MCF Device: Phone (secured)"
+    m_aAuthoredLabels {
+     ENTITYTYPE_OBJECT
+     CONTENT_MODDED
+    }
+   }
+  }
+ }
+}

@@ -74,12 +74,11 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
  }
  coords 1891.659 11.326 1821.161
 }
-GenericEntity MCF_ConeProbe : "{2D283A489D1D8BCC}Prefabs/MCF_Obj_ConeDetectionTrigger.et" {
- coords 1851 19 1840
-}
-GenericEntity MCF_SpottedProbe : "{6C5FE2CCB6B45596}Prefabs/MCF_Obj_SpottedByPlayer.et" {
- coords 1848 19 1840
-}
-GenericEntity MCF_WatcherProbe : "{8A24F93EA862750C}Prefabs/MCF_Obj_ProximityTrigger.et" {
- coords 1845 19 1840
+$grp GenericEntity : "{6A1C4F0B39D30100}Prefabs/MCF_Devices_Phone.et" {
+ MCF_PhoneTest {
+  coords 1840 19.2 1838
+ }
+ MCF_PhoneTest {
+  coords 1840 19.2 1838
+ }
 }
