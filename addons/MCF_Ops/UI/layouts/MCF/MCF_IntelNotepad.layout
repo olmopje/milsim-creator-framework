@@ -436,7 +436,7 @@ FrameWidgetClass {
    }
    Color 0.72 0.76 0.82 1
   }
-  TextWidgetClass "{6A1C4F0B39D3303B}" {
+  RichTextWidgetClass "{6A1C4F0B39D3303B}" {
    Name "ReadHeading"
    Slot FrameWidgetSlot "{6A1C4F0B39D3303C}" {
     Anchor 0.372 0.108 0.660 0.152
@@ -454,7 +454,7 @@ FrameWidgetClass {
    "Min Font Size" 20
    Color 0.12 0.14 0.22 1
   }
-  TextWidgetClass "{6A1C4F0B39D3303D}" {
+  RichTextWidgetClass "{6A1C4F0B39D3303D}" {
    Name "ReadTimestamp"
    Slot FrameWidgetSlot "{6A1C4F0B39D3303E}" {
     Anchor 0.372 0.154 0.660 0.182
@@ -496,6 +496,19 @@ FrameWidgetClass {
      Slot AlignableSlot "{6A1C4F0B39D33043}" {
       HorizontalAlign 3
       VerticalAlign 0
+     }
+     {
+      RichTextWidgetClass "{6A1C4F0B39D33030}" {
+       Name "ReadBody"
+       Slot AlignableSlot "{6A1C4F0B39D33031}" { HorizontalAlign 3 VerticalAlign 0 }
+       Clipping Ancestor
+       Wrap 1
+       Text ""
+       "Font Size" 15
+       "Min Font Size" 15
+       "Line Spacing" 22
+       Color 0.12 0.14 0.22 1
+      }
      }
     }
    }
