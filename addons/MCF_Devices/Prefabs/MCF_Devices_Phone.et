@@ -1,8 +1,7 @@
 // A phone you have to break into before you can read it.
 //
-// PLACEHOLDER MODEL. This points at the notepad mesh from MCF_Ops until the
-// smartphone in art/Devices is imported -- swapping it is one line. Everything
-// else about the object is final.
+// The mesh is the imported smartphone, 878 tris, 7.0 x 14.9 x 0.9 cm, with its
+// collision coming from the model's own UTM_ box via ModelGeometry below.
 //
 // WHAT MAKES IT A DEVICE. Three components, from two different addons:
 //
@@ -28,7 +27,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
  ID "6A1C4F0B39D30100"
  components {
   MeshObject "{6A1C4F0B39D30101}" {
-   Object "{D70CC5B0CF5A8C30}Assets/Props/Intel/Notepad/Notepad.xob"
+   Object "{F8CCF67BB2B3ADF4}Assets/Props/Devices/Smartphone/Smartphone.xob"
   }
   RigidBody "{6A1C4F0B39D30102}" {
    Mass 0.2

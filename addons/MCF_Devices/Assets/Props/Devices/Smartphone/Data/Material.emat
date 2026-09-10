@@ -1,0 +1,4 @@
+MatPBRBasic {
+ BCRMap "{CDF21A4AF576F041}Assets/Props/Devices/Smartphone/Data/Smartphone_BCR.edds"
+ NMOMap "{F52AA1D82C01A2DF}Assets/Props/Devices/Smartphone/Data/Smartphone_NMO.edds"
+}
