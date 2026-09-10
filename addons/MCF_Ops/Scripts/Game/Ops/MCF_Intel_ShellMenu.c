@@ -73,9 +73,22 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! A laptop lid fills less of the screen's height than a phone does, and
 	//! nearly all of its face is glass -- there is no bezel worth drawing on a
 	//! screen that is already only a screen.
+	//! MEASURED OFF THE MESH, not guessed. LaptopOpen.xob in engine axes is
+	//! 0.3608 across, 0.2274 tall, 0.3514 deep; the base is 0.0282 of that
+	//! height, so the lid's own vertical extent is 0.199 -- 87% of the
+	//! silhouette, sitting at the top of it. Its centre is 56.3% of the way up,
+	//! not 50%, hence the last number.
+	//!
+	//!   X   0.88  the lid spans the full width; the rest is bezel
+	//!   Y   0.87 x 0.88 = 0.77
+	//!   up  0.563 - 0.5 = 0.063
+	//!
+	//! At 0.94 x 0.94 centred, the glass was bigger than the laptop drawn
+	//! behind it and hid the whole thing.
 	protected static const float LAPTOP_HEIGHT = 0.78;
-	protected static const float LAPTOP_GLASS_X = 0.94;
-	protected static const float LAPTOP_GLASS_Y = 0.94;
+	protected static const float LAPTOP_GLASS_X = 0.88;
+	protected static const float LAPTOP_GLASS_Y = 0.77;
+	protected static const float LAPTOP_GLASS_UP = 0.063;
 
 	protected static MCF_Intel_CarrierComponent s_PendingCarrier;
 	protected static MCF_EIntelView s_PendingView;
@@ -194,6 +207,16 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! Owns no intel and knows no apps -- see MCF_Device_Layout.
 	protected ref MCF_Device_Layout m_Geometry;
 	protected int m_iFitFrame;
+
+	//! Set once the preview has told us where the device really is. Until then
+	//! the glass is placed against the preview BOX, which is bigger than the
+	//! model inside it.
+	protected bool m_bFitted;
+
+	//! How long to keep asking. A second at 60fps: long enough for a preview
+	//! that is merely slow, short enough that a preview which will never answer
+	//! says so in the log while the player is still looking at the screen.
+	protected static const int FIT_GIVE_UP_FRAME = 60;
 
 	//! Opens the skin this object's view calls for.
 	//! \return True if a skin took it; false means the caller should fall back
@@ -426,7 +449,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// everything else about the placement is identical, which is the whole
 		// point of these being two numbers rather than two classes.
 		if (m_eView == MCF_EIntelView.LAPTOP)
-			m_Geometry.Configure(LAPTOP_HEIGHT, LAPTOP_GLASS_X, LAPTOP_GLASS_Y);
+			m_Geometry.Configure(LAPTOP_HEIGHT, LAPTOP_GLASS_X, LAPTOP_GLASS_Y, LAPTOP_GLASS_UP);
 
 		if (!m_Geometry.Attach(root, PreviewSize()))
 			return;
@@ -1371,7 +1394,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		PollLock();
 
-		if (m_iFitFrame > 2)
+		if (m_bFitted || m_iFitFrame > FIT_GIVE_UP_FRAME)
 			return;
 
 		Widget root = GetRootWidget();
@@ -1388,13 +1411,38 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			return;
 
 		if (m_iFitFrame == 1)
-			m_Geometry.FitToBox();
-		else if (m_iFitFrame == 3)
 		{
-			// The preview has drawn by now, so it can be asked where the device
-			// really is. If it cannot answer, the box-relative placement stays,
-			// which is wrong by a known amount rather than broken.
-			m_Geometry.FitToDevice();
+			m_Geometry.FitToBox();
+			return;
+		}
+
+		if (m_iFitFrame < 3)
+			return;
+
+		// KEEP ASKING UNTIL IT ANSWERS. This was one attempt on frame three,
+		// which is enough for a phone and was not enough for the laptop: the
+		// preview answered nothing, the box-relative placement stood, and the
+		// glass came out about a third too big in both directions -- big enough
+		// to read as a flat panel with a laptop somewhere behind it rather than
+		// as a laptop's screen.
+		//
+		// The box-relative fit assumes the model FILLS the box it is given, and
+		// it does not. Measured on the phone, where the preview does answer:
+		// 400x851 of model inside a 643x1368 box, so 62% of it. That is the
+		// size of the error being papered over, and it is why the fallback is
+		// worth this many frames of asking.
+		if (m_Geometry.FitToDevice())
+		{
+			m_bFitted = true;
+			FitHackPanel();
+			LogGeometry(root);
+			return;
+		}
+
+		if (m_iFitFrame == FIT_GIVE_UP_FRAME)
+		{
+			MCF_Core_Log.Warn("the preview never said where this device is, after " + FIT_GIVE_UP_FRAME.ToString()
+				+ " frames -- the glass stays box-relative and will be too big for the model behind it");
 			LogGeometry(root);
 		}
 	}

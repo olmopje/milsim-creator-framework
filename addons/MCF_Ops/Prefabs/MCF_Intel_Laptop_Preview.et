@@ -1,8 +1,50 @@
-GenericEntity {
+// The laptop as the shell draws it: open, seen from the front.
+//
+// WHY IT IS A SEPARATE PREFAB. The laptop in the world is a closed body with
+// the lid as a child entity that a DoorComponent swings. An ItemPreviewWidget
+// renders a prefab from scratch, so it would render that laptop shut -- which
+// is what it did, and a shut laptop is a poor thing to lay a screen on. This
+// is the same model posed open and baked into one mesh, LaptopOpen.xob.
+//
+// WHY IT INHERITS Item_Base. It was a bare GenericEntity with a MeshObject on
+// it, which renders, and then quietly does not do the one other thing the
+// shell needs: TryGetItemNodePositionInWidgetSpace answered nothing, so
+// MCF_Device_Layout could never find out where in its box the laptop actually
+// ended up. The glass then stayed sized against the BOX, which the model fills
+// only about two thirds of -- so the screen came out half again too big and
+// covered the entire laptop. What you saw was the preview widget's black
+// background around a panel, with the laptop hidden behind it.
+//
+// The phone's preview prefab is the phone itself, an Item_Base, and its
+// measurement has always worked. That is the whole difference, so this one is
+// an Item_Base too. Measured, in engine axes: 0.3608 across, 0.2274 tall,
+// 0.3514 deep -- which is the 0.36 x 0.227 face m_vPreviewSize declares.
+//
+// CameraOrbitAngles is PITCH, yaw, roll. Zero looks horizontally at the
+// standing screen. The phone uses 90 because a phone lies flat and has to be
+// looked down at; a laptop screen is already facing you.
+GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
  ID "6A1C4F0B39D2D090"
  components {
   MeshObject "{6A1C4F0B39D2D091}" {
    Object "{A83A4C59D97ED743}Assets/Props/Intel/Laptop/LaptopOpen.xob"
+  }
+  InventoryItemComponent "{5222EB4D0C73006B}" {
+   Attributes SCR_ItemAttributeCollection "{5222EB4D0A2B466B}" {
+    ItemDisplayName UIInfo "{5222EB4D07D865FA}" {
+     Name "Laptop"
+    }
+    CustomAttributes {
+     PreviewRenderAttributes "{6A1C4F0B39D2D093}" {
+      CameraOrbitAngles 0 0 0
+      CameraDistanceToItem 0.36
+      ItemRenderRotation 0 0 0
+      LodModel 1
+     }
+    }
+    m_Size SLOT_1x1
+    m_SlotType SLOT_LOADOUT_STORAGE
+   }
   }
   Hierarchy "{6A1C4F0B39D2D092}" {
   }
