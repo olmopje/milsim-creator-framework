@@ -49,9 +49,16 @@ class MCF_Intel_ReadAction : ScriptedUserAction
 		return true;
 	}
 
+	//! Opens whichever skin the object's view asks for, and falls back to the
+	//! plain viewer when it asks for none. DOCUMENT, DEVICE and MAP still get
+	//! the flat index-and-body screen, which is the right shape for them and
+	//! the honest default for anything new.
 	override void PerformAction(IEntity pOwnerEntity, IEntity pUserEntity)
 	{
 		if (!m_Carrier)
+			return;
+
+		if (MCF_Intel_ShellMenu.OpenFor(m_Carrier))
 			return;
 
 		MCF_Intel_ViewerMenu.OpenFor(m_Carrier);

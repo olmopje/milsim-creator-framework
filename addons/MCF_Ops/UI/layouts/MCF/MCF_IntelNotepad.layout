@@ -1,0 +1,653 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D33001}" {
+   Name "Dim"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33002}" {
+    Anchor 0 0 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0 0 0 0.8
+  }
+  ImageWidgetClass "{6A1C4F0B39D33003}" {
+   Name "Shadow"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33004}" {
+    Anchor 0.318 0.085 0.696 0.865
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0 0 0 0.5
+  }
+  ImageWidgetClass "{6A1C4F0B39D33005}" {
+   Name "Board"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33006}" {
+    Anchor 0.310 0.075 0.688 0.855
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.20 0.17 0.14 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33007}" {
+   Name "Sheet"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33008}" {
+    Anchor 0.348 0.090 0.676 0.842
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.95 0.94 0.88 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33009}" {
+   Name "Ring0"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3300A}" {
+    Anchor 0.326 0.104 0.356 0.134
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3300B}" {
+   Name "Ring1"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3300C}" {
+    Anchor 0.326 0.172 0.356 0.202
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3300D}" {
+   Name "Ring2"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3300E}" {
+    Anchor 0.326 0.240 0.356 0.270
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3300F}" {
+   Name "Ring3"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33010}" {
+    Anchor 0.326 0.308 0.356 0.338
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33011}" {
+   Name "Ring4"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33012}" {
+    Anchor 0.326 0.376 0.356 0.406
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33013}" {
+   Name "Ring5"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33014}" {
+    Anchor 0.326 0.444 0.356 0.474
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33015}" {
+   Name "Ring6"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33016}" {
+    Anchor 0.326 0.512 0.356 0.542
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33017}" {
+   Name "Ring7"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33018}" {
+    Anchor 0.326 0.580 0.356 0.610
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33019}" {
+   Name "Ring8"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3301A}" {
+    Anchor 0.326 0.648 0.356 0.678
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3301B}" {
+   Name "Ring9"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3301C}" {
+    Anchor 0.326 0.716 0.356 0.746
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3301D}" {
+   Name "Ring10"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3301E}" {
+    Anchor 0.326 0.784 0.356 0.814
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.62 0.63 0.66 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3301F}" {
+   Name "Rule0"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33020}" {
+    Anchor 0.372 0.235 0.660 0.237
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33021}" {
+   Name "Rule1"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33022}" {
+    Anchor 0.372 0.277 0.660 0.279
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33023}" {
+   Name "Rule2"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33024}" {
+    Anchor 0.372 0.319 0.660 0.321
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33025}" {
+   Name "Rule3"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33026}" {
+    Anchor 0.372 0.361 0.660 0.363
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33027}" {
+   Name "Rule4"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33028}" {
+    Anchor 0.372 0.403 0.660 0.405
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33029}" {
+   Name "Rule5"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3302A}" {
+    Anchor 0.372 0.445 0.660 0.447
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3302B}" {
+   Name "Rule6"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3302C}" {
+    Anchor 0.372 0.487 0.660 0.489
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3302D}" {
+   Name "Rule7"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3302E}" {
+    Anchor 0.372 0.529 0.660 0.531
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3302F}" {
+   Name "Rule8"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33030}" {
+    Anchor 0.372 0.571 0.660 0.573
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33031}" {
+   Name "Rule9"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33032}" {
+    Anchor 0.372 0.613 0.660 0.615
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33033}" {
+   Name "Rule10"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33034}" {
+    Anchor 0.372 0.655 0.660 0.657
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33035}" {
+   Name "Rule11"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33036}" {
+    Anchor 0.372 0.697 0.660 0.699
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33037}" {
+   Name "Rule12"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33038}" {
+    Anchor 0.372 0.739 0.660 0.741
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D33039}" {
+   Name "Rule13"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3303A}" {
+    Anchor 0.372 0.781 0.660 0.783
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.76 0.82 1
+  }
+  TextWidgetClass "{6A1C4F0B39D3303B}" {
+   Name "ReadHeading"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3303C}" {
+    Anchor 0.372 0.108 0.660 0.152
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 20
+   "Min Font Size" 20
+   Color 0.12 0.14 0.22 1
+  }
+  TextWidgetClass "{6A1C4F0B39D3303D}" {
+   Name "ReadTimestamp"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3303E}" {
+    Anchor 0.372 0.154 0.660 0.182
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 13
+   "Min Font Size" 13
+   Color 0.36 0.38 0.42 1
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D3303F}" {
+   Name "ReadScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33040}" {
+    Anchor 0.368 0.196 0.664 0.820
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D33041}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D33042}" {
+     Name "ReadColumn"
+     Slot AlignableSlot "{6A1C4F0B39D33043}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D33044}" {
+   Name "PageNumber"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33045}" {
+    Anchor 0.348 0.822 0.676 0.848
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 13
+   "Min Font Size" 13
+   Color 0.42 0.44 0.48 1
+  }
+  TextWidgetClass "{6A1C4F0B39D33046}" {
+   Name "DeviceName"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33047}" {
+    Anchor 0.25 0.026 0.75 0.064
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 18
+   "Min Font Size" 18
+  }
+  TextWidgetClass "{6A1C4F0B39D33048}" {
+   Name "StatusBar"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33049}" {
+    Anchor 0 0 0 0
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 12
+   "Min Font Size" 12
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3304A}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonPrev"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3304B}" {
+    Anchor 0.335 0.885 0.395 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3304C}" {
+     m_bCanBeToggled 0
+     m_sText "PREV"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3304D}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonLog"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3304E}" {
+    Anchor 0.435 0.885 0.565 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3304F}" {
+     m_bCanBeToggled 0
+     m_sText "LOG"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D33050}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonNext"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33051}" {
+    Anchor 0.605 0.885 0.665 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D33052}" {
+     m_bCanBeToggled 0
+     m_sText "NEXT"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D33053}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonClose"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33054}" {
+    Anchor 0.700 0.885 0.790 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D33055}" {
+     m_bCanBeToggled 0
+     m_sText "PUT DOWN"
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D33056}" {
+   Name "Hint"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33057}" {
+    Anchor 0.25 0.940 0.75 0.975
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 14
+   "Min Font Size" 14
+  }
+ }
+}

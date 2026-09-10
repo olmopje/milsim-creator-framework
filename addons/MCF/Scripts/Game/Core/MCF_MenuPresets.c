@@ -20,12 +20,22 @@ modded enum ChimeraMenuPreset
 	//! about them. Opened from the physical board in the world.
 	MCF_PlanningBoard,
 
-	//! Reading an intel object -- a letter, a phone, a notebook. Opened by
-	//! the read action on the object itself.
+	//! Reading an intel object as a plain list -- the fallback skin, and what
+	//! every object used before the shells below existed. Opened by the read
+	//! action on the object itself.
 	MCF_IntelViewer,
 
 	//! Where a Game Master rewrites what an intel object says.
 	MCF_IntelEditor,
+
+	//! The three presentation skins. Same data, same menu class
+	//! (MCF_Intel_ShellMenu), different layout: a single sheet of paper, a
+	//! ring-bound notepad you page through, a handheld device screen with app
+	//! icons. Which one opens is decided by the object's MCF_EIntelView, not
+	//! by the caller.
+	MCF_IntelPaper,
+	MCF_IntelNotepad,
+	MCF_IntelDevice,
 
 	//! Talking to somebody: what they say, and what you may say back.
 	//! Opened by the talk action on the person themselves.

@@ -1,0 +1,278 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D32001}" {
+   Name "Dim"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32002}" {
+    Anchor 0 0 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0 0 0 0.8
+  }
+  ImageWidgetClass "{6A1C4F0B39D32003}" {
+   Name "Shadow"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32004}" {
+    Anchor 0.318 0.075 0.686 0.865
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0 0 0 0.5
+  }
+  ImageWidgetClass "{6A1C4F0B39D32005}" {
+   Name "Sheet"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32006}" {
+    Anchor 0.310 0.065 0.678 0.855
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.90 0.87 0.79 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D32007}" {
+   Name "Fold"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32008}" {
+    Anchor 0.310 0.455 0.678 0.458
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.72 0.69 0.61 1
+  }
+  TextWidgetClass "{6A1C4F0B39D32009}" {
+   Name "ReadHeading"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3200A}" {
+    Anchor 0.345 0.105 0.645 0.150
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 22
+   "Min Font Size" 22
+   Color 0.13 0.12 0.16 1
+  }
+  TextWidgetClass "{6A1C4F0B39D3200B}" {
+   Name "ReadTimestamp"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3200C}" {
+    Anchor 0.345 0.152 0.645 0.182
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 14
+   "Min Font Size" 14
+   Color 0.34 0.31 0.28 1
+  }
+  ScrollLayoutWidgetClass "{6A1C4F0B39D3200D}" {
+   Name "ReadScroll"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3200E}" {
+    Anchor 0.340 0.195 0.650 0.830
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_GamepadScrollComponent "{6A1C4F0B39D3200F}" {
+    }
+   }
+   style Small
+   {
+    VerticalLayoutWidgetClass "{6A1C4F0B39D32010}" {
+     Name "ReadColumn"
+     Slot AlignableSlot "{6A1C4F0B39D32011}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+     }
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D32012}" {
+   Name "PageNumber"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32013}" {
+    Anchor 0.310 0.858 0.678 0.884
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 13
+   "Min Font Size" 13
+   Color 0.45 0.42 0.38 1
+  }
+  TextWidgetClass "{6A1C4F0B39D32014}" {
+   Name "DeviceName"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32015}" {
+    Anchor 0.25 0.020 0.75 0.058
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 18
+   "Min Font Size" 18
+  }
+  TextWidgetClass "{6A1C4F0B39D32016}" {
+   Name "StatusBar"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32017}" {
+    Anchor 0 0 0 0
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 12
+   "Min Font Size" 12
+  }
+  ButtonWidgetClass "{6A1C4F0B39D32018}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonPrev"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32019}" {
+    Anchor 0.335 0.885 0.395 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3201A}" {
+     m_bCanBeToggled 0
+     m_sText "PREV"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3201B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonLog"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3201C}" {
+    Anchor 0.435 0.885 0.565 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3201D}" {
+     m_bCanBeToggled 0
+     m_sText "LOG"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3201E}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonNext"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3201F}" {
+    Anchor 0.605 0.885 0.665 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D32020}" {
+     m_bCanBeToggled 0
+     m_sText "NEXT"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D32021}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonClose"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32022}" {
+    Anchor 0.700 0.885 0.790 0.925
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D32023}" {
+     m_bCanBeToggled 0
+     m_sText "PUT DOWN"
+    }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D32024}" {
+   Name "Hint"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32025}" {
+    Anchor 0.25 0.940 0.75 0.975
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Text ""
+   "Font Size" 14
+   "Min Font Size" 14
+  }
+ }
+}

@@ -116,7 +116,11 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 
 		foreach (MCF_Intel_Entry entry : entries)
 		{
-			result = result + ENTRY_SEP + Clean(entry.m_sHeading) + FIELD_SEP + Clean(entry.m_sTimestamp) + FIELD_SEP + Clean(entry.m_sBody);
+			// The app is appended LAST so that content written before it
+			// existed still parses -- see the fallback in
+			// ApplySerializedContent. Adding a field anywhere but the end
+			// would silently shift every field after it.
+			result = result + ENTRY_SEP + Clean(entry.m_sHeading) + FIELD_SEP + Clean(entry.m_sTimestamp) + FIELD_SEP + Clean(entry.m_sBody) + FIELD_SEP + entry.m_eApp.ToString();
 		}
 
 		return result;
@@ -161,6 +165,11 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 
 			if (fields.Count() > 2)
 				entry.m_sBody = fields[2];
+
+			// Older content has three fields and no app. GENERAL is the
+			// right answer for it: no particular section.
+			if (fields.Count() > 3)
+				entry.m_eApp = fields[3].ToInt();
 
 			m_aEntries.Insert(entry);
 		}
