@@ -112,6 +112,58 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	[RplProp(onRplName: "OnProfileReplicated")]
 	protected string m_sProfileOverride;
 
+	//! Every carrier in this world, on whichever machine is asking.
+	//!
+	//! WHY A REGISTRY. Something occasionally needs "a device, any device" --
+	//! the self test needs one to write a profile onto, and a laptop shell will
+	//! want to find its neighbours. Walking the world for a component is slow
+	//! and needs a starting point; registering on creation costs one insert.
+	//!
+	//! Held weakly in the sense that entries are removed on delete. A stale
+	//! entry here would hand out a component whose entity is gone, which reads
+	//! as a null-reference bug three files away from its cause.
+	protected static ref array<MCF_Intel_CarrierComponent> s_aAll = {};
+
+	//! The first device registered in this world, or null if there are none.
+	static MCF_Intel_CarrierComponent FirstRegistered()
+	{
+		foreach (MCF_Intel_CarrierComponent carrier : s_aAll)
+		{
+			if (carrier && carrier.GetOwner())
+				return carrier;
+		}
+
+		return null;
+	}
+
+	static int GetAllRegistered(notnull out array<MCF_Intel_CarrierComponent> outCarriers)
+	{
+		outCarriers.Clear();
+
+		foreach (MCF_Intel_CarrierComponent carrier : s_aAll)
+		{
+			if (carrier && carrier.GetOwner())
+				outCarriers.Insert(carrier);
+		}
+
+		return outCarriers.Count();
+	}
+
+	override void OnPostInit(IEntity owner)
+	{
+		super.OnPostInit(owner);
+		s_aAll.Insert(this);
+	}
+
+	override void OnDelete(IEntity owner)
+	{
+		int at = s_aAll.Find(this);
+		if (at >= 0)
+			s_aAll.Remove(at);
+
+		super.OnDelete(owner);
+	}
+
 	string GetDeviceName()
 	{
 		return m_sDeviceName;
@@ -163,9 +215,36 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	//! opens. A phone already open in somebody's hands keeps what it was
 	//! showing, which is the right answer -- content changing under a reader
 	//! mid-sentence would be worse than one screen being a few seconds old.
+	//! A Game Master rewrote this device and the change has reached this
+	//! machine.
+	//!
+	//! SAYS WHAT ARRIVED, not that something did. "device profile replicated"
+	//! cannot tell a late-joining client that got the right profile from one
+	//! that got an empty string, and late join is exactly the case this field
+	//! exists for and the one that has never been watched.
 	protected void OnProfileReplicated()
 	{
-		MCF_Core_Log.Debug("device profile replicated to this machine");
+		if (m_sProfileOverride.IsEmpty())
+		{
+			MCF_Core_Log.Debug("device profile cleared on '" + m_sDeviceName + "'");
+			return;
+		}
+
+		MCF_Device_Profile parsed = MCF_Device_Script.Deserialize(m_sProfileOverride);
+
+		if (!parsed)
+		{
+			MCF_Core_Log.Warn("device profile arrived on '" + m_sDeviceName + "' but could not be read back -- "
+				+ m_sProfileOverride.Length().ToString() + " character(s)");
+			return;
+		}
+
+		int apps;
+		if (parsed.m_aApps)
+			apps = parsed.m_aApps.Count();
+
+		MCF_Core_Log.Debug("device profile '" + parsed.m_sId + "' arrived on '" + m_sDeviceName
+			+ "': " + apps.ToString() + " app(s), " + m_sProfileOverride.Length().ToString() + " character(s)");
 	}
 
 	string GetActionVerb()

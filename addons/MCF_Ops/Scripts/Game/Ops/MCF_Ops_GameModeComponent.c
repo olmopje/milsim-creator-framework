@@ -320,16 +320,30 @@ class MCF_Ops_GameModeComponent : SCR_BaseGameModeComponent
 		array<MCF_Intel_Record> visible = {};
 		MCF_Intel_Store.GetInstance().GetVisibleTo(playerId, factionKey, visible);
 
-		foreach (MCF_Intel_Record record : visible)
+		// Log WHICH records, not just how many -- the same reason the task push
+		// does. This was a count alone until 2026-09-10, and on the day the
+		// faction filter was finally watched in a two-peer session it was the
+		// difference between "player 3 got four and player 2 got three" and
+		// knowing which four.
+		string intelIds = "";
+
+		foreach (int i, MCF_Intel_Record record : visible)
+		{
 			controller.MCF_SendIntel(record);
 
-		// Log the faction alongside the count for the same reason the task
-		// push does: "2 records" reads identically whether the faction filter
-		// ran or silently passed everything through.
+			if (i > 0)
+				intelIds = intelIds + ", ";
+			intelIds = intelIds + record.m_sId;
+		}
+
+		if (intelIds.IsEmpty())
+			intelIds = "none";
+
 		string intelFaction = factionKey;
 		if (intelFaction.IsEmpty())
 			intelFaction = "no faction yet";
 
-		MCF_Core_Log.Debug("sent " + visible.Count().ToString() + " intel record(s) to player " + playerId.ToString() + " (" + intelFaction + ")");
+		MCF_Core_Log.Debug("sent " + visible.Count().ToString() + " intel record(s) to player "
+			+ playerId.ToString() + " (" + intelFaction + "): " + intelIds);
 	}
 }

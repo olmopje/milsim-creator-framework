@@ -39,8 +39,40 @@ class MCF_UI_LineDisplayComponent : ScriptComponent
 
 	protected ScriptInvoker m_LineInvoker;
 
+	//! The one in this world, so something that wants to say a line does not
+	//! have to know where the component is mounted. There is one per world by
+	//! construction -- two would show every line twice, which is a mistake with
+	//! a very loud symptom.
+	protected static MCF_UI_LineDisplayComponent s_Instance;
+
+	//! How many lines this machine has drawn and how many it has declined to.
+	//!
+	//! COUNTED BECAUSE A FILTER CANNOT BE WATCHED FROM OUTSIDE. A client that
+	//! correctly drops a line addressed to somebody else looks exactly like a
+	//! client the line never reached, and telling those apart is the whole
+	//! point of an audience filter existing. Two counters, so "neither" is a
+	//! third answer rather than an invisible one.
+	protected static int s_iShown;
+	protected static int s_iFiltered;
+
+	static MCF_UI_LineDisplayComponent GetInstance()
+	{
+		return s_Instance;
+	}
+
+	static int GetShownCount()
+	{
+		return s_iShown;
+	}
+
+	static int GetFilteredCount()
+	{
+		return s_iFiltered;
+	}
+
 	override void OnPostInit(IEntity owner)
 	{
+		s_Instance = this;
 		SetEventMask(owner, EntityEvent.INIT);
 	}
 
@@ -104,7 +136,19 @@ class MCF_UI_LineDisplayComponent : ScriptComponent
 	protected void RpcDo_ShowLine(string text, MCF_EAudience audience, string factionKey, int playerId)
 	{
 		if (!IsForLocalPlayer(audience, factionKey, playerId))
+		{
+			// SAY THAT IT WAS FILTERED. A client that drops a line silently
+			// looks exactly like a client the line never reached, and telling
+			// those two apart is the whole point of watching an audience
+			// filter in a session with several people in it.
+			s_iFiltered++;
+
+			MCF_Core_Log.Debug("LineDisplay filtered out a line for audience "
+				+ typename.EnumToString(MCF_EAudience, audience) + " (wanted faction '" + factionKey
+				+ "' player " + playerId.ToString() + "; this machine is faction '" + GetLocalFactionKey()
+				+ "' player " + GetLocalPlayerId().ToString() + "): " + text);
 			return;
+		}
 
 		Show(text);
 	}
@@ -170,6 +214,8 @@ class MCF_UI_LineDisplayComponent : ScriptComponent
 			MCF_Core_Log.Debug("LineDisplay has no popup widget on this machine -- not rendering: " + text);
 			return;
 		}
+
+		s_iShown++;
 
 		MCF_Core_Log.Debug("LineDisplay showing: " + text);
 		popup.PopupMsg(text, m_fDisplayDuration, m_sSubtitle);

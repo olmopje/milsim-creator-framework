@@ -64,6 +64,9 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
   }
   MCF_Core_TickManagerComponent "{6A515757BD053812}" {
   }
+  MCF_Dev_SelfTestComponent "{6A54D258FBE6C24B}" {
+   m_bEnabled 1
+  }
   MCF_Dialogue_GameModeComponent "{6A515757B6739101}" {
   }
   MCF_Ops_GameModeComponent "{6A515757B6739100}" {
@@ -78,6 +81,9 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
    ID "56E685E92F1B7E7A"
    Factions {
     SCR_Faction "{56DEAC40D2DBC8B1}" {
+     m_bIsPlayable 1
+    }
+    SCR_Faction "{56DEAC40D3C2E623}" {
      m_bIsPlayable 1
     }
    }

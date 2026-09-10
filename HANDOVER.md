@@ -77,13 +77,44 @@ If you learn something that cost time to discover, it belongs in
 All of it was re-confirmed in a live session after the phase-0 refactor on
 2026-09-10.
 
-### Not proven
+### Proven by the self test, 2026-09-10
 
-- **Faction-scoped intel.** Implemented, needs two factions and two peers.
-- **Late-join replication** of Game Master intel edits. Built on `RplProp` and
-  believed correct, never watched with a client joining late.
-- **The audience filter** on text lines. Plumbed end to end, never observed
-  actually selecting a subset.
+All four of these had been "believed correct, never watched" for weeks. They are
+now watched, automatically, on two peers on two factions:
+
+    SELFTEST start -- 2 player(s): 2 (USSR), 3 (US)
+    faction-intel:  PASS -- player 2 (USSR) holds its own record and not the other's
+    line-audience:  PASS -- player 3 (US) filtered out a line for USSR
+    device-profile: PASS -- player 2 sees the profile the server wrote
+    picture-fetch:  PASS -- player 3 has the picture on disk
+    SELFTEST done -- 8 passed, 0 failed
+
+- **Faction-scoped intel**, in both directions.
+- **The audience filter** on text lines, shown to the faction addressed and
+  filtered out by the other.
+- **Device profiles over RplProp**, seen by clients that are not the host.
+- **Per-client picture fetching**, two clients fetching the same url
+  independently -- the shared pending map does not get in their way.
+
+### How to run it
+
+Put `MCF_Dev_SelfTestComponent` on the game mode, tick `m_bEnabled`, start two
+peers **on different factions**, and read the log. Nothing to click. It is in
+MCF_Dev and never ships.
+
+WAIT FOR FACTIONS, NOT FOR PLAYERS -- that is the trap it was built around. The
+first run started as soon as two players existed, which was before either had
+picked a side, and every filter check then compared nothing against nothing.
+The component now waits for people who are actually on a team, and says so if
+they never arrive.
+
+The run writes one intel record per faction, and deletes them when it finishes.
+
+### Still not proven
+
+- **Late join.** The self test asks everyone who was present when it began; a
+  client connecting to a mission that already has authored content is a
+  different question and still an open one.
 
 ### Known gaps, deliberately open
 
