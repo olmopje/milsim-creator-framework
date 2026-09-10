@@ -56,6 +56,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_APP_LABEL_PREFIX = "AppLabel";
 	protected static const string W_CLOCK_TIME = "ClockTime";
 	protected static const string W_CLOCK_DATE = "ClockDate";
+	protected static const string W_LOCK_SCREEN = "LockScreen";
+	protected static const string W_LOCK_TITLE = "LockTitle";
+	protected static const string W_LOCK_NOTE = "LockNote";
+	protected static const string W_BUTTON_UNLOCK = "ButtonUnlock";
 
 	//! Tiles on the home screen. The layout has this many App/AppLabel pairs;
 	//! the presenter decides which of them are used.
@@ -125,6 +129,15 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected Widget m_wPhotoOverlay;
 	protected ImageWidget m_wPhotoFull;
 	protected Widget m_wPhotoFullButton;
+
+	// The lock screen. Null on any device whose layout has no lock widgets --
+	// a sheet of paper, say -- and every use of these is guarded, so a layout
+	// that predates this feature keeps working and simply never locks.
+	protected Widget m_wLockScreen;
+	protected TextWidget m_wLockTitle;
+	protected RichTextWidget m_wLockNote;
+	protected SCR_ButtonTextComponent m_UnlockButton;
+	protected bool m_bOnLock;
 
 	//! Held because a handler that is not referenced is collected, and a
 	//! collected handler stops handling -- quietly, exactly like the callback
@@ -223,6 +236,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wPhotoOverlay = root.FindAnyWidget(W_PHOTO_OVERLAY);
 		m_wPhotoFull = ImageWidget.Cast(root.FindAnyWidget(W_PHOTO_FULL));
 		m_wPhotoFullButton = root.FindAnyWidget(W_PHOTO_FULL_BUTTON);
+
+		m_wLockScreen = root.FindAnyWidget(W_LOCK_SCREEN);
+		m_wLockTitle = TextWidget.Cast(root.FindAnyWidget(W_LOCK_TITLE));
+		m_wLockNote = RichTextWidget.Cast(root.FindAnyWidget(W_LOCK_NOTE));
+		m_UnlockButton = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_UNLOCK, root);
+		if (m_UnlockButton)
+			m_UnlockButton.m_OnClicked.Insert(OnUnlockClicked);
 
 		// THE BUTTON TAKES THE CLICK, NOT THE IMAGE. An ImageWidget does not
 		// accept cursor input, so a handler on it is attached, never called, and
@@ -339,7 +359,15 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		else
 		{
 			m_Content.GetApps(m_aApps);
-			ShowHome();
+
+			// A shut device shows its lock screen instead of its home screen.
+			// Checked here rather than in the read action so that there is one
+			// prompt in the world and the refusal happens where the player can
+			// see what it is and do something about it.
+			if (IsDeviceLocked())
+				ShowLock();
+			else
+				ShowHome();
 		}
 
 		MCF_Core_Log.Debug("device shell showing '" + m_Content.DeviceName() + "' with " + m_Content.TotalItems().ToString() + " item(s) across " + m_aApps.Count().ToString() + " app(s)");
@@ -890,8 +918,126 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	// ------------------------------------------------------------ plumbing
 
+	// ---------------------------------------------------------------- the lock
+
+	protected bool IsDeviceLocked()
+	{
+		if (!m_Carrier)
+			return false;
+
+		return MCF_Devices_LockComponent.IsEntityLocked(m_Carrier.GetOwner());
+	}
+
+	//! The screen a shut device shows. Everything else goes away, including the
+	//! app tiles -- a locked phone that still lists its apps has told you what
+	//! is on it, which is most of what breaking in was supposed to earn.
+	protected void ShowLock()
+	{
+		m_bOnLock = true;
+		m_bOnHome = false;
+		m_bOnList = false;
+		m_OpenApp = null;
+		m_iOpenEntry = -1;
+		StopWaitingForPicture();
+
+		SetScreens(false, false, false);
+
+		if (m_wLockScreen)
+			m_wLockScreen.SetVisible(true);
+
+		MCF_Devices_LockComponent lock = MCF_Devices_LockComponent.FindOn(m_Carrier.GetOwner());
+
+		if (m_wLockTitle)
+			m_wLockTitle.SetText("LOCKED");
+
+		if (m_wLockNote && lock)
+			m_wLockNote.SetText(DescribeLock(lock.GetDifficulty()));
+
+		if (m_UnlockButton && lock)
+			m_UnlockButton.SetText(lock.GetBreakInVerb());
+
+		SetHint("This device is secured.");
+	}
+
+	//! What the player is up against, in words rather than a number. Naming it
+	//! before the attempt is deliberate: a device that cannot be cracked in the
+	//! time available should say so first, not after.
+	protected string DescribeLock(int difficulty)
+	{
+		if (difficulty <= 0)
+			return "Consumer lock";
+
+		if (difficulty == 1)
+			return "Consumer lock, patched";
+
+		if (difficulty == 2)
+			return "Commercial encryption";
+
+		if (difficulty == 3)
+			return "Hardened, military issue";
+
+		return "Hardened, tamper alarmed";
+	}
+
+	//! Asks the server for a challenge. Nothing about the puzzle is decided
+	//! here, because a client that generated its own puzzle would also know the
+	//! answer to it.
+	protected void OnUnlockClicked(SCR_ButtonTextComponent button)
+	{
+		if (!m_Carrier)
+			return;
+
+		IEntity owner = m_Carrier.GetOwner();
+		if (!owner)
+			return;
+
+		RplComponent rpl = RplComponent.Cast(owner.FindComponent(RplComponent));
+		if (!rpl)
+		{
+			MCF_Core_Log.Warn("device has a lock but no RplComponent -- cannot ask the server for a challenge");
+			return;
+		}
+
+		SCR_PlayerController controller = SCR_PlayerController.Cast(GetGame().GetPlayerController());
+		if (!controller)
+			return;
+
+		SetHint("Working...");
+		controller.MCF_RequestDeviceChallenge(rpl.Id());
+	}
+
+	//! Watches for the unlock arriving. The server decides, and the answer
+	//! comes back as a replicated bool with no callback of its own on this end,
+	//! so the shell has to notice rather than be told. Polling a bool once a
+	//! frame costs nothing and is the only thing that turns a solved puzzle
+	//! into an open screen without the player closing and reopening the device.
+	protected void PollLock()
+	{
+		if (!m_bOnLock)
+			return;
+
+		if (IsDeviceLocked())
+			return;
+
+		MCF_Core_Log.Debug("device unlocked while its screen was open -- opening it");
+
+		m_bOnLock = false;
+
+		if (m_wLockScreen)
+			m_wLockScreen.SetVisible(false);
+
+		m_Content.GetApps(m_aApps);
+		ShowHome();
+	}
+
+	// ------------------------------------------------------------ plumbing
+
 	protected void SetScreens(bool home, bool list, bool read)
 	{
+		// Any ordinary screen means the lock screen is not the one showing.
+		if (m_wLockScreen && (home || list || read))
+			m_wLockScreen.SetVisible(false);
+
 		foreach (SCR_ButtonTextComponent button : m_aAppButtons)
 		{
 			button.GetRootWidget().SetVisible(home);
@@ -929,6 +1075,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		}
 
 		if (m_bPageMode)
+		{
+			Close();
+			return;
+		}
+
+		// There is nowhere behind a lock screen to go back to.
+		if (m_bOnLock)
 		{
 			Close();
 			return;
@@ -1039,8 +1192,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		super.OnMenuUpdate(tDelta);
 
 		// BEFORE the geometry early-out below. The fit finishes after three
-		// frames and stops running; a picture can arrive seconds later.
+		// frames and stops running; a picture can arrive seconds later, and an
+		// unlock can arrive later still.
 		UpdatePicture(tDelta);
+		PollLock();
 
 		if (m_iFitFrame > 2)
 			return;

@@ -70,6 +70,26 @@ class MCF_Devices_LockComponent : ScriptComponent
 		MCF_Core_Log.Debug("device lock init, secured=" + m_bSecured.ToString() + " difficulty=" + m_iDifficulty.ToString());
 	}
 
+	//! Convenience for callers that hold an entity rather than the component --
+	//! the read action and the shell both do. Null-safe on purpose: an object
+	//! with no lock is not locked, which is what makes a lock optional.
+	static bool IsEntityLocked(IEntity entity)
+	{
+		if (!entity)
+			return false;
+
+		MCF_Devices_LockComponent lock = MCF_Devices_LockComponent.Cast(entity.FindComponent(MCF_Devices_LockComponent));
+		return lock && lock.IsLocked();
+	}
+
+	static MCF_Devices_LockComponent FindOn(IEntity entity)
+	{
+		if (!entity)
+			return null;
+
+		return MCF_Devices_LockComponent.Cast(entity.FindComponent(MCF_Devices_LockComponent));
+	}
+
 	bool IsSecured()
 	{
 		return m_bSecured;

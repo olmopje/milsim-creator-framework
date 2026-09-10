@@ -730,6 +730,87 @@ FrameWidgetClass {
      "Font Size" 11
      "Min Font Size" 11
     }
+    FrameWidgetClass "{6A1C4F0B39D35090}" {
+     Name "LockScreen"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35091}" {
+      Anchor 0.0000 0.0000 1.0000 1.0000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     "Is Visible" 0
+     {
+      ImageWidgetClass "{6A1C4F0B39D35092}" {
+       Name "LockDim"
+       Slot AlignableSlot "{6A1C4F0B39D35093}" { HorizontalAlign 3 VerticalAlign 3 }
+       Color 0.02 0.03 0.03 0.97
+      }
+      TextWidgetClass "{6A1C4F0B39D35094}" {
+       Name "LockTitle"
+       Slot FrameWidgetSlot "{6A1C4F0B39D35095}" {
+        Anchor 0.0600 0.3400 0.9400 0.4300
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       Text "LOCKED"
+       "Font Size" 24
+       "Min Font Size" 24
+       "Horizontal Align" 1
+       Color 0.85 0.87 0.87 1
+      }
+      RichTextWidgetClass "{6A1C4F0B39D35096}" {
+       Name "LockNote"
+       Slot FrameWidgetSlot "{6A1C4F0B39D35097}" {
+        Anchor 0.0600 0.4400 0.9400 0.5400
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       Text ""
+       "Font Size" 12
+       "Min Font Size" 12
+       "Horizontal Align" 1
+       Color 0.60 0.62 0.62 1
+      }
+      ButtonWidgetClass "{6A1C4F0B39D35098}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+       Name "ButtonUnlock"
+       Slot FrameWidgetSlot "{6A1C4F0B39D35099}" {
+        Anchor 0.2200 0.5900 0.7800 0.6700
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       components {
+        SCR_ButtonTextComponent "{6A1C4F0B39D3509A}" {
+         m_bCanBeToggled 0
+         m_sText "BREAK IN"
+        }
+       }
+      }
+     }
+    }
+
     ImageWidgetClass "{6A1C4F0B39D35059}" {
      Name "HomeBar"
      Slot FrameWidgetSlot "{6A1C4F0B39D35058}" {

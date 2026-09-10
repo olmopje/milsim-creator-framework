@@ -59,7 +59,7 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	//! as itself rather than as a flat panel.
 	//!
 	//! WHY THE OBJECT NAMES ITS OWN MODEL, rather than the shell knowing which
-	//! model goes with which view. A phone lives in MCF_Devices and the shell
+	//! model goes with which view. A phone and its shell live together and the shell
 	//! lives here, and Ops must not learn what is in Devices -- that is the
 	//! whole reason presentation moved here in the first place. So the prefab
 	//! points at its own model and the shell renders whatever it is handed.

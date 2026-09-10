@@ -740,8 +740,89 @@ FrameWidgetClass {
       "Min Font Size" 12
       Color 0.65 0.65 0.65 1
      }
+     FrameWidgetClass "{6A1C4F0B39D37090}" {
+      Name "LockScreen"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37091}" {
+       Anchor 0.0000 0.0000 1.0000 1.0000
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      "Is Visible" 0
+      {
+       ImageWidgetClass "{6A1C4F0B39D37092}" {
+        Name "LockDim"
+        Slot AlignableSlot "{6A1C4F0B39D37093}" { HorizontalAlign 3 VerticalAlign 3 }
+        Color 0.02 0.03 0.03 0.97
+       }
+       TextWidgetClass "{6A1C4F0B39D37094}" {
+        Name "LockTitle"
+        Slot FrameWidgetSlot "{6A1C4F0B39D37095}" {
+         Anchor 0.0800 0.3200 0.9200 0.4200
+         PositionX 0
+         OffsetLeft 0
+         PositionY 0
+         OffsetTop 0
+         SizeX 0
+         OffsetRight 0
+         SizeY 0
+         OffsetBottom 0
+        }
+        Text "LOCKED"
+        "Font Size" 34
+        "Min Font Size" 34
+        "Horizontal Align" 1
+        Color 0.85 0.87 0.87 1
+       }
+       RichTextWidgetClass "{6A1C4F0B39D37096}" {
+        Name "LockNote"
+        Slot FrameWidgetSlot "{6A1C4F0B39D37097}" {
+         Anchor 0.0800 0.4300 0.9200 0.5300
+         PositionX 0
+         OffsetLeft 0
+         PositionY 0
+         OffsetTop 0
+         SizeX 0
+         OffsetRight 0
+         SizeY 0
+         OffsetBottom 0
+        }
+        Text ""
+        "Font Size" 15
+        "Min Font Size" 15
+        "Horizontal Align" 1
+        Color 0.60 0.62 0.62 1
+       }
+       ButtonWidgetClass "{6A1C4F0B39D37098}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+        Name "ButtonUnlock"
+        Slot FrameWidgetSlot "{6A1C4F0B39D37099}" {
+         Anchor 0.3600 0.5800 0.6400 0.6600
+         PositionX 0
+         OffsetLeft 0
+         PositionY 0
+         OffsetTop 0
+         SizeX 0
+         OffsetRight 0
+         SizeY 0
+         OffsetBottom 0
+        }
+        components {
+         SCR_ButtonTextComponent "{6A1C4F0B39D3709A}" {
+          m_bCanBeToggled 0
+          m_sText "BREAK IN"
+         }
+        }
+       }
+      }
+     }
    }
   }
+
   FrameWidgetClass "{6A1C4F0B39D37075}" {
    Name "PhotoOverlay"
    Slot FrameWidgetSlot "{6A1C4F0B39D37076}" {

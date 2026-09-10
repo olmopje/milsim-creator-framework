@@ -1,4 +1,4 @@
-//! The interaction on an intel object: read the letter, search the phone.
+//! The interaction on an intel object: read the letter, use the phone.
 //!
 //! Reading is a world action rather than an inventory one, deliberately. It
 //! avoids inventory integration entirely, and it plays better: you kneel next
@@ -6,9 +6,16 @@
 //! be picked up and carried like any item -- that is the prefab's business,
 //! not this action's.
 //!
+//! ONE PROMPT, NOT TWO. A locked device used to hide this action and offer
+//! "Break into" instead, so you stood in front of a phone choosing between two
+//! prompts, one of which only existed because the other was refused. Now the
+//! screen always opens and a shut device shows a lock screen, which is what a
+//! shut device does. Everything about the lock is decided inside the shell.
+//!
 //! Local effect only. Opening a screen affects nobody else, and nothing here
 //! changes shared state. Logging the intel to the operations board is a
-//! separate, server-validated step that happens from inside the viewer.
+//! separate, server-validated step that happens from inside the viewer, and so
+//! is answering a lock challenge.
 
 class MCF_Intel_ReadAction : ScriptedUserAction
 {
@@ -35,6 +42,10 @@ class MCF_Intel_ReadAction : ScriptedUserAction
 
 	//! Hidden rather than greyed when the object holds nothing. An empty
 	//! prompt on a prop is worse than no prompt: it promises something.
+	//!
+	//! A locked device is NOT empty. It has content the player cannot reach
+	//! yet, and hiding the prompt would make a phone worth breaking into look
+	//! like a phone worth ignoring.
 	override bool CanBeShownScript(IEntity user)
 	{
 		return m_Carrier && m_Carrier.HasContent();
@@ -60,6 +71,14 @@ class MCF_Intel_ReadAction : ScriptedUserAction
 
 		if (MCF_Intel_ShellMenu.OpenFor(m_Carrier))
 			return;
+
+		// A flat viewer has nowhere to put a lock screen, so a locked object
+		// without a shell stays shut rather than spilling its contents.
+		if (MCF_Devices_LockComponent.IsEntityLocked(pOwnerEntity))
+		{
+			MCF_Core_Log.Debug("intel object is locked and has no shell to show it in -- nothing opened");
+			return;
+		}
 
 		MCF_Intel_ViewerMenu.OpenFor(m_Carrier);
 	}

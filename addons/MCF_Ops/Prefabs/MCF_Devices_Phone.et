@@ -168,16 +168,6 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
   }
   ActionsManagerComponent "{508AB5952B584B2E}" {
    additionalActions +{
-    MCF_Devices_HackAction "{6A1C4F0B39D3010D}" {
-     ParentContextList {
-      "default"
-     }
-     UIInfo UIInfo "{6A1C4F0B39D3010E}" {
-      Name "Break into"
-     }
-     VisibilityRange 3
-     Duration 0
-    }
     MCF_Intel_ReadAction "{6A1C4F0B39D3010F}" {
      ParentContextList {
       "default"

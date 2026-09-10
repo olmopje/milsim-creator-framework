@@ -107,7 +107,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     Hierarchy "{6A1C4F0B39D2D058}" {
     }
    }
-   coords 0.165 0.021 0.107
+   coords 0.165 0.023 0.113
    angles 0 0 90
   }
  }
