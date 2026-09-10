@@ -86,18 +86,23 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	//! How wide the laptop's box is, in box-heights. NOT the model's own
 	//! proportions: the box is cropped to the laptop itself so that the preview
-	//! world's sky has nowhere left to show. Measured, not guessed -- the
-	//! screen quad came back 1022.01 wide in a box 1026 tall, and the lid is
-	//! 1.046 times the LCD's width.
-	protected static const float LAPTOP_BOX_ASPECT = 1.04;
+	//! world's sky has nowhere left to show.
+	//!
+	//! Derived from two logged fits rather than guessed. The preview's apparent
+	//! size against CameraDistanceToItem fits 0.2988 / (d + 0.10) almost
+	//! exactly -- 0.6495 box-heights at d = 0.36, 0.996 at d = 0.20 -- so at
+	//! d = 0.23 the LCD comes out 0.904 box-heights wide, and the lid is 1.046
+	//! times the LCD across. 0.904 x 1.046 = 0.946.
+	protected static const float LAPTOP_BOX_ASPECT = 0.95;
 
-	//! Which end runs off the screen. The preview centres the item, so a laptop
-	//! big enough to be worth reading loses the top of its lid and the bottom
-	//! of its keyboard in equal measure -- and the top of the lid is the part
-	//! that must not be cut, because a screen with its top edge missing reads
-	//! as a mistake while a keyboard running off the bottom reads as a laptop
-	//! on a desk in front of you.
-	protected static const float LAPTOP_MODEL_DOWN = 0.15;
+	//! ZERO, AND HERE IS WHY IT IS NOT THE FIX IT LOOKED LIKE. Shifting the
+	//! preview widget down moves the clip rectangle and the picture inside it
+	//! together, so whatever was cut off at the top stays cut off -- it just
+	//! sits lower on the screen. The only thing that decides whether the lid
+	//! fits is how big the item is drawn inside its widget, and that is
+	//! CameraDistanceToItem's job. The box is the whole screen now, so there is
+	//! nothing to shift into.
+	protected static const float LAPTOP_MODEL_DOWN = 0;
 	protected static const float LAPTOP_GLASS_X = 0.99;
 	protected static const float LAPTOP_GLASS_Y = 0.99;
 
