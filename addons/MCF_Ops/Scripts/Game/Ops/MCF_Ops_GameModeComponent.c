@@ -48,6 +48,23 @@ class MCF_Ops_GameModeComponent : SCR_BaseGameModeComponent
 		events.GetInvoker(MCF_Core_GameModeComponent.EVENT_PLAYER_REGISTERED).Insert(OnCorePlayerRegistered);
 		events.GetInvoker(MCF_Core_GameModeComponent.EVENT_FACTION_CHANGED).Insert(OnCoreFactionChanged);
 
+		// What this module keeps in the persistent store, so a Game Master can
+		// see it, count it, clear it and snapshot it without anything in Core
+		// having to know that taskings exist.
+		MCF_Core_DataSets.Register("tasks", "Taskings",
+			"Every order on the board, published and draft, and who accepted what.",
+			"tasks", "task.", "taskNextId");
+
+		MCF_Core_DataSets.Register("intel", "Intel reports",
+			"Every INTREP entered on the board, including the photographs filed with them.",
+			"intel", "intel.", "intelNextId");
+
+		MCF_Core_DataSets.Register("devices", "Device profiles",
+			"What Game Masters wrote onto phones and laptops. Prefab contents are untouched.",
+			"deviceProfiles", "deviceProfile.", "");
+
+		MCF_Core_DataSets.GetOnReloaded().Insert(ReloadFromStore);
+
 		MCF_Core_ValidationRegistry registry = MCF_Core_ValidationRegistry.GetInstance();
 		registry.RegisterConsumer(MCF_Core_GameModeComponent.EVENT_STORE_READY, "MCF_Ops_GameModeComponent (load the task, intel and device stores)");
 		registry.RegisterConsumer(MCF_Core_GameModeComponent.EVENT_PLAYER_REGISTERED, "MCF_Ops_GameModeComponent (send a joining player their board)");
@@ -61,6 +78,8 @@ class MCF_Ops_GameModeComponent : SCR_BaseGameModeComponent
 		events.GetInvoker(MCF_Core_GameModeComponent.EVENT_PLAYER_REGISTERED).Remove(OnCorePlayerRegistered);
 		events.GetInvoker(MCF_Core_GameModeComponent.EVENT_FACTION_CHANGED).Remove(OnCoreFactionChanged);
 
+		MCF_Core_DataSets.GetOnReloaded().Remove(ReloadFromStore);
+
 		super.OnDelete(owner);
 	}
 
@@ -69,14 +88,7 @@ class MCF_Ops_GameModeComponent : SCR_BaseGameModeComponent
 	{
 		m_bTaskStoreReady = false;
 
-		MCF_Task_Store.GetInstance().Load();
-		MCF_Intel_Store.GetInstance().Load();
-
-		// Device profiles a Game Master wrote in an earlier session. Loaded
-		// here rather than lazily because a device read before this point would
-		// find its profile missing and quietly fall back to its own entries --
-		// a phone with the wrong contents and no error anywhere.
-		MCF_Device_Library.GetInstance().LoadRuntime();
+		LoadStores();
 
 		if (m_bCreateSampleTask)
 			CreateSampleTasks();
@@ -85,6 +97,39 @@ class MCF_Ops_GameModeComponent : SCR_BaseGameModeComponent
 		// before this point was skipped and is caught up here.
 		m_bTaskStoreReady = true;
 		SendTasksToConnectedPlayers();
+	}
+
+	//! Called when the persistent store has changed underneath us -- a Game
+	//! Master cleared a set, or restored a snapshot.
+	//!
+	//! SAME WORK AS A COLD START, DELIBERATELY. The alternative is a second
+	//! path that reloads "just the bits that changed", and a second path is a
+	//! second place for the mission to end up in a state a restart would not
+	//! produce. This one is cheap: three small files and one send.
+	//!
+	//! The sample taskings are NOT recreated. Somebody who just emptied the
+	//! board did not ask for four demonstration orders back.
+	protected void ReloadFromStore()
+	{
+		if (!Replication.IsServer())
+			return;
+
+		LoadStores();
+
+		if (m_bTaskStoreReady)
+			SendTasksToConnectedPlayers();
+	}
+
+	protected void LoadStores()
+	{
+		MCF_Task_Store.GetInstance().Load();
+		MCF_Intel_Store.GetInstance().Load();
+
+		// Device profiles a Game Master wrote in an earlier session. Loaded
+		// here rather than lazily because a device read before this point would
+		// find its profile missing and quietly fall back to its own entries --
+		// a phone with the wrong contents and no error anywhere.
+		MCF_Device_Library.GetInstance().LoadRuntime();
 	}
 
 	protected void OnCorePlayerRegistered(Managed payload)
