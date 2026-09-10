@@ -68,6 +68,9 @@ class MCF_Intel_EditorMenu : ChimeraMenuBase
 	protected ref array<ref MCF_Intel_Entry> m_aDraft = {};
 	protected string m_sDraftDevice;
 	protected MCF_EIntelView m_eDraftView;
+	//! The verb the object already carried. Kept so APPLY does not rename
+	//! an authored action just because this screen has no field for it.
+	protected string m_sDraftVerb;
 	protected int m_iSelected = -1;
 
 	static MCF_Intel_EditorMenu OpenFor(notnull MCF_Intel_CarrierComponent carrier, SCR_EditableEntityComponent editable)
@@ -169,6 +172,7 @@ class MCF_Intel_EditorMenu : ChimeraMenuBase
 	{
 		m_sDraftDevice = m_Carrier.GetDeviceName();
 		m_eDraftView = m_Carrier.GetView();
+		m_sDraftVerb = m_Carrier.GetActionVerb();
 
 		array<MCF_Intel_Entry> current = {};
 		m_Carrier.GetEntries(current);
@@ -326,12 +330,33 @@ class MCF_Intel_EditorMenu : ChimeraMenuBase
 
 	// -------------------------------------------------------------- actions
 
+	//! DOCUMENT and DEVICE are the only two shapes this screen can describe,
+	//! and the button flips between them -- taking the action verb with it,
+	//! because a device is searched and a page is read.
+	//!
+	//! Anything else is left exactly as it is. PAPER, NOTEPAD and MAP reach
+	//! this screen (the device-shaped views do not -- see
+	//! MCF_Intel_EditContextAction), and flipping one of them would land on
+	//! DOCUMENT and quietly turn a notepad into a flat page. The button used
+	//! to do that on a single click, while showing "VIEW: DOCUMENT" for a view
+	//! that was nothing of the kind.
 	protected void OnViewClicked(SCR_ButtonTextComponent button)
 	{
 		if (m_eDraftView == MCF_EIntelView.DOCUMENT)
+		{
 			m_eDraftView = MCF_EIntelView.DEVICE;
-		else
+			m_sDraftVerb = "Search";
+		}
+		else if (m_eDraftView == MCF_EIntelView.DEVICE)
+		{
 			m_eDraftView = MCF_EIntelView.DOCUMENT;
+			m_sDraftVerb = "Read";
+		}
+		else if (m_wStatus)
+		{
+			m_wStatus.SetText("VIEW is " + ViewName(m_eDraftView) + ". This screen edits its pages but cannot change that shape.");
+			return;
+		}
 
 		SyncViewButton();
 	}
@@ -341,10 +366,25 @@ class MCF_Intel_EditorMenu : ChimeraMenuBase
 		if (!m_ButtonView)
 			return;
 
-		if (m_eDraftView == MCF_EIntelView.DEVICE)
-			m_ButtonView.SetText("VIEW: DEVICE");
-		else
-			m_ButtonView.SetText("VIEW: DOCUMENT");
+		m_ButtonView.SetText("VIEW: " + ViewName(m_eDraftView));
+	}
+
+	//! The enum's own ToString() gives the number, which is what goes over the
+	//! wire and is not what a Game Master should be shown.
+	protected string ViewName(MCF_EIntelView view)
+	{
+		switch (view)
+		{
+			case MCF_EIntelView.DOCUMENT: return "DOCUMENT";
+			case MCF_EIntelView.DEVICE:   return "DEVICE";
+			case MCF_EIntelView.MAP:      return "MAP";
+			case MCF_EIntelView.PAPER:    return "PAPER";
+			case MCF_EIntelView.NOTEPAD:  return "NOTEPAD";
+			case MCF_EIntelView.PHONE:    return "PHONE";
+			case MCF_EIntelView.LAPTOP:   return "LAPTOP";
+		}
+
+		return "UNKNOWN";
 	}
 
 	protected void OnAddClicked(SCR_ButtonTextComponent button)
@@ -402,12 +442,7 @@ class MCF_Intel_EditorMenu : ChimeraMenuBase
 	//! Packs the working copy into the same wire format the carrier reads.
 	protected string BuildPayload()
 	{
-		string result = m_sDraftDevice + "<<f>>" + m_eDraftView.ToString() + "<<f>>";
-
-		if (m_eDraftView == MCF_EIntelView.DEVICE)
-			result = result + "Search";
-		else
-			result = result + "Read";
+		string result = m_sDraftDevice + "<<f>>" + m_eDraftView.ToString() + "<<f>>" + m_sDraftVerb;
 
 		foreach (MCF_Intel_Entry entry : m_aDraft)
 		{

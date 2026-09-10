@@ -310,8 +310,22 @@ repository.
 
 **The two namespace defects in section 4.**
 
-**Never observed:** the missing-component behaviour at runtime on a dedicated
-server, and after packing to `.pak`. Both were measured only in the World
-Editor, unpacked. Also unobserved: whether a **user action** entry naming a
-missing class behaves like a component entry. It is the same container parser
-and almost certainly does, but `Character_Base` carries six user actions.
+**Measured 2026-09-10 on a dedicated server, and it holds.** A component naming
+a missing class and a **user action** naming a missing class were both put into
+the loaded content and both produced exactly one line —
+`WORLD (E): Unknown class '<name>' at offset N` — with the entity keeping its
+other components, the phone keeping its real action, and the server reaching
+`Entered online game state`. The user-action case was the one this section
+called unobserved; it behaves identically to the component case, which is what
+lets `Character_Base` carry six of them.
+
+Also measured, from a run with Core alone: the eleven `MenuPreset` entries whose
+layouts live in modules cost one `RESOURCES (E)` each and left the rest of the
+presets working.
+
+**Still never observed: the same behaviour after packing to `.pak`.** Not
+because MCF resists it — the Workbench's `-buildData` cannot be driven from the
+command line here at all. Steam's launcher wrapper re-emits the command line
+and drops the output-directory argument, so the run opens a GUI and writes
+nothing. See HANDOVER step 4. The remaining route is the Workbench GUI, with a
+human at the machine.

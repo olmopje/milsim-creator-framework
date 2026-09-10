@@ -30,7 +30,6 @@ MetaFileClass {
    }
    GeometryParams {
     GeometryParam UBX_Laptop_Body {
-
      Mass 0
      Margin 0
     }

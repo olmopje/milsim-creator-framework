@@ -174,6 +174,19 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 		return m_eView;
 	}
 
+	//! True for the views that draw themselves as a device -- a screen with a
+	//! list of entries -- and false for the ones that draw as a flat page.
+	//!
+	//! ONE LIST, IN ONE PLACE. The Game Master's "Edit device" action offers
+	//! itself on exactly the views this returns true for, and "Edit intel" on
+	//! exactly the ones it returns false for. Kept as two hand-written lists
+	//! they drift, and the drift is silent: an object gets both screens, or
+	//! neither. A new device-shaped view is added here and nowhere else.
+	static bool IsDeviceView(MCF_EIntelView view)
+	{
+		return view == MCF_EIntelView.PHONE || view == MCF_EIntelView.LAPTOP || view == MCF_EIntelView.DEVICE;
+	}
+
 	//! Empty means "draw the flat panel". Never assume a model is there.
 	ResourceName GetPreviewPrefab()
 	{

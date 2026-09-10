@@ -137,39 +137,137 @@ world and session saves, so a mod update cannot wipe a campaign.
 
 ## The next steps, in the order I would take them
 
-### 1. Close the Edit intel / Edit device overlap — one line
+### 1. Close the Edit intel / Edit device overlap — DONE 2026-09-10
 
-`MCF_Intel_EditContextAction.CanBeShown` has no view filter, so "Edit intel" is
-offered on **every** carrier including phones and laptops. Its VIEW toggle only
-knows DOCUMENT and DEVICE, so pressing APPLY there silently rewrites a phone into
-a flat document. `MCF_Device_EditContextAction` already has the filter that
-should be mirrored here, inverted.
+Was: `MCF_Intel_EditContextAction.CanBeShown` had no view filter, so "Edit intel"
+was offered on every carrier including phones and laptops, and its VIEW toggle
+only knew DOCUMENT and DEVICE — one APPLY rewrote a phone into a flat document.
 
-Silent data loss for a mission maker who picks the wrong one of two screens with
-similar names. Cheapest real fix on the list.
+What changed, four files in MCF_Ops:
 
-### 2. Kill the `metal.gamemat` noise
+- `MCF_Intel_CarrierComponent.IsDeviceView(view)` — the PHONE/LAPTOP/DEVICE test,
+  now stated once. Both context actions read it, so the two lists cannot drift.
+- `MCF_Device_EditContextAction` uses it instead of its own inline list.
+- `MCF_Intel_EditContextAction` refuses device views, which is that filter
+  mirrored. Edit intel now appears only on DOCUMENT, PAPER, NOTEPAD and MAP.
+- `MCF_Intel_EditorMenu`: the VIEW button labels the real view instead of
+  calling a NOTEPAD "DOCUMENT", flips only DOCUMENT ↔ DEVICE and refuses the
+  rest in the status line, and APPLY now carries the object's own action verb
+  instead of resetting it to Read/Search on every write.
 
-`{536BF67B2052B869}` resolves to nothing and is re-injected into every
-`.xob.meta` on reimport, so every model load costs two `RESOURCES (E)` lines.
-This is not cosmetic: those lines are read past dozens of times per debugging
-session, and error noise is how a real error gets missed.
+Compiles clean: `Module: Game; loaded 5774x files; 11330x classes`, 0 script
+errors. **Not yet watched in a live Game Master session** — right-click a phone
+and confirm only "Edit device" is offered, and that a notepad's VIEW button
+refuses rather than flattens.
 
-### 3. Turn `m_bEveryoneMayDoEverything` off and play a session
+### 2. Kill the `metal.gamemat` noise — DONE 2026-09-10
 
-The permission system is fully written and completely unexercised — it has never
-once said no. Roles come from vanilla's command hierarchy, so even solo you can
-watch resolution and confirm DESTROY is gated. Do this before anything is built
-on top of the tasking model.
+Was: `{536BF67B2052B869}material/metal.gamemat` resolves to nothing and cost two
+`RESOURCES (E)` lines per model load.
 
-### 4. Dedicated server, then packed to `.pak`
+**The received wisdom about this was wrong, and that is why it kept coming
+back.** Stripping `SurfaceProperties` out of the `.xob.meta` does nothing on its
+own: all six metas had been clean since 17:48 and every `.xob` still carried the
+GUID in its bytes, because the meta was cleaned and the resource was never
+rebuilt. `DEVICES.md` had this right and this file did not.
 
-The two remaining modularisation unknowns — whether an unresolvable component is
-dropped gracefully at runtime on a dedicated server, and whether it still is once
-packed — were only ever measured in the World Editor, unpacked. Both are testable
-without a second person, and both must be answered before any publish. The
-manifest pattern that lets Core name every module's contributions rests on this
-behaviour.
+What worked, and it is a two-step:
+
+1. Rewrite the `.fbx` (same bytes is enough — the watcher goes on mtime).
+2. Give the Workbench window focus. `wb_resources rebuild` does **not** do it;
+   the file watcher is what rebuilds, and it only runs on focus.
+
+Then read the `.xob` back as ASCII and check the GUID is gone — the meta being
+clean proves nothing. Five meshes rebuilt (Letter, Notepad, Smartphone,
+Laptop_Body, LaptopOpen; LaptopLid has no collider and never carried it).
+
+The importer did **not** re-inject it, which contradicts the old note: with
+`SurfaceProperties` empty in the meta, the rebuilt `.xob` came out clean.
+Verified on a fresh Workbench session: the phone streams in at 22:22:07 with no
+error line behind it, and the session's `error.log` holds 0 errors.
+
+### 3. Turn `m_bEveryoneMayDoEverything` off — SWITCHED 2026-09-10, still needs a session
+
+`MCF_Task_Permissions.m_bEveryoneMayDoEverything` is now `false`, with a note at
+the field saying how to put it back. The role checks bite from the next
+Workbench start onward; DESTROY was always asked properly regardless.
+
+What is still owed is the *session*: the system has still never been watched
+refusing anything, and a permission table that has only ever said yes is not
+evidence of anything. Play, and note what gets refused that should not — roles
+come from vanilla's command hierarchy, so solo you resolve high.
+
+The Game Master half of that evening was watched and works: "Edit intel" and
+"Edit device" no longer overlap, and a NOTEPAD keeps its shape through APPLY.
+
+### 4. Dedicated server — MEASURED 2026-09-10. Packed to `.pak` — still open, and blocked
+
+**The server half is answered, in both shapes.** A probe component naming a
+class that does not exist was put on the test world's game mode entity, and a
+probe *user action* naming a missing class on the phone prefab. One dedicated
+server run, all six addons, `MCFTestworld.conf`:
+
+```
+WORLD (E): Unknown class 'MCF_Probe_MissingComponent' at offset 1832(0x728)
+WORLD (E): Unknown class 'MCF_Probe_MissingAction'    at offset 6872(0x1ad8)
+...
+DEFAULT : Entered online game state.
+SCRIPT  : [MCF] GameMode start -- resetting per-mission state
+SCRIPT  : [MCF] intel action registered on 'Mobile phone'
+```
+
+One error line each, nothing else. The entity keeps its other components, the
+phone keeps its real action, the game mode starts, the server goes online. **A
+user action entry behaves exactly like a component entry** — that was listed as
+unobserved in STRUCTURE §9 and is now observed. The manifest pattern holds on a
+dedicated server. Both probes were reverted.
+
+A second, unplanned measurement fell out of a run with `-addons MCF` alone: the
+eleven `MenuPreset` entries whose layouts live in modules each cost one
+`RESOURCES (E)` and the rest of the presets loaded normally. Core alone compiles
+`5686x files; 11058x classes`; all six give `5774x; 11252x` on the server.
+
+**Packing is blocked by the launcher, not by MCF.** `-buildData` never runs:
+Steam's wrapper re-emits the command line and drops the output-directory
+argument, so the Workbench opens its GUI and writes nothing.
+
+```
+CLI Params: -wbModule ResourceManager -buildData PC -wbProjectPath G:\MCF\addons\MCF_Dev\addon.gproj
+                                                 ^ the out dir is simply gone
+```
+
+Tried and all equivalent: `wb_build_data` (run and start/poll), `mod build`,
+and a hand-rolled `Start-Process` with both back- and forward-slash paths. The
+same wrapper is what makes `wb_validate_scripts` fall back to a stub session.
+What has not been tried: building through the Workbench GUI (Resource Manager /
+publish), which is where the remaining answer probably is, and which needs a
+human at the machine.
+
+**Running the dedicated server, written down because it cost time twice:**
+
+```powershell
+Start-Process -FilePath 'C:\Program Files (x86)\Steam\steamapps\common\Arma Reforger Server\ArmaReforgerServer.exe' `
+  -WorkingDirectory 'C:\Program Files (x86)\Steam\steamapps\common\Arma Reforger Server' `
+  -ArgumentList '-server','{B8BD092E327C2224}Missions/MCFTestworld.conf',
+                '-addonsDir','G:\MCF\addons',
+                '-addons','MCF,MCF_Objectives,MCF_Ops,MCF_Dialogue,MCF_AI,MCF_Dev',
+                '-profile','G:\MCF\server\profile','-maxFPS','60'
+```
+
+- **The working directory matters.** One of the server's addon dirs is the
+  relative `./addons`, which is where the base game data addon (`58D0FB3206B6F859`,
+  `ArmaReforger.gproj` — not a mod, and not the MCP tool) is found. Launch from
+  anywhere else and it reports `Game addon '58D0FB3206B6F859' not found` /
+  `Unable to initialize Enfusion`, which reads like a broken dependency in MCF
+  and is nothing of the kind.
+- **`-addons` must list every addon the scenario needs.** `MCFTestworld.conf`
+  lives in MCF_Dev, so `-addons MCF` alone compiles fine and then dies with
+  `Unable to initialize the game`.
+- The game mode components are **not** loaded from `Prefabs/Systems/Milsim.et`
+  in this scenario. The test world places them directly on its
+  `GameMode_Editor_Full` entity in `MCFTestworld_Layers/default.layer`. A probe
+  put in Milsim.et is therefore never loaded — check where the components
+  actually live before concluding anything from a quiet log.
 
 ### 5. The namespace rename, with a fresh head
 
@@ -278,8 +376,11 @@ channel, so it previews olive-green — that is correct. Name files `_BCR` and
 came out as `metafile without corresponding resource`. Re-importing produced it
 with the same GUID. **Check the file exists, not just its meta.** The FBX
 importer also assigns `{536BF67B2052B869}material/metal.gamemat` as the
-collision surface, which does not resolve — delete the `SurfaceProperties`
-block from the `.xob.meta`.
+collision surface, which does not resolve. Deleting the `SurfaceProperties`
+block from the `.xob.meta` is only half of it — the GUID is also baked into the
+built `.xob`, which has to be rebuilt afterwards (rewrite the FBX, focus the
+Workbench). Measured 2026-09-10: with the meta clean, the rebuild does not
+re-inject it.
 
 **A model needs one mesh named `LOD0` and collision named `UTM_<x>`**, at
 real-world scale with the origin at the base. Both are confirmed to survive the
@@ -597,5 +698,8 @@ why the photo overlay never showed this and the lock screen did.
   `RoughnessScale`, `MetalnessScale`, `BCRMap` and `NMOMap`.
 - The importer injects `{536BF67B2052B869}material/metal.gamemat` into every
   collider it builds. That GUID resolves to nothing in this install and costs
-  an error line per mesh per load. It comes back on every reimport; strip it
-  with a regex over the `.xob.meta` files.
+  an error line per mesh per load. Strip the `SurfaceProperties` block from the
+  `.xob.meta` **and then rebuild the mesh** — rewrite the `.fbx` and focus the
+  Workbench — because the GUID is baked into the `.xob` too and a clean meta
+  beside a stale `.xob` looks exactly like a fix that did not take. With the
+  meta clean the rebuild comes out clean; it does not come back.

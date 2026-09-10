@@ -52,7 +52,12 @@ class MCF_Task_Permissions
 	//! Turn this off and the role checks below start biting. Kept as one
 	//! switch so the whole restriction can be tried and reverted in a session
 	//! without a rebuild.
-	protected bool m_bEveryoneMayDoEverything = true;
+	//!
+	//! OFF SINCE 2026-09-10. The system had been written for weeks and had
+	//! never once refused anything, which is not the same as being right. Put
+	//! it back to true if a session turns into a fight with the permission
+	//! table rather than a test of it.
+	protected bool m_bEveryoneMayDoEverything = false;
 
 	static MCF_Task_Permissions GetInstance()
 	{

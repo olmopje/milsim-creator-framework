@@ -35,7 +35,9 @@ class MCF_Intel_EditContextAction : SCR_SelectedEntitiesContextAction
 		return false;
 	}
 
-	//! Only offered on things that actually carry intel.
+	//! Only offered on things that carry intel and do not draw as a device.
+	//! Devices have their own screen -- see GetCarrier for why the two must
+	//! not overlap.
 	override bool CanBeShown(SCR_EditableEntityComponent selectedEntity, vector cursorWorldPosition, int flags)
 	{
 		return GetCarrier(selectedEntity) != null;
@@ -74,6 +76,18 @@ class MCF_Intel_EditContextAction : SCR_SelectedEntitiesContextAction
 		if (!owner)
 			return null;
 
-		return MCF_Intel_CarrierComponent.Cast(owner.FindComponent(MCF_Intel_CarrierComponent));
+		MCF_Intel_CarrierComponent carrier = MCF_Intel_CarrierComponent.Cast(owner.FindComponent(MCF_Intel_CarrierComponent));
+		if (!carrier)
+			return null;
+
+		// The mirror image of MCF_Device_EditContextAction's filter, and it has
+		// to stay a mirror: a phone offered this screen is a phone one APPLY
+		// away from being a flat document, because the VIEW toggle here only
+		// knows DOCUMENT and DEVICE and the payload carries the view whether
+		// the author touched it or not.
+		if (MCF_Intel_CarrierComponent.IsDeviceView(carrier.GetView()))
+			return null;
+
+		return carrier;
 	}
 }

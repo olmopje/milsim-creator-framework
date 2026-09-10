@@ -118,10 +118,14 @@ laptop are not**, so `MCF_Devices_Phone.et` still wears a placeholder mesh.
 from the model, so the `UTM_` collision mesh has to survive the import. If it
 does not, that is the first thing to check when a letter falls through a table.
 
-**Open, cosmetic:** both imported `.xob` files carry a reference to
-`material/metal.gamemat` that does not resolve, logged once each at load.
-Removing `SurfaceProperties` from the `.xob.meta` did not help because the
-reference is baked into the `.xob`; both need re-importing.
+**Closed 2026-09-10.** Both imported `.xob` files carried a reference to
+`material/metal.gamemat` that resolves to nothing, logged once each at load.
+Removing `SurfaceProperties` from the `.xob.meta` was never enough on its own —
+the reference is baked into the `.xob` — so the meshes were rebuilt: rewrite the
+`.fbx`, give the Workbench focus, then read the `.xob` back as ASCII and confirm
+the GUID is gone. Done for Letter, Notepad, Smartphone, Laptop_Body and
+LaptopOpen; LaptopLid has no collider and never carried it. A fresh session
+loads the phone with no error line and 0 errors in `error.log`.
 
 ## 5. The lock, and why the server has to hold it
 

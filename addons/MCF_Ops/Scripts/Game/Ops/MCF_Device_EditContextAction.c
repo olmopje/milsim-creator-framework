@@ -72,8 +72,7 @@ class MCF_Device_EditContextAction : SCR_SelectedEntitiesContextAction
 		if (!carrier)
 			return null;
 
-		MCF_EIntelView view = carrier.GetView();
-		if (view == MCF_EIntelView.PHONE || view == MCF_EIntelView.LAPTOP || view == MCF_EIntelView.DEVICE)
+		if (MCF_Intel_CarrierComponent.IsDeviceView(carrier.GetView()))
 			return carrier;
 
 		return null;

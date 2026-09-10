@@ -13,6 +13,123 @@ written. The structure of record is
 
 Supersedes `PHASE0_PROGRESS.md` (kept below for historical environment notes). Last updated after completing the full phased roadmap (ARCHITECTURE.md section 9, Phases 0-14) plus a follow-up session closing several "manual driver" gaps.
 
+## 2026-09-10 (evening): the Edit intel / Edit device overlap, closed
+
+Two Game Master screens with similar names were offered on the same objects.
+`MCF_Intel_EditContextAction` had no view filter at all, so "Edit intel" appeared
+on every carrier — phones and laptops included — while its VIEW toggle only knew
+DOCUMENT and DEVICE. A mission maker who picked the wrong screen and pressed
+APPLY turned a phone into a flat document, with no warning and no undo.
+
+The filter now exists once, as `MCF_Intel_CarrierComponent.IsDeviceView(view)`.
+`MCF_Device_EditContextAction` shows itself where it returns true, the intel
+action where it returns false, so the two menus are mirrors that cannot drift
+apart: adding a device-shaped view means editing one list.
+
+Two smaller silent rewrites in `MCF_Intel_EditorMenu` went with it, both found by
+reading the payload rather than the screen:
+
+- The VIEW button printed "VIEW: DOCUMENT" for anything that was not DEVICE, so
+  a PAPER or NOTEPAD object was mislabelled, and one click on it really did
+  become a DOCUMENT. It now prints the view's own name, flips only between
+  DOCUMENT and DEVICE, and refuses the rest in the status line.
+- `BuildPayload` wrote the action verb from the view — "Search" for DEVICE,
+  "Read" for everything else — so every APPLY overwrote an authored verb.
+  The draft now carries the object's own verb, and only a real view flip
+  changes it.
+
+Compiles clean in the MCF_Dev project: `Module: Game; loaded 5774x files;
+11330x classes`, no script errors. Behaviour is unwatched — and by this
+project's own first rule, a clean compile proves only that it compiled.
+
+## 2026-09-10 (evening): the metal.gamemat noise, and a fix that had never taken
+
+`{536BF67B2052B869}material/metal.gamemat` had been logged as two
+`RESOURCES (E)` lines per model load for weeks. The standing advice — strip
+`SurfaceProperties` from the `.xob.meta` with a regex — had been followed at
+17:48 that same day, and the errors were still there at 22:13.
+
+The reason: all six `.xob.meta` files were clean, and all six `.xob` files still
+carried the GUID in their bytes. The meta describes how to build the resource;
+the `.xob` is the built resource. Cleaning the first without rebuilding the
+second changes nothing, and leaves behind the most expensive kind of
+documentation — a fix that reads as done. `DEVICES.md` had already said this;
+`HANDOVER.md` had not, and the next reader believed the wrong one.
+
+What rebuilds a mesh, measured:
+
+- `wb_resources rebuild` (with `buildRuntime`) does nothing observable — same
+  mtime, same hash.
+- Rewriting the `.fbx` (identical bytes; the watcher goes on mtime) and then
+  giving the Workbench window focus rebuilds it within seconds. Focus is the
+  trigger, as with the original import.
+
+Five meshes rebuilt this way — Letter, Notepad, Smartphone, Laptop_Body,
+LaptopOpen — and all five came out without the GUID. LaptopLid has no collider
+and never had it. The importer did **not** re-inject the reference, contradicting
+the old note that it "comes back on every reimport": with `SurfaceProperties`
+empty in the meta, the rebuild is clean.
+
+Verified on a fresh Workbench session: `Smartphone.xob` streams in at 22:22:07
+with no error line behind it, and the session's `error.log` holds 0 errors and
+only the usual vanilla obsolete-API warnings. The check that matters is reading
+the `.xob` back as ASCII — a clean meta is not evidence.
+
+## 2026-09-10 (evening): the manifest pattern, measured on a dedicated server
+
+The modularisation design rests on one engine behaviour: a component whose class
+the engine cannot resolve is dropped, and the entity survives it. That had only
+ever been watched in the World Editor, unpacked. Two of the three remaining
+unknowns are now closed.
+
+**Probe.** `MCF_Probe_MissingComponent` added to the test world's game mode
+entity (`MCFTestworld_Layers/default.layer`, where the MCF game-mode components
+actually live — *not* `Prefabs/Systems/Milsim.et`, which this scenario never
+loads), and `MCF_Probe_MissingAction` added to the phone prefab's
+`ActionsManagerComponent`. One dedicated server run with all six addons:
+
+```
+WORLD (E): Unknown class 'MCF_Probe_MissingComponent' at offset 1832(0x728)
+WORLD (E): Unknown class 'MCF_Probe_MissingAction'    at offset 6872(0x1ad8)
+DEFAULT  : Entered online game state.
+SCRIPT   : [MCF] GameMode start -- resetting per-mission state
+SCRIPT   : [MCF] intel action registered on 'Mobile phone'
+```
+
+One line each, nothing else, everything else intact. **A user action entry
+behaves exactly like a component entry** — the case STRUCTURE §9 listed as
+unobserved, and the one `Character_Base` depends on six times over. Both probes
+were reverted afterwards.
+
+**A free measurement from a failed run.** Started with `-addons MCF` (Core
+alone), the eleven `MenuPreset` entries whose layouts live in modules each cost
+one `RESOURCES (E)` and the remaining presets loaded normally — the manifest
+pattern working exactly as designed, on a server, with the modules genuinely
+absent. Core alone compiles `5686x files; 11058x classes`; all six addons give
+`5774x; 11252x`.
+
+**Packing to `.pak` could not be measured, and the reason is the launcher.**
+`-buildData` never runs: Steam's wrapper re-emits the command line and drops the
+positional output-directory argument.
+
+```
+CLI Params: -wbModule ResourceManager -buildData PC -wbProjectPath G:\MCF\addons\MCF_Dev\addon.gproj
+```
+
+The out dir is gone, so the Workbench opens its GUI and writes nothing.
+`wb_build_data` (both run and start/poll), `mod build`, and a hand-rolled
+`Start-Process` with either slash direction all end the same way. It is the same
+wrapper behaviour that makes `wb_validate_scripts` fall back to a stub session.
+The remaining route is the Workbench GUI, which needs a human at the machine.
+
+**Two hours of the evening went to running the server at all**, so the exact
+invocation is in HANDOVER step 4. The two traps: the working directory has to be
+the server install (one of its addon dirs is the relative `./addons`, which is
+where the base game data addon `58D0FB3206B6F859` lives — that GUID is
+`ArmaReforger.gproj`, not a mod and not the MCP tool, and "Game addon ... not
+found" reads exactly like a broken MCF dependency); and `-addons` has to list
+every addon the scenario needs, because `MCFTestworld.conf` lives in MCF_Dev.
+
 ## MAJOR UPDATE (2026-09-09, later session): EOnInit never fired -- framework-wide
 
 **This supersedes the "What now runs automatically" list below. Until this fix,
