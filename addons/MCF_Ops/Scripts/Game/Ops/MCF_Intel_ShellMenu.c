@@ -477,6 +477,24 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		manager.SetPreviewItemFromPrefab(m_Geometry.GetModelWidget(), prefab);
 		m_Geometry.ShowFallbackBody(false);
 
+		// WHAT THE PREVIEW WORLD ACTUALLY BUILT. The widget draws black when it
+		// has nothing to draw, which looks exactly like a device whose screen
+		// is simply too big -- and telling those two apart by eye cost several
+		// rounds. The preview manager keeps its own entity per prefab, so ask
+		// it: no entity means the prefab never built, and empty bounds mean it
+		// built without geometry the camera can frame.
+		IEntity previewed = manager.ResolvePreviewEntityForPrefab(prefab);
+		if (!previewed)
+		{
+			MCF_Core_Log.Warn("the preview manager built no entity for " + prefab + " -- nothing will be drawn behind the screen");
+		}
+		else
+		{
+			vector mins, maxs;
+			previewed.GetBounds(mins, maxs);
+			MCF_Core_Log.Debug("preview entity bounds " + mins.ToString() + " .. " + maxs.ToString() + " for " + prefab);
+		}
+
 		// Not here: a widget has no screen size until the layout has been
 		// through a frame, and asking during OnMenuOpen returns 0x0.
 		m_iFitFrame = 0;
