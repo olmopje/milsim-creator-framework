@@ -76,9 +76,9 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
 }
 $grp GenericEntity : "{6A1C4F0B39D30100}Prefabs/MCF_Devices_Phone.et" {
  MCF_PhoneTest {
-  coords 1840 19.2 1838
+  coords 1390.281 39.919 2231.357
  }
  MCF_PhoneTest {
-  coords 1840 19.2 1838
+  coords 1390.98 39.919 2231.543
  }
 }

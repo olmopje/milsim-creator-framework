@@ -151,6 +151,21 @@ runtime**, not merely at compile time. No `Wrong GUID/name`, no
 Not exercised: an actual shout (only the key binding), and the restrain/escort
 chain.
 
+### The devices module — functional 2026-09-10
+
+Break-in and intel presentation both run in a live session. See
+`docs/architecture/DEVICES.md` for the design and the open list.
+
+- **Presentation moved out of MCF_Devices into MCF_Ops.** A letter that looks
+  like paper has nothing to do with hacking. `MCF_Intel_ShellMenu` draws three
+  skins — paper, notepad, phone — chosen by the object's own `MCF_EIntelView`.
+  MCF_Devices keeps the lock and the games, nothing else.
+- **Three break-in games**, and the seed decides which: keypad, signal lock,
+  port table. Nothing about the puzzle travels except the seed, so a fourth
+  game touches three places and none of them is the wire format.
+- Confirmed working, not polished. Nobody has tuned the difficulty curve, and
+  the smartphone and laptop models are still not imported.
+
 ### Next, in order
 
 1. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
@@ -282,9 +297,22 @@ are engine-raised only, which is why the shout system asks each AI directly.
 **Characters cannot be physically coupled.** `Character_Base` lists itself under
 "Forbidden linking"; carry mods work only because their subject is unconscious.
 
-**Enforce Script has no ternary and no closures**, `reference` is a reserved
-word, `ToUpper()` mutates in place and returns an int, and a ScriptComponent
-cannot declare a bare constructor.
+**Enforce Script has no ternary and no closures**, `reference` and `out` are
+reserved words — `out` used as a local name is a "Broken expression (missing
+';'?)" with no hint why — `ToUpper()` mutates in place and returns an int, and a
+ScriptComponent cannot declare a bare constructor.
+
+**A script method cannot take a `func` parameter.** "func arguments are not
+supported in script methods", so a helper cannot be handed a callback to bind.
+Bind several buttons to one handler and tell them apart by the component the
+click carries.
+
+**`Math.RandomInt` breaks down on a large range.** `Math.RandomInt(1, 0x7FFFFFFE)`
+returned, on four consecutive calls, `-1`, `65535`, `1` and `65536` — negative,
+clustered on powers of two, and outside the lower bound it was given. Keep each
+draw well under ~30 000 and mix several together if you need a wide value.
+Measured 2026-09-10, and worth remembering because the symptom was nowhere near
+the cause: it looked like a puzzle picker that always picked the same puzzle.
 
 **Escape stops the play session in the Workbench.** Every MCF screen needs a
 visible, always-enabled close button.
