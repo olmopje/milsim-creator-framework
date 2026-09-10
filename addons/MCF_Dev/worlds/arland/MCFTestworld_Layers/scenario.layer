@@ -15,9 +15,19 @@ GenericEntity : "{6A1C4F0B39D2D020}Prefabs/MCF_Intel_Notebook.et" {
  coords 1390.166 39.919 2231.748
  angles 0 160.473 0
 }
-GenericEntity : "{6A1C4F0B39D30100}Prefabs/MCF_Devices_Phone.et" {
- coords 1390.611 39.936 2231.451
- angles 0 0 -178.764
+$grp GenericEntity : "{6A1C4F0B39D30100}Prefabs/MCF_Devices_Phone.et" {
+ {
+  coords 1390.611 39.936 2231.451
+  angles 0 0 -178.764
+ }
+ MCF_PhoneTest {
+  coords 1390.98 39.924 2231.543
+  angles 0 0 -177.661
+ }
+ MCF_PhoneTest {
+  coords 1390.281 39.925 2231.357
+  angles 0 0 -179.844
+ }
 }
 GenericEntity MCF_SpottedProbe : "{6C5FE2CCB6B45596}Prefabs/MCF_Obj_SpottedByPlayer.et" {
  coords 1370.23 39 2229.099

@@ -49,7 +49,7 @@ class MCF_Ops_GameModeComponent : SCR_BaseGameModeComponent
 		events.GetInvoker(MCF_Core_GameModeComponent.EVENT_FACTION_CHANGED).Insert(OnCoreFactionChanged);
 
 		MCF_Core_ValidationRegistry registry = MCF_Core_ValidationRegistry.GetInstance();
-		registry.RegisterConsumer(MCF_Core_GameModeComponent.EVENT_STORE_READY, "MCF_Ops_GameModeComponent (load the task and intel stores)");
+		registry.RegisterConsumer(MCF_Core_GameModeComponent.EVENT_STORE_READY, "MCF_Ops_GameModeComponent (load the task, intel and device stores)");
 		registry.RegisterConsumer(MCF_Core_GameModeComponent.EVENT_PLAYER_REGISTERED, "MCF_Ops_GameModeComponent (send a joining player their board)");
 		registry.RegisterConsumer(MCF_Core_GameModeComponent.EVENT_FACTION_CHANGED, "MCF_Ops_GameModeComponent (re-send a player's board after they pick a side)");
 	}
@@ -71,6 +71,12 @@ class MCF_Ops_GameModeComponent : SCR_BaseGameModeComponent
 
 		MCF_Task_Store.GetInstance().Load();
 		MCF_Intel_Store.GetInstance().Load();
+
+		// Device profiles a Game Master wrote in an earlier session. Loaded
+		// here rather than lazily because a device read before this point would
+		// find its profile missing and quietly fall back to its own entries --
+		// a phone with the wrong contents and no error anywhere.
+		MCF_Device_Library.GetInstance().LoadRuntime();
 
 		if (m_bCreateSampleTask)
 			CreateSampleTasks();

@@ -72,16 +72,16 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! The apps that actually have something in them, in enum order. An empty
 	//! app is not drawn at all: a phone with a Photos icon that opens on
 	//! nothing is worse than a phone with no Photos icon.
-	protected ref array<int> m_aApps = {};
+	protected ref array<MCF_Device_App> m_aApps = {};
 	protected ref array<SCR_ButtonTextComponent> m_aAppButtons = {};
 
 	//! The app name sits UNDER its tile, the way it does on a phone, so it is
 	//! its own widget rather than text inside the button.
 	protected ref array<TextWidget> m_aAppLabels = {};
 
-	protected int m_iOpenApp = -1;
+	protected MCF_Device_App m_OpenApp;
 	protected int m_iOpenEntry = -1;
-	protected ref array<MCF_Intel_Entry> m_aVisible = {};
+	protected ref array<ref MCF_Device_Item> m_aVisible = {};
 	protected ref array<SCR_ButtonTextComponent> m_aRowButtons = {};
 
 	protected Widget m_wListScroll;
@@ -353,7 +353,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	{
 		m_bOnHome = true;
 		m_bOnList = false;
-		m_iOpenApp = -1;
+		m_OpenApp = null;
 		m_iOpenEntry = -1;
 
 		SetScreens(true, false, false);
@@ -373,7 +373,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_aAppLabels[i].SetVisible(used);
 
 			if (used)
-				m_aAppLabels[i].SetText(m_Content.AppLabel(m_aApps[i]));
+				m_aAppLabels[i].SetText(m_aApps[i].ResolveLabel());
 		}
 
 		ShowClock(true);
@@ -396,11 +396,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	// ---------------------------------------------------------- the list
 
-	protected void ShowList(int app)
+	protected void ShowList(MCF_Device_App app)
 	{
 		m_bOnHome = false;
 		m_bOnList = true;
-		m_iOpenApp = app;
+		m_OpenApp = app;
 		m_iOpenEntry = -1;
 
 		SetScreens(false, true, false);
@@ -415,13 +415,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// screen.
 		m_Content.GetItems(app, m_aVisible);
 
-		foreach (MCF_Intel_Entry entry : m_aVisible)
+		foreach (MCF_Device_Item entry : m_aVisible)
 		{
 			AddRow(entry);
 		}
 
 		if (m_wDeviceName)
-			m_wDeviceName.SetText(m_Content.AppLabel(app));
+			m_wDeviceName.SetText(app.ResolveLabel());
 
 		if (m_ButtonBack)
 			m_ButtonBack.SetText("HOME");
@@ -429,12 +429,12 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		UpdateLogButton();
 
 		if (m_aVisible.IsEmpty())
-			SetHint(m_Content.EmptyText(app));
+			SetHint(app.ResolveEmptyText());
 		else
 			SetHint(m_aVisible.Count().ToString() + " item(s)");
 	}
 
-	protected void AddRow(notnull MCF_Intel_Entry entry)
+	protected void AddRow(notnull MCF_Device_Item entry)
 	{
 		if (!m_wEntryList)
 			return;
@@ -472,7 +472,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		SetScreens(false, false, true);
 
 		m_iOpenEntry = index;
-		MCF_Intel_Entry entry = m_aVisible[index];
+		MCF_Device_Item entry = m_aVisible[index];
 
 		if (m_wReadHeading)
 			m_wReadHeading.SetText(entry.m_sHeading);
@@ -542,7 +542,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			return;
 		}
 
-		ShowList(m_iOpenApp);
+		ShowList(m_OpenApp);
 	}
 
 	//! Enters the open message on the board. Only ever the one being read --
@@ -557,7 +557,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (!controller)
 			return;
 
-		MCF_Intel_Entry entry = m_aVisible[m_iOpenEntry];
+		MCF_Device_Item entry = m_aVisible[m_iOpenEntry];
 		controller.MCF_RequestLogIntel(m_Carrier.GetDeviceName(), entry.m_sHeading, entry.m_sTimestamp, entry.m_sBody);
 	}
 

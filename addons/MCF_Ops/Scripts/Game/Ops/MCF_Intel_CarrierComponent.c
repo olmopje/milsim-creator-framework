@@ -39,6 +39,19 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	[Attribute(defvalue: "Read", uiwidget: UIWidgets.EditBox, desc: "Verb on the interaction prompt: Read, Examine, Search, Study.")]
 	protected string m_sActionVerb;
 
+	//! Which authored profile this device carries, if any.
+	//!
+	//! WHY AN ID AND NOT THE CONTENT ITSELF. Content on the prefab is content
+	//! on every object made from that prefab, and a Game Master cannot type
+	//! into a prefab at runtime anyway -- an editor attribute carries twelve
+	//! bytes. So the content lives in MCF_Device_Library, authored in one place,
+	//! and the object says which of it to show.
+	//!
+	//! Empty means "use my own entries", which is what every prefab written
+	//! before profiles existed does, and it keeps doing it.
+	[Attribute(defvalue: "", uiwidget: UIWidgets.EditBox, desc: "Id of the device profile this carries. Empty uses the entries below instead.")]
+	protected string m_sProfileId;
+
 	[Attribute(desc: "What this object contains. A letter has one entry; a phone has one per message.")]
 	protected ref array<ref MCF_Intel_Entry> m_aEntries;
 
@@ -97,6 +110,12 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	vector GetPreviewSize()
 	{
 		return m_vPreviewSize;
+	}
+
+	//! Empty means "read my own entries".
+	string GetProfileId()
+	{
+		return m_sProfileId;
 	}
 
 	string GetActionVerb()

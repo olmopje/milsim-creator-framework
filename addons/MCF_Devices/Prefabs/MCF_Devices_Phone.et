@@ -94,6 +94,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
   MCF_Intel_CarrierComponent "{6A1C4F0B39D30106}" {
    m_sDeviceName "Mobile phone"
    m_eView PHONE
+   m_sProfileId "smuggler_phone"
    m_sPreviewPrefab "{6A1C4F0B39D30100}Prefabs/MCF_Devices_Phone.et"
    m_sActionVerb "Search"
    m_aEntries {
