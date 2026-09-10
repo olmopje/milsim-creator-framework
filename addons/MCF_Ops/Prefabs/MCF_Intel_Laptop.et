@@ -7,15 +7,15 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
      Name "Laptop"
     }
     ItemPhysAttributes ItemPhysicalAttributes PhysicalAttributes {
-     Weight 2.2
+     Weight 0.15
      SizeSetupStrategy Manual
      // INVENTORY CELLS, NOT CENTIMETRES. These are grid squares: vanilla's
      // medical kit is 2 2 2 with a volume of 2, which is a 2x2 item -- the same
      // footprint m_Size already declares. Written as real centimetres,
      // 36 25 3 with a volume of 2700, this was larger than any container a
      // player carries and pick-up was refused with nothing said about why.
-     ItemDimensions 2 2 2
-     ItemVolume 2
+     ItemDimensions 1 1 1
+     ItemVolume 1
      DimensionScaler 1
     }
     // THE INVENTORY THUMBNAIL IS A LIVE RENDER, not an image file. Without
@@ -33,7 +33,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
       LodModel 1
      }
     }
-    m_Size SLOT_2x2
+    m_Size SLOT_1x1
     m_SlotType SLOT_LOADOUT_STORAGE
    }
   }
@@ -61,7 +61,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    Object "{45F5FEABF5F2BF90}Assets/Props/Intel/Laptop/Laptop_Body.xob"
   }
   RigidBody "{6A1C4F0B39D2D032}" {
-   Mass 2.2
+   Mass 0.15
    LinearDamping 0.5
    AngularDamping 0.5
    ModelGeometry 1
