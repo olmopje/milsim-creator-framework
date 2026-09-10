@@ -1,5 +1,5 @@
 MetaFileClass {
- Name "{2ABDDA9CF1BC2638}Assets/Props/Intel/Laptop/Data/Laptop_Leather_BCR.edds"
+ Name "{2ABDDA9CF1BC2638}Assets/Props/Intel/Laptop/Data/Laptop_Leather_NMO.edds"
  Configurations {
   PNGResourceClass PC : "{EAB5DE3219F9CBA8}Configs/System/ResourceTypes/PC/TextureColorMap.conf" {
   }

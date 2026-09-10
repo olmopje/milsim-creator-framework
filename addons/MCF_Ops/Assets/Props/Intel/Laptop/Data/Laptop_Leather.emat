@@ -1,6 +1,6 @@
 MatPBRBasic {
- Color 1 1 1 1
+ Color 0.035 0.033 0.031 1
  RoughnessScale 0.85
  MetalnessScale 0
- BCRMap "{2ABDDA9CF1BC2638}Assets/Props/Intel/Laptop/Data/Laptop_Leather_BCR.edds"
+ NMOMap "{2ABDDA9CF1BC2638}Assets/Props/Intel/Laptop/Data/Laptop_Leather_NMO.edds"
 }
