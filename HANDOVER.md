@@ -180,6 +180,55 @@ Break-in and intel presentation both run in a live session. See
    crash is a size problem, not a concept problem. `arms_back` was the clip the
    user picked. Preview in `anims/workspaces/player/player_main.aw`.
 
+### The mission data screen — working 2026-09-10
+
+Game Master, right-click the operations board, "Mission data". Shows every
+registered persistent set with a live count, clears them one at a time or all
+at once behind a two-click confirmation, and keeps named whole-store snapshots.
+Watched working: 16 keys cleared to 1 across four sets with the clients going to
+zero taskings without a restart, and a snapshot restored both before and after a
+server restart.
+
+To add a fifth kind of persisted data, call `MCF_Core_DataSets.Register` in the
+module that owns it and insert that module's reload into
+`MCF_Core_DataSets.GetOnReloaded()`. Nothing in Core needs to change.
+
+**`m_bEveryoneMayDoEverything` is still `true`, and this screen deletes.** It is
+the first thing in MCF that destroys data, and right now everyone may use it.
+
+### ANSWERED: MCF snapshots cannot be paired with the engine's own saves
+
+Asked on 2026-09-10, because "see all the save data in one place" is a fair
+thing to want. The entry point does not exist in 1.8.0.13:
+
+    ArmaReforgerScripted.GetSaveManager    Undefined function
+    SCR_SaveManagerCore                    Unknown type
+    SCR_SaveLoadComponent                  Unknown type
+    SCR_SaveWorkshopManager                Unknown type
+
+and fourteen further plausible renames -- SCR_SaveManager, SaveManager,
+SCR_GameSaveManager, SCR_SessionSaveManager, SCR_MissionSaveManager,
+SCR_SaveGameManager, SCR_SavesManager, SCR_SaveFileManager,
+SCR_ScenarioSaveManager, SCR_SaveLoadManager, SCR_PersistenceManager,
+SCR_SessionStorage, SCR_SaveManagerComponent, SCR_GameModeSaveManagerComponent
+-- are all absent too. `SCR_CreateNewSaveDialog` and `SCR_MissionHeader` DO
+exist, so saving has been renamed rather than removed, but the name is not
+guessable and the engine's own scripts are inside data.pak.
+
+Do not repeat this search from the published API documentation. That is
+generated from **1.1.0.42** and this machine runs **1.8.0.13**; every signature
+it gives for the save system is wrong. The fallback, if the overview is still
+wanted, is to list `$saves:` with `FileIO` -- read-only, no engine API, cannot
+break on a rename.
+
+**Technique worth keeping: the compiler is a type lookup.** A file declaring one
+variable per candidate type, in a method that is never called, costs one
+Workbench start and answers for all of them at once -- "Unknown type 'X'" names
+everything absent, and silence names everything present. Include one type you
+know exists as a control, so a round that reports everything missing can be told
+apart from a round where the probe itself was broken. This is far cheaper than
+one guess per restart, which is how the RestApi afternoon went.
+
 ## Environment quirks that will otherwise cost you an hour
 
 **A brand-new addon cannot be launched from the command line, and stage 1
