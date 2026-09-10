@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{02698BECACF79475}Assets/Props/Intel/Laptop/Data/LaptopLid_Leather.emat"
+ Configurations {
+  EMATResourceClass PC {
+  }
+  EMATResourceClass XBOX_ONE : PC {
+  }
+  EMATResourceClass XBOX_SERIES : PC {
+  }
+  EMATResourceClass PS4 : PC {
+  }
+  EMATResourceClass PS5 : PC {
+  }
+  EMATResourceClass HEADLESS : PC {
+  }
+ }
+}
