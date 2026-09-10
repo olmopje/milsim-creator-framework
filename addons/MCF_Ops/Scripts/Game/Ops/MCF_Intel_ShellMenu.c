@@ -42,6 +42,30 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_BUTTON_LOG = "ButtonLog";
 	protected static const string W_BUTTON_CLOSE = "ButtonClose";
 	protected static const string W_HINT = "Hint";
+	protected static const string W_APP_LABEL_PREFIX = "AppLabel";
+	protected static const string W_CLOCK_TIME = "ClockTime";
+	protected static const string W_CLOCK_DATE = "ClockDate";
+	protected static const string W_MODEL = "Model";
+	protected static const string W_BODY = "Body";
+	protected static const string W_SCREEN_AREA = "ScreenArea";
+
+	//! The phone's own proportions, and how much of its face is glass. Two
+	//! constants and a measurement are all it takes to put the controls on the
+	//! display at any resolution -- see FitScreenToModel.
+	protected static const float PHONE_ASPECT = 0.4698;
+	//! At 0.92 x 0.94 the glass covered the phone almost edge to edge, and what
+	//! was left of the body read as a glow around a panel rather than as a
+	//! phone. A visible bezel is what makes it look held rather than overlaid.
+	protected static const float GLASS_X = 0.86;
+	protected static const float GLASS_Y = 0.90;
+
+	//! How tall the preview box is, as a fraction of the screen.
+	protected static const float PHONE_SCREEN_HEIGHT = 0.95;
+
+	//! Half the model, in metres, from MCF_Devices_Phone.et's own dimensions:
+	//! 7.0 x 14.9 x 0.9 cm, lying flat, long axis forward.
+	protected static const float PHONE_HALF_X = 0.035;
+	protected static const float PHONE_HALF_Z = 0.0745;
 
 	protected static const int APP_SLOTS = 6;
 
@@ -64,6 +88,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected ref array<int> m_aApps = {};
 	protected ref array<SCR_ButtonTextComponent> m_aAppButtons = {};
 
+	//! The app name sits UNDER its tile, the way it does on a phone, so it is
+	//! its own widget rather than text inside the button.
+	protected ref array<TextWidget> m_aAppLabels = {};
+
 	protected int m_iOpenApp = -1;
 	protected int m_iOpenEntry = -1;
 	protected ref array<MCF_Intel_Entry> m_aVisible = {};
@@ -79,6 +107,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected TextWidget m_wReadHeading;
 	protected TextWidget m_wReadTimestamp;
 	protected TextWidget m_wHint;
+	protected TextWidget m_wClockTime;
+	protected TextWidget m_wClockDate;
 	protected SCR_ButtonTextComponent m_ButtonBack;
 	protected SCR_ButtonTextComponent m_ButtonLog;
 	protected SCR_ButtonTextComponent m_ButtonPrev;
@@ -91,6 +121,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! behaviour by which widgets it has.
 	protected bool m_bPageMode;
 	protected SCR_ButtonTextComponent m_ButtonClose;
+
+	protected ItemPreviewWidget m_wModel;
+	protected Widget m_wBody;
+	protected int m_iFitFrame;
 
 	//! Opens the skin this object's view calls for.
 	//! \return True if a skin took it; false means the caller should fall back
@@ -151,6 +185,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wReadHeading = TextWidget.Cast(root.FindAnyWidget(W_READ_HEADING));
 		m_wReadTimestamp = TextWidget.Cast(root.FindAnyWidget(W_READ_TIMESTAMP));
 		m_wHint = TextWidget.Cast(root.FindAnyWidget(W_HINT));
+		m_wClockTime = TextWidget.Cast(root.FindAnyWidget(W_CLOCK_TIME));
+		m_wClockDate = TextWidget.Cast(root.FindAnyWidget(W_CLOCK_DATE));
 
 		m_ButtonBack = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_BACK, root);
 		if (m_ButtonBack)
@@ -181,6 +217,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_ButtonClose.m_OnClicked.Insert(OnCloseClicked);
 
 		m_aAppButtons.Clear();
+		m_aAppLabels.Clear();
 		for (int i = 0; i < APP_SLOTS; i++)
 		{
 			SCR_ButtonTextComponent app = SCR_ButtonTextComponent.GetButtonText(W_APP_PREFIX + i.ToString(), root);
@@ -189,6 +226,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 			app.m_OnClicked.Insert(OnAppClicked);
 			m_aAppButtons.Insert(app);
+
+			// Inserted even when null, so a label always shares its tile's
+			// index and a missing widget cannot shift every name by one.
+			m_aAppLabels.Insert(TextWidget.Cast(root.FindAnyWidget(W_APP_LABEL_PREFIX + i.ToString())));
 		}
 
 		// The body text is created rather than laid out, so that a long
@@ -205,6 +246,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			MCF_Core_Log.Warn("device shell opened with nothing to read");
 			return;
 		}
+
+		ShowModel(root);
 
 		m_Carrier.GetEntries(m_aEntries);
 
@@ -237,6 +280,244 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		}
 
 		MCF_Core_Log.Debug("device shell showing '" + m_Carrier.GetDeviceName() + "' with " + m_aEntries.Count().ToString() + " entrie(s) across " + m_aApps.Count().ToString() + " app(s)");
+	}
+
+	//! Puts the object's own model behind the screen.
+	//!
+	//! This is the vanilla inventory preview: an ItemPreviewWidget rendered by
+	//! ItemPreviewManagerEntity, the same machinery that draws a rifle in the
+	//! inventory. Which means the thing on screen is the actual phone, lit and
+	//! shaded, and the controls sit on its glass rather than on a rectangle
+	//! that resembles glass.
+	//!
+	//! EVERY STEP CAN FAIL AND EACH ONE FALLS BACK TO THE DRAWN PANEL. No
+	//! prefab named, no world, no preview manager, no widget in this layout --
+	//! all of them mean "draw the flat body instead", which is a screen that
+	//! looks plainer than intended rather than a screen that is not there. The
+	//! same rule as the lock: degrade where the mission maker can see it.
+	protected void ShowModel(notnull Widget root)
+	{
+		m_wModel = ItemPreviewWidget.Cast(root.FindAnyWidget(W_MODEL));
+		m_wBody = root.FindAnyWidget(W_BODY);
+
+		if (m_wModel)
+			m_wModel.SetVisible(false);
+
+		if (m_wBody)
+			m_wBody.SetVisible(true);
+
+		if (!m_wModel || !m_Carrier)
+			return;
+
+		ResourceName prefab = m_Carrier.GetPreviewPrefab();
+		if (prefab.IsEmpty())
+			return;
+
+		ChimeraWorld world = ChimeraWorld.CastFrom(GetGame().GetWorld());
+		if (!world)
+			return;
+
+		ItemPreviewManagerEntity manager = world.GetItemPreviewManager();
+		if (!manager)
+		{
+			MCF_Core_Log.Warn("no ItemPreviewManager in this world -- the shell falls back to the drawn panel");
+			return;
+		}
+
+		manager.SetPreviewItemFromPrefab(m_wModel, prefab);
+
+		m_wModel.SetVisible(true);
+
+		// Not here: a widget has no screen size until the layout has been
+		// through a frame, and asking during OnMenuOpen returns 0x0.
+		m_iFitFrame = 0;
+
+		if (m_wBody)
+			m_wBody.SetVisible(false);
+	}
+
+	//! Sizes the preview box to the phone's own proportions, then puts the
+	//! glass on it.
+	//!
+	//! WHY THE BOX IS RESHAPED AND NOT JUST MEASURED. The first attempt kept a
+	//! box of whatever shape the layout gave it and multiplied its height by a
+	//! measured "how much of it the model fills" constant. That constant is not
+	//! constant: widening the box from 280 to 600 pixels, at the same height,
+	//! made the rendered phone SMALLER -- 519 pixels tall became 440. Whatever
+	//! the preview camera is fitting, it is not the box's height alone, so any
+	//! number measured in one box shape is wrong in another.
+	//!
+	//! Giving the box the model's own 7.0 x 14.9 proportions removes the
+	//! variable instead of trying to calibrate it: there is only one shape the
+	//! box is ever in, so there is only one thing to tune -- the camera
+	//! distance on the prefab, until the phone fills it.
+	//!
+	//! Units: GetScreenSize and GetWidth report physical pixels while FrameSlot
+	//! works in the reference resolution, so DPIUnscale is what converts.
+	protected void FitScreenToModel(notnull Widget root)
+	{
+		if (!m_wModel)
+			return;
+
+		Widget screenArea = root.FindAnyWidget(W_SCREEN_AREA);
+		if (!screenArea)
+			return;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return;
+
+		float screenHeight = workspace.DPIUnscale(workspace.GetHeight());
+		if (screenHeight <= 0)
+			return;
+
+		float boxH = screenHeight * PHONE_SCREEN_HEIGHT;
+		float boxW = boxH * PHONE_ASPECT;
+
+		PlaceCentred(m_wModel, boxW, boxH);
+		PlaceCentred(screenArea, boxW * GLASS_X, boxH * GLASS_Y);
+	}
+
+	//! Asks the preview where the phone actually ended up, and puts the glass
+	//! there.
+	//!
+	//! WHY THIS EXISTS AT ALL. Everything above still assumes the model fills
+	//! the box it is given, and it does not -- at the camera distance the
+	//! prefab asks for it fills about three quarters of it. That could be tuned
+	//! by hand, but it would have to be retuned for every new model and after
+	//! every change to the camera, and each round of that costs a restart.
+	//!
+	//! TryGetItemNodePositionInWidgetSpace answers the question directly: give
+	//! it a point on the model and it returns where that point landed in the
+	//! widget. Four corners of the model's own bounding box are enough to know
+	//! exactly how big the phone is on screen, whatever the camera is doing.
+	//!
+	//! \return True if the preview answered and the glass was placed from it.
+	protected bool FitScreenToPhone(notnull Widget root)
+	{
+		Widget screenArea = root.FindAnyWidget(W_SCREEN_AREA);
+		if (!m_wModel || !screenArea)
+			return false;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return false;
+
+		float left, right, top, bottom;
+		if (!NodePoint(-PHONE_HALF_X, 0, left, top))
+			return false;
+
+		float unusedY;
+		if (!NodePoint(PHONE_HALF_X, 0, right, unusedY))
+			return false;
+
+		float unusedX;
+		if (!NodePoint(0, PHONE_HALF_Z, unusedX, top))
+			return false;
+
+		if (!NodePoint(0, -PHONE_HALF_Z, unusedX, bottom))
+			return false;
+
+		float phoneW = right - left;
+		float phoneH = bottom - top;
+
+		// Signs depend on which way the camera looks at it; only the extent
+		// matters here.
+		if (phoneW < 0)
+			phoneW = -phoneW;
+		if (phoneH < 0)
+			phoneH = -phoneH;
+
+		float boxW, boxH;
+		m_wModel.GetScreenSize(boxW, boxH);
+
+		MCF_Core_Log.Debug("phone in widget space: " + phoneW.ToString() + "x" + phoneH.ToString()
+			+ " against a box of " + boxW.ToString() + "x" + boxH.ToString());
+
+		// A preview that has not drawn yet answers with a degenerate box.
+		if (phoneW < 8 || phoneH < 8)
+			return false;
+
+		// THE ANSWER IS NOT ALWAYS IN THE SAME UNITS AS THE WIDGET, and that is
+		// what this guard is for. Measured on the same build, the same phone
+		// came back as 399.7 x 850.6 both in a 1101 x 615 Workbench viewport
+		// and at 1920 x 1080 fullscreen -- an unchanging number, so it is in
+		// the reference resolution, not in the widget's own. Fullscreen those
+		// coincide and the placement is exact. In a viewport they do not, and
+		// the phone is reported taller than the box that contains it, which
+		// cannot be true.
+		//
+		// So: believe the answer only when it fits inside the box. Otherwise
+		// keep the box-relative placement, which is a little generous but stays
+		// on the screen. Fullscreen -- the case that ships -- gets the exact
+		// one; the Workbench viewport gets the approximation.
+		if (boxH > 0 && phoneH > boxH * 1.05)
+		{
+			MCF_Core_Log.Debug("preview answered in a different coordinate space than the widget -- keeping the box-relative fit");
+			return false;
+		}
+
+		PlaceCentred(screenArea, phoneW * GLASS_X, phoneH * GLASS_Y);
+		return true;
+	}
+
+	//! One point on the model, in the model's own space, as a position in the
+	//! widget. The transform is the identity with the point in its last row --
+	//! Enfusion passes transforms as four vectors and the fourth is the
+	//! translation.
+	protected bool NodePoint(float x, float z, out float outX, out float outY)
+	{
+		vector offset[4];
+		Math3D.MatrixIdentity4(offset);
+		offset[3] = Vector(x, 0, z);
+
+		vector inWidget;
+		if (!m_wModel.TryGetItemNodePositionInWidgetSpace(-1, offset, inWidget))
+			return false;
+
+		outX = inWidget[0];
+		outY = inWidget[1];
+		return true;
+	}
+
+	//! Pins a widget to the middle of the screen at an exact size.
+	//!
+	//! The anchors have to collapse to a point first. A slot whose anchors are
+	//! stretched takes its size from them and ignores SetSize entirely, which
+	//! fails silently and looks like the call did nothing.
+	protected void PlaceCentred(notnull Widget widget, float width, float height)
+	{
+		FrameSlot.SetAnchor(widget, 0.5, 0.5);
+		FrameSlot.SetSize(widget, width, height);
+		FrameSlot.SetPos(widget, -width * 0.5, -height * 0.5);
+	}
+
+	//! Prints what the screen is actually made of, in real pixels.
+	//!
+	//! WHY THIS IS WORTH KEEPING. Lining the controls up with the rendered
+	//! phone was done for three rounds by measuring screenshots, and it failed
+	//! every time for the same reason: a screenshot arrives cropped and scaled
+	//! by an unknown amount, so a size read off it is a size in unknown units.
+	//! Two numbers from the game itself settle it -- and because ScreenArea's
+	//! size is logged too, any later screenshot can be scaled correctly by
+	//! comparing the panel in the picture against the panel in this line.
+	protected void LogGeometry(notnull Widget root)
+	{
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return;
+
+		float modelW, modelH, screenW, screenH, modelX, modelY;
+		m_wModel.GetScreenSize(modelW, modelH);
+		m_wModel.GetScreenPos(modelX, modelY);
+
+		Widget screenArea = root.FindAnyWidget("ScreenArea");
+		if (screenArea)
+			screenArea.GetScreenSize(screenW, screenH);
+
+		MCF_Core_Log.Debug("shell geometry: workspace " + workspace.GetWidth().ToString() + "x" + workspace.GetHeight().ToString()
+			+ " | Model " + modelW.ToString() + "x" + modelH.ToString() + " at " + modelX.ToString() + "," + modelY.ToString()
+			+ " | ScreenArea " + screenW.ToString() + "x" + screenH.ToString());
 	}
 
 	// ----------------------------------------------------------- the apps
@@ -273,9 +554,20 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			bool used = i < m_aApps.Count();
 			button.GetRootWidget().SetVisible(used);
 
+			// The tile stays blank. The name goes underneath it, which is what
+			// separates a home screen from a list of grey buttons.
+			button.SetText("");
+
+			if (i >= m_aAppLabels.Count() || !m_aAppLabels[i])
+				continue;
+
+			m_aAppLabels[i].SetVisible(used);
+
 			if (used)
-				button.SetText(AppLabel(m_aApps[i]));
+				m_aAppLabels[i].SetText(AppLabel(m_aApps[i]));
 		}
+
+		ShowClock(true);
 
 		if (m_ButtonBack)
 			m_ButtonBack.SetText("LOCK");
@@ -403,6 +695,16 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			button.GetRootWidget().SetVisible(home);
 		}
 
+		foreach (TextWidget label : m_aAppLabels)
+		{
+			if (label)
+				label.SetVisible(home);
+		}
+
+		// A phone replaces its home screen rather than scrolling past it, so
+		// the clock goes away with the tiles.
+		ShowClock(home);
+
 		if (m_wListScroll)
 			m_wListScroll.SetVisible(list);
 
@@ -523,6 +825,35 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		Close();
 	}
 
+	override void OnMenuUpdate(float tDelta)
+	{
+		super.OnMenuUpdate(tDelta);
+
+		if (m_iFitFrame > 2)
+			return;
+
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		m_iFitFrame++;
+
+		// Frame one places the widgets. The measurement waits, because
+		// GetScreenSize reports what the last layout pass produced -- asking in
+		// the same frame reports the size from before the change, which read
+		// as "the call did nothing" for two rounds.
+		if (m_iFitFrame == 1)
+			FitScreenToModel(root);
+		else if (m_iFitFrame == 3)
+		{
+			// The preview has drawn by now, so it can be asked where the phone
+			// really is. If it cannot answer, the box-relative guess above
+			// stays, which is wrong by a known amount rather than broken.
+			FitScreenToPhone(root);
+			LogGeometry(root);
+		}
+	}
+
 	override void OnMenuFocusGained()
 	{
 		super.OnMenuFocusGained();
@@ -557,12 +888,76 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_wHint.SetText(text);
 	}
 
+	//! The clock, from the mission's own time rather than the player's.
+	protected void ShowClock(bool visible)
+	{
+		if (m_wClockTime)
+		{
+			m_wClockTime.SetVisible(visible);
+			m_wClockTime.SetText(ClockText());
+		}
+
+		if (m_wClockDate)
+		{
+			m_wClockDate.SetVisible(visible);
+			m_wClockDate.SetText(DateText());
+		}
+
+		// The device name and the clock want the same line, and only one of
+		// them is worth reading at a time: the name once you are inside an app,
+		// the clock on the home screen.
+		if (m_wDeviceName)
+			m_wDeviceName.SetVisible(!visible);
+	}
+
+	protected string ClockText()
+	{
+		TimeAndWeatherManagerEntity time = WorldTime();
+		if (!time)
+			return "";
+
+		TimeContainer now = time.GetTime();
+		if (!now)
+			return "";
+
+		return Pad(now.m_iHours) + ":" + Pad(now.m_iMinutes);
+	}
+
+	protected string DateText()
+	{
+		TimeAndWeatherManagerEntity time = WorldTime();
+		if (!time)
+			return "";
+
+		int year, month, day;
+		time.GetDate(year, month, day);
+
+		return time.GetWeekDayString() + "  " + day.ToString() + "/" + Pad(month);
+	}
+
+	protected TimeAndWeatherManagerEntity WorldTime()
+	{
+		ChimeraWorld world = ChimeraWorld.CastFrom(GetGame().GetWorld());
+		if (!world)
+			return null;
+
+		return world.GetTimeAndWeatherManager();
+	}
+
+	protected string Pad(int value)
+	{
+		if (value < 10)
+			return "0" + value.ToString();
+
+		return value.ToString();
+	}
+
 	protected string StatusLine()
 	{
 		if (m_eView == MCF_EIntelView.LAPTOP)
-			return "MCF                    AC POWER";
+			return "MCF          AC POWER";
 
-		return "MCF                    100%";
+		return "MCF          LTE          100%";
 	}
 
 	protected string AppLabel(int app)

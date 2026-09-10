@@ -42,6 +42,19 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	[Attribute(desc: "What this object contains. A letter has one entry; a phone has one per message.")]
 	protected ref array<ref MCF_Intel_Entry> m_aEntries;
 
+	//! The model to render behind the screen, if this object wants to be drawn
+	//! as itself rather than as a flat panel.
+	//!
+	//! WHY THE OBJECT NAMES ITS OWN MODEL, rather than the shell knowing which
+	//! model goes with which view. A phone lives in MCF_Devices and the shell
+	//! lives here, and Ops must not learn what is in Devices -- that is the
+	//! whole reason presentation moved here in the first place. So the prefab
+	//! points at its own model and the shell renders whatever it is handed.
+	//! Leave it empty and the shell falls back to the drawn panel, which is
+	//! also what happens if the preview system is unavailable.
+	[Attribute(defvalue: "", uiwidget: UIWidgets.ResourceNamePicker, params: "et", desc: "Prefab whose model is rendered behind the screen. Empty draws a plain panel instead.")]
+	protected ResourceName m_sPreviewPrefab;
+
 	//! The runtime override, empty until a Game Master edits this object.
 	//!
 	//! WHY A REPLICATED PROPERTY AND NOT AN RPC: an edit sent as a broadcast
@@ -61,6 +74,12 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	MCF_EIntelView GetView()
 	{
 		return m_eView;
+	}
+
+	//! Empty means "draw the flat panel". Never assume a model is there.
+	ResourceName GetPreviewPrefab()
+	{
+		return m_sPreviewPrefab;
 	}
 
 	string GetActionVerb()

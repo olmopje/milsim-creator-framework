@@ -73,12 +73,24 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
   }
  }
  coords 1891.659 11.326 1821.161
+ {
+  SCR_FactionManager {
+   ID "56E685E92F1B7E7A"
+   Factions {
+    SCR_Faction "{56DEAC40D2DBC8B1}" {
+     m_bIsPlayable 1
+    }
+   }
+  }
+ }
 }
 $grp GenericEntity : "{6A1C4F0B39D30100}Prefabs/MCF_Devices_Phone.et" {
  MCF_PhoneTest {
-  coords 1390.281 39.919 2231.357
+  coords 1390.281 39.925 2231.357
+  angles 0 0 -179.844
  }
  MCF_PhoneTest {
-  coords 1390.98 39.919 2231.543
+  coords 1390.98 39.924 2231.543
+  angles 0 0 -177.661
  }
 }
