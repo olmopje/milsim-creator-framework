@@ -32,3 +32,8 @@ enfusion-workbench-mcp/
 # addresses and an admin password, and the profile folder is pure runtime
 # output (logs, saves). Neither belongs in the repository.
 server/
+
+# Local working copy of the GitHub wiki, which is its own repository.
+# Cloned here so the wiki can be edited alongside the code; it is never part
+# of this repository's history.
+.wiki/
