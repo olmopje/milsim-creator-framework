@@ -243,6 +243,24 @@ with `game_duplicate`; never hand-write one. But `+{ }` inside a config override
 Measured 2026-09-10. A `MenuPreset` naming a missing script class is silent;
 one naming a missing layout GUID logs a single `RESOURCES (E)`.
 
+**Enfusion materials take two PACKED textures, not separate maps.**
+`MatPBRBasic` wants `BCRMap` (base colour RGB, roughness in alpha) and `NMOMap`
+(normal X/Y in R/G, metalness in B, occlusion in A). An NMO has no blue Z
+channel, so it previews olive-green — that is correct. Name files `_BCR` and
+`_NMO` and the importer picks the right preset by itself, but it leaves the
+`.emat` empty for you to fill.
+
+**An import can write the `.meta` and not the resource.** One texture in eight
+came out as `metafile without corresponding resource`. Re-importing produced it
+with the same GUID. **Check the file exists, not just its meta.** The FBX
+importer also assigns `{536BF67B2052B869}material/metal.gamemat` as the
+collision surface, which does not resolve — delete the `SurfaceProperties`
+block from the `.xob.meta`.
+
+**A model needs one mesh named `LOD0` and collision named `UTM_<x>`**, at
+real-world scale with the origin at the base. Both are confirmed to survive the
+import. Store models arrive at absurd scales — check before trusting one.
+
 **`[BaseContainerProps()]` on every class that appears in a `.conf`**, or the
 parser silently skips them and the config loads empty with no error.
 

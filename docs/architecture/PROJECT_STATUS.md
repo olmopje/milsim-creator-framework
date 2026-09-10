@@ -1784,3 +1784,89 @@ toolbar icon, one per `Mode_Edit.layout` creation, nothing to do with MCF.
 
 Not exercised in this session: an actual shout (only the key binding was
 observed), and the restrain/escort chain.
+
+
+## The asset pipeline, learned the hard way (2026-09-10)
+
+Getting the first two custom models into the game. Both intel prefabs had been
+sharing one vanilla notebook model; they now have their own.
+
+### What the FBX import needs from the model
+
+Confirmed working, straight out of a headless Blender export:
+
+- **One mesh named `LOD0`.** The importer wrote `MeshParams { MeshParam LOD0 }`.
+- **Collision named `UTM_<something>`.** The importer wrote
+  `GeometryParams { GeometryParam UTM_Notepad { Mass 0 Margin 0 } }`. This
+  matters: both intel prefabs use `RigidBody { ModelGeometry 1 }`, so the
+  physics shape comes from the model. No `UTM_` mesh, no collision.
+- **Real-world scale, Z up, origin at the base.** Store models cannot be
+  trusted here — of four, one arrived at 75 × 115 cm and one at 3.6 cm.
+
+### Materials are packed, not separate maps
+
+`MatPBRBasic` takes two textures, not four or five:
+
+```
+MatPBRBasic {
+ BCRMap "{GUID}..._BCR.edds"
+ NMOMap "{GUID}..._NMO.edds"
+}
+```
+
+- **BCR** — base colour in RGB, **roughness in alpha**.
+- **NMO** — **normal X and Y in R and G, metalness in B, occlusion in A.**
+  There is no blue Z channel, so an NMO preview looks olive-green rather than
+  lavender. That is correct and not a sign of anything wrong.
+
+The importer picks the right preset from the suffix on its own:
+`TextureColorMap.conf` for `_BCR`, `TextureNType.conf` for `_NMO`. Name the
+files with those suffixes and it does the work.
+
+The importer creates the `.emat` empty (`MatPBRBasic { }`), so the two lines
+above have to be written by hand or set in the Material Editor.
+
+### Two things the importer got wrong
+
+**It assigns a surface material that does not resolve.** Every import wrote
+`SurfaceProperties { "{536BF67B2052B869}material/metal.gamemat" }` into the
+`.xob.meta`, and that GUID is not valid here — every world load produced
+
+```
+RESOURCES (E): Wrong GUID/name for resource @"{536BF67B2052B869}material/metal.gamemat" in property "UTM_Letter"
+RESOURCES (E): Failed to open
+```
+
+Removing the `SurfaceProperties` block entirely fixes it; the collision falls
+back to the engine default. (It also stopped paper behaving like metal.)
+
+**A texture import can write the `.meta` and not the `.edds`.** One of eight
+textures came out as an orphan:
+
+```
+RESOURCES (E): metafile without corresponding resource: 'Notepad_BCR.edds.meta'
+RESOURCES (E): Failed to load 'Assets/Props/Intel/Notepad/Data/Notepad_BCR.edds'
+```
+
+The PNG was fine — same format and size as the seven that worked. Deleting the
+orphan `.meta` and re-importing produced the `.edds` **with the same GUID**, so
+the `.emat` needed no change. This is the same silent-write failure that bites
+file edits in this repository. **After any import, check that the resource file
+exists, not just its meta.**
+
+### Cleaning a store model without Blender installed
+
+There is no Blender on this machine, only the Enfusion Blender Tools zip.
+`pip install bpy` gives Blender as a Python module and is enough for the whole
+job: join meshes, delete lights, apply transforms, reorient, rescale, move the
+origin, add a `UTM_` box, export FBX. One caveat: bpy 5.0's FBX importer throws
+`AttributeError: 'CyclesLightSettings' object has no attribute 'cast_shadow'`
+on any file containing a light — monkeypatch `import_fbx.blen_read_light`.
+
+**The trap that cost a pass:** meshes parented to empties. Deleting the empties
+first collapses the children onto each other, with no error anywhere — the
+envelope came out 3 cm wide instead of 6.2 and the laptop 17.8 instead of 22.2.
+Unparent with `CLEAR_KEEP_TRANSFORM` *before* removing the empties.
+
+Textures went 4096² -> 1024². A prop you hold in your hand does not need 4K;
+that alone took the set from 45.6 MB to 5.7 MB.
