@@ -598,3 +598,94 @@ something that can be picked up and stuffed in a backpack is not a
 configuration vanilla ever ships. As an intel prop placed on a table by the
 Game Master it is fine. If it also has to be carryable, expect the lid child to
 need attention on pick-up, and test that before assuming.
+
+## Enfusion facts learned building the laptop, all of them the hard way
+
+Every one of these cost at least one wrong turn. They are written down because
+none of them is discoverable from the published documentation, which is
+generated from 1.1.0.42 while this machine runs 1.8.0.13.
+
+### Blender's FBX exporter does not bake the axis change into the vertices
+
+It leaves vertex data in Blender's own axes and writes `Lcl Rotation -90 0 0`
+on every node, so the engine applies `(x,y,z) -> (x, z, -y)` at import. The
+consequence that costs time: **a local axis is not the same axis on both
+sides.** Blender local Z is what arrives as engine Y. Reasoning "local axes
+survive a global conversion" is wrong and produced four consecutive wrong
+answers here.
+
+The thing that finally worked is checked in as
+`art/Devices/Laptop/engine_preview.py`: it reads the exported .fbx back,
+converts the vertices the way Enfusion does, applies the prefab's child
+transform and a given door angle, and renders it. Use it for any orientation
+question. Rendering what the engine would build was right first time; every
+attempt to reason about it was not.
+
+### An opening lid needs no rig, no bones and no animation clip
+
+`DoorComponent` with `DoorAnimationType WholeEntity` rotates the entity bodily
+about its own **local Y**. The proof that it is local Y: a plain door's hinge
+is vertical and its entity is unrotated. So the leaf mesh is an ordinary .xob
+with its origin on the hinge, and there is no skeleton in it.
+
+A lid on a body is `HatchSet_Roof_01`: parent holds the frame mesh, the lid is
+a nested child entity carrying `DoorComponent`. Vanilla positions that child
+with `Hierarchy { PivotID "socket_..." }`, but an FBX null exported from
+Blender did **not** become a point the engine could look up by name -- the lid
+pivoted about the parent's origin instead. Explicit `coords` and `angles` on
+the child work and are easier to reason about.
+
+`angles` roll is the opposite sign from right-handed maths. Reforger is
+left-handed; expect to flip it.
+
+### A component GUID that does not match the inherited one ADDS a component
+
+It does not override it. Five GUIDs each one character off `Item_Base` gave the
+laptop two `InventoryItemComponent`s, two `ActionsManagerComponent`s and two
+`Hierarchy`s, and the editor died on a null inside
+`SCR_PlacingEditorComponent.CreateEntityServer`. Copy the GUIDs from a working
+sibling prefab; never type them from memory.
+
+### The layout parser: bad property survivable, bad slot class fatal
+
+An unknown **property** name is reported and skipped -- the device layouts
+carried eleven of them for weeks with no ill effect. An unknown or wrong
+**slot class** derails the parser: it misreads the next few lines as
+properties, and at widget-creation time everything downstream is attached to
+the wrong parent. In this case the rest of the tree landed in a
+`SizeLayoutWidget` that accepts one child, and every button in the layout
+vanished at once -- including five that had worked for weeks.
+
+`SizeToContent` inside an `AlignableSlot` was the culprit. If widgets go
+missing wholesale, map the `GUI (E) ... at offset N` values back to line
+numbers before assuming the newest change is at fault.
+
+### GetButtonText does not traverse hidden subtrees; FindAnyWidget does
+
+`SCR_ButtonTextComponent.GetButtonText` will not find a button inside a
+subtree the layout marks `"Is Visible" 0`. Ship such a panel visible and hide
+it from script after binding. `FindAnyWidget` has no such problem, which is
+why the photo overlay never showed this and the lock screen did.
+
+### Importing an FBX
+
+- The workbench reads `<name>.xob.meta`, **not** `<name>.fbx.meta`. A
+  hand-written `.fbx.meta` is silently ignored.
+- It assigns its own GUID on import and does not honour a pre-written one, so
+  wire prefabs **after** the import, not before.
+- A metafile without a corresponding `.xob` is treated as garbage and the FBX
+  is skipped entirely.
+- The sequence that works: a `.xob.meta` must exist (an empty one from
+  `wb_resources register` is enough), then the FBX has to be written again,
+  then the workbench window needs focus -- its watcher only rebuilds on focus.
+- **A material name shared with an already-imported mesh makes the second
+  import parse as empty**: no MeshParams, no GeometryParams, one line of log
+  and no reason. The lid shared `Laptop_Leather` with the body and would not
+  build until its materials were renamed.
+- `.emat` syntax, read out of the shipped materials rather than guessed:
+  `Color` is an RGBA tint that works with no map at all, alongside
+  `RoughnessScale`, `MetalnessScale`, `BCRMap` and `NMOMap`.
+- The importer injects `{536BF67B2052B869}material/metal.gamemat` into every
+  collider it builds. That GUID resolves to nothing in this install and costs
+  an error line per mesh per load. It comes back on every reimport; strip it
+  with a regex over the `.xob.meta` files.
