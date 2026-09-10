@@ -66,6 +66,7 @@ class MCF_Device_Layout
 	protected float m_fGlassY = PHONE_GLASS_Y;
 	protected float m_fGlassUp;
 	protected float m_fModelDown;
+	protected float m_fBoxAspect;
 
 	//! The shift actually applied to the preview widget, in reference units.
 	//! Kept because the glass is placed against that widget and has to move
@@ -160,6 +161,23 @@ class MCF_Device_Layout
 		}
 
 		return m_wModel != null;
+	}
+
+	//! Overrides the shape of the box the preview is drawn into.
+	//!
+	//! WHAT THIS IS FOR. The preview world draws its own sky -- a treeline,
+	//! from InventoryPreviewWorld.et's HDRi -- and SetClearColor does not
+	//! govern it. So the sky is removed by leaving it nowhere to be: the box is
+	//! cropped to the width of the device itself, and the device covers what is
+	//! left. Measured from the log rather than guessed: the screen quad came
+	//! back 1022.01 wide in a box 1026 tall, and the lid is 1.046 times the
+	//! LCD's width, so the laptop is 1.04 box-heights across.
+	//!
+	//! Zero means "use the model's own proportions", which is right for
+	//! anything that fills its box.
+	void SetBoxAspect(float aspect)
+	{
+		m_fBoxAspect = aspect;
 	}
 
 	//! Tells the layout exactly where this device's glass is, in the model's own
@@ -416,6 +434,9 @@ class MCF_Device_Layout
 
 	protected float Aspect()
 	{
+		if (m_fBoxAspect > 0)
+			return m_fBoxAspect;
+
 		return m_fSizeX / m_fSizeZ;
 	}
 

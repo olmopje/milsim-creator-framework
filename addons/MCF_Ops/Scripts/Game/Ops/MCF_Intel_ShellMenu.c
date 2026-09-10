@@ -82,7 +82,14 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! the only part anyone is reading -- at a size worth reading. The glass
 	//! follows the projected screen quad, which is computed rather than
 	//! clipped, so it tracks the model out past the box's edge.
-	protected static const float LAPTOP_HEIGHT = 0.95;
+	protected static const float LAPTOP_HEIGHT = 1.0;
+
+	//! How wide the laptop's box is, in box-heights. NOT the model's own
+	//! proportions: the box is cropped to the laptop itself so that the preview
+	//! world's sky has nowhere left to show. Measured, not guessed -- the
+	//! screen quad came back 1022.01 wide in a box 1026 tall, and the lid is
+	//! 1.046 times the LCD's width.
+	protected static const float LAPTOP_BOX_ASPECT = 1.04;
 
 	//! Which end runs off the screen. The preview centres the item, so a laptop
 	//! big enough to be worth reading loses the top of its lid and the bottom
@@ -470,6 +477,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_eView == MCF_EIntelView.LAPTOP)
 		{
 			m_Geometry.Configure(LAPTOP_HEIGHT, LAPTOP_GLASS_X, LAPTOP_GLASS_Y, 0, LAPTOP_MODEL_DOWN);
+			m_Geometry.SetBoxAspect(LAPTOP_BOX_ASPECT);
 			m_Geometry.SetScreenQuad(LaptopScreenQuad());
 		}
 
