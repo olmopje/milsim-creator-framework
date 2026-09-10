@@ -83,6 +83,14 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! follows the projected screen quad, which is computed rather than
 	//! clipped, so it tracks the model out past the box's edge.
 	protected static const float LAPTOP_HEIGHT = 0.95;
+
+	//! Which end runs off the screen. The preview centres the item, so a laptop
+	//! big enough to be worth reading loses the top of its lid and the bottom
+	//! of its keyboard in equal measure -- and the top of the lid is the part
+	//! that must not be cut, because a screen with its top edge missing reads
+	//! as a mistake while a keyboard running off the bottom reads as a laptop
+	//! on a desk in front of you.
+	protected static const float LAPTOP_MODEL_DOWN = 0.15;
 	protected static const float LAPTOP_GLASS_X = 0.99;
 	protected static const float LAPTOP_GLASS_Y = 0.99;
 
@@ -461,7 +469,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// point of these being two numbers rather than two classes.
 		if (m_eView == MCF_EIntelView.LAPTOP)
 		{
-			m_Geometry.Configure(LAPTOP_HEIGHT, LAPTOP_GLASS_X, LAPTOP_GLASS_Y);
+			m_Geometry.Configure(LAPTOP_HEIGHT, LAPTOP_GLASS_X, LAPTOP_GLASS_Y, 0, LAPTOP_MODEL_DOWN);
 			m_Geometry.SetScreenQuad(LaptopScreenQuad());
 		}
 
@@ -1464,6 +1472,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// 400x851 of model inside a 643x1368 box, so 62% of it. That is the
 		// size of the error being papered over, and it is why the fallback is
 		// worth this many frames of asking.
+		// Every frame until the fit lands: the preview manager takes the render
+		// target over when it is ready, and whatever was set before that is
+		// gone.
+		m_Geometry.ClearPreviewBackground();
+
 		if (m_Geometry.FitToDevice())
 		{
 			m_bFitted = true;

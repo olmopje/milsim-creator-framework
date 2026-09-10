@@ -65,6 +65,12 @@ class MCF_Device_Layout
 	protected float m_fGlassX = PHONE_GLASS_X;
 	protected float m_fGlassY = PHONE_GLASS_Y;
 	protected float m_fGlassUp;
+	protected float m_fModelDown;
+
+	//! The shift actually applied to the preview widget, in reference units.
+	//! Kept because the glass is placed against that widget and has to move
+	//! with it.
+	protected float m_fModelShift;
 
 	//! How much of the glass the text columns use, leaving the margin you would
 	//! expect down each side of a screen.
@@ -82,12 +88,20 @@ class MCF_Device_Layout
 	//!                    that: its silhouette is a screen standing on a
 	//!                    keyboard, so a centred glass covers the keyboard and
 	//!                    leaves a strip of dead screen along the top.
-	void Configure(float screenHeight, float glassX, float glassY, float glassUp = 0)
+	//! \param modelDown  How far DOWN the drawn device sits in its box, as a
+	//!                   fraction of that box's height. The preview always
+	//!                   centres the item in the widget, so this is the only
+	//!                   way to choose which end of an overflowing device runs
+	//!                   off the screen: a laptop drawn big enough to be worth
+	//!                   reading should lose the bottom of its keyboard, not
+	//!                   the top of its lid.
+	void Configure(float screenHeight, float glassX, float glassY, float glassUp = 0, float modelDown = 0)
 	{
 		m_fScreenHeight = screenHeight;
 		m_fGlassX = glassX;
 		m_fGlassY = glassY;
 		m_fGlassUp = glassUp;
+		m_fModelDown = modelDown;
 	}
 
 	//! Below this the preview has not drawn yet and is answering with a
@@ -162,12 +176,19 @@ class MCF_Device_Layout
 	//! size of an inventory tile that reads as a soft backdrop; at the size of
 	//! a laptop it reads as a photograph somebody left behind the device.
 	//!
-	//! Called AFTER the item is set, because the manager configures the render
-	//! target when it takes it over and a clear colour set before that is lost.
+	//! Called AFTER the item is set, and again on every frame of the fit,
+	//! because the manager configures the render target when it takes it over
+	//! and a clear colour set before that is lost.
+	//!
+	//! OPAQUE BLACK, NOT TRANSPARENT, on purpose. Transparent was tried first
+	//! and the treeline stayed, which leaves two possibilities: either this
+	//! call does not govern the background at all, or it does and the sky is
+	//! drawn over it. Black tells those apart in one look -- and if it works it
+	//! is also the better backdrop for a lit screen.
 	void ClearPreviewBackground()
 	{
 		if (m_wModel)
-			m_wModel.SetClearColor(true, 0x00000000);
+			m_wModel.SetClearColor(true, 0xFF000000);
 	}
 
 	ItemPreviewWidget GetModelWidget()
@@ -236,7 +257,9 @@ class MCF_Device_Layout
 			boxH = boxW / Aspect();
 		}
 
-		PlaceCentred(m_wModel, boxW, boxH);
+		m_fModelShift = boxH * m_fModelDown;
+
+		PlaceCentred(m_wModel, boxW, boxH, m_fModelShift);
 		PlaceGlass(boxW, boxH);
 	}
 
@@ -379,7 +402,10 @@ class MCF_Device_Layout
 		// Widget space runs from the widget's top-left corner, and the preview
 		// widget is placed centred, so the glass moves by how far the screen's
 		// middle is from the widget's middle.
-		PlaceCentred(m_wScreenArea, m_fGlassWidth, m_fGlassHeight, midY - boxH * 0.5, midX - boxW * 0.5);
+		// Plus the preview widget's own shift: the quad is measured inside that
+		// widget, and the glass is a sibling of it.
+		PlaceCentred(m_wScreenArea, m_fGlassWidth, m_fGlassHeight,
+			midY - boxH * 0.5 + m_fModelShift, midX - boxW * 0.5);
 
 		CapWidth(W_LIST_WIDTH, m_fGlassWidth);
 		CapWidth(W_READ_WIDTH, m_fGlassWidth);
