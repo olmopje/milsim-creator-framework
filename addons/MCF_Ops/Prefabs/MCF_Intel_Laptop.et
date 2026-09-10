@@ -21,7 +21,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    m_sDeviceName "Field laptop"
    m_eView LAPTOP
    m_sActionVerb "Use"
-   m_sPreviewPrefab "{6A1C4F0B39D2D060}Prefabs/MCF_Intel_Laptop.et"
+   m_sPreviewPrefab "{6A1C4F0B39D2D090}Prefabs/MCF_Intel_Laptop_Preview.et"
    m_sProfileId ""
    m_aEntries {
     MCF_Intel_Entry "{6A1C4F0B39D2D034}" {
@@ -35,7 +35,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
      m_sBody "River road after dark, no lights past the bridge. Second driver waits at the quarry and takes it from there."
     }
    }
-   m_vPreviewSize 0.33 0.02 0.23
+   m_vPreviewSize 0.36 0.351 0.227
   }
   MeshObject "{6A1C4F0B39D2D031}" {
    Object "{45F5FEABF5F2BF90}Assets/Props/Intel/Laptop/Laptop_Body.xob"

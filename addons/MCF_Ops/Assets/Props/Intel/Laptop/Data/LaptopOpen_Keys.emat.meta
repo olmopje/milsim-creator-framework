@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{783B3D753CA63285}Assets/Props/Intel/Laptop/Data/LaptopOpen_Keys.emat"
+ Configurations {
+  EMATResourceClass PC {
+  }
+  EMATResourceClass XBOX_ONE : PC {
+  }
+  EMATResourceClass XBOX_SERIES : PC {
+  }
+  EMATResourceClass PS4 : PC {
+  }
+  EMATResourceClass PS5 : PC {
+  }
+  EMATResourceClass HEADLESS : PC {
+  }
+ }
+}

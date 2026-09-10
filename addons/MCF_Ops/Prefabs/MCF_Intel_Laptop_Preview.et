@@ -1,0 +1,10 @@
+GenericEntity {
+ ID "6A1C4F0B39D2D090"
+ components {
+  MeshObject "{6A1C4F0B39D2D091}" {
+   Object "{A83A4C59D97ED743}Assets/Props/Intel/Laptop/LaptopOpen.xob"
+  }
+  Hierarchy "{6A1C4F0B39D2D092}" {
+  }
+ }
+}
