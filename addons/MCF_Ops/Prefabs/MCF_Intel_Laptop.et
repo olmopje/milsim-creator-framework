@@ -111,6 +111,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     }
    }
    coords 0.1654 0.021 -0.1138
+   angles 0 0 -90
   }
  }
 }
