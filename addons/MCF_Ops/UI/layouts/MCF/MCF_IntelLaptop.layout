@@ -1,0 +1,824 @@
+FrameWidgetClass {
+ Name "rootFrame"
+ {
+  ImageWidgetClass "{6A1C4F0B39D37001}" {
+   Name "Dim"
+   Slot FrameWidgetSlot "{6A1C4F0B39D37002}" {
+    Anchor 0.0000 0.0000 1.0000 1.0000
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0 0 0 0.75
+  }
+  ImageWidgetClass "{6A1C4F0B39D37003}" {
+   Name "Body"
+   Slot FrameWidgetSlot "{6A1C4F0B39D37004}" {
+    Anchor 0.1000 0.1000 0.9000 0.8000
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   Color 0.06 0.065 0.07 1
+  }
+  ItemPreviewWidgetClass "{6A1C4F0B39D37005}" {
+   Name "Model"
+   Slot FrameWidgetSlot "{6A1C4F0B39D37006}" {
+    Anchor 0.1000 0.1000 0.9000 0.8000
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+  }
+  FrameWidgetClass "{6A1C4F0B39D37069}" {
+   Name "ScreenArea"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3706A}" {
+    Anchor 0.1200 0.1200 0.8800 0.7800
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+     ImageWidgetClass "{6A1C4F0B39D37007}" {
+      Name "Tint"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37008}" {
+       Anchor 0.0000 0.0000 1.0000 1.0000
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 0.03 0.035 0.04 1
+     }
+     TextWidgetClass "{6A1C4F0B39D37009}" {
+      Name "StatusBar"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3700A}" {
+       Anchor 0.0300 0.0200 0.4500 0.0700
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 13
+      "Min Font Size" 13
+     }
+     TextWidgetClass "{6A1C4F0B39D3700B}" {
+      Name "ClockTime"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3700C}" {
+       Anchor 0.5500 0.0200 0.9700 0.0700
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 13
+      "Min Font Size" 13
+      "Text Horizontal Align" 2
+     }
+     TextWidgetClass "{6A1C4F0B39D3700D}" {
+      Name "ClockDate"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3700E}" {
+       Anchor 0.5500 0.0700 0.9700 0.1100
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 11
+      "Min Font Size" 11
+      "Text Horizontal Align" 2
+      Color 0.6 0.6 0.6 1
+     }
+     TextWidgetClass "{6A1C4F0B39D3700F}" {
+      Name "DeviceName"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37010}" {
+       Anchor 0.0300 0.0900 0.5500 0.1500
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 20
+      "Min Font Size" 20
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37012}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App0"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37013}" {
+       Anchor 0.0600 0.2600 0.2100 0.4100
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37011}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D37014}" {
+      Name "AppLabel0"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37015}" {
+       Anchor 0.0600 0.4120 0.2100 0.4650
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37017}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App1"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37018}" {
+       Anchor 0.2400 0.2600 0.3900 0.4100
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37016}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D37019}" {
+      Name "AppLabel1"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3701A}" {
+       Anchor 0.2400 0.4120 0.3900 0.4650
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3701C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App2"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3701D}" {
+       Anchor 0.4200 0.2600 0.5700 0.4100
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D3701B}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D3701E}" {
+      Name "AppLabel2"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3701F}" {
+       Anchor 0.4200 0.4120 0.5700 0.4650
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37021}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App3"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37022}" {
+       Anchor 0.6000 0.2600 0.7500 0.4100
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37020}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D37023}" {
+      Name "AppLabel3"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37024}" {
+       Anchor 0.6000 0.4120 0.7500 0.4650
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37026}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App4"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37027}" {
+       Anchor 0.7800 0.2600 0.9300 0.4100
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37025}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D37028}" {
+      Name "AppLabel4"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37029}" {
+       Anchor 0.7800 0.4120 0.9300 0.4650
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3702B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App5"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3702C}" {
+       Anchor 0.0600 0.4900 0.2100 0.6400
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D3702A}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D3702D}" {
+      Name "AppLabel5"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3702E}" {
+       Anchor 0.0600 0.6420 0.2100 0.6950
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37030}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App6"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37031}" {
+       Anchor 0.2400 0.4900 0.3900 0.6400
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D3702F}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D37032}" {
+      Name "AppLabel6"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37033}" {
+       Anchor 0.2400 0.6420 0.3900 0.6950
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37035}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App7"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37036}" {
+       Anchor 0.4200 0.4900 0.5700 0.6400
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37034}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D37037}" {
+      Name "AppLabel7"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37038}" {
+       Anchor 0.4200 0.6420 0.5700 0.6950
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3703A}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "App8"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3703B}" {
+       Anchor 0.6000 0.4900 0.7500 0.6400
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37039}" {
+        m_bCanBeToggled 0
+        m_sText ""
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D3703C}" {
+      Name "AppLabel8"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3703D}" {
+       Anchor 0.6000 0.6420 0.7500 0.6950
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Text Horizontal Align" 1
+     }
+     ScrollLayoutWidgetClass "{6A1C4F0B39D37042}" {
+      Name "ListScroll"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37043}" {
+       Anchor 0.0400 0.1700 0.9600 0.8600
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      {
+       SizeLayoutWidgetClass "{6A1C4F0B39D3703E}" {
+        Name "ListWidth"
+        Slot ScrollLayoutSlot "{6A1C4F0B39D3703F}" {
+        }
+        AllowWidthOverride 1
+        WidthOverride 600
+        {
+         VerticalLayoutWidgetClass "{6A1C4F0B39D37040}" {
+          Name "EntryList"
+          Slot SizeLayoutSlot "{6A1C4F0B39D37041}" {
+          }
+         }
+        }
+       }
+      }
+     }
+     ScrollLayoutWidgetClass "{6A1C4F0B39D37054}" {
+      Name "ReadScroll"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37055}" {
+       Anchor 0.0400 0.1700 0.9600 0.8600
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      {
+       SizeLayoutWidgetClass "{6A1C4F0B39D37044}" {
+        Name "ReadWidth"
+        Slot ScrollLayoutSlot "{6A1C4F0B39D37045}" {
+        }
+        AllowWidthOverride 1
+        WidthOverride 600
+        {
+         VerticalLayoutWidgetClass "{6A1C4F0B39D37046}" {
+          Name "ReadColumn"
+          Slot SizeLayoutSlot "{6A1C4F0B39D37047}" {
+          }
+          {
+           RichTextWidgetClass "{6A1C4F0B39D37048}" {
+            Name "ReadHeading"
+            Slot AlignableSlot "{6A1C4F0B39D37049}" { HorizontalAlign 3 VerticalAlign 0 }
+            Clipping Ancestor
+            Wrap 1
+            Text ""
+            "Font Size" 18
+            "Min Font Size" 18
+            "Line Spacing" 20
+           }
+           RichTextWidgetClass "{6A1C4F0B39D3704A}" {
+            Name "ReadTimestamp"
+            Slot AlignableSlot "{6A1C4F0B39D3704B}" { HorizontalAlign 3 VerticalAlign 0 }
+            Clipping Ancestor
+            Wrap 1
+            Text ""
+            "Font Size" 12
+            "Min Font Size" 12
+            "Line Spacing" 20
+           }
+           ButtonWidgetClass "{6A1C4F0B39D3704C}" {
+            Name "ReadImageButton"
+            Slot AlignableSlot "{6A1C4F0B39D3704D}" { HorizontalAlign 0 VerticalAlign 0 SizeToContent 1 }
+            "Is Visible" 0
+            {
+             ImageWidgetClass "{6A1C4F0B39D3704E}" {
+              Name "ReadImage"
+              Slot AlignableSlot "{6A1C4F0B39D3704F}" { HorizontalAlign 0 VerticalAlign 0 }
+              Color 1 1 1 1
+             }
+            }
+           }
+           RichTextWidgetClass "{6A1C4F0B39D37050}" {
+            Name "ReadImageNote"
+            Slot AlignableSlot "{6A1C4F0B39D37051}" { HorizontalAlign 3 VerticalAlign 0 }
+            Clipping Ancestor
+            Wrap 1
+            "Is Visible" 0
+            Text ""
+            "Font Size" 12
+            "Min Font Size" 12
+            "Line Spacing" 20
+            Color 0.6 0.6 0.6 1
+           }
+           RichTextWidgetClass "{6A1C4F0B39D37052}" {
+            Name "ReadBody"
+            Slot AlignableSlot "{6A1C4F0B39D37053}" { HorizontalAlign 3 VerticalAlign 0 }
+            Clipping Ancestor
+            Wrap 1
+            Text ""
+            "Font Size" 14
+            "Min Font Size" 14
+            "Line Spacing" 20
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37057}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "ButtonBack"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37058}" {
+       Anchor 0.0400 0.8850 0.1900 0.9550
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37056}" {
+        m_bCanBeToggled 0
+        m_sText "BACK"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3705A}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "ButtonPrev"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3705B}" {
+       Anchor 0.2100 0.8850 0.3200 0.9550
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37059}" {
+        m_bCanBeToggled 0
+        m_sText "PREV"
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D3705C}" {
+      Name "PageNumber"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3705D}" {
+       Anchor 0.3350 0.8950 0.4400 0.9450
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 13
+      "Min Font Size" 13
+      "Text Horizontal Align" 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3705F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "ButtonNext"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37060}" {
+       Anchor 0.4550 0.8850 0.5650 0.9550
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D3705E}" {
+        m_bCanBeToggled 0
+        m_sText "NEXT"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37062}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "ButtonLog"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37063}" {
+       Anchor 0.6600 0.8850 0.8100 0.9550
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37061}" {
+        m_bCanBeToggled 0
+        m_sText "LOG"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37065}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+      Name "ButtonClose"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37066}" {
+       Anchor 0.8300 0.8850 0.9600 0.9550
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D37064}" {
+        m_bCanBeToggled 0
+        m_sText "CLOSE"
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D37067}" {
+      Name "Hint"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37068}" {
+       Anchor 0.0400 0.8450 0.9600 0.8820
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      Color 0.65 0.65 0.65 1
+     }
+   }
+  }
+  FrameWidgetClass "{6A1C4F0B39D37075}" {
+   Name "PhotoOverlay"
+   Slot FrameWidgetSlot "{6A1C4F0B39D37076}" {
+    Anchor 0.0000 0.0000 1.0000 1.0000
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   {
+     ButtonWidgetClass "{6A1C4F0B39D3706D}" {
+      Name "PhotoBackdrop"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3706E}" {
+       Anchor 0.0000 0.0000 1.0000 1.0000
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      {
+       ImageWidgetClass "{6A1C4F0B39D3706B}" {
+        Name "PhotoBackdropFill"
+        Slot AlignableSlot "{6A1C4F0B39D3706C}" { HorizontalAlign 3 VerticalAlign 3 }
+        Color 0 0 0 0.94
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D37071}" {
+      Name "PhotoFullButton"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37072}" {
+       Anchor 0.5000 0.5000 0.5000 0.5000
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      {
+       ImageWidgetClass "{6A1C4F0B39D3706F}" {
+        Name "PhotoFull"
+        Slot AlignableSlot "{6A1C4F0B39D37070}" { HorizontalAlign 0 VerticalAlign 0 }
+        Color 1 1 1 1
+       }
+      }
+     }
+     TextWidgetClass "{6A1C4F0B39D37073}" {
+      Name "PhotoHint"
+      Slot FrameWidgetSlot "{6A1C4F0B39D37074}" {
+       Anchor 0.0000 0.9500 1.0000 0.9800
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text "Click anywhere to close"
+      "Font Size" 15
+      "Min Font Size" 15
+      "Text Horizontal Align" 1
+      Color 0.7 0.7 0.7 1
+     }
+   }
+  }
+ }
+}

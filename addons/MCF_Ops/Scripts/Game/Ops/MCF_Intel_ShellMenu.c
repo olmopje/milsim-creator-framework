@@ -61,6 +61,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! the presenter decides which of them are used.
 	protected static const int APP_SLOTS = 9;
 
+	//! A laptop lid fills less of the screen's height than a phone does, and
+	//! nearly all of its face is glass -- there is no bezel worth drawing on a
+	//! screen that is already only a screen.
+	protected static const float LAPTOP_HEIGHT = 0.78;
+	protected static const float LAPTOP_GLASS_X = 0.94;
+	protected static const float LAPTOP_GLASS_Y = 0.94;
+
 	protected static MCF_Intel_CarrierComponent s_PendingCarrier;
 	protected static MCF_EIntelView s_PendingView;
 
@@ -167,7 +174,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			case MCF_EIntelView.PAPER:   preset = ChimeraMenuPreset.MCF_IntelPaper; break;
 			case MCF_EIntelView.NOTEPAD: preset = ChimeraMenuPreset.MCF_IntelNotepad; break;
 			case MCF_EIntelView.PHONE:   preset = ChimeraMenuPreset.MCF_IntelDevice; break;
-			case MCF_EIntelView.LAPTOP:  preset = ChimeraMenuPreset.MCF_IntelDevice; break;
+			case MCF_EIntelView.LAPTOP:  preset = ChimeraMenuPreset.MCF_IntelLaptop; break;
 		}
 
 		if (preset < 0)
@@ -354,6 +361,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected void ShowModel(notnull Widget root)
 	{
 		m_Geometry = new MCF_Device_Layout();
+
+		// The shell tells the geometry what shape of thing it is drawing. A
+		// laptop is landscape and sits lower on the screen than a phone does;
+		// everything else about the placement is identical, which is the whole
+		// point of these being two numbers rather than two classes.
+		if (m_eView == MCF_EIntelView.LAPTOP)
+			m_Geometry.Configure(LAPTOP_HEIGHT, LAPTOP_GLASS_X, LAPTOP_GLASS_Y);
 
 		if (!m_Geometry.Attach(root, PreviewSize()))
 			return;

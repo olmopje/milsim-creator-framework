@@ -1,0 +1,70 @@
+GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
+ ID "6A1C4F0B39D2D030"
+ components {
+  RigidBody "{6A1C4F0B39D2D032}" {
+   Mass 2.2
+   LinearDamping 0.5
+   AngularDamping 0.5
+   ModelGeometry 1
+  }
+  InventoryItemComponent "{5222EB4D0C73106B}" {
+   Attributes SCR_ItemAttributeCollection "{5222EB4D0A2B566B}" {
+    ItemDisplayName UIInfo "{5222EB4D07D875FA}" {
+     Name "Laptop"
+    }
+    ItemPhysAttributes ItemPhysicalAttributes PhysicalAttributes {
+     Weight 2.2
+     SizeSetupStrategy Manual
+     ItemDimensions 34 24 3
+     ItemVolume 2400
+     DimensionScaler 1
+    }
+    m_Size SLOT_2x2
+    m_SlotType SLOT_LOADOUT_STORAGE
+   }
+  }
+  MCF_Intel_CarrierComponent "{6A1C4F0B39D2D033}" {
+   m_sDeviceName "Field laptop"
+   m_eView LAPTOP
+   m_sActionVerb "Use"
+   m_vPreviewSize "0.33 0.02 0.23"
+   m_sProfileId ""
+   m_aEntries {
+    MCF_Intel_Entry "{6A1C4F0B39D2D034}" {
+     m_sHeading "Consignment manifest"
+     m_sTimestamp "12 MAR"
+     m_sBody "Four crates, marked as agricultural machinery. Weights do not match the paperwork. Signed for at the mill by somebody whose name is not on the roster."
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D2D035}" {
+     m_sHeading "Route sheet"
+     m_sTimestamp "13 MAR"
+     m_sBody "River road after dark, no lights past the bridge. Second driver waits at the quarry and takes it from there."
+    }
+   }
+  }
+  ActionsManagerComponent "{508AB5952B584C2E}" {
+   additionalActions +{
+    MCF_Intel_ReadAction "{6A1C4F0B39D2D038}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{6A1C4F0B39D2D039}" {
+      Name "Use"
+     }
+     VisibilityRange 3
+     Duration 2
+    }
+   }
+  }
+  SCR_EditableEntityComponent "{6A1C4F0B39D2D03A}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
+   m_EntityType OBJECT
+   m_UIInfo SCR_EditableEntityUIInfo "{6A1C4F0B39D2D03B}" {
+    Name "MCF Intel: Laptop"
+    m_aAuthoredLabels {
+     ENTITYTYPE_OBJECT
+     CONTENT_MODDED
+    }
+   }
+  }
+ }
+}

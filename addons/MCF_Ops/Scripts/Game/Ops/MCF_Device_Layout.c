@@ -50,18 +50,37 @@ class MCF_Device_Layout
 	static const string W_LIST_WIDTH = "ListWidth";
 	static const string W_READ_WIDTH = "ReadWidth";
 
-	//! How much of the screen's height the device is drawn at.
-	static const float SCREEN_HEIGHT = 0.95;
+	//! The phone's numbers, and the defaults, because it is the shell these were
+	//! measured on.
+	static const float PHONE_HEIGHT = 0.95;
+	static const float PHONE_GLASS_X = 0.86;
+	static const float PHONE_GLASS_Y = 0.90;
 
-	//! How much of the device's face is glass. A visible bezel is what makes it
-	//! look held rather than overlaid: at 0.92 x 0.94 the screen covered the
-	//! body almost edge to edge and what was left read as a glow around a panel.
-	static const float GLASS_X = 0.86;
-	static const float GLASS_Y = 0.90;
+	//! PER SHELL, NOT PER CLASS. These were static consts while a phone was the
+	//! only device, which quietly made "reusable for a laptop" untrue: a laptop
+	//! drawn at 95% of screen HEIGHT is wider than the screen it is drawn on,
+	//! because it is a landscape object and a phone is not. A device that is
+	//! asked how big it is should also be asked what shape it wears.
+	protected float m_fScreenHeight = PHONE_HEIGHT;
+	protected float m_fGlassX = PHONE_GLASS_X;
+	protected float m_fGlassY = PHONE_GLASS_Y;
 
 	//! How much of the glass the text columns use, leaving the margin you would
 	//! expect down each side of a screen.
 	static const float TEXT_WIDTH = 0.90;
+
+	//! \param screenHeight How much of the screen's height the device fills.
+	//! \param glassX       How much of the device's face is glass, across.
+	//! \param glassY       The same, down. A visible bezel is what makes it
+	//!                     look held rather than overlaid: at 0.92 x 0.94 the
+	//!                     phone's screen covered the body almost edge to edge
+	//!                     and what was left read as a glow around a panel.
+	void Configure(float screenHeight, float glassX, float glassY)
+	{
+		m_fScreenHeight = screenHeight;
+		m_fGlassX = glassX;
+		m_fGlassY = glassY;
+	}
 
 	//! Below this the preview has not drawn yet and is answering with a
 	//! degenerate box.
@@ -151,8 +170,21 @@ class MCF_Device_Layout
 		if (screenHeight <= 0)
 			return;
 
-		float boxH = screenHeight * SCREEN_HEIGHT;
+		float boxH = screenHeight * m_fScreenHeight;
 		float boxW = boxH * Aspect();
+
+		// A LANDSCAPE DEVICE RUNS OUT OF WIDTH FIRST. Sizing from height alone
+		// is right for a phone and wrong for a laptop: at the same fraction of
+		// the screen's height, something wider than it is tall ends up wider
+		// than the screen. Whichever side runs out first decides.
+		float screenWidth = workspace.DPIUnscale(workspace.GetWidth());
+		float maxW = screenWidth * m_fScreenHeight;
+
+		if (boxW > maxW)
+		{
+			boxW = maxW;
+			boxH = boxW / Aspect();
+		}
 
 		PlaceCentred(m_wModel, boxW, boxH);
 		PlaceGlass(boxW, boxH);
@@ -232,11 +264,11 @@ class MCF_Device_Layout
 	//! The glass, and the width the text inside it is allowed to reach.
 	protected void PlaceGlass(float deviceW, float deviceH)
 	{
-		float glassW = deviceW * GLASS_X;
+		float glassW = deviceW * m_fGlassX;
 		m_fGlassWidth = glassW;
 
 		if (m_wScreenArea)
-			PlaceCentred(m_wScreenArea, glassW, deviceH * GLASS_Y);
+			PlaceCentred(m_wScreenArea, glassW, deviceH * m_fGlassY);
 
 		CapWidth(W_LIST_WIDTH, glassW);
 		CapWidth(W_READ_WIDTH, glassW);

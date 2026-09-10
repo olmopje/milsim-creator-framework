@@ -37,6 +37,11 @@ modded enum ChimeraMenuPreset
 	MCF_IntelNotepad,
 	MCF_IntelDevice,
 
+	//! The fourth skin, and the reason the geometry stopped being a set of
+	//! constants: a laptop is landscape. Same menu class as the three above,
+	//! same data, a wider screen and an app grid five across instead of three.
+	MCF_IntelLaptop,
+
 	//! Talking to somebody: what they say, and what you may say back.
 	//! Opened by the talk action on the person themselves.
 	MCF_Dialogue,
