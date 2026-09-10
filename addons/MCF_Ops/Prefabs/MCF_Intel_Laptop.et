@@ -9,9 +9,28 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     ItemPhysAttributes ItemPhysicalAttributes PhysicalAttributes {
      Weight 2.2
      SizeSetupStrategy Manual
-     ItemDimensions 36 25 3
-     ItemVolume 2700
+     // ABSTRACT SLOT UNITS, NOT CENTIMETRES. Vanilla's medical kit is 2 2 2
+     // with a volume of 2; the phone and the letter here are 5 5 2 and 50.
+     // Written as real centimetres, 36 25 3 / 2700, this was larger than any
+     // container a player carries, so pick-up was refused outright.
+     ItemDimensions 8 6 2
+     ItemVolume 90
      DimensionScaler 1
+    }
+    // THE INVENTORY THUMBNAIL IS A LIVE RENDER, not an image file. Without
+    // PreviewRenderAttributes the camera uses defaults meant for a small item
+    // held upright, and a wide flat object ends up cropped or edge-on.
+    //
+    // CameraOrbitAngles is PITCH, yaw, roll -- established by elimination on
+    // the phone, not from documentation. 55 degrees looks down at the closed
+    // lid from the front, which reads as a laptop rather than as a grey slab.
+    CustomAttributes {
+     PreviewRenderAttributes "{6A1C4F0B39D2D0A0}" {
+      CameraOrbitAngles 55 0 0
+      CameraDistanceToItem 0.62
+      ItemRenderRotation 0 0 0
+      LodModel 1
+     }
     }
     m_Size SLOT_2x2
     m_SlotType SLOT_LOADOUT_STORAGE
@@ -61,6 +80,15 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    }
   }
   ActionsManagerComponent "{508AB5952B584B2E}" {
+   ActionContexts {
+    // A LAPTOP IS 36cm ACROSS. The context inherited from Item_Base is a 20cm
+    // sphere around the entity origin, which is generous for an envelope and
+    // leaves most of a laptop outside it -- aim at either end and there is no
+    // prompt at all. Widened to cover the object it is actually on.
+    UserActionContext "{508AC2ABEC97066C}" {
+     Radius 0.35
+    }
+   }
    additionalActions {
     MCF_Intel_ReadAction "{6A1C4F0B39D2D038}" {
      ParentContextList {
@@ -104,7 +132,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
        Position PointInfo "{6A1C4F0B39D2D057}" {
         Offset -0.002 -0.165 0.114
        }
-       Radius 0.5
+       Radius 0.3
       }
      }
     }
