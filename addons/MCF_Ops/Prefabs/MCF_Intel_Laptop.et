@@ -1,6 +1,9 @@
 GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
- ID "6A1C4F0B39D2D030"
+ ID "6A1C4F0B39D2D060"
  components {
+  MeshObject "{6A1C4F0B39D2D031}" {
+   Object "{6A1C4F0B39D2D06B}Assets/Props/Intel/Laptop/Laptop_Body.xob"
+  }
   RigidBody "{6A1C4F0B39D2D032}" {
    Mass 2.2
    LinearDamping 0.5
@@ -15,8 +18,8 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     ItemPhysAttributes ItemPhysicalAttributes PhysicalAttributes {
      Weight 2.2
      SizeSetupStrategy Manual
-     ItemDimensions 34 24 3
-     ItemVolume 2400
+     ItemDimensions 36 25 3
+     ItemVolume 2700
      DimensionScaler 1
     }
     m_Size SLOT_2x2
@@ -27,7 +30,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    m_sDeviceName "Field laptop"
    m_eView LAPTOP
    m_sActionVerb "Use"
-   m_vPreviewSize "0.33 0.02 0.23"
+   m_vPreviewSize 0.33 0.02 0.23
    m_sProfileId ""
    m_aEntries {
     MCF_Intel_Entry "{6A1C4F0B39D2D034}" {
@@ -63,6 +66,46 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     m_aAuthoredLabels {
      ENTITYTYPE_OBJECT
      CONTENT_MODDED
+    }
+   }
+  }
+  Hierarchy "{6A1C4F0B39D2D03C}" {
+  }
+ }
+ {
+  GenericEntity {
+   ID "6A1C4F0B39D2D050"
+   components {
+    MeshObject "{6A1C4F0B39D2D051}" {
+     Object "{6A1C4F0B39D2D06C}Assets/Props/Intel/Laptop/Laptop_Lid.xob"
+    }
+    DoorComponent "{6A1C4F0B39D2D052}" {
+     DoorAction SCR_DoorUserAction "{6A1C4F0B39D2D053}" {
+      ParentContextList {
+       "SCR_DoorUserAction"
+      }
+      UIInfo SCR_ActionUIInfo "{6A1C4F0B39D2D054}" {
+       m_sIconName "open-door"
+      }
+     }
+     DoorAnimationType WholeEntity
+     OpenTime 1
+     AngleRange -117
+     ClosedAngle 0
+     InitialAngle 0
+    }
+    ActionsManagerComponent "{6A1C4F0B39D2D055}" {
+     ActionContexts {
+      UserActionContext "{6A1C4F0B39D2D056}" {
+       ContextName "SCR_DoorUserAction"
+       Position PointInfo "{6A1C4F0B39D2D057}" {
+       }
+       Radius 0.4
+      }
+     }
+    }
+    Hierarchy "{6A1C4F0B39D2D058}" {
+     PivotID "socket_LaptopLid"
     }
    }
   }
