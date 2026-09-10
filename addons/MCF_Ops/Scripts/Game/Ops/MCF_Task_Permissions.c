@@ -33,7 +33,16 @@ enum MCF_ETaskAction
 	//! Write a new one.
 	CREATE,
 	//! Put a draft on the board for the force to see.
-	PUBLISH
+	PUBLISH,
+
+	//! Throw away what the server remembers, or replace it with a snapshot.
+	//!
+	//! NOT LIKE THE OTHERS, and it is the only action here that is not about a
+	//! task. Everything above changes something that can be changed back by
+	//! hand; this one deletes a mission's taskings, intel, conversations and
+	//! device profiles, and nothing puts them back. So it is deliberately the
+	//! one action the permissive master switch does not cover.
+	DESTROY
 }
 
 class MCF_Task_Permissions
@@ -58,6 +67,27 @@ class MCF_Task_Permissions
 	//! \return Whether they may.
 	bool Can(int playerId, MCF_ETaskAction action)
 	{
+		// DESTROY IGNORES THE MASTER SWITCH. That switch is permissive on
+		// purpose -- roles are watched being right before they are enforced --
+		// and that is a reasonable trade for actions whose worst case is a
+		// tasking somebody has to edit back. It is not a reasonable trade for
+		// an action that empties the mission, so this one is always asked
+		// properly, whatever the switch says.
+		if (action == MCF_ETaskAction.DESTROY)
+		{
+			MCF_ERole role = MCF_Core_Roles.GetInstance().ResolveRole(playerId);
+			bool allowed = IsAllowed(role, action);
+
+			// Says the role, not just no. A locked-out mission maker with
+			// "you are not authorised" and nothing else has to go reading
+			// source to find out what the mod thinks they are.
+			if (!allowed)
+				MCF_Core_Log.Warn("player " + playerId.ToString() + " resolved to "
+					+ typename.EnumToString(MCF_ERole, role) + " and may not clear mission data");
+
+			return allowed;
+		}
+
 		if (m_bEveryoneMayDoEverything)
 			return true;
 
@@ -93,6 +123,10 @@ class MCF_Task_Permissions
 			// separately, so an author editing their own draft is handled
 			// there rather than here.
 			case MCF_ETaskAction.EDIT:
+				return role >= MCF_ERole.COMMANDER;
+
+			// The whole mission's memory. Command only, always.
+			case MCF_ETaskAction.DESTROY:
 				return role >= MCF_ERole.COMMANDER;
 		}
 

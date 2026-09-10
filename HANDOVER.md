@@ -224,8 +224,27 @@ To add a fifth kind of persisted data, call `MCF_Core_DataSets.Register` in the
 module that owns it and insert that module's reload into
 `MCF_Core_DataSets.GetOnReloaded()`. Nothing in Core needs to change.
 
-**`m_bEveryoneMayDoEverything` is still `true`, and this screen deletes.** It is
-the first thing in MCF that destroys data, and right now everyone may use it.
+**`m_bEveryoneMayDoEverything` is still `true`, but this screen is not behind
+it.** Clearing and restoring ask for `MCF_ETaskAction.DESTROY`, which is the one
+action that ignores the master switch and always resolves the role properly.
+COMMANDER only.
+
+Reading the counts, and saving a snapshot, are gated as ordinary authoring
+instead: looking is how somebody decides whether anything needs clearing, and
+saving a copy takes nothing away. A person who may not clear can still keep a
+snapshot and fetch someone who may.
+
+WHY THIS ONE SCREEN IS STRICTER THAN THE REST, since that inconsistency will
+otherwise read as an accident. The screen hangs off a Game Master context
+action, and Game Master access is already granted per player by the server -- so
+on any normal server a player cannot reach it. What the permission adds is that
+the RPCs are not behind the button: MCF_RequestClearAllData is callable by any
+client that talks to the server directly, without the UI. For every other
+authoring screen the worst case is text somebody has to type back. Here it is a
+week of planning with nothing to put it back, and MCF is going to other units'
+servers. Weighed and chosen 2026-09-10; the alternative -- keeping it consistent
+with the other authoring RPCs until roles are enforced everywhere -- is one line
+in MCF_PlayerController_Data.
 
 ### ANSWERED: MCF snapshots cannot be paired with the engine's own saves
 

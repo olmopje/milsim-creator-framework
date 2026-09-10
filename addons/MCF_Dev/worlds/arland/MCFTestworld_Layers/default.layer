@@ -1,20 +1,3 @@
-SCR_MapEntity MapEntity : "{731564B66F91B107}Prefabs/World/Game/MapEntity.et" {
- coords 1891.659 11.714 1824.161
- "Map Geometry Data" "{0DD089CCD442399A}worlds/Arland/Arland.topo"
- "Satellite background image" "{F98F3D2CBA523091}UI/Textures/Map/worlds/Arland/ArlandRasterized.edds"
- {
-  CommentEntity {
-   coords 0 1 0
-   m_Comment "MapEntity: "\
-   "Set up map textures"
-   m_Color 0 0 0
-   m_FaceCamera 1
-   m_TextBackground 1
-   m_BackgroundColor 1 0.6 0
-   m_BackgroundTransparency 0
-  }
- }
-}
 SCR_AIWorld SCR_AIWorld : "{E0A05C76552E7F58}Prefabs/AI/SCR_AIWorld.et" {
  components {
   NavmeshWorldComponent "{5584F30E67F617AD}" {
@@ -65,7 +48,6 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
   MCF_Core_TickManagerComponent "{6A515757BD053812}" {
   }
   MCF_Dev_SelfTestComponent "{6A54D258FBE6C24B}" {
-   m_bEnabled 1
   }
   MCF_Dialogue_GameModeComponent "{6A515757B6739101}" {
   }

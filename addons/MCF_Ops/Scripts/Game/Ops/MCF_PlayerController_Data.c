@@ -66,9 +66,10 @@ modded class SCR_PlayerController
 		if (!Replication.IsServer())
 			return;
 
-		// Reading is not destructive, but it does describe the whole mission's
-		// state, so it is gated the same way the writing is.
-		if (!MCF_DataAllowed("read the mission's data"))
+		// Reading is not destroying. Looking at what the server holds is how a
+		// mission maker decides whether to clear anything at all, so refusing
+		// it would leave them an empty screen and no reason for it.
+		if (!MCF_DataReadAllowed())
 			return;
 
 		Rpc(MCF_RpcDo_ReceiveDataSummary, MCF_BuildDataSummary());
@@ -122,7 +123,11 @@ modded class SCR_PlayerController
 		if (!Replication.IsServer())
 			return;
 
-		if (!MCF_DataAllowed("save a snapshot"))
+		// Saving a snapshot takes nothing away -- it writes a new file beside
+		// the live store. Gated as authoring, not as destruction, so somebody
+		// who may not clear the mission can still keep a copy before asking
+		// somebody who may.
+		if (!MCF_DataReadAllowed())
 			return;
 
 		if (name.Length() > MCF_SNAPSHOT_NAME_MAX)
@@ -187,9 +192,30 @@ modded class SCR_PlayerController
 
 	// ------------------------------------------------------------- internals
 
-	protected bool MCF_DataAllowed(string what)
+	//! Whether this player may see what the store holds.
+	//!
+	//! Deliberately the ordinary authoring permission, not the destructive one.
+	//! The counts on that screen are how somebody decides whether anything
+	//! needs clearing; a person who may not clear can still usefully look.
+	protected bool MCF_DataReadAllowed()
 	{
 		if (MCF_Task_Permissions.GetInstance().Can(GetPlayerId(), MCF_ETaskAction.EDIT))
+			return true;
+
+		MCF_SendMessage("You are not authorised to read the mission's data.");
+		return false;
+	}
+
+	//! \return Whether this player may throw the mission's memory away.
+	//!
+	//! DESTROY rather than EDIT. Editing a tasking and emptying the store are
+	//! not the same size of mistake, and until now they were the same
+	//! permission -- which meant the one screen in MCF that deletes was open to
+	//! everybody, because the task switch is permissive while roles are still
+	//! being watched.
+	protected bool MCF_DataAllowed(string what)
+	{
+		if (MCF_Task_Permissions.GetInstance().Can(GetPlayerId(), MCF_ETaskAction.DESTROY))
 			return true;
 
 		MCF_Core_Log.Warn("player " + GetPlayerId().ToString() + " tried to " + what + " without permission");

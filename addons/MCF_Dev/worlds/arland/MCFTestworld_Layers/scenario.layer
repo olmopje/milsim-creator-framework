@@ -20,7 +20,7 @@ $grp GenericEntity : "{6A1C4F0B39D30100}Prefabs/MCF_Devices_Phone.et" {
   coords 1390.611 39.936 2231.451
   angles 0 0 -178.764
  }
- MCF_PhoneTest {
+ MCF_PhoneTest_2 {
   coords 1390.98 39.924 2231.543
   angles 0 0 -177.661
  }
