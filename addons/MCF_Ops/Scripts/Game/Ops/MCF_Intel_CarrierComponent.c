@@ -91,6 +91,27 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	[RplProp(onRplName: "OnContentReplicated")]
 	protected string m_sContentOverride;
 
+	//! A whole device profile written onto THIS object by a Game Master.
+	//!
+	//! WHY IT LIVES HERE AND NOT IN THE LIBRARY. MCF_Device_Library is server
+	//! state. The device shell runs on the client that opened the phone, and
+	//! reads its content locally as it browses -- so a profile that exists only
+	//! on the server is a profile that client cannot see, and the shell falls
+	//! back to the entries below: the wrong contents, with no error anywhere.
+	//!
+	//! Shipped profiles come from a .conf and are therefore on every machine
+	//! already, which is why assigning one by id works. Authored ones travel as
+	//! replicated state on the object they were written for -- the same route
+	//! m_sContentOverride takes, for the same reason, and it inherits the same
+	//! properties: a client joining an hour later or streaming this object in
+	//! for the first time gets it without any push-on-join code.
+	//!
+	//! The trade is that a profile written this way belongs to this device
+	//! rather than to the mission. Reusable profiles are authored in the .conf
+	//! and assigned by id; this is for making THIS phone different.
+	[RplProp(onRplName: "OnProfileReplicated")]
+	protected string m_sProfileOverride;
+
 	string GetDeviceName()
 	{
 		return m_sDeviceName;
@@ -116,6 +137,35 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	string GetProfileId()
 	{
 		return m_sProfileId;
+	}
+
+	//! A serialised profile written onto this object, or empty. Beats the
+	//! profile id: an edit made to this device is more specific than the
+	//! library entry it started from.
+	string GetProfileOverride()
+	{
+		return m_sProfileOverride;
+	}
+
+	//! Server side. Writes a profile onto this device and tells everyone.
+	void SetProfileFromServer(string serialisedProfile)
+	{
+		if (!Replication.IsServer())
+			return;
+
+		m_sProfileOverride = serialisedProfile;
+		Replication.BumpMe();
+	}
+
+	//! Runs on every client when the profile arrives or changes.
+	//!
+	//! Nothing to apply: the shell reads GetProfileOverride the next time it
+	//! opens. A phone already open in somebody's hands keeps what it was
+	//! showing, which is the right answer -- content changing under a reader
+	//! mid-sentence would be worse than one screen being a few seconds old.
+	protected void OnProfileReplicated()
+	{
+		MCF_Core_Log.Debug("device profile replicated to this machine");
 	}
 
 	string GetActionVerb()

@@ -75,10 +75,15 @@ class MCF_Device_Script
 			if (!item)
 				continue;
 
+			// APPENDED, NEVER INSERTED -- see the note at the top of this file.
+			// A profile written before pictures existed has three fields here
+			// and is read back correctly because DeserializeApp counts.
 			result = result + SEP_ITEM
 				+ Clean(item.m_sHeading) + SEP_FIELD
 				+ Clean(item.m_sTimestamp) + SEP_FIELD
-				+ Clean(item.m_sBody);
+				+ Clean(item.m_sBody) + SEP_FIELD
+				+ Clean(item.m_sImage) + SEP_FIELD
+				+ Clean(item.m_sImageUrl);
 		}
 
 		return result;
@@ -167,6 +172,12 @@ class MCF_Device_Script
 
 			if (fields.Count() > 2)
 				item.m_sBody = fields[2];
+
+			if (fields.Count() > 3)
+				item.m_sImage = fields[3];
+
+			if (fields.Count() > 4)
+				item.m_sImageUrl = fields[4];
 
 			app.m_aItems.Insert(item);
 		}

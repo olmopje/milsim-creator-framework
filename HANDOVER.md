@@ -317,23 +317,44 @@ the cause: it looked like a puzzle picker that always picked the same puzzle.
 **Escape stops the play session in the Workbench.** Every MCF screen needs a
 visible, always-enabled close button.
 
----
+**A widget wraps text only with `Wrap 1`.** `Clipping` decides whether overflow
+is drawn or cut, never whether there is any. And a RichText wraps at the width
+it is GIVEN -- a scroll gives as much as is asked for, so a `SizeLayoutWidget`
+has to cap it. Three things, and getting two right looks exactly like getting
+none right.
 
-## Working conventions
+**`GetScreenSize` reports the previous layout pass.** Reading it in the same
+frame as a `FrameSlot` change returns the old value, which reads exactly like
+the call did nothing. Wait a frame.
 
-- Commits end with the Co-Authored-By and Claude-Session attribution lines.
-- Research notes go in `docs/research/`, **never** under `addons/MCF/` —
-  anything under the addon is packed into the shipped mod and handed to every
-  player. This was fixed on 2026-09-10.
-- `Scripts/Game/` has one folder per future addon: `Core`, `Objectives`, `Ops`,
-  `Dialogue`, `AI`, `Subdue`, `Ambient`, `React`. Put a new file in the folder
-  of the module it belongs to, and do not let a module name a class from a
-  module it does not depend on.
-- `server/` is untracked: it holds a launcher config with an admin password and
-  a profile folder of pure runtime logs.
-- `addons/MCF/EnfusionMCP/` and `Scripts/WorkbenchGame/EnfusionMCP/` are the MCP
-  tool's own handlers, living inside the addon that gets packed for players.
-  They should become their own addon during the split.
-- The UI is deliberately placeholder and uniform, with one exception: the
-  conversation screen is a running chat with the newest line at the top, and is
-  meant to look different.
+**A `FrameWidgetSlot`'s fields pair up**: PositionX/OffsetLeft,
+PositionY/OffsetTop, SizeX/OffsetRight, SizeY/OffsetBottom. Position and Size
+are the box, the Offsets are padding. Writing the box into the Offsets leaves
+the size at zero and every widget vanishes with no error.
+
+**External images ARE possible, by a route nobody signposts. Measured
+2026-09-10, every link.** The obvious ones are all shut:
+`ImageWidget.LoadImageTexture` refuses an http address outright;
+`RestContext.FILE`, the only file download, is `[Obsolete("Not supported")]` and
+INERT -- it never calls back, never errors and never writes the file; and there
+is no API to build a texture from bytes (`ScreenshotTextureData` is an engine
+pointer with no constructor).
+
+What works is a chain of four supported calls:
+
+    RestContext.GET               text from a URL
+    base64 -> array<int>          in script; 5216 chars in 7 ms
+    FileHandle.WriteArray(a,1,n)  raw bytes to $profile: -- one byte per element
+    LoadImageTexture(.., true)    png from disk, no import, no conversion
+
+So the image travels as TEXT and is rebuilt as a file on the machine that draws
+it. `MCF_Device_ImageCache` is that, written out. Two conditions: whoever
+publishes the image must publish a base64 copy beside it (a raw .jpg URL cannot
+be used -- `GetData` returns a string and binary dies at the first zero byte),
+and EACH CLIENT fetches its own, so a player behind a firewall has no picture
+and that has to read as normal rather than as an error.
+
+`fromLocalStorage` on `LoadImageTexture` is the flag that makes any of it work:
+it skips the resource database, so a path is handed to the file system instead
+of looked up as an imported asset. `.png` loads directly -- no `.edds`
+conversion needed.

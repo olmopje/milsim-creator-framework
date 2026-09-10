@@ -47,6 +47,34 @@ class MCF_Device_Item
 	[Attribute(defvalue: "", uiwidget: UIWidgets.EditBox, desc: "The text itself.")]
 	string m_sBody;
 
+	//! A picture shipped with the mod: an imported texture, by resource name.
+	//! Always available, on every machine, offline.
+	[Attribute(defvalue: "", uiwidget: UIWidgets.ResourceNamePicker, params: "edds", desc: "Picture to show with this item, imported into an addon. Leave empty for none.")]
+	ResourceName m_sImage;
+
+	//! A picture from outside the mod, fetched at runtime.
+	//!
+	//! IT MUST POINT AT BASE64 TEXT, not at a .jpg. The engine refuses an http
+	//! address on a widget and its file download is inert; what works is
+	//! fetching the image as text and rebuilding it locally. See
+	//! MCF_Device_ImageCache for the whole chain and why it is the only one.
+	//!
+	//! EACH CLIENT FETCHES ITS OWN, because a texture has to exist on the
+	//! machine drawing it. A player who cannot reach the address sees no
+	//! picture, and that is normal rather than an error.
+	[Attribute(defvalue: "", uiwidget: UIWidgets.EditBox, desc: "URL of a BASE64 TEXT copy of a picture. Not a .jpg -- see MCF_Device_ImageCache. Each player fetches it themselves.")]
+	string m_sImageUrl;
+
+	//! What the fetched copy is filed under. Two items naming the same picture
+	//! should share one file rather than fetching it twice.
+	string ImageKey()
+	{
+		if (m_sImageUrl.IsEmpty())
+			return "";
+
+		return m_sImageUrl;
+	}
+
 	//! One line for a list.
 	string DescribeShort()
 	{

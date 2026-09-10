@@ -1,9 +1,9 @@
 FrameWidgetClass {
  Name "rootFrame"
  {
-  ImageWidgetClass "{6A1C4F0B39D35059}" {
+  ImageWidgetClass "{6A1C4F0B39D3505B}" {
    Name "Dim"
-   Slot FrameWidgetSlot "{6A1C4F0B39D35058}" {
+   Slot FrameWidgetSlot "{6A1C4F0B39D3505A}" {
     Anchor 0.0000 0.0000 1.0000 1.0000
     PositionX 0
     OffsetLeft 0
@@ -16,9 +16,9 @@ FrameWidgetClass {
    }
    Color 0 0 0 0.75
   }
-  ImageWidgetClass "{6A1C4F0B39D3505B}" {
+  ImageWidgetClass "{6A1C4F0B39D3505D}" {
    Name "Body"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3505A}" {
+   Slot FrameWidgetSlot "{6A1C4F0B39D3505C}" {
     Anchor 0.4150 0.0600 0.5850 0.9500
     PositionX 0
     OffsetLeft 0
@@ -31,9 +31,9 @@ FrameWidgetClass {
    }
    Color 0.06 0.065 0.07 1
   }
-  ItemPreviewWidgetClass "{6A1C4F0B39D3505C}" {
+  ItemPreviewWidgetClass "{6A1C4F0B39D3505E}" {
    Name "Model"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3505D}" {
+   Slot FrameWidgetSlot "{6A1C4F0B39D3505F}" {
     Anchor 0.2750 0.0100 0.7250 0.9900
     PositionX 0
     OffsetLeft 0
@@ -50,9 +50,9 @@ FrameWidgetClass {
    "Blend mode" Blend
    "Use Engine Scale" 0
   }
-  FrameWidgetClass "{6A1C4F0B39D3505E}" {
+  FrameWidgetClass "{6A1C4F0B39D35060}" {
    Name "ScreenArea"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3505F}" {
+   Slot FrameWidgetSlot "{6A1C4F0B39D35061}" {
     Anchor 0.4159 0.1034 0.5841 0.8966
     PositionX 0
     OffsetLeft 0
@@ -539,9 +539,9 @@ FrameWidgetClass {
       }
      }
     }
-    ScrollLayoutWidgetClass "{6A1C4F0B39D35044}" {
+    ScrollLayoutWidgetClass "{6A1C4F0B39D35046}" {
      Name "ReadScroll"
-     Slot FrameWidgetSlot "{6A1C4F0B39D35045}" {
+     Slot FrameWidgetSlot "{6A1C4F0B39D35047}" {
       Anchor 0.0500 0.2050 0.9500 0.8400
       PositionX 0
       OffsetLeft 0
@@ -553,23 +553,23 @@ FrameWidgetClass {
       OffsetBottom 0
      }
      components {
-      SCR_GamepadScrollComponent "{6A1C4F0B39D35046}" {
+      SCR_GamepadScrollComponent "{6A1C4F0B39D35048}" {
       }
      }
      style Small
      {
-      SizeLayoutWidgetClass "{6A1C4F0B39D35047}" {
+      SizeLayoutWidgetClass "{6A1C4F0B39D35049}" {
        Name "ReadWidth"
-       Slot AlignableSlot "{6A1C4F0B39D35048}" {
+       Slot AlignableSlot "{6A1C4F0B39D3504A}" {
         HorizontalAlign 0
         VerticalAlign 0
        }
        AllowWidthOverride 1
        WidthOverride 200
        {
-        VerticalLayoutWidgetClass "{6A1C4F0B39D35049}" {
+        VerticalLayoutWidgetClass "{6A1C4F0B39D3504B}" {
          Name "ReadColumn"
-         Slot AlignableSlot "{6A1C4F0B39D3504A}" {
+         Slot AlignableSlot "{6A1C4F0B39D3504C}" {
           HorizontalAlign 3
           VerticalAlign 0
          }
@@ -600,9 +600,19 @@ FrameWidgetClass {
            "Min Font Size" 11
            "Line Spacing" 20
           }
-          RichTextWidgetClass "{6A1C4F0B39D35042}" {
-           Name "ReadBody"
+          ImageWidgetClass "{6A1C4F0B39D35042}" {
+           Name "ReadImage"
            Slot AlignableSlot "{6A1C4F0B39D35043}" {
+            HorizontalAlign 3
+            VerticalAlign 0
+            SizeToContent 1
+           }
+           "Is Visible" 0
+           Color 1 1 1 1
+          }
+          RichTextWidgetClass "{6A1C4F0B39D35044}" {
+           Name "ReadBody"
+           Slot AlignableSlot "{6A1C4F0B39D35045}" {
             HorizontalAlign 3
             VerticalAlign 0
            }
@@ -619,9 +629,9 @@ FrameWidgetClass {
       }
      }
     }
-    ButtonWidgetClass "{6A1C4F0B39D3504B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    ButtonWidgetClass "{6A1C4F0B39D3504D}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
      Name "ButtonBack"
-     Slot FrameWidgetSlot "{6A1C4F0B39D3504C}" {
+     Slot FrameWidgetSlot "{6A1C4F0B39D3504E}" {
       Anchor 0.0600 0.8580 0.3600 0.9180
       PositionX 0
       OffsetLeft 0
@@ -633,15 +643,15 @@ FrameWidgetClass {
       OffsetBottom 0
      }
      components {
-      SCR_ButtonTextComponent "{6A1C4F0B39D3504D}" {
+      SCR_ButtonTextComponent "{6A1C4F0B39D3504F}" {
        m_bCanBeToggled 0
        m_sText "BACK"
       }
      }
     }
-    ButtonWidgetClass "{6A1C4F0B39D3504E}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    ButtonWidgetClass "{6A1C4F0B39D35050}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
      Name "ButtonLog"
-     Slot FrameWidgetSlot "{6A1C4F0B39D3504F}" {
+     Slot FrameWidgetSlot "{6A1C4F0B39D35051}" {
       Anchor 0.3800 0.8580 0.6200 0.9180
       PositionX 0
       OffsetLeft 0
@@ -653,15 +663,15 @@ FrameWidgetClass {
       OffsetBottom 0
      }
      components {
-      SCR_ButtonTextComponent "{6A1C4F0B39D35050}" {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35052}" {
        m_bCanBeToggled 0
        m_sText "LOG"
       }
      }
     }
-    ButtonWidgetClass "{6A1C4F0B39D35051}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    ButtonWidgetClass "{6A1C4F0B39D35053}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
      Name "ButtonClose"
-     Slot FrameWidgetSlot "{6A1C4F0B39D35052}" {
+     Slot FrameWidgetSlot "{6A1C4F0B39D35054}" {
       Anchor 0.6400 0.8580 0.9400 0.9180
       PositionX 0
       OffsetLeft 0
@@ -673,15 +683,15 @@ FrameWidgetClass {
       OffsetBottom 0
      }
      components {
-      SCR_ButtonTextComponent "{6A1C4F0B39D35053}" {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35055}" {
        m_bCanBeToggled 0
        m_sText "CLOSE"
       }
      }
     }
-    TextWidgetClass "{6A1C4F0B39D35054}" {
+    TextWidgetClass "{6A1C4F0B39D35056}" {
      Name "Hint"
-     Slot FrameWidgetSlot "{6A1C4F0B39D35055}" {
+     Slot FrameWidgetSlot "{6A1C4F0B39D35057}" {
       Anchor 0.0500 0.9210 0.9500 0.9550
       PositionX 0
       OffsetLeft 0
@@ -696,9 +706,9 @@ FrameWidgetClass {
      "Font Size" 11
      "Min Font Size" 11
     }
-    ImageWidgetClass "{6A1C4F0B39D35057}" {
+    ImageWidgetClass "{6A1C4F0B39D35059}" {
      Name "HomeBar"
-     Slot FrameWidgetSlot "{6A1C4F0B39D35056}" {
+     Slot FrameWidgetSlot "{6A1C4F0B39D35058}" {
       Anchor 0.3600 0.9680 0.6400 0.9780
       PositionX 0
       OffsetLeft 0

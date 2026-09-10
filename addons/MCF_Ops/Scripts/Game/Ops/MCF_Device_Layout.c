@@ -77,6 +77,10 @@ class MCF_Device_Layout
 	protected float m_fSizeX;
 	protected float m_fSizeZ;
 
+	//! Remembered from the last placement, because it is the one number
+	//! everything else on the screen is measured against.
+	protected float m_fGlassWidth;
+
 	//! Binds to a layout and to the object being drawn.
 	//! \param size The model's real size in metres. X across the face, Z along
 	//!             its length. Y -- its thickness -- is not used.
@@ -107,6 +111,14 @@ class MCF_Device_Layout
 	ItemPreviewWidget GetModelWidget()
 	{
 		return m_wModel;
+	}
+
+	//! How wide the glass is, in reference units. Anything that has to be sized
+	//! to the screen -- a photograph, for one -- asks here rather than measuring
+	//! again and getting a different answer.
+	float GetGlassWidth()
+	{
+		return m_fGlassWidth;
 	}
 
 	//! Whether the drawn fallback panel is shown instead of the model.
@@ -221,6 +233,7 @@ class MCF_Device_Layout
 	protected void PlaceGlass(float deviceW, float deviceH)
 	{
 		float glassW = deviceW * GLASS_X;
+		m_fGlassWidth = glassW;
 
 		if (m_wScreenArea)
 			PlaceCentred(m_wScreenArea, glassW, deviceH * GLASS_Y);

@@ -37,6 +37,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_READ_SCROLL = "ReadScroll";
 	protected static const string W_READ_COLUMN = "ReadColumn";
 	protected static const string W_READ_BODY = "ReadBody";
+	protected static const string W_READ_IMAGE = "ReadImage";
 	protected static const string W_READ_HEADING = "ReadHeading";
 	protected static const string W_READ_TIMESTAMP = "ReadTimestamp";
 	protected static const string W_BUTTON_BACK = "ButtonBack";
@@ -89,6 +90,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected VerticalLayoutWidget m_wEntryList;
 	protected VerticalLayoutWidget m_wReadColumn;
 	protected RichTextWidget m_wReadBody;
+	protected ImageWidget m_wReadImage;
 	protected TextWidget m_wDeviceName;
 	protected TextWidget m_wStatusBar;
 	protected RichTextWidget m_wReadHeading;
@@ -171,6 +173,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wEntryList = VerticalLayoutWidget.Cast(root.FindAnyWidget(W_ENTRY_LIST));
 		m_wReadColumn = VerticalLayoutWidget.Cast(root.FindAnyWidget(W_READ_COLUMN));
 		m_wReadBody = RichTextWidget.Cast(root.FindAnyWidget(W_READ_BODY));
+		m_wReadImage = ImageWidget.Cast(root.FindAnyWidget(W_READ_IMAGE));
 		m_wReadHeading = RichTextWidget.Cast(root.FindAnyWidget(W_READ_HEADING));
 		m_wReadTimestamp = RichTextWidget.Cast(root.FindAnyWidget(W_READ_TIMESTAMP));
 		m_wHint = TextWidget.Cast(root.FindAnyWidget(W_HINT));
@@ -230,6 +233,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		ShowModel(root);
 
 		m_Content.Bind(m_Carrier);
+		PrefetchPictures();
 
 		if (m_wDeviceName)
 			m_wDeviceName.SetText(m_Content.DeviceName());
@@ -486,11 +490,93 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_wReadBody)
 			m_wReadBody.SetText(entry.m_sBody);
 
+		ShowPicture(entry);
+
 		if (m_ButtonBack)
 			m_ButtonBack.SetText("BACK");
 
 		UpdatePageButtons();
 		UpdateLogButton();
+	}
+
+	//! The photograph on an item, if it has one and if this machine has it.
+	//!
+	//! TWO SOURCES, IN THIS ORDER. An imported texture ships with the mod and is
+	//! on every machine; a fetched one exists only where somebody fetched it.
+	//! The imported one wins when both are named, because a picture that is
+	//! always there beats one that usually is.
+	//!
+	//! NOT HAVING IT IS NORMAL. A player who cannot reach the address, or who
+	//! opened the phone before the fetch finished, sees the text without the
+	//! picture. That is a photograph that has not loaded, not an error, and it
+	//! must not read as one.
+	protected void ShowPicture(notnull MCF_Device_Item item)
+	{
+		if (!m_wReadImage)
+			return;
+
+		bool shown;
+
+		if (!item.m_sImage.IsEmpty())
+			shown = m_wReadImage.LoadImageTexture(0, item.m_sImage);
+
+		if (!shown && !item.m_sImageUrl.IsEmpty())
+			shown = MCF_Device_ImageCache.Show(m_wReadImage, item.ImageKey());
+
+		m_wReadImage.SetVisible(shown);
+
+		if (!shown)
+			return;
+
+		// Sized to the glass rather than to the picture: a photograph wider than
+		// the screen would push the text off the side, and one much narrower
+		// would look like a thumbnail somebody forgot to finish.
+		float width = GlassWidth() * 0.88;
+		m_wReadImage.SetSize(width, width * 0.75);
+	}
+
+	//! Asks a picture's source to fetch itself, so it is on disk by the time
+	//! somebody opens the item. Called once when the device opens, because that
+	//! is the only moment there is time to spare.
+	protected void PrefetchPictures()
+	{
+		array<ref MCF_Device_Item> items = {};
+		m_Content.GetAllItems(items);
+
+		foreach (MCF_Device_Item item : items)
+		{
+			if (item.m_sImageUrl.IsEmpty())
+				continue;
+
+			string host, path;
+			if (SplitUrl(item.m_sImageUrl, host, path))
+				MCF_Device_ImageCache.Fetch(host, path, item.ImageKey());
+		}
+	}
+
+	//! "https://host/some/path" into its two halves, because RestApi wants a
+	//! context per host and a request path per call.
+	protected bool SplitUrl(string url, out string host, out string path)
+	{
+		int schemeEnd = url.IndexOf("//");
+		if (schemeEnd < 0)
+			return false;
+
+		int slash = url.IndexOfFrom(schemeEnd + 2, "/");
+		if (slash < 0)
+			return false;
+
+		host = url.Substring(0, slash);
+		path = url.Substring(slash, url.Length() - slash);
+		return true;
+	}
+
+	protected float GlassWidth()
+	{
+		if (m_Geometry)
+			return m_Geometry.GetGlassWidth();
+
+		return 200;
 	}
 
 	// ------------------------------------------------------------ plumbing

@@ -33,6 +33,21 @@ class MCF_Device_Presenter
 		if (!m_Carrier)
 			return;
 
+		// Written onto this device by a Game Master. Beats the library, because
+		// an edit made to this object is more specific than the entry it
+		// started from -- and because it is the only kind of authored profile
+		// a client can see. See MCF_Intel_CarrierComponent.m_sProfileOverride.
+		string written = m_Carrier.GetProfileOverride();
+		if (!written.IsEmpty())
+		{
+			m_Profile = MCF_Device_Script.Deserialize(written);
+
+			if (m_Profile)
+				return;
+
+			MCF_Core_Log.Warn("device carries a profile that could not be read -- falling back");
+		}
+
 		string profileId = m_Carrier.GetProfileId();
 		if (!profileId.IsEmpty())
 		{
