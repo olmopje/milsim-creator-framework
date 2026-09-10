@@ -39,9 +39,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_READ_BODY = "ReadBody";
 	protected static const string W_READ_IMAGE = "ReadImage";
 	protected static const string W_READ_IMAGE_NOTE = "ReadImageNote";
+	protected static const string W_READ_IMAGE_BUTTON = "ReadImageButton";
 	protected static const string W_PHOTO_OVERLAY = "PhotoOverlay";
 	protected static const string W_PHOTO_BACKDROP = "PhotoBackdrop";
 	protected static const string W_PHOTO_FULL = "PhotoFull";
+	protected static const string W_PHOTO_FULL_BUTTON = "PhotoFullButton";
 	protected static const string W_READ_HEADING = "ReadHeading";
 	protected static const string W_READ_TIMESTAMP = "ReadTimestamp";
 	protected static const string W_BUTTON_BACK = "ButtonBack";
@@ -111,15 +113,18 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected VerticalLayoutWidget m_wReadColumn;
 	protected RichTextWidget m_wReadBody;
 	protected ImageWidget m_wReadImage;
+	protected Widget m_wReadImageButton;
 	protected RichTextWidget m_wReadImageNote;
 	protected Widget m_wPhotoOverlay;
 	protected ImageWidget m_wPhotoFull;
+	protected Widget m_wPhotoFullButton;
 
 	//! Held because a handler that is not referenced is collected, and a
 	//! collected handler stops handling -- quietly, exactly like the callback
 	//! that cost this feature an afternoon.
 	protected ref MCF_Device_ImageClick m_PhotoClick;
 	protected ref MCF_Device_ImageClick m_BackdropClick;
+	protected ref MCF_Device_ImageClick m_PhotoCloseClick;
 
 	//! The picture currently drawn, so its shape can be looked up. Empty when
 	//! what is drawn came from the mod rather than from a url.
@@ -210,20 +215,38 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wReadImageNote = RichTextWidget.Cast(root.FindAnyWidget(W_READ_IMAGE_NOTE));
 		m_wPhotoOverlay = root.FindAnyWidget(W_PHOTO_OVERLAY);
 		m_wPhotoFull = ImageWidget.Cast(root.FindAnyWidget(W_PHOTO_FULL));
+		m_wPhotoFullButton = root.FindAnyWidget(W_PHOTO_FULL_BUTTON);
 
-		if (m_wReadImage)
+		// THE BUTTON TAKES THE CLICK, NOT THE IMAGE. An ImageWidget does not
+		// accept cursor input, so a handler on it is attached, never called, and
+		// looks exactly like a handler that is broken. The button wraps the image
+		// and both are given the same size every time a picture is drawn, so the
+		// clickable area cannot drift away from what is on screen.
+		m_wReadImageButton = root.FindAnyWidget(W_READ_IMAGE_BUTTON);
+		if (m_wReadImageButton)
 		{
 			m_PhotoClick = new MCF_Device_ImageClick();
 			m_PhotoClick.m_OnClicked.Insert(OnPhotoClicked);
-			m_wReadImage.AddHandler(m_PhotoClick);
+			m_wReadImageButton.AddHandler(m_PhotoClick);
 		}
 
+		// BOTH SURFACES, because "click anywhere" has to mean anywhere. The
+		// enlarged picture covers most of the screen, so a backdrop that closes
+		// and a picture that does not would leave the obvious click doing
+		// nothing.
 		Widget backdrop = root.FindAnyWidget(W_PHOTO_BACKDROP);
 		if (backdrop)
 		{
 			m_BackdropClick = new MCF_Device_ImageClick();
 			m_BackdropClick.m_OnClicked.Insert(ClosePhoto);
 			backdrop.AddHandler(m_BackdropClick);
+		}
+
+		if (m_wPhotoFullButton)
+		{
+			m_PhotoCloseClick = new MCF_Device_ImageClick();
+			m_PhotoCloseClick.m_OnClicked.Insert(ClosePhoto);
+			m_wPhotoFullButton.AddHandler(m_PhotoCloseClick);
 		}
 
 		ClosePhoto();
@@ -591,6 +614,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		m_wReadImage.SetVisible(false);
 
+		if (m_wReadImageButton)
+			m_wReadImageButton.SetVisible(false);
+
 		// No picture and none coming: an ordinary item, nothing to say.
 		if (key.IsEmpty())
 		{
@@ -625,10 +651,19 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (!m_wReadImage)
 			return;
 
+		float width = GlassWidth() * 0.88;
+		float height = width / PictureAspect();
+
+		m_wReadImage.SetSize(width, height);
 		m_wReadImage.SetVisible(true);
 
-		float width = GlassWidth() * 0.88;
-		m_wReadImage.SetSize(width, width / PictureAspect());
+		// The button is NOT sized here: Widget has no SetSize -- only the widget
+		// types that own a size do -- so the button's slot is set to size itself
+		// to its content instead, and its content is the image just sized above.
+		// One number, one place, and the clickable area cannot disagree with what
+		// is drawn.
+		if (m_wReadImageButton)
+			m_wReadImageButton.SetVisible(true);
 
 		SetPictureNote("");
 	}
@@ -674,18 +709,26 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		// Fit inside the screen rather than fill it: whichever side runs out
 		// first decides, so nothing is cropped and nothing is stretched.
-		float height = screenH * 0.86;
+		float height = screenH * 0.80;
 		float width = height * aspect;
 
-		if (width > screenW * 0.94)
+		if (width > screenW * 0.80)
 		{
-			width = screenW * 0.94;
+			width = screenW * 0.80;
 			height = width / aspect;
 		}
 
-		FrameSlot.SetAnchor(m_wPhotoFull, 0.5, 0.5);
-		FrameSlot.SetSize(m_wPhotoFull, width, height);
-		FrameSlot.SetPos(m_wPhotoFull, -width * 0.5, -height * 0.5);
+		// The wrapper is placed, the picture inside is sized: FrameSlot works on
+		// any widget, but only widgets that own a size have SetSize, and a button
+		// is not one of them.
+		if (m_wPhotoFullButton)
+		{
+			FrameSlot.SetAnchor(m_wPhotoFullButton, 0.5, 0.5);
+			FrameSlot.SetSize(m_wPhotoFullButton, width, height);
+			FrameSlot.SetPos(m_wPhotoFullButton, -width * 0.5, -height * 0.5);
+		}
+
+		m_wPhotoFull.SetSize(width, height);
 
 		m_wPhotoOverlay.SetVisible(true);
 	}

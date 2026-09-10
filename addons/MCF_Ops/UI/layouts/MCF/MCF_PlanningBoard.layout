@@ -172,14 +172,24 @@ FrameWidgetClass {
        "Font Size" 17
        "Min Font Size" 17
       }
-      ImageWidgetClass "{6A1C4F0B39D2A160}" {
-       Name "DetailImage"
-       Slot LayoutSlot "{6A1C4F0B39D2A161}" {
+      ButtonWidgetClass "{6A1C4F0B39D2A170}" {
+       Name "DetailImageButton"
+       Slot LayoutSlot "{6A1C4F0B39D2A171}" {
         HorizontalAlign 0
         Padding 8 0 8 8
+        SizeToContent 1
        }
        "Is Visible" 0
-       Color 1 1 1 1
+       {
+        ImageWidgetClass "{6A1C4F0B39D2A160}" {
+         Name "DetailImage"
+         Slot AlignableSlot "{6A1C4F0B39D2A161}" {
+          HorizontalAlign 0
+          VerticalAlign 0
+         }
+         Color 1 1 1 1
+        }
+       }
       }
       TextWidgetClass "{6A1C4F0B39D2A162}" {
        Name "DetailImageNote"
@@ -435,6 +445,90 @@ FrameWidgetClass {
    Text "CLOSE leaves the board."
    "Font Size" 15
    "Min Font Size" 15
+  }
+  FrameWidgetClass "{6A1C4F0B39D2A180}" {
+   Name "PhotoOverlay"
+   Slot FrameWidgetSlot "{6A1C4F0B39D2A181}" {
+    Anchor 0.0000 0.0000 1.0000 1.0000
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   {
+    ButtonWidgetClass "{6A1C4F0B39D2A182}" {
+     Name "PhotoBackdrop"
+     Slot FrameWidgetSlot "{6A1C4F0B39D2A183}" {
+      Anchor 0.0000 0.0000 1.0000 1.0000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     {
+      ImageWidgetClass "{6A1C4F0B39D2A188}" {
+       Name "PhotoBackdropFill"
+       Slot AlignableSlot "{6A1C4F0B39D2A189}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       Color 0 0 0 0.94
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D2A18A}" {
+     Name "PhotoFullButton"
+     Slot FrameWidgetSlot "{6A1C4F0B39D2A18B}" {
+      Anchor 0.5000 0.5000 0.5000 0.5000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     {
+      ImageWidgetClass "{6A1C4F0B39D2A184}" {
+       Name "PhotoFull"
+       Slot AlignableSlot "{6A1C4F0B39D2A185}" {
+        HorizontalAlign 0
+        VerticalAlign 0
+       }
+       Color 1 1 1 1
+      }
+     }
+    }
+    TextWidgetClass "{6A1C4F0B39D2A186}" {
+     Name "PhotoHint"
+     Slot FrameWidgetSlot "{6A1C4F0B39D2A187}" {
+      Anchor 0.0000 0.9500 1.0000 0.9800
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text "Click anywhere to close"
+     "Font Size" 15
+     "Min Font Size" 15
+     "Text Horizontal Align" 1
+     Color 0.7 0.7 0.7 1
+    }
+   }
   }
  }
 }

@@ -600,15 +600,24 @@ FrameWidgetClass {
            "Min Font Size" 11
            "Line Spacing" 20
           }
-          ImageWidgetClass "{6A1C4F0B39D35042}" {
-           Name "ReadImage"
-           Slot AlignableSlot "{6A1C4F0B39D35043}" {
-            HorizontalAlign 3
+          ButtonWidgetClass "{6A1C4F0B39D35090}" {
+           Name "ReadImageButton"
+           Slot AlignableSlot "{6A1C4F0B39D35091}" {
+            HorizontalAlign 0
             VerticalAlign 0
             SizeToContent 1
            }
            "Is Visible" 0
-           Color 1 1 1 1
+           {
+            ImageWidgetClass "{6A1C4F0B39D35042}" {
+             Name "ReadImage"
+             Slot AlignableSlot "{6A1C4F0B39D35043}" {
+              HorizontalAlign 0
+              VerticalAlign 0
+             }
+             Color 1 1 1 1
+            }
+           }
           }
           RichTextWidgetClass "{6A1C4F0B39D35070}" {
            Name "ReadImageNote"
@@ -753,7 +762,7 @@ FrameWidgetClass {
    }
    "Is Visible" 0
    {
-    ImageWidgetClass "{6A1C4F0B39D35082}" {
+    ButtonWidgetClass "{6A1C4F0B39D35082}" {
      Name "PhotoBackdrop"
      Slot FrameWidgetSlot "{6A1C4F0B39D35083}" {
       Anchor 0.0000 0.0000 1.0000 1.0000
@@ -766,11 +775,20 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0 0 0 0.94
+     {
+      ImageWidgetClass "{6A1C4F0B39D35088}" {
+       Name "PhotoBackdropFill"
+       Slot AlignableSlot "{6A1C4F0B39D35089}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       Color 0 0 0 0.94
+      }
+     }
     }
-    ImageWidgetClass "{6A1C4F0B39D35084}" {
-     Name "PhotoFull"
-     Slot FrameWidgetSlot "{6A1C4F0B39D35085}" {
+    ButtonWidgetClass "{6A1C4F0B39D3508A}" {
+     Name "PhotoFullButton"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3508B}" {
       Anchor 0.5000 0.5000 0.5000 0.5000
       PositionX 0
       OffsetLeft 0
@@ -781,7 +799,16 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     {
+      ImageWidgetClass "{6A1C4F0B39D35084}" {
+       Name "PhotoFull"
+       Slot AlignableSlot "{6A1C4F0B39D35085}" {
+        HorizontalAlign 0
+        VerticalAlign 0
+       }
+       Color 1 1 1 1
+      }
+     }
     }
     TextWidgetClass "{6A1C4F0B39D35086}" {
      Name "PhotoHint"

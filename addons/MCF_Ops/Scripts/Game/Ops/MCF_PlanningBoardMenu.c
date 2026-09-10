@@ -66,6 +66,11 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 	protected static const string W_TASK_LIST = "TaskList";
 	protected static const string W_DETAIL_BODY = "DetailBody";
 	protected static const string W_DETAIL_IMAGE = "DetailImage";
+	protected static const string W_DETAIL_IMAGE_BUTTON = "DetailImageButton";
+	protected static const string W_PHOTO_OVERLAY = "PhotoOverlay";
+	protected static const string W_PHOTO_BACKDROP = "PhotoBackdrop";
+	protected static const string W_PHOTO_FULL = "PhotoFull";
+	protected static const string W_PHOTO_FULL_BUTTON = "PhotoFullButton";
 	protected static const string W_DETAIL_IMAGE_NOTE = "DetailImageNote";
 	protected static const string W_EDIT_PANE = "EditPane";
 
@@ -93,6 +98,19 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 	protected VerticalLayoutWidget m_wTaskList;
 	protected RichTextWidget m_wDetailBody;
 	protected ImageWidget m_wDetailImage;
+	protected Widget m_wDetailImageButton;
+	protected Widget m_wPhotoOverlay;
+	protected ImageWidget m_wPhotoFull;
+	protected Widget m_wPhotoFullButton;
+
+	//! Held because a handler that is not referenced is collected, and a
+	//! collected handler stops handling without saying so.
+	protected ref MCF_Device_ImageClick m_PhotoClick;
+	protected ref MCF_Device_ImageClick m_BackdropClick;
+	protected ref MCF_Device_ImageClick m_PhotoCloseClick;
+
+	//! The picture on screen, so its shape can be looked up when enlarging it.
+	protected string m_sPictureShown;
 	protected TextWidget m_wDetailImageNote;
 
 	//! The picture the selected report is waiting for, empty when it is not
@@ -171,6 +189,40 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		m_wTaskList = VerticalLayoutWidget.Cast(root.FindAnyWidget(W_TASK_LIST));
 		m_wDetailBody = RichTextWidget.Cast(root.FindAnyWidget(W_DETAIL_BODY));
 		m_wDetailImage = ImageWidget.Cast(root.FindAnyWidget(W_DETAIL_IMAGE));
+		m_wPhotoOverlay = root.FindAnyWidget(W_PHOTO_OVERLAY);
+		m_wPhotoFull = ImageWidget.Cast(root.FindAnyWidget(W_PHOTO_FULL));
+		m_wPhotoFullButton = root.FindAnyWidget(W_PHOTO_FULL_BUTTON);
+
+		// See the note in MCF_Intel_ShellMenu: an ImageWidget takes no cursor
+		// input, so the click belongs to a button wrapped around it.
+		m_wDetailImageButton = root.FindAnyWidget(W_DETAIL_IMAGE_BUTTON);
+		if (m_wDetailImageButton)
+		{
+			m_PhotoClick = new MCF_Device_ImageClick();
+			m_PhotoClick.m_OnClicked.Insert(OnPhotoClicked);
+			m_wDetailImageButton.AddHandler(m_PhotoClick);
+		}
+
+		// BOTH SURFACES, because "click anywhere" has to mean anywhere. The
+		// enlarged picture covers most of the screen, so a backdrop that closes
+		// and a picture that does not would leave the obvious click doing
+		// nothing.
+		Widget backdrop = root.FindAnyWidget(W_PHOTO_BACKDROP);
+		if (backdrop)
+		{
+			m_BackdropClick = new MCF_Device_ImageClick();
+			m_BackdropClick.m_OnClicked.Insert(ClosePhoto);
+			backdrop.AddHandler(m_BackdropClick);
+		}
+
+		if (m_wPhotoFullButton)
+		{
+			m_PhotoCloseClick = new MCF_Device_ImageClick();
+			m_PhotoCloseClick.m_OnClicked.Insert(ClosePhoto);
+			m_wPhotoFullButton.AddHandler(m_PhotoCloseClick);
+		}
+
+		ClosePhoto();
 		m_wDetailImageNote = TextWidget.Cast(root.FindAnyWidget(W_DETAIL_IMAGE_NOTE));
 		m_wEditPane = root.FindAnyWidget(W_EDIT_PANE);
 
@@ -882,6 +934,10 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 			return;
 
 		m_wDetailImage.SetVisible(false);
+
+		if (m_wDetailImageButton)
+			m_wDetailImageButton.SetVisible(false);
+
 		SetPictureNote("");
 
 		if (!record)
@@ -909,19 +965,84 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		if (!m_wDetailImage)
 			return;
 
-		float aspect = MCF_Device_ImageCache.Aspect(key);
-		if (aspect <= 0)
-			aspect = 4.0 / 3.0;
+		m_sPictureShown = key;
 
+		float height = PICTURE_WIDTH / PictureAspect();
+
+		m_wDetailImage.SetSize(PICTURE_WIDTH, height);
 		m_wDetailImage.SetVisible(true);
-		m_wDetailImage.SetSize(PICTURE_WIDTH, PICTURE_WIDTH / aspect);
+
+		// Sized by its slot, from the image inside it -- Widget has no SetSize.
+		if (m_wDetailImageButton)
+			m_wDetailImageButton.SetVisible(true);
 
 		SetPictureNote("");
+	}
+
+	protected float PictureAspect()
+	{
+		float aspect = MCF_Device_ImageCache.Aspect(m_sPictureShown);
+		if (aspect > 0)
+			return aspect;
+
+		return 4.0 / 3.0;
+	}
+
+	//! A photograph on a report is evidence, and evidence gets looked at. Same
+	//! behaviour as the phone, deliberately: a commander should not have to
+	//! learn a second way to enlarge the same picture.
+	protected void OnPhotoClicked()
+	{
+		if (!m_wPhotoOverlay || !m_wPhotoFull || m_sPictureShown.IsEmpty())
+			return;
+
+		if (!MCF_Device_ImageCache.Show(m_wPhotoFull, m_sPictureShown))
+			return;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return;
+
+		float screenW = workspace.DPIUnscale(workspace.GetWidth());
+		float screenH = workspace.DPIUnscale(workspace.GetHeight());
+
+		float aspect = PictureAspect();
+
+		float height = screenH * 0.80;
+		float width = height * aspect;
+
+		if (width > screenW * 0.80)
+		{
+			width = screenW * 0.80;
+			height = width / aspect;
+		}
+
+		// The wrapper is placed, the picture inside is sized: FrameSlot works on
+		// any widget, but only widgets that own a size have SetSize, and a button
+		// is not one of them.
+		if (m_wPhotoFullButton)
+		{
+			FrameSlot.SetAnchor(m_wPhotoFullButton, 0.5, 0.5);
+			FrameSlot.SetSize(m_wPhotoFullButton, width, height);
+			FrameSlot.SetPos(m_wPhotoFullButton, -width * 0.5, -height * 0.5);
+		}
+
+		m_wPhotoFull.SetSize(width, height);
+
+		m_wPhotoOverlay.SetVisible(true);
+	}
+
+	protected void ClosePhoto()
+	{
+		if (m_wPhotoOverlay)
+			m_wPhotoOverlay.SetVisible(false);
 	}
 
 	protected void StopWaitingForPicture()
 	{
 		m_sPictureKey = "";
+		m_sPictureShown = "";
+		ClosePhoto();
 		m_fPictureTick = 0;
 		m_fPictureWaited = 0;
 		m_iPictureDots = 0;
