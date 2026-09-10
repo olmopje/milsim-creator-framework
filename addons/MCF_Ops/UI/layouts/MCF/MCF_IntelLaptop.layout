@@ -756,7 +756,17 @@ FrameWidgetClass {
       {
        ImageWidgetClass "{6A1C4F0B39D37092}" {
         Name "LockDim"
-        Slot AlignableSlot "{6A1C4F0B39D37093}" { HorizontalAlign 3 VerticalAlign 3 }
+       Slot FrameWidgetSlot "{6A1C4F0B39D37093}" {
+        Anchor 0.0000 0.0000 1.0000 1.0000
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
         Color 0.02 0.03 0.03 0.97
        }
        TextWidgetClass "{6A1C4F0B39D37094}" {
@@ -775,7 +785,6 @@ FrameWidgetClass {
         Text "LOCKED"
         "Font Size" 34
         "Min Font Size" 34
-        "Horizontal Align" 1
         Color 0.85 0.87 0.87 1
        }
        RichTextWidgetClass "{6A1C4F0B39D37096}" {
@@ -794,7 +803,6 @@ FrameWidgetClass {
         Text ""
         "Font Size" 15
         "Min Font Size" 15
-        "Horizontal Align" 1
         Color 0.60 0.62 0.62 1
        }
        ButtonWidgetClass "{6A1C4F0B39D37098}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
