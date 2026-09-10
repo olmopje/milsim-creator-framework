@@ -37,7 +37,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     CustomAttributes {
      PreviewRenderAttributes "{6A1C4F0B39D2D093}" {
       CameraOrbitAngles -28 180 0
-      CameraDistanceToItem 0.36
+      CameraDistanceToItem 0.20
       ItemRenderRotation 0 0 0
       LodModel 1
      }

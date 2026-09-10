@@ -77,7 +77,12 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! MCF_Device_Layout.SetScreenQuad. These are a shade under 1 only so the
 	//! bezel shows as a hairline rather than the UI running to the very edge of
 	//! the panel.
-	protected static const float LAPTOP_HEIGHT = 0.78;
+	//! The laptop is deliberately drawn LARGER than the box it is given, so it
+	//! overflows and covers the preview world's sky. It also puts the screen --
+	//! the only part anyone is reading -- at a size worth reading. The glass
+	//! follows the projected screen quad, which is computed rather than
+	//! clipped, so it tracks the model out past the box's edge.
+	protected static const float LAPTOP_HEIGHT = 0.95;
 	protected static const float LAPTOP_GLASS_X = 0.99;
 	protected static const float LAPTOP_GLASS_Y = 0.99;
 
@@ -485,6 +490,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		manager.SetPreviewItemFromPrefab(m_Geometry.GetModelWidget(), prefab);
 		m_Geometry.ShowFallbackBody(false);
+		m_Geometry.ClearPreviewBackground();
 
 		// WHAT THE PREVIEW WORLD ACTUALLY BUILT. The widget draws black when it
 		// has nothing to draw, which looks exactly like a device whose screen

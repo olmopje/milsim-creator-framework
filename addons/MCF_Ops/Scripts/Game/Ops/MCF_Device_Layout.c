@@ -129,13 +129,6 @@ class MCF_Device_Layout
 	{
 		m_wRoot = root;
 		m_wModel = ItemPreviewWidget.Cast(root.FindAnyWidget(W_MODEL));
-
-		// THE PREVIEW DRAWS ITS OWN WORLD BEHIND THE ITEM -- a treeline and a
-		// dark sky, which on a laptop-sized widget reads as a photograph
-		// somebody left behind the device. Clearing to transparent leaves the
-		// item and nothing else.
-		if (m_wModel)
-			m_wModel.SetClearColor(true, 0x00000000);
 		m_wScreenArea = root.FindAnyWidget(W_SCREEN_AREA);
 		m_wBody = root.FindAnyWidget(W_BODY);
 
@@ -160,6 +153,21 @@ class MCF_Device_Layout
 	void SetScreenQuad(notnull array<vector> corners)
 	{
 		m_aScreenQuad = corners;
+	}
+
+	//! Asks the render target not to draw the preview world's own sky.
+	//!
+	//! The inventory preview world is InventoryPreviewWorld.et and it carries
+	//! SkyPreset HDRi_inventory.emat -- a treeline under a dark sky. At the
+	//! size of an inventory tile that reads as a soft backdrop; at the size of
+	//! a laptop it reads as a photograph somebody left behind the device.
+	//!
+	//! Called AFTER the item is set, because the manager configures the render
+	//! target when it takes it over and a clear colour set before that is lost.
+	void ClearPreviewBackground()
+	{
+		if (m_wModel)
+			m_wModel.SetClearColor(true, 0x00000000);
 	}
 
 	ItemPreviewWidget GetModelWidget()
