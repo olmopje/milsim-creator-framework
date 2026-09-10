@@ -8,7 +8,7 @@
 //! It is registered in Configs/Editor/MCF_EditorAttributes.conf like the rest.
 //! With the subdue module absent the entry names a class the parser cannot
 //! resolve and is skipped, which is the intended outcome -- see
-//! docs/architecture/MODULARISATION.md.
+//! docs/architecture/STRUCTURE.md.
 
 //! Which clip in the restrained-pose graph plays.
 //!

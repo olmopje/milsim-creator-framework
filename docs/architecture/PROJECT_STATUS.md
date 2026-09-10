@@ -1,5 +1,16 @@
 # Project Status
 
+**What this file is: the chronological record, not the current state.** Sessions
+are appended in order, including every dead end, because a framework that only
+writes down its successes teaches nothing. Entries are true as of their own
+date and are deliberately left standing when they are later overtaken.
+
+**So do not read this to learn how MCF is structured today.** Older entries
+describe a single addon, then nine, then eight — all of which were true when
+written. The structure of record is
+[`STRUCTURE.md`](STRUCTURE.md); the plan and the reasoning behind it are in
+[`ARCHITECTURE.md`](ARCHITECTURE.md).
+
 Supersedes `PHASE0_PROGRESS.md` (kept below for historical environment notes). Last updated after completing the full phased roadmap (ARCHITECTURE.md section 9, Phases 0-14) plus a follow-up session closing several "manual driver" gaps.
 
 ## MAJOR UPDATE (2026-09-09, later session): EOnInit never fired -- framework-wide
@@ -1870,3 +1881,97 @@ Unparent with `CLEAR_KEEP_TRANSFORM` *before* removing the empties.
 
 Textures went 4096² -> 1024². A prop you hold in your hand does not need 4K;
 that alone took the set from 45.6 MB to 5.7 MB.
+
+---
+
+## Consolidation to six addons, and the documentation sweep (2026-09-10, late)
+
+The nine-addon split lasted a day. Folded down to six, and then every document
+that described the old shape was corrected — which turned out to be almost all
+of them.
+
+### What moved
+
+| Was its own addon | Went into | Why |
+|---|---|---|
+| `MCF_Devices` | `MCF_Ops` | It split one feature down the middle. A locked laptop is intel you cannot read yet, not a separate subject. It produced the only illegal cross-module edge the framework has ever had, plus two files whose entire purpose was to reach across the boundary it created |
+| `MCF_Subdue`, `MCF_Ambient` | `MCF_AI` | The argument was sitting in the tree: every class in both is named `MCF_AI_something`. Neither referenced the other; the merge cost nothing |
+| `MCF_React` | `MCF_Objectives` | Sequence playback and step running are mission logic. Four scripts and 9 KB do not earn a `.gproj`, a dependency GUID, a Workshop listing and the open-it-once-in-the-Workbench tax |
+
+Moving files between addons cost nothing outside the moved files, because
+resource references are `{GUID}relative/path` and the path is relative to the
+addon root. Same relative path, byte-identical references.
+
+### The measured graph afterwards
+
+```
+MCF              -> (none)
+MCF_AI           -> MCF 8
+MCF_Dialogue     -> MCF 12
+MCF_Objectives   -> MCF 7
+MCF_Ops          -> MCF 12
+MCF_Dev          -> MCF 4, MCF_Ops 8
+```
+
+Every module depends on Core and nothing else. `MCF_Dev` is the test
+environment — not a distribution addon — and reaches everywhere because a
+harness must.
+
+**The measuring script had to learn to ignore comments first.** Its first
+version counted any occurrence of a class name and reported five illegal edges
+that do not exist: Core "depending on" Ops because `MCF_Core_Roles.c` has the
+words `MCF_ETaskState` in a sentence explaining why an enum is append-only, and
+Ops "depending on" Dialogue because `MCF_Device_Library.c` opens with "this is
+`MCF_Dialogue_Library` with the nouns changed". A cross-reference is code or it
+is nothing. The script is checked in at `tools/measure_addon_graph.ps1` so the
+next person measures instead of believing.
+
+### Core is the mod
+
+Settled this session, and it changes the framing rather than the code: Core is
+not one addon among six, it is the framework a server installs and the thing
+everything else plugs into. That decides the publishing shape — Core as the
+headline Workshop entry, the four modules as dependent entries, `MCF_Dev` never
+published.
+
+It also puts pressure on the one rule that keeps Core honest. "Core is the main
+mod" makes it easy to argue that anything *important* belongs there. The rule is
+*shared*: used by two modules, not merely central. Core is already 207 KB and
+the second-largest addon; if that boundary slips, in a year Core is the mod and
+the modules are empty shells, which is the single-addon project this structure
+was built to escape.
+
+### The documentation was wrong in two different ways
+
+**Stale, because nobody re-measured.** `README.md` still described one addon
+with `Scripts/Game/Modules/` under it. The wiki told readers to open
+`addons/MCF/addon.gproj`, which now loads Core alone. `DEVICES.md` described
+`MCF_Devices` as a live addon with its own dependency edge. `HANDOVER.md` said
+"eight addons" in four places and named three addons that no longer exist.
+
+**Divergent, because it was updated in a copy.** `MODULARISATION.md` had been
+rewritten for six addons — in the Claude project's knowledge base, and never in
+the repository. So the repository kept telling readers there were eight for a
+day after there were six, while a second copy said otherwise. Two files
+disagreeing is worse than one file being out of date, because now you have to
+know which one to trust.
+
+The fix for both is the same and it is not "be more careful": the document says
+at the top that it is the structure of record, the script that produces its
+numbers is checked in next to it, and `CONTRIBUTING.md` now requires it to be
+updated in the same PR as any change to the layout. Renamed to `STRUCTURE.md`,
+because a file called MODULARISATION describes a project that has finished.
+
+### Known defects, recorded rather than tolerated
+
+- `MCF_Device_` and `MCF_Devices_` differ by one letter and mean different
+  things — what is on a device versus whether you may look at it. Wants
+  renaming to `MCF_Device_` and `MCF_Lock_`.
+- `MCF_AI_` and `MCF_Interact_` each span two addons, a direct consequence of
+  the Core rule: the shared half moved to Core and kept its name. Defensible,
+  but it means a namespace no longer names an addon, and a name that needs a
+  lookup table is doing less work than it should.
+
+Neither was fixed in this pass. Both are code changes, not documentation, and
+renaming a namespace across sixty files at the end of a long session is how a
+working build stops working.

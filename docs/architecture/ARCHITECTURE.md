@@ -1,5 +1,15 @@
 # Milsim Creator Framework (MCF) — Architecture Plan
 
+> **This is the plan, not the shipped structure.** It is the reasoning: what the
+> layers are, what the Core is for, and the integration contract every module is
+> held to. Most of it still stands, and where it does not, the difference is
+> deliberate and recorded elsewhere.
+>
+> For **what actually exists on disk today** — the six addons, the measured
+> dependency graph, which addon owns which namespace, and which project file to
+> open — read [`STRUCTURE.md`](STRUCTURE.md). Where the two disagree, that one
+> is right.
+
 ## 1. Vision
 
 A self-built, modular framework for Arma Reforger that gives mission makers Eden-like narrative depth — usable live in Game Master, built around a shared Core, and suitable from the start for large PvE co-op groups without performance degradation.
@@ -52,20 +62,35 @@ These are rules that apply **once, at the Core level**, so no module has to inte
 
 - **Naming convention & prefix.** Project name: **Milsim Creator Framework (MCF)**. All classes/prefabs get the fixed prefix `MCF_`, per BI's official *Editor Entity Naming Conventions* ("replace `SCR_` with your own tag"). Within that, every module gets its own sub-namespace, so the class name immediately shows which module is responsible:
 
-  | Namespace | Covers |
-  |---|---|
-  | `MCF_Core_` | Event Bus, Object Identity, Module Registry, Tick Manager |
-  | `MCF_AI_` | Civilian AI behavior (5.3), Ambient Life behavior profiles (5.5), Compliance/ROE logic (5.7), AI Command Watchdog (5.11) |
-  | `MCF_Obj_` | Objective/POI/Logic Nodes (4.x) |
-  | `MCF_Hostility_` | Hostility/Reputation manager (5.1) |
-  | `MCF_Infra_` | Infrastructure network/AI Warning (5.2) |
-  | `MCF_Voice_` | Voice Line/Comms (4.4) |
-  | `MCF_Interact_` | Interaction hint system (5.6) |
-  | `MCF_AAR_` | Debrief module (5.8) |
-  | `MCF_Squad_` | Squad Cohesion/C2 layer (5.10) |
-  | `MCF_Build_` | Field Construction module — worked out separately in `docs/modules/field-construction.md`, deliberately not included in the phased roadmap (section 9) |
-  | `MCF_ACE_` | ACE Anvil compatibility bridge — worked out separately in `docs/modules/ace-anvil-compatibility.md`, always optional (soft dependency), modularly toggleable per integration point (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`) — **confirmed actively needed**, not speculative work |
-  | `MCF_React_` | Scripted AI Reactions — reusable behavior-recipe catalog (5.12) + Sequence Recorder (5.13), combines existing building blocks, no behavior logic of its own |
+  | Namespace | Addon | Covers |
+  |---|---|---|
+  | `MCF_Core_` | MCF | Event Bus, Object Identity, Module Registry, Tick Manager |
+  | `MCF_Hostility_` | MCF | Hostility/Reputation manager (5.1) |
+  | `MCF_Voice_` | MCF | Voice Line/Comms (4.4) |
+  | `MCF_UI_` | MCF | Player-facing display components |
+  | `MCF_AAR_` | MCF | Debrief module (5.8) |
+  | `MCF_AI_` | MCF **and** MCF_AI | Disposition and roles in Core; civilian behaviour (5.3), ambient life (5.5), compliance/ROE (5.7), command watchdog (5.11) in MCF_AI |
+  | `MCF_Interact_` | MCF **and** MCF_Dialogue | The hint primitive (5.6) in Core; the talk action in MCF_Dialogue |
+  | `MCF_Dialogue_` | MCF_Dialogue | Conversation data, library, component, menus |
+  | `MCF_Obj_` | MCF_Objectives | Objective/POI/Logic Nodes (4.x) |
+  | `MCF_Infra_` | MCF_Objectives | Infrastructure network/AI Warning (5.2) |
+  | `MCF_React_` | MCF_Objectives | Scripted AI Reactions — behaviour-recipe catalog (5.12) + Sequence Recorder (5.13) |
+  | `MCF_Ops_` | MCF_Ops | The game mode component |
+  | `MCF_Task_` | MCF_Ops | Taskings, board, permissions |
+  | `MCF_Intel_` | MCF_Ops | Intel records, carriers, sources, and the reading shells |
+  | `MCF_Device_` | MCF_Ops | Device content: profiles, library, presenter, layout |
+  | `MCF_Devices_` | MCF_Ops | Device locks and the break-in games |
+  | `MCF_Squad_` | MCF_Ops | Squad Cohesion/C2 layer (5.10) |
+  | `MCF_Data_` | MCF_Ops | The mission data screen |
+  | `MCF_Dev_` | MCF_Dev | The self-test harness. Not distributed |
+  | `MCF_Build_` | *not built* | Field Construction — worked out separately in `docs/modules/field-construction.md`, deliberately not in the phased roadmap (section 9) |
+  | `MCF_ACE_` | *not built* | ACE Anvil compatibility bridge — `docs/modules/ace-anvil-compatibility.md`, always optional (soft dependency), toggleable per integration point (`MCF_ACE_Compliance_`, `MCF_ACE_AAR_`, `MCF_ACE_Interact_`, `MCF_ACE_Carrying_`) — **confirmed actively needed**, not speculative |
+
+  **A namespace no longer names an addon.** Two of them span two addons, which
+  is a direct consequence of the Core rule: the shared half moved to Core and
+  kept its name. `docs/architecture/STRUCTURE.md` is the structure of record and
+  records both that and the `MCF_Device_` / `MCF_Devices_` collision as defects
+  to be paid off, not as design.
 
   New modules that don't fit this table only get a new namespace after discussion — prevents namespace sprawl.
 - **Event contract.** Every event has a fixed namespace pattern (`Module_Action`, e.g. `Objective_Complete`, `Hostility_ThresholdCrossed`) and a documented payload schema. No event is named ad hoc — new events are registered centrally in the Module Registry, not invented loosely per module.

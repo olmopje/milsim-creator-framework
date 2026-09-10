@@ -1,9 +1,15 @@
 # MCF Devices — design
 
-Status: **built, not yet run**. Everything below exists on disk. Nothing here
-has been through a play session since the three-puzzle rewrite of 2026-09-10.
+Status: **run and working**, not polished. Break-in and reading both watched in
+a live session on 2026-09-10.
 
 Phones and laptops you can find, break into, and read. Written 2026-09-10.
+
+> **`MCF_Devices` is no longer an addon.** It was one, and folding it back into
+> `MCF_Ops` is the whole point of section 2 below. Everywhere this document says
+> "MCF_Devices owns" a piece, read it as a **class namespace inside MCF_Ops**,
+> and read the argument as what it is: the reason the split failed.
+> `docs/architecture/STRUCTURE.md` is the structure of record.
 
 ---
 
@@ -25,26 +31,39 @@ breaking into anything, and nobody should have to install a hacking module to
 get a readable letter. Presentation is a property of intel, which is what the
 paragraph above has said since the day it was written. So:
 
-- **MCF_Ops** owns presentation: `MCF_Intel_ShellMenu` and the three skins
-  (`MCF_IntelPaper`, `MCF_IntelNotepad`, `MCF_IntelDevice`).
-- **MCF_Devices** owns the lock and the break-in games, and nothing else.
+- `MCF_Intel_` owns presentation: `MCF_Intel_ShellMenu` and the four skins
+  (`MCF_IntelPaper`, `MCF_IntelNotepad`, `MCF_IntelDevice`, `MCF_IntelLaptop`).
+- `MCF_Devices_` owns the lock and the break-in games, and nothing else.
 
 That is the whole feature. Everything else already existed.
 
-## 2. Where each piece lives
+## 2. Where each piece lives, and why the addon split failed
 
-| Piece | Addon | Why |
+This started as two addons. `MCF_Devices` held the lock and the games while the
+carrier and the shells stayed in `MCF_Ops` — and that produced the only illegal
+cross-module edge the framework has ever had, plus two files whose entire
+purpose was to reach across the boundary it created. It split **one feature**
+down the middle: a locked laptop is intel you cannot read yet, not a separate
+subject.
+
+Folded back into `MCF_Ops` on 2026-09-10. Both namespaces now live in one addon:
+
+| Piece | Namespace | Why |
 |---|---|---|
-| `MCF_Devices_LockComponent` | MCF_Devices | Sits **beside** `MCF_Intel_CarrierComponent`, never inside it, so Ops never learns that hacking exists |
-| The three break-in games | MCF_Devices | |
-| The break-in screen and its layout | MCF_Devices | |
-| Menu preset for the break-in screen | **Core**'s `chimeraMenus.conf` manifest | Same as the planning board: preset in Core, layout in the module |
-| Game Master attribute classes | MCF_Devices | Listed in Core's `Configs/Editor/MCF_EditorAttributes.conf` manifest, exactly as `MCF_RestraintPoseEditorAttribute` in Subdue is |
-| **The phone / paper / notepad shells** | **MCF_Ops** | Presentation is a property of intel — see §1 |
-| Menu presets for the three skins | **Core**'s `chimeraMenus.conf` manifest | |
-| Intel data, store, viewer, read action | MCF_Ops, unchanged | |
+| `MCF_Devices_LockComponent` | `MCF_Devices_` | Sits **beside** `MCF_Intel_CarrierComponent`, never inside it, so nothing about reading has to know that locks exist |
+| The three break-in games | `MCF_Devices_` | |
+| The break-in screen | `MCF_Devices_` | `MCF_Devices_HackScreen` — not a menu; it binds to a widget it is handed |
+| The break-in layout | `MCF_Ops/UI/layouts/` | Created into the device's own `ScreenArea` at runtime, so one layout serves every skin |
+| Game Master attribute classes | `MCF_Devices_` | Listed in Core's `Configs/Editor/MCF_EditorAttributes.conf` manifest, exactly as `MCF_RestraintPoseEditorAttribute` in `MCF_AI` is |
+| **The paper / notepad / phone / laptop shells** | `MCF_Intel_` | Presentation is a property of intel — see §1 |
+| Menu presets for the skins | **Core**'s `chimeraMenus.conf` manifest | Preset in Core, layout in the module |
+| Intel data, store, viewer, read action | `MCF_Intel_`, unchanged | |
 
-Dependencies: `MCF_Devices` -> Core, Ops.
+Dependencies: `MCF_Ops` -> Core. That is the whole graph now, and it is the
+point.
+
+The two namespaces one letter apart are a real defect — see section 4 of
+`STRUCTURE.md` for what they should be called instead.
 
 **Not in Core: the minigames.** It is tempting — "a skill check that gates an
 interaction" is obviously generic, and a locked door or a safe would want the
@@ -52,7 +71,7 @@ same thing. But there is exactly one consumer today, and Core's rule is *what
 more than one module needs*. It moves to Core the day a second module asks for
 it. That move is a folder and a rename.
 
-## 3. What happens with the module absent
+## 3. What happens with the lock absent
 
 A smartphone prefab whose `MCF_Devices_LockComponent` cannot be resolved loses
 that component and keeps everything else — proven behaviour, one `WORLD (E)`
@@ -73,8 +92,8 @@ Four models, cleaned headlessly in Blender on 2026-09-10 and measured:
 |---|---|---|---|---|
 | Letter (envelope, paper, wax seal) | 7 642 | 6.2 × 15.5 × 2.6 cm | 3 | `MCF_Ops/Assets/Props/Intel/Letter/` |
 | Notepad | 4 188 | 13.7 × 21.0 × 1.7 cm | 1 | `MCF_Ops/Assets/Props/Intel/Notepad/` |
-| Smartphone | 878 | 7.0 × 14.9 × 0.9 cm | 1 | `art/Devices/Smartphone/` — moves into MCF_Devices when imported |
-| Laptop | 13 014 | 22.2 × 33.0 × 2.9 cm | 6 | `art/Devices/Laptop/` |
+| Smartphone | 878 | 7.0 × 14.9 × 0.9 cm | 1 | imported: `MCF_Ops/Assets/Props/Devices/Smartphone/` |
+| Laptop | 13 014 | 22.2 × 33.0 × 2.9 cm | 6 | imported: `MCF_Ops/Assets/Props/Intel/Laptop/`, split into body and lid |
 
 What the cleanup did: joined every mesh into one `LOD0`, deleted the
 `directionalLight1` and `aiSkyDomeLight1` that shipped inside the laptop scene,

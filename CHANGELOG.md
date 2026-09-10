@@ -5,6 +5,44 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Changed -- structure
+- **MCF is six addons, and Core is the mod.** The nine-addon split lasted a day.
+  `MCF_Devices` folded into `MCF_Ops` (it split one feature down the middle and
+  produced the only illegal cross-module edge the framework has ever had),
+  `MCF_Subdue` and `MCF_Ambient` into `MCF_AI` (every class in both was already
+  named `MCF_AI_something`), `MCF_React` into `MCF_Objectives` (four scripts do
+  not earn a `.gproj`, a dependency GUID and a Workshop listing)
+- Core is positioned as the framework itself rather than one addon among six:
+  the thing a server installs, the headline Workshop entry when there is one,
+  with the four modules as dependent entries. `MCF_Dev` is the test
+  environment and is never distributed
+- Measured graph after the fold: every module references Core and nothing else;
+  only `MCF_Dev` reaches across, which is what a test harness is for
+
+### Added
+- `tools/measure_addon_graph.ps1` -- counts the real cross-addon references so
+  nobody has to take a document's word for it. Comment lines are stripped
+  first: counting them reported five illegal edges that were five comments
+- `docs/architecture/STRUCTURE.md` -- the structure of record. The six addons,
+  the measured graph, which addon owns which namespace, the Core rule, which
+  `.gproj` to open, and where a new module goes
+
+### Changed -- documentation
+- `docs/architecture/MODULARISATION.md` renamed to `STRUCTURE.md`; a file named
+  after a finished project is a poor place to keep the current shape
+- `README.md`, `CONTRIBUTING.md`, `HANDOVER.md`, `DEVICES.md` and the
+  `ARCHITECTURE.md` namespace table corrected -- all of them still described the
+  single-addon layout, and `DEVICES.md` still described `MCF_Devices` as a live
+  addon with its own dependency edge
+- `CONTRIBUTING.md` gains the rules that decide which addon a change belongs in,
+  and requires `STRUCTURE.md` to be updated in the same PR as any layout change
+- `PROJECT_STATUS.md` states at the top that it is chronology, not current state
+
+### Fixed
+- Two namespaces recorded as known defects rather than quietly tolerated:
+  `MCF_Device_` / `MCF_Devices_` differ by one letter, and `MCF_AI_` and
+  `MCF_Interact_` each span two addons. Both documented in `STRUCTURE.md` s4
+
 ## [0.3.0] - 2026-09-10 - Talking to, subduing and escorting AI
 The framework stops being only a trigger-and-event system and starts being something
 the player interacts with directly. Every character in the game -- vanilla or modded,

@@ -22,8 +22,8 @@ without scripting.
 | Thing | Where |
 |---|---|
 | Repository root | `G:\MCF` |
-| The addons | `G:\MCF\addons\` — `MCF` (Core), `MCF_Objectives`, `MCF_Ops`, `MCF_Dialogue`, `MCF_Subdue`, `MCF_Ambient`, `MCF_React`, `MCF_Dev` |
-| Workbench project | open **`MCF_Dev`** with every `MCF*` addon ticked — it depends on all of them and holds the test world |
+| The addons | `G:\MCF\addons\` — `MCF` (Core), `MCF_Ops`, `MCF_Dialogue`, `MCF_AI`, `MCF_Objectives`, `MCF_Dev`. Six. |
+| Workbench project | open **`addons/MCF_Dev/addon.gproj`** — the only one that depends on all five others, and it holds the test world |
 | Test world | `G:\MCF\addons\MCF_Dev\worlds\arland\MCFTestworld.ent` |
 | GitHub | `olmopje/milsim-creator-framework`, branch `main` |
 | Wiki | `.../wiki` — 11 pages, the public-facing documentation |
@@ -44,8 +44,8 @@ Nothing important should live only in a chat. In order of authority:
 
 | Document | What it is |
 |---|---|
-| `docs/architecture/PROJECT_STATUS.md` | The chronological record, ~1400 lines. Every session including the dead ends. **The primary source.** |
-| `docs/architecture/MODULARISATION.md` | The plan for splitting MCF into separate addons, and the measurements it rests on. **The current main thread of work.** |
+| `docs/architecture/STRUCTURE.md` | **The structure of record.** What the six addons are, the measured dependency graph, which namespace lives where, and the Core rule. If anything else disagrees with it, it is stale. |
+| `docs/architecture/PROJECT_STATUS.md` | The chronological record, ~1400 lines. Every session including the dead ends. **The primary source for how we got here.** |
 | `docs/ROADMAP.md` | What is verified, what is missing, what comes next |
 | `docs/architecture/ARCHITECTURE.md` | The plan: layering, the core, the integration contract |
 | `docs/guides/MISSION_MAKER_GUIDE.md` | Plain-language reference to every node and player-facing system |
@@ -134,9 +134,16 @@ The run writes one intel record per faction, and deletes them when it finishes.
 
 ## The modularisation — done
 
-MCF is eight addons. Every module depends on Core and on nothing else. The full
-design and every measurement is `docs/architecture/MODULARISATION.md`; the
-chronology is in `PROJECT_STATUS.md`. What to carry in your head:
+**MCF is six addons, and Core is the mod.** Core is the framework a server
+installs; the other five plug into it. Every module depends on Core and on
+nothing else. `MCF_Dev` is the test environment, not a distribution addon: it
+depends on everything precisely because a harness must reach everywhere, and
+that is only safe because it never ships.
+
+The full design, the measured graph and the namespace map are in
+`docs/architecture/STRUCTURE.md`; the chronology is in `PROJECT_STATUS.md`.
+`tools/measure_addon_graph.ps1` re-measures it — run that before believing any
+of it. What to carry in your head:
 
 **The measured fact it all rests on.** A prefab that names a script class from
 an addon that is not loaded still loads: the unresolvable component is dropped,
@@ -159,13 +166,13 @@ factions, the line/HUD channel, the player-controller message channel,
 and the AAR manager. A thing that only ever exists as somebody's dependency is
 a library, and libraries go in Core.
 
-**Verified end to end.** All eight addons loaded:
+**Verified end to end.** All addons loaded:
 `Module: Game; loaded 5746x files; 11270x classes`, no `(E)`, and the test
 world in `MCF_Dev` initialised prefabs from four different addons.
 
 ### Watched running, and it holds
 
-A live session with all eight addons exercised every module across an addon
+A live session with every addon loaded exercised every module across an addon
 boundary: the listen-server race and the deferral, both stores loading from
 module addons on Core's event, the join push and faction re-push, all three
 detection triggers registering through Core's watcher registry and firing, the
@@ -173,7 +180,7 @@ planning board opening from a preset in Core's manifest with a layout in
 `MCF_Ops`, a conversation assigned and opened (`trust=50 fear=0` — the
 disposition component from Core's `Character_Base` manifest, read by the
 dialogue module, with the Game-Master check going through `MCF_Core_Roles`),
-and `shout keys bound` from `MCF_Subdue` against Core's input manifest.
+and `shout keys bound` from `MCF_AI` against Core's input manifest.
 
 **The `modded class SCR_PlayerController` merges across four addons at
 runtime**, not merely at compile time. No `Wrong GUID/name`, no
@@ -187,15 +194,24 @@ chain.
 Break-in and intel presentation both run in a live session. See
 `docs/architecture/DEVICES.md` for the design and the open list.
 
-- **Presentation moved out of MCF_Devices into MCF_Ops.** A letter that looks
-  like paper has nothing to do with hacking. `MCF_Intel_ShellMenu` draws three
-  skins — paper, notepad, phone — chosen by the object's own `MCF_EIntelView`.
-  MCF_Devices keeps the lock and the games, nothing else.
+- **It is all one addon now.** `MCF_Devices` was its own addon holding the lock
+  and the games while the carrier and the shell stayed in Ops — one feature
+  split down the middle, and the only illegal edge the framework ever had. Both
+  halves live in `MCF_Ops`; `MCF_Devices_` survives only as a class namespace,
+  and section 4 of `STRUCTURE.md` records why that name should change.
+- **`MCF_Intel_ShellMenu` draws four skins** — paper, notepad, phone, laptop —
+  chosen by the object's own `MCF_EIntelView`. A letter that looks like paper
+  has nothing to do with hacking, which is why presentation is intel's job.
 - **Three break-in games**, and the seed decides which: keypad, signal lock,
   port table. Nothing about the puzzle travels except the seed, so a fourth
   game touches three places and none of them is the wire format.
-- Confirmed working, not polished. Nobody has tuned the difficulty curve, and
-  the smartphone and laptop models are still not imported.
+- **The break-in is drawn on the device's own screen**, not in a window over it:
+  `MCF_Devices_HackScreen` binds to a widget it is handed and the shell creates
+  that panel inside the device's `ScreenArea`. The old `MCF_Devices_HackMenu`
+  and its menu preset are gone.
+- Confirmed working, not polished. The smartphone and laptop models are both
+  imported; the laptop's preview framing and its flat-colour materials are
+  parked mid-tuning, and nobody has tuned the difficulty curve.
 
 ### Next, in order
 
@@ -203,9 +219,11 @@ Break-in and intel presentation both run in a live session. See
    late-join replication and the audience filter — and can fold in the two
    remaining modularisation unknowns: the dropped-component behaviour at
    runtime on a dedicated server, and the same packed to `.pak`.
-2. **Decide what gets published and how.** Eight addons is a lot for a user to
-   install. Worth checking whether a Workshop dependency chain does the work,
-   or whether a bundle is needed.
+2. **Decide how it gets published.** The shape is settled — Core is the headline
+   entry, the four modules are dependent entries, MCF_Dev is never published.
+   What is not settled is whether Reforger's Workshop dependency handling makes
+   four separate module entries pleasant enough to be worth it, or whether the
+   first release is one entry with the split kept only in the repository.
 3. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
 4. A one-clip animation graph for the restrained pose. Build it small — the
    crash is a size problem, not a concept problem. `arms_back` was the clip the
@@ -313,7 +331,7 @@ sleep ~55s
 logs_filter for  \(E\)|Module: Game;
 ```
 
-With all eight addons loaded a clean compile reads
+With every addon loaded a clean compile reads
 `Module: Game; loaded 5746x files; 11270x classes` with no `(E)` lines. That
 proves the scripts compiled and **nothing else** — see the first rule below.
 
