@@ -99,6 +99,7 @@ class MCF_Device_Layout
 	//! Remembered from the last placement, because it is the one number
 	//! everything else on the screen is measured against.
 	protected float m_fGlassWidth;
+	protected float m_fGlassHeight;
 
 	//! Binds to a layout and to the object being drawn.
 	//! \param size The model's real size in metres. X across the face, Z along
@@ -138,6 +139,13 @@ class MCF_Device_Layout
 	float GetGlassWidth()
 	{
 		return m_fGlassWidth;
+	}
+
+	//! The same, down. Anything that has to FILL the glass rather than fit
+	//! inside its width -- the break-in panel -- needs both numbers.
+	float GetGlassHeight()
+	{
+		return m_fGlassHeight;
 	}
 
 	//! Whether the drawn fallback panel is shown instead of the model.
@@ -265,10 +273,12 @@ class MCF_Device_Layout
 	protected void PlaceGlass(float deviceW, float deviceH)
 	{
 		float glassW = deviceW * m_fGlassX;
+		float glassH = deviceH * m_fGlassY;
 		m_fGlassWidth = glassW;
+		m_fGlassHeight = glassH;
 
 		if (m_wScreenArea)
-			PlaceCentred(m_wScreenArea, glassW, deviceH * m_fGlassY);
+			PlaceCentred(m_wScreenArea, glassW, glassH);
 
 		CapWidth(W_LIST_WIDTH, glassW);
 		CapWidth(W_READ_WIDTH, glassW);

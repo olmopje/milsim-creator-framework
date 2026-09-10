@@ -41,10 +41,22 @@ modded class SCR_PlayerController
 	}
 
 	//! Runs on the owning client. The puzzle to draw.
+	//!
+	//! DRAWN ON THE DEVICE, NOT OVER IT. This used to open a menu of its own,
+	//! and a break-in that covers the phone you are breaking into reads as two
+	//! unrelated screens. The only way to ask for a challenge is the lock
+	//! screen inside the device shell, so the shell is always the thing that
+	//! should answer -- see MCF_Intel_ShellMenu.ShowChallenge.
 	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
 	void MCF_RpcDo_DeviceChallenge(RplId deviceId, int seed, int difficulty)
 	{
-		MCF_Devices_HackMenu.OpenFor(deviceId, seed, difficulty);
+		if (MCF_Intel_ShellMenu.ShowChallenge(deviceId, seed, difficulty))
+			return;
+
+		// Reachable only by closing the device between asking and being
+		// answered. The challenge expires on its own and the next attempt gets
+		// a fresh seed, so there is nothing to clean up.
+		MCF_Core_Log.Debug("a break-in challenge arrived with no device screen open to draw it on -- dropped");
 	}
 
 	//! Client side. What the player pressed, in order. Not whether it was right.

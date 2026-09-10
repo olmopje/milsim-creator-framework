@@ -58,10 +58,5 @@ modded enum ChimeraMenuPreset
 	//! is, throwing parts of it away, and the named starting positions a
 	//! mission maker keeps. Opened from the right-click menu on the operations
 	//! board -- the only screen in MCF that deletes anything.
-	MCF_DataManager,
-
-	//! Breaking into a locked device. Opened by the break-in action on the
-	//! phone or laptop itself. Lives in MCF_Ops alongside the shell; the name is
-	//! declared here because the preset it pairs with is in Core's manifest.
-	MCF_DeviceHack
+	MCF_DataManager
 }

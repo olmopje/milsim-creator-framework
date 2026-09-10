@@ -29,6 +29,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! and on a phone it drew straight out past the side of the handset.
 	protected static const ResourceName ROW_LAYOUT = "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout";
 
+	//! The break-in panel, drawn inside the device's own glass. One layout
+	//! serves every skin, and it is created on demand rather than shipped
+	//! inside each device layout -- see StartHack below.
+	protected static const ResourceName HACK_LAYOUT = "{6A1C4F0B39D30000}UI/layouts/MCF/MCF_DeviceHack.layout";
+
 	protected static const string W_DEVICE_NAME = "DeviceName";
 	protected static const string W_STATUS_BAR = "StatusBar";
 	protected static const string W_APP_PREFIX = "App";
@@ -139,6 +144,22 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected SCR_ButtonTextComponent m_UnlockButton;
 	protected bool m_bOnLock;
 
+	//! The break-in panel while it is up, and the game running inside it.
+	protected Widget m_wHackPanel;
+	protected ref MCF_Devices_HackScreen m_HackScreen;
+
+	//! Set when the puzzle announces it is over. The teardown happens on the
+	//! next tick rather than inside the announcement, because that announcement
+	//! reaches here from inside a click handler on a button that lives in the
+	//! panel about to be destroyed.
+	protected bool m_bHackDone;
+
+	//! The shell that has a device open on this client. A challenge coming back
+	//! from the server is drawn on the device it belongs to rather than in a
+	//! window of its own, and this is how the reply finds it. One at a time:
+	//! menus stack, but a player only has one device in their hands.
+	protected static MCF_Intel_ShellMenu s_Open;
+
 	//! Held because a handler that is not referenced is collected, and a
 	//! collected handler stops handling -- quietly, exactly like the callback
 	//! that cost this feature an afternoon.
@@ -216,6 +237,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_Carrier = s_PendingCarrier;
 		m_eView = s_PendingView;
 		s_PendingCarrier = null;
+		s_Open = this;
 
 		Widget root = GetRootWidget();
 		if (!root)
@@ -1039,6 +1061,129 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		ShowHome();
 	}
 
+	// ------------------------------------------------------------ the break-in
+
+	//! Draws a challenge on the device it belongs to.
+	//!
+	//! WHY THIS IS A STATIC HANDOFF. The challenge is a reply from the server
+	//! and arrives on the player controller, which has no idea what is on
+	//! screen. It used to answer that by opening a menu of its own over the top
+	//! of the device -- which is precisely what made breaking into a phone feel
+	//! like putting the phone down first.
+	//!
+	//! \return True if a shell took it. False means nothing is open to draw on
+	//! and the challenge is dropped, which is only reachable if the player
+	//! closed the device between asking and being answered.
+	static bool ShowChallenge(RplId deviceId, int seed, int difficulty)
+	{
+		if (!s_Open)
+			return false;
+
+		return s_Open.StartHack(deviceId, seed, difficulty);
+	}
+
+	//! Puts the puzzle on the device's own glass.
+	//!
+	//! CREATED ON DEMAND, DESTROYED AFTERWARDS, rather than shipped hidden
+	//! inside every device layout. Two reasons, and the second one is the one
+	//! that decided it: one layout then serves the phone, the laptop and
+	//! anything added later, and SCR_ButtonTextComponent.GetButtonText will not
+	//! find a button inside a subtree marked hidden -- a panel that ships
+	//! hidden binds nothing at all, silently, which cost this feature's lock
+	//! screen an evening already.
+	protected bool StartHack(RplId deviceId, int seed, int difficulty)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return false;
+
+		Widget screen = root.FindAnyWidget(MCF_Device_Layout.W_SCREEN_AREA);
+		if (!screen)
+		{
+			MCF_Core_Log.Warn("this device skin has no " + MCF_Device_Layout.W_SCREEN_AREA + " -- nowhere to draw the break-in");
+			return false;
+		}
+
+		CloseHack();
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return false;
+
+		m_wHackPanel = workspace.CreateWidgets(HACK_LAYOUT, screen);
+		if (!m_wHackPanel)
+		{
+			MCF_Core_Log.Warn("could not create the break-in panel -- check the layout path");
+			return false;
+		}
+
+		FitHackPanel();
+
+		// The lock screen is what the player pressed to get here. The puzzle
+		// replaces it rather than sitting on top of it.
+		if (m_wLockScreen)
+			m_wLockScreen.SetVisible(false);
+
+		m_bHackDone = false;
+		m_HackScreen = new MCF_Devices_HackScreen();
+		m_HackScreen.m_OnFinished.Insert(OnHackFinished);
+		m_HackScreen.Start(m_wHackPanel, deviceId, seed, difficulty);
+
+		SetHint("");
+		return true;
+	}
+
+	//! The panel fills the glass, whatever shape this device's glass is.
+	//!
+	//! The anchors collapse to a point before the size is set. A slot whose
+	//! anchors are stretched takes its size from them and ignores SetSize,
+	//! silently -- see the note at the top of MCF_Device_Layout.c.
+	protected void FitHackPanel()
+	{
+		if (!m_wHackPanel || !m_Geometry)
+			return;
+
+		float width = m_Geometry.GetGlassWidth();
+		float height = m_Geometry.GetGlassHeight();
+		if (width <= 0 || height <= 0)
+			return;
+
+		FrameSlot.SetAnchor(m_wHackPanel, 0.5, 0.5);
+		FrameSlot.SetSize(m_wHackPanel, width, height);
+		FrameSlot.SetPos(m_wHackPanel, -width * 0.5, -height * 0.5);
+	}
+
+	//! Only records that it is over. See m_bHackDone.
+	protected void OnHackFinished()
+	{
+		m_bHackDone = true;
+	}
+
+	//! Takes the panel down and puts the device back where it was.
+	//!
+	//! Whether the break-in worked is the server's answer and arrives as a
+	//! replicated bool a moment later, so the lock screen goes back up and
+	//! PollLock takes it down again if the device opened.
+	protected void FinishHack()
+	{
+		CloseHack();
+
+		if (IsDeviceLocked())
+			ShowLock();
+	}
+
+	protected void CloseHack()
+	{
+		m_HackScreen = null;
+		m_bHackDone = false;
+
+		if (m_wHackPanel)
+		{
+			m_wHackPanel.RemoveFromHierarchy();
+			m_wHackPanel = null;
+		}
+	}
+
 	// ------------------------------------------------------------ plumbing
 
 	protected void SetScreens(bool home, bool list, bool read)
@@ -1074,6 +1219,15 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! which is what a phone does, and means the button is never dead.
 	protected void OnBackClicked(SCR_ButtonTextComponent button)
 	{
+		// Backing out of the puzzle returns to the lock screen, not out of the
+		// device. Giving up on a break-in is not the same as putting the phone
+		// away, and the player almost always wants another go.
+		if (m_HackScreen && m_HackScreen.IsRunning())
+		{
+			m_HackScreen.Cancel();
+			return;
+		}
+
 		// The photograph is a layer over the screen, not a screen of its own, so
 		// backing out of it puts you where you already were rather than one step
 		// further back than you asked for.
@@ -1204,6 +1358,17 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// frames and stops running; a picture can arrive seconds later, and an
 		// unlock can arrive later still.
 		UpdatePicture(tDelta);
+
+		// The puzzle runs on the same tick as everything else, and is torn down
+		// here rather than inside its own click handler.
+		if (m_HackScreen)
+		{
+			if (m_bHackDone)
+				FinishHack();
+			else
+				m_HackScreen.Update();
+		}
+
 		PollLock();
 
 		if (m_iFitFrame > 2)
@@ -1232,6 +1397,17 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_Geometry.FitToDevice();
 			LogGeometry(root);
 		}
+	}
+
+	//! Stops the server's reply arriving at a shell that is no longer on screen.
+	override void OnMenuClose()
+	{
+		CloseHack();
+
+		if (s_Open == this)
+			s_Open = null;
+
+		super.OnMenuClose();
 	}
 
 	override void OnMenuFocusGained()

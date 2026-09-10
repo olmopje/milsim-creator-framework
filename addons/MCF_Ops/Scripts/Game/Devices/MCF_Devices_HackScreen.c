@@ -1,14 +1,22 @@
 //! The break-in screen. Three games behind one door.
 //!
+//! NOT A MENU. It was one -- MCF_Devices_HackMenu, its own preset, its own
+//! window over the top of the device shell -- and that is exactly what made
+//! breaking into a phone feel like leaving the phone. So the puzzle is now
+//! drawn INSIDE the device's glass by whoever owns that glass: this class binds
+//! to a root widget it is handed, and knows nothing about menus, presets or
+//! where on the screen it ended up. MCF_Intel_ShellMenu creates the panel from
+//! MCF_DeviceHack.layout into the device's ScreenArea and ticks Update().
+//!
 //! The client draws whatever puzzle the seed calls for and sends back what the
 //! player did. It never reports success -- MCF_Devices_Challenge.c explains why
 //! at length.
 //!
 //! ONE LAYOUT, THREE PANELS. Each game gets its own frame in the layout and all
-//! but one is hidden on open. Three separate menu presets would have been
-//! tidier on paper and worse in practice: the title, the clock, the stop button
-//! and the whole submit path are identical for all three, and three copies of
-//! them would drift the moment one was fixed.
+//! but one is hidden on open. Three separate layouts would have been tidier on
+//! paper and worse in practice: the title, the clock, the stop button and the
+//! whole submit path are identical for all three, and three copies of them
+//! would drift the moment one was fixed.
 //!
 //! WHICH GAME IS NOT SENT. The seed decides it, and the seed is already on both
 //! machines -- see MCF_Devices_Challenge.KindFor. So nothing about the puzzle
@@ -21,7 +29,7 @@
 //! connection, which is the right way round -- better to look tight and pass
 //! than look comfortable and be refused.
 
-class MCF_Devices_HackMenu : ChimeraMenuBase
+class MCF_Devices_HackScreen
 {
 	protected static const string W_TITLE = "Title";
 	protected static const string W_STATUS = "Status";
@@ -55,10 +63,12 @@ class MCF_Devices_HackMenu : ChimeraMenuBase
 	protected static const int COLOUR_MINE = 0xFFE0A020;
 	protected static const int COLOUR_BOTH = 0xFF30E060;
 
-	protected static RplId s_PendingDevice;
-	protected static int s_PendingSeed;
-	protected static int s_PendingDifficulty;
+	//! Fires when the puzzle is over, however it ended -- submitted, failed or
+	//! walked away from. The owner takes the panel down; this class does not
+	//! know how it was put up.
+	ref ScriptInvoker m_OnFinished = new ScriptInvoker();
 
+	protected Widget m_wRoot;
 	protected RplId m_DeviceId;
 	protected int m_iSeed;
 	protected int m_iDifficulty;
@@ -78,6 +88,7 @@ class MCF_Devices_HackMenu : ChimeraMenuBase
 
 	//! Runs for every game: the clock starts when the player may first act.
 	protected bool m_bAccepting;
+	protected bool m_bFinished;
 	protected float m_fDeadline;
 
 	// keypad
@@ -105,34 +116,19 @@ class MCF_Devices_HackMenu : ChimeraMenuBase
 	protected ref array<bool> m_aPortOpen = {};
 	protected int m_iRule;
 
-	static void OpenFor(RplId deviceId, int seed, int difficulty)
+	//! Binds to a freshly created panel and starts the game the seed calls for.
+	//!
+	//! The panel must be VISIBLE when this is called.
+	//! SCR_ButtonTextComponent.GetButtonText does not find a button inside a
+	//! subtree marked hidden, which is why the panel is created on demand and
+	//! destroyed afterwards rather than shipped hidden inside the device layout.
+	void Start(notnull Widget root, RplId deviceId, int seed, int difficulty)
 	{
-		MenuManager menuManager = GetGame().GetMenuManager();
-		if (!menuManager)
-			return;
-
-		s_PendingDevice = deviceId;
-		s_PendingSeed = seed;
-		s_PendingDifficulty = difficulty;
-
-		menuManager.OpenMenu(ChimeraMenuPreset.MCF_DeviceHack);
-	}
-
-	override void OnMenuOpen()
-	{
-		super.OnMenuOpen();
-
-		m_DeviceId = s_PendingDevice;
-		m_iSeed = s_PendingSeed;
-		m_iDifficulty = s_PendingDifficulty;
+		m_wRoot = root;
+		m_DeviceId = deviceId;
+		m_iSeed = seed;
+		m_iDifficulty = difficulty;
 		m_iKind = MCF_Devices_Challenge.KindFor(m_iSeed);
-
-		Widget root = GetRootWidget();
-		if (!root)
-		{
-			MCF_Core_Log.Warn("hack screen opened with no root widget -- check the Layout path in chimeraMenus.conf");
-			return;
-		}
 
 		m_wTitle = TextWidget.Cast(root.FindAnyWidget(W_TITLE));
 		m_wStatus = TextWidget.Cast(root.FindAnyWidget(W_STATUS));
@@ -175,6 +171,13 @@ class MCF_Devices_HackMenu : ChimeraMenuBase
 			StartSequence(root);
 	}
 
+	//! Whether the puzzle is still running. The owner asks before ticking, and
+	//! before deciding what a BACK press means.
+	bool IsRunning()
+	{
+		return !m_bFinished;
+	}
+
 	protected void ShowPanel(int kind)
 	{
 		if (m_wPanelKeypad)
@@ -192,9 +195,11 @@ class MCF_Devices_HackMenu : ChimeraMenuBase
 			m_ButtonSubmit.GetRootWidget().SetVisible(kind != MCF_EPuzzleKind.SEQUENCE);
 	}
 
-	override void OnMenuUpdate(float tDelta)
+	//! Ticked once a frame by whoever owns the panel.
+	void Update()
 	{
-		super.OnMenuUpdate(tDelta);
+		if (m_bFinished)
+			return;
 
 		if (m_bShowing)
 		{
@@ -512,7 +517,7 @@ class MCF_Devices_HackMenu : ChimeraMenuBase
 	}
 
 	//! The open/shut state is kept here rather than read back off the widget,
-	//! because what gets sent has to be what this menu believes, not what a
+	//! because what gets sent has to be what this screen believes, not what a
 	//! toggle happened to be showing.
 	protected void OnPortClicked(SCR_ButtonTextComponent button)
 	{
@@ -560,7 +565,7 @@ class MCF_Devices_HackMenu : ChimeraMenuBase
 		if (controller)
 			controller.MCF_RequestDeviceAnswer(m_DeviceId, answer);
 
-		Close();
+		Finish();
 	}
 
 	protected void Fail(string reason)
@@ -575,29 +580,33 @@ class MCF_Devices_HackMenu : ChimeraMenuBase
 		// Nothing is sent. The server's challenge simply goes unanswered and
 		// expires, and the next attempt gets a fresh seed -- which is what
 		// stops a player from learning one puzzle and retrying it.
-		Close();
+		Finish();
+	}
+
+	//! Walking away. Same as failing, minus the message: the challenge on the
+	//! server is left to expire.
+	void Cancel()
+	{
+		m_bShowing = false;
+		m_bAccepting = false;
+		Finish();
 	}
 
 	protected void OnCloseClicked(SCR_ButtonTextComponent button)
 	{
-		Close();
+		Cancel();
 	}
 
-	override void OnMenuFocusGained()
+	//! Announces the end exactly once. Submit and Fail can both be reached from
+	//! inside a click handler that the owner is about to tear down, so a second
+	//! announcement would arrive after the widgets are gone.
+	protected void Finish()
 	{
-		super.OnMenuFocusGained();
-		GetGame().GetInputManager().AddActionListener("MenuBack", EActionTrigger.DOWN, OnBack);
-	}
+		if (m_bFinished)
+			return;
 
-	override void OnMenuFocusLost()
-	{
-		super.OnMenuFocusLost();
-		GetGame().GetInputManager().RemoveActionListener("MenuBack", EActionTrigger.DOWN, OnBack);
-	}
-
-	protected void OnBack()
-	{
-		Close();
+		m_bFinished = true;
+		m_OnFinished.Invoke();
 	}
 
 	protected float Now()

@@ -7,7 +7,7 @@
 //! which game it handed out. Drawing is the opposite: a flashing grid, a pair
 //! of waveforms and a port table have nothing in common visually, and forcing
 //! them through one "give me your widgets" interface would produce a contract
-//! that every implementation lies about. So MCF_Devices_HackMenu switches on
+//! that every implementation lies about. So MCF_Devices_HackScreen switches on
 //! the kind and calls each puzzle's own builders directly.
 //!
 //! The practical rule this leaves: ADDING A PUZZLE TOUCHES THREE PLACES. The
