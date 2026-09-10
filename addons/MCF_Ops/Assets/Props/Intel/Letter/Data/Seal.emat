@@ -1,0 +1,4 @@
+MatPBRBasic {
+ BCRMap "{500EBAC9429F4DA4}Assets/Props/Intel/Letter/Data/Seal_BCR.edds"
+ NMOMap "{68D6015B9BE81F3A}Assets/Props/Intel/Letter/Data/Seal_NMO.edds"
+}
