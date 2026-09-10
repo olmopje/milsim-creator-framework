@@ -509,3 +509,92 @@ indices over copying a large one out of it.
 anything sized in script. This hid on the phone for a while because the column
 there is capped to roughly the width the image was being set to, so the stretch
 was invisible -- on a wide column it is immediate.
+
+## An opening laptop needs no rig, no bones and no animation clip
+
+This was researched after I claimed twice, wrongly, that the laptop model was a
+single closed mesh. It is not, and the way Enfusion animates a lid is far
+cheaper than either of us assumed.
+
+### What is actually in the model
+
+There are two laptop FBX files and they are not the same object.
+
+  art/Devices/Laptop/Laptop.fbx          2 nodes, 122 meshes merged into one,
+                                         no hinge, no animation
+  art/Devices/Laptop/source/             159 nodes, 122 geometries,
+    laptop_leather.fbx                   AnimationStack "Take 001"
+
+The source is the Sketchfab download. Its animation drives exactly one node,
+pCylinder3, and only one channel of it moves: Lcl Rotation Y, from -97 degrees
+to +20 degrees over five seconds. Translation, scaling and visibility are
+constant across all three keys. pCylinder3 is the hinge; pCube4 (lid panel),
+pCube134 (screen) and pCylinder2 are parented to it, so that single rotation
+swings the whole lid. Hinge rest transform: T = (1.654, 0.192, -1.15),
+R = (0, 20, 90), S = (0.075, 0.15, 0.075).
+
+The file in art/ is a flattened export of that. Whoever exported it merged the
+hierarchy away. Read the source, not the export.
+
+### How BI opens a lid
+
+Not with an animation graph. Vanilla doors are ordinary entities that the
+engine rotates bodily, and a lid is just a door lying on its back.
+
+Prefabs/Structures/BuildingParts/Doors/Door_Base.et carries DoorComponent with
+`DoorAnimationType WholeEntity`, and every concrete door under it supplies only
+a mesh and some numbers:
+
+    DoorComponent {
+      OpenTime     2
+      AngleRange   -90         // degrees of travel
+      ClosedAngle  0
+      InitialAngle 0
+      TestContacts 1
+      TestCollider "UBX_..."   // refuses to open into something
+      DoorAction SCR_DoorUserAction { ... }
+    }
+
+The leaf mesh is a plain .xob with its origin on the hinge. There is no
+skeleton in it and no clip anywhere.
+
+The pattern for a lid on a body -- exactly our case -- is
+HatchDoor_Roof_01/HatchSet_Roof_01_EXT_COV_B.et: a parent entity holding the
+frame mesh, with the hatch nested inside it as a child entity that carries
+DoorComponent and
+
+    Hierarchy { PivotID "socket_HatchDoor" }
+
+The socket is a named point in the PARENT mesh. It supplies the child's
+position and orientation, which is how the same component that swings a house
+door around a vertical axis tips a roof hatch onto a horizontal one: the
+rotation is about the child entity's own local up axis, and the socket is what
+decides where that axis points. (Read from the prefabs, not measured -- confirm
+with a 90 degree test swing before trusting the sign.)
+
+### So the export has to produce
+
+  Laptop_Body.xob   everything except pCylinder3 and its children.
+                    Origin at the laptop's own base. Carries a socket point
+                    on the hinge line, oriented so its up axis runs along the
+                    hinge -- name it socket_LaptopLid.
+
+  Laptop_Lid.xob    pCube4, pCube134, pCylinder2. Origin ON THE HINGE, at
+                    pCylinder3's position, in the closed pose.
+
+  UBX_Laptop_Lid    a collider on the lid if we want TestContacts.
+
+Then the prefab is body + nested child with DoorComponent, AngleRange 117
+(the model's own -97 to +20), OpenTime around 1, and PivotID socket_LaptopLid.
+
+Also still to do in Blender, unrelated to the hinge: drop directionalLight1
+and the second Maya light, and rename the six default materials.
+
+### The caveat worth knowing before building it
+
+Doors are static world entities. Our laptop is an inventory item -- Item_Base
+with InventoryItemComponent -- and a child entity with DoorComponent on
+something that can be picked up and stuffed in a backpack is not a
+configuration vanilla ever ships. As an intel prop placed on a table by the
+Game Master it is fine. If it also has to be carryable, expect the lid child to
+need attention on pick-up, and test that before assuming.
