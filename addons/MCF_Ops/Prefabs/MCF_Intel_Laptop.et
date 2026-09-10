@@ -10,9 +10,9 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    AngularDamping 0.5
    ModelGeometry 1
   }
-  InventoryItemComponent "{5222EB4D0C73106B}" {
-   Attributes SCR_ItemAttributeCollection "{5222EB4D0A2B566B}" {
-    ItemDisplayName UIInfo "{5222EB4D07D875FA}" {
+  InventoryItemComponent "{5222EB4D0C73006B}" {
+   Attributes SCR_ItemAttributeCollection "{5222EB4D0A2B466B}" {
+    ItemDisplayName UIInfo "{5222EB4D07D865FA}" {
      Name "Laptop"
     }
     ItemPhysAttributes ItemPhysicalAttributes PhysicalAttributes {
@@ -45,7 +45,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     }
    }
   }
-  ActionsManagerComponent "{508AB5952B584C2E}" {
+  ActionsManagerComponent "{508AB5952B584B2E}" {
    additionalActions +{
     MCF_Intel_ReadAction "{6A1C4F0B39D2D038}" {
      ParentContextList {
@@ -69,7 +69,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
     }
    }
   }
-  Hierarchy "{6A1C4F0B39D2D03C}" {
+  Hierarchy "{5D9ED4F4B675D16F}" {
   }
  }
  {
@@ -103,6 +103,9 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
        Radius 0.4
       }
      }
+    }
+    RplComponent "{6A1C4F0B39D2D059}" {
+     RuntimeOnly 1
     }
     Hierarchy "{6A1C4F0B39D2D058}" {
      PivotID "socket_LaptopLid"
