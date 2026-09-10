@@ -129,6 +129,13 @@ class MCF_Device_Layout
 	{
 		m_wRoot = root;
 		m_wModel = ItemPreviewWidget.Cast(root.FindAnyWidget(W_MODEL));
+
+		// THE PREVIEW DRAWS ITS OWN WORLD BEHIND THE ITEM -- a treeline and a
+		// dark sky, which on a laptop-sized widget reads as a photograph
+		// somebody left behind the device. Clearing to transparent leaves the
+		// item and nothing else.
+		if (m_wModel)
+			m_wModel.SetClearColor(true, 0x00000000);
 		m_wScreenArea = root.FindAnyWidget(W_SCREEN_AREA);
 		m_wBody = root.FindAnyWidget(W_BODY);
 
@@ -288,10 +295,25 @@ class MCF_Device_Layout
 	//! own corners through the preview the player is looking at.
 	protected bool FitToScreenQuad()
 	{
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return false;
+
+		// UNITS. GetScreenSize answers in PHYSICAL pixels;
+		// TryGetItemNodePositionInWidgetSpace answers in the REFERENCE
+		// resolution, and so does FrameSlot. Mixing them put the glass a fifth
+		// of the screen up and to the left of the laptop it belonged on -- and
+		// it was the log that said so, because the screen's middle came back at
+		// 667.9 against a half-box of 890.6, which is 668.1 once the box is
+		// converted. Those two agreeing to a quarter of a pixel is the whole
+		// proof.
 		float boxW, boxH;
 		m_wModel.GetScreenSize(boxW, boxH);
 		if (boxW <= 0 || boxH <= 0)
 			return false;
+
+		boxW = workspace.DPIUnscale(boxW);
+		boxH = workspace.DPIUnscale(boxH);
 
 		float minX, minY, maxX, maxY;
 		bool first = true;
@@ -330,7 +352,7 @@ class MCF_Device_Layout
 
 		MCF_Core_Log.Debug("screen quad in widget space: " + w.ToString() + "x" + h.ToString()
 			+ " centred at " + midX.ToString() + "," + midY.ToString()
-			+ " in a box of " + boxW.ToString() + "x" + boxH.ToString());
+			+ " in a box of " + boxW.ToString() + "x" + boxH.ToString() + " (reference units)");
 
 		if (w < MIN_SENSIBLE_PIXELS || h < MIN_SENSIBLE_PIXELS)
 			return false;
