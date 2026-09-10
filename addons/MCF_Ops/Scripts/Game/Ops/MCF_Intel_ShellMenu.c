@@ -36,7 +36,27 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	protected static const string W_DEVICE_NAME = "DeviceName";
 	protected static const string W_STATUS_BAR = "StatusBar";
+	protected static const string W_STATUS_RIGHT = "StatusRight";
+	protected static const string W_TILE = "Tile";
+	protected static const string W_ICON = "Icon";
+
+	//! The base game's own icon atlas. White masks, tinted by the widget.
+	protected static const ResourceName ICON_SET = "{2EFEA2AF1F38E7F0}UI/Textures/Icons/icons_wrapperUI-64.imageset";
 	protected static const string W_APP_PREFIX = "App";
+	protected static const string W_DOCK_PREFIX = "Dock";
+	protected static const string W_DOCK_PANEL = "DockPanel";
+	protected static const string W_CHASSIS = "Chassis";
+	protected static const string W_HOME_BAR = "HomeTap";
+	protected static const string W_KEYPAD = "Keypad";
+	protected static const string W_KEYPAD_TITLE = "KeypadTitle";
+	protected static const string W_PIP_PREFIX = "Pip";
+	protected static const string W_KEY_DELETE = "KeyDel";
+
+	//! What opens the break-in. Four digits, and deliberately a joke a player
+	//! can be told by another player -- the code is not the puzzle, the puzzle
+	//! is the puzzle.
+	protected static const string BREAK_IN_CODE = "1337";
+	protected static const int CODE_LENGTH = 4;
 	protected static const string W_LIST_SCROLL = "ListScroll";
 	protected static const string W_ENTRY_LIST = "EntryList";
 	protected static const string W_READ_SCROLL = "ReadScroll";
@@ -68,7 +88,15 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	//! Tiles on the home screen. The layout has this many App/AppLabel pairs;
 	//! the presenter decides which of them are used.
-	protected static const int APP_SLOTS = 9;
+	//! Tiles on the home screen: four across, three down. The layout has this
+	//! many App/AppLabel pairs; the presenter decides which of them are used.
+	protected static const int APP_SLOTS = 12;
+
+	//! Tiles in the dock. They repeat the first four apps, which is what a
+	//! phone does -- the dock is the shortcut row, not a separate drawer -- and
+	//! they carry no label, which is what makes it read as a dock.
+	protected static const int DOCK_SLOTS = 4;
+
 
 	//! A laptop lid fills less of the screen's height than a phone does, and
 	//! nearly all of its face is glass -- there is no bezel worth drawing on a
@@ -141,6 +169,22 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! nothing is worse than a phone with no Photos icon.
 	protected ref array<MCF_Device_App> m_aApps = {};
 	protected ref array<SCR_ButtonTextComponent> m_aAppButtons = {};
+	protected ref array<SCR_ButtonTextComponent> m_aDockButtons = {};
+	protected Widget m_wDockPanel;
+	protected Widget m_wChassis;
+	protected Widget m_wHomeBar;
+	protected Widget m_wKeypad;
+	protected TextWidget m_wKeypadTitle;
+	protected ref array<Widget> m_aPips = {};
+	protected ref array<SCR_ButtonTextComponent> m_aKeys = {};
+	protected string m_sCode;
+	protected bool m_bOnKeypad;
+	protected ref MCF_Device_ImageClick m_HomeBarClick;
+	//! Seconds since the home bar was last tapped. Two taps inside
+	//! HOME_DOUBLE_TAP put the phone away.
+	protected float m_fSinceHomeTap = 99;
+	protected static const float HOME_DOUBLE_TAP = 0.45;
+	protected Widget m_wScreenArea;
 
 	//! The app name sits UNDER its tile, the way it does on a phone, so it is
 	//! its own widget rather than text inside the button.
@@ -216,6 +260,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected string m_sPictureShown;
 	protected TextWidget m_wDeviceName;
 	protected TextWidget m_wStatusBar;
+	protected TextWidget m_wStatusRight;
+	//! Seconds since the status bar was last re-read.
+	protected float m_fStatusTick;
 	protected RichTextWidget m_wReadHeading;
 	protected RichTextWidget m_wReadTimestamp;
 	protected TextWidget m_wHint;
@@ -302,6 +349,54 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		m_wDeviceName = TextWidget.Cast(root.FindAnyWidget(W_DEVICE_NAME));
 		m_wStatusBar = TextWidget.Cast(root.FindAnyWidget(W_STATUS_BAR));
+		m_wStatusRight = TextWidget.Cast(root.FindAnyWidget(W_STATUS_RIGHT));
+		m_wDockPanel = root.FindAnyWidget(W_DOCK_PANEL);
+
+		// The passcode pad. Ten digits, a delete key and four pips -- bound
+		// while the pad is visible in the layout, because GetButtonText does
+		// not walk into a subtree the layout marks hidden.
+		m_wKeypad = root.FindAnyWidget(W_KEYPAD);
+		m_wKeypadTitle = TextWidget.Cast(root.FindAnyWidget(W_KEYPAD_TITLE));
+
+		m_aKeys.Clear();
+		for (int k = 0; k < 10; k++)
+		{
+			SCR_ButtonTextComponent digit = SCR_ButtonTextComponent.GetButtonText("Key" + k.ToString(), root);
+			if (!digit)
+				continue;
+
+			digit.m_OnClicked.Insert(OnKeyClicked);
+			m_aKeys.Insert(digit);
+		}
+
+		SCR_ButtonTextComponent del = SCR_ButtonTextComponent.GetButtonText(W_KEY_DELETE, root);
+		if (del)
+		{
+			del.m_OnClicked.Insert(OnDeleteClicked);
+			m_aKeys.Insert(del);
+		}
+
+		m_aPips.Clear();
+		for (int pip = 0; pip < CODE_LENGTH; pip++)
+		{
+			m_aPips.Insert(root.FindAnyWidget(W_PIP_PREFIX + pip.ToString()));
+		}
+
+		if (m_wKeypad)
+			m_wKeypad.SetVisible(false);
+
+		// THE HOME BAR IS THE ONLY CONTROL THE PHONE NEEDS. One tap steps back
+		// -- entry to list, list to home, and nothing at all once you are home.
+		// Two taps in quick succession put the phone away. The three grey
+		// buttons that used to sit under the screen are gone: they were the
+		// last thing on it that said "game menu" out loud.
+		m_wHomeBar = root.FindAnyWidget(W_HOME_BAR);
+		if (m_wHomeBar)
+		{
+			m_HomeBarClick = new MCF_Device_ImageClick();
+			m_HomeBarClick.m_OnClicked.Insert(OnHomeBarTapped);
+			m_wHomeBar.AddHandler(m_HomeBarClick);
+		}
 		m_wListScroll = root.FindAnyWidget(W_LIST_SCROLL);
 		m_wReadScroll = root.FindAnyWidget(W_READ_SCROLL);
 		m_wEntryList = VerticalLayoutWidget.Cast(root.FindAnyWidget(W_ENTRY_LIST));
@@ -412,6 +507,17 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_aAppLabels.Insert(TextWidget.Cast(root.FindAnyWidget(W_APP_LABEL_PREFIX + i.ToString())));
 		}
 
+		m_aDockButtons.Clear();
+		for (int d = 0; d < DOCK_SLOTS; d++)
+		{
+			SCR_ButtonTextComponent dock = SCR_ButtonTextComponent.GetButtonText(W_DOCK_PREFIX + d.ToString(), root);
+			if (!dock)
+				continue;
+
+			dock.m_OnClicked.Insert(OnDockClicked);
+			m_aDockButtons.Insert(dock);
+		}
+
 		if (!m_Carrier)
 		{
 			MCF_Core_Log.Warn("device shell opened with nothing to read");
@@ -426,8 +532,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_wDeviceName)
 			m_wDeviceName.SetText(m_Content.DeviceName());
 
-		if (m_wStatusBar)
-			m_wStatusBar.SetText(StatusLine());
+		RefreshStatus();
 
 		m_bPageMode = m_aAppButtons.IsEmpty();
 
@@ -471,8 +576,109 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! all of them mean "draw the flat body instead", which is a screen that
 	//! looks plainer than intended rather than a screen that is not there. The
 	//! same rule as the lock: degrade where the mission maker can see it.
+	//! How tall the drawn phone is, as a share of the screen, and how wide it
+	//! is for that height. The art is 592 x 1220, so the ratio is its own.
+	protected static const float DRAWN_PHONE_HEIGHT = 0.94;
+	protected static const float DRAWN_PHONE_ASPECT = 0.4852;
+
+	//! The bezel, as a share of the art. Everything inside it is the glass.
+	protected static const float DRAWN_BEZEL_X = 0.0372;
+	protected static const float DRAWN_BEZEL_Y = 0.0180;
+
+	//! Places the drawn handset and its glass.
+	//!
+	//! WHY THE PHONE IS A PICTURE NOW AND NOT THE MODEL. Rendering the real
+	//! model behind the UI meant measuring where it landed, in a preview whose
+	//! answer arrives in a different unit than the widget it lands in, a frame
+	//! or three later, sometimes never. Every fault this screen has had came
+	//! from that measurement -- a glass too big for the phone, a puzzle sized
+	//! before the glass existed, a handset that vanished at one window size.
+	//!
+	//! A drawn chassis has none of it: two rectangles from one aspect ratio,
+	//! recomputed every frame, correct on the first one. The laptop still uses
+	//! the model -- its screen is a quad on a mesh and there is a real reason
+	//! to project it.
+	protected void FitDrawnPhone()
+	{
+		if (m_eView != MCF_EIntelView.PHONE || !m_wChassis || !m_wScreenArea)
+			return;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return;
+
+		float screenW = workspace.GetWidth();
+		float screenH = workspace.GetHeight();
+		if (screenW <= 0 || screenH <= 0)
+			return;
+
+		float h = screenH * DRAWN_PHONE_HEIGHT;
+		float w = h * DRAWN_PHONE_ASPECT;
+
+		// Never wider than a third of the screen: on an ultrawide the phone
+		// would otherwise grow into a monolith.
+		float maxW = screenW * 0.33;
+		if (w > maxW)
+		{
+			w = maxW;
+			h = w / DRAWN_PHONE_ASPECT;
+		}
+
+		FrameSlot.SetAnchor(m_wChassis, 0.5, 0.5);
+		FrameSlot.SetSize(m_wChassis, w, h);
+		FrameSlot.SetPos(m_wChassis, -w * 0.5, -h * 0.5);
+
+		float glassW = w * (1 - DRAWN_BEZEL_X * 2);
+		float glassH = h * (1 - DRAWN_BEZEL_Y * 2);
+
+		FrameSlot.SetAnchor(m_wScreenArea, 0.5, 0.5);
+		FrameSlot.SetSize(m_wScreenArea, glassW, glassH);
+		FrameSlot.SetPos(m_wScreenArea, -glassW * 0.5, -glassH * 0.5);
+
+		// The home bar rides on top of the chassis, not under it. A widget
+		// underneath the drawn body would be covered by it, and an image
+		// cannot take a click at all -- only a button can, which is why this
+		// is one. Its hit area is deliberately taller than the pill it draws:
+		// a 4-pixel line is not something anyone can hit.
+		if (m_wHomeBar)
+		{
+			float barW = glassW * 0.42;
+			float barH = h * 0.040;
+
+			FrameSlot.SetAnchor(m_wHomeBar, 0.5, 0.5);
+			FrameSlot.SetSize(m_wHomeBar, barW, barH);
+			FrameSlot.SetPos(m_wHomeBar, -barW * 0.5, h * 0.5 - barH - h * 0.008);
+		}
+	}
+
 	protected void ShowModel(notnull Widget root)
 	{
+		m_wChassis = root.FindAnyWidget(W_CHASSIS);
+		m_wScreenArea = root.FindAnyWidget(MCF_Device_Layout.W_SCREEN_AREA);
+
+		// The phone is drawn, not previewed. Hide the model widget and the
+		// flat fallback body with it, and let FitDrawnPhone do the placing.
+		if (m_eView == MCF_EIntelView.PHONE)
+		{
+			Widget model = root.FindAnyWidget(MCF_Device_Layout.W_MODEL);
+			if (model)
+				model.SetVisible(false);
+
+			Widget body = root.FindAnyWidget(MCF_Device_Layout.W_BODY);
+			if (body)
+				body.SetVisible(false);
+
+			if (m_wChassis)
+				m_wChassis.SetVisible(true);
+
+			FitDrawnPhone();
+			m_bFitted = true;
+			return;
+		}
+
+		if (m_wChassis)
+			m_wChassis.SetVisible(false);
+
 		m_Geometry = new MCF_Device_Layout();
 
 		// The shell tells the geometry what shape of thing it is drawing. A
@@ -594,9 +800,28 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			bool used = i < m_aApps.Count();
 			button.GetRootWidget().SetVisible(used);
 
-			// The tile stays blank. The name goes underneath it, which is what
-			// separates a home screen from a list of grey buttons.
-			button.SetText("");
+			// A short mark on a coloured tile, with the app's name underneath.
+			// The colour belongs to the app rather than to the device, so
+			// MESSAGES is the same green on every phone in the mission and a
+			// player learns the grid once.
+			if (used)
+			{
+				int kind = m_aApps[i].m_eKind;
+				PaintTile(button, MCF_Device_Names.ColorFor(kind));
+
+				// The icon if the atlas has one we are sure of, the letter
+				// mark if it does not. Never both: a tile with a picture AND
+				// three letters on it reads as a placeholder.
+				if (SetTileIcon(button, MCF_Device_Names.IconFor(kind)))
+					button.SetText("");
+				else
+					button.SetText(MCF_Device_Names.GlyphFor(kind));
+			}
+			else
+			{
+				button.SetText("");
+				SetTileIcon(button, "");
+			}
 
 			if (i >= m_aAppLabels.Count() || !m_aAppLabels[i])
 				continue;
@@ -607,6 +832,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 				m_aAppLabels[i].SetText(m_aApps[i].ResolveLabel());
 		}
 
+		PaintDock();
 		ShowClock(true);
 
 		if (m_ButtonBack)
@@ -614,6 +840,91 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		UpdateLogButton();
 		SetHint("");
+	}
+
+	//! Colours one home-screen tile.
+	//!
+	//! The tile layout keeps the colour on a widget named "Tile", which
+	//! SCR_ButtonTextComponent knows nothing about. Painting the widget named
+	//! "Background" instead -- the obvious choice -- works until the first
+	//! mouse-over, at which point the component repaints it from its own
+	//! m_BackgroundHovered and the app's colour is gone for good.
+	//!
+	//! Nine tiles share the widget name. FindAnyWidget from THIS button's own
+	//! root searches only this button's subtree, so they never collide.
+	//! Puts one sprite from the base game's icon atlas on a tile.
+	//!
+	//! \return True if a sprite was actually drawn. False means the caller
+	//! should fall back to the letter mark -- an unknown sprite name is not an
+	//! error the player should ever see, it is a tile that quietly says TXT
+	//! instead.
+	protected bool SetTileIcon(notnull SCR_ButtonTextComponent button, string sprite)
+	{
+		Widget tileRoot = button.GetRootWidget();
+		if (!tileRoot)
+			return false;
+
+		ImageWidget icon = ImageWidget.Cast(tileRoot.FindAnyWidget(W_ICON));
+		if (!icon)
+			return false;
+
+		if (sprite.IsEmpty())
+		{
+			icon.SetVisible(false);
+			return false;
+		}
+
+		bool drawn = icon.LoadImageTexture(0, sprite);
+		icon.SetVisible(drawn);
+		return drawn;
+	}
+
+	protected void PaintTile(notnull SCR_ButtonTextComponent button, int colour)
+	{
+		Widget tileRoot = button.GetRootWidget();
+		if (!tileRoot)
+			return;
+
+		ImageWidget tile = ImageWidget.Cast(tileRoot.FindAnyWidget(W_TILE));
+		if (!tile)
+			return;
+
+		tile.SetColor(Color.FromInt(colour));
+	}
+
+	//! The dock repeats the first four apps. A click there is the same click as
+	//! on the grid tile above it -- one handler, one code path, and the dock
+	//! cannot drift out of step with what the device actually carries.
+	protected void OnDockClicked(SCR_ButtonTextComponent button)
+	{
+		int slot = m_aDockButtons.Find(button);
+		if (slot < 0 || slot >= m_aApps.Count())
+			return;
+
+		ShowList(m_aApps[slot]);
+	}
+
+	//! Paints the dock from the first apps the device has, and hides any tile
+	//! it cannot fill -- a dock with three apps in it is a phone with three
+	//! apps, not a broken row of four.
+	protected void PaintDock()
+	{
+		foreach (int i, SCR_ButtonTextComponent dockButton : m_aDockButtons)
+		{
+			bool used = i < m_aApps.Count();
+			dockButton.GetRootWidget().SetVisible(used);
+
+			if (!used)
+				continue;
+
+			int kind = m_aApps[i].m_eKind;
+			PaintTile(dockButton, MCF_Device_Names.ColorFor(kind));
+
+			if (SetTileIcon(dockButton, MCF_Device_Names.IconFor(kind)))
+				dockButton.SetText("");
+			else
+				dockButton.SetText(MCF_Device_Names.GlyphFor(kind));
+		}
 	}
 
 	protected void OnAppClicked(SCR_ButtonTextComponent button)
@@ -627,8 +938,16 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	// ---------------------------------------------------------- the list
 
+	//! \param app Which app to list. Null means the caller lost its place --
+	//! go home rather than off the end of a null.
 	protected void ShowList(MCF_Device_App app)
 	{
+		if (!app)
+		{
+			ShowHome();
+			return;
+		}
+
 		m_bOnHome = false;
 		m_bOnList = true;
 		m_OpenApp = app;
@@ -679,7 +998,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (!rowButton)
 			return;
 
-		rowButton.SetText(entry.DescribeShort());
+		rowButton.SetText(entry.DescribeRow());
 		rowButton.m_OnClicked.Insert(OnRowClicked);
 		m_aRowButtons.Insert(rowButton);
 	}
@@ -1039,6 +1358,97 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! The screen a shut device shows. Everything else goes away, including the
 	//! app tiles -- a locked phone that still lists its apps has told you what
 	//! is on it, which is most of what breaking in was supposed to earn.
+	//! The passcode pad, which is what a locked phone shows when you touch it.
+	//!
+	//! WHY A CODE IN FRONT OF THE PUZZLE. The break-in used to be one button
+	//! that said BREAK IN, which told the player nothing and looked like a
+	//! cheat. A keypad is what the object actually has: it can be tried, it
+	//! can be wrong, and a code found somewhere else in the mission -- on a
+	//! note, from a prisoner, over the radio -- now has a place to be typed.
+	//! Type the right one and the lock's own challenge starts.
+	protected void ShowKeypad()
+	{
+		m_bOnKeypad = true;
+		m_bOnLock = false;
+		m_sCode = "";
+
+		if (m_wLockScreen)
+			m_wLockScreen.SetVisible(false);
+
+		if (m_wKeypad)
+			m_wKeypad.SetVisible(true);
+
+		if (m_wKeypadTitle)
+			m_wKeypadTitle.SetText("Enter passcode");
+
+		DrawPips();
+		SetHint("");
+	}
+
+	//! Four pips, filled as far as the code has been typed.
+	protected void DrawPips()
+	{
+		foreach (int i, Widget pip : m_aPips)
+		{
+			if (!pip)
+				continue;
+
+			ImageWidget dot = ImageWidget.Cast(pip);
+			if (!dot)
+				continue;
+
+			if (i < m_sCode.Length())
+				dot.SetColor(Color.FromInt(0xFFFFFFFF));
+			else
+				dot.SetColor(Color.FromInt(0x59FFFFFF));
+		}
+	}
+
+	protected void OnKeyClicked(SCR_ButtonTextComponent button)
+	{
+		if (!m_bOnKeypad || !button)
+			return;
+
+		if (m_sCode.Length() >= CODE_LENGTH)
+			return;
+
+		int slot = m_aKeys.Find(button);
+		if (slot < 0 || slot > 9)
+			return;
+
+		m_sCode = m_sCode + slot.ToString();
+		DrawPips();
+
+		if (m_sCode.Length() < CODE_LENGTH)
+			return;
+
+		if (m_sCode == BREAK_IN_CODE)
+		{
+			if (m_wKeypadTitle)
+				m_wKeypadTitle.SetText("Accepted");
+
+			OnUnlockClicked(null);
+			return;
+		}
+
+		// Wrong. Say so, empty the pips, and let them try again -- the phone
+		// is not the thing keeping score, the lock on the server is.
+		if (m_wKeypadTitle)
+			m_wKeypadTitle.SetText("Wrong code");
+
+		m_sCode = "";
+		DrawPips();
+	}
+
+	protected void OnDeleteClicked(SCR_ButtonTextComponent button)
+	{
+		if (!m_bOnKeypad || m_sCode.IsEmpty())
+			return;
+
+		m_sCode = m_sCode.Substring(0, m_sCode.Length() - 1);
+		DrawPips();
+	}
+
 	protected void ShowLock()
 	{
 		m_bOnLock = true;
@@ -1053,38 +1463,63 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_wLockScreen)
 			m_wLockScreen.SetVisible(true);
 
+		if (m_wKeypad)
+			m_wKeypad.SetVisible(false);
+
+		m_bOnKeypad = false;
+
+		// The name belongs to an app screen's header. On the lock screen it
+		// landed on top of the note, which is what made it read as a jumble.
+		if (m_wDeviceName)
+			m_wDeviceName.SetVisible(false);
+
+		// The old BREAK IN button is gone: the way in is the keypad, reached
+		// by touching the bar, which is where a hand goes on a phone anyway.
+		if (m_UnlockButton)
+			m_UnlockButton.GetRootWidget().SetVisible(false);
+
 		MCF_Devices_LockComponent lock = MCF_Devices_LockComponent.FindOn(m_Carrier.GetOwner());
 
+		// A locked phone still shows its clock, large, the way a phone on a
+		// table does -- and the fact that it is locked belongs under it in
+		// small type, not as a shout across the middle of the screen. The word
+		// LOCKED was the only thing on this screen for weeks and it read as an
+		// error message rather than as a phone.
 		if (m_wLockTitle)
-			m_wLockTitle.SetText("LOCKED");
+			m_wLockTitle.SetText(ClockText());
 
 		if (m_wLockNote && lock)
-			m_wLockNote.SetText(DescribeLock(lock.GetDifficulty()));
+			m_wLockNote.SetText(DateText() + "\n\nLocked  -  " + DescribeLock(lock.GetDifficulty()));
 
 		if (m_UnlockButton && lock)
 			m_UnlockButton.SetText(lock.GetBreakInVerb());
 
-		SetHint("This device is secured.");
+		SetHint("Touch the bar to unlock.");
 	}
 
 	//! What the player is up against, in words rather than a number. Naming it
 	//! before the attempt is deliberate: a device that cannot be cracked in the
 	//! time available should say so first, not after.
+	//! Said as the BREAK-IN it is, not as the lock it sits behind.
+	//!
+	//! The player is not shopping for a padlock; they are deciding whether to
+	//! spend the next minute on this phone while the patrol comes back. So the
+	//! line names the work: how hard, and roughly how long.
 	protected string DescribeLock(int difficulty)
 	{
 		if (difficulty <= 0)
-			return "Consumer lock";
+			return "Hack: trivial, seconds";
 
 		if (difficulty == 1)
-			return "Consumer lock, patched";
+			return "Hack: light, under a minute";
 
 		if (difficulty == 2)
-			return "Commercial encryption";
+			return "Hack: signal work, a minute or two";
 
 		if (difficulty == 3)
-			return "Hardened, military issue";
+			return "Hack: hardened, expect a fight";
 
-		return "Hardened, tamper alarmed";
+		return "Hack: hardened and alarmed";
 	}
 
 	//! Asks the server for a challenge. Nothing about the puzzle is decided
@@ -1197,9 +1632,17 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		FitHackPanel();
 
 		// The lock screen is what the player pressed to get here. The puzzle
-		// replaces it rather than sitting on top of it.
+		// replaces it rather than sitting on top of it -- and the keypad goes
+		// with it, or it is still standing there when the puzzle is over and
+		// the phone comes back to a passcode nobody asked for. That was the
+		// glitch: a finished break-in landing on the keypad instead of home.
 		if (m_wLockScreen)
 			m_wLockScreen.SetVisible(false);
+
+		if (m_wKeypad)
+			m_wKeypad.SetVisible(false);
+
+		m_bOnKeypad = false;
 
 		m_bHackDone = false;
 		m_HackScreen = new MCF_Devices_HackScreen();
@@ -1217,11 +1660,38 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! silently -- see the note at the top of MCF_Device_Layout.c.
 	protected void FitHackPanel()
 	{
-		if (!m_wHackPanel || !m_Geometry)
+		if (!m_wHackPanel)
 			return;
 
-		float width = m_Geometry.GetGlassWidth();
-		float height = m_Geometry.GetGlassHeight();
+		// MEASURED OFF THE GLASS WIDGET ITSELF, not off the geometry object.
+		// The panel is a child of ScreenArea, so the size that matters is the
+		// one that widget actually has after a layout pass -- and asking the
+		// widget survives a device whose 3D fit never landed, which is exactly
+		// when the puzzle used to come up as a strip too small to read.
+		//
+		// GetScreenSize answers in physical pixels and FrameSlot works in the
+		// reference resolution. Converting is not optional; see the same note
+		// in MCF_Device_Layout.FitToDevice.
+		float width, height;
+		Widget screenArea = m_wHackPanel.GetParent();
+		if (screenArea)
+		{
+			screenArea.GetScreenSize(width, height);
+
+			WorkspaceWidget workspace = GetGame().GetWorkspace();
+			if (workspace)
+			{
+				width = workspace.DPIUnscale(width);
+				height = workspace.DPIUnscale(height);
+			}
+		}
+
+		if (width <= 0 || height <= 0)
+		{
+			width = m_Geometry.GetGlassWidth();
+			height = m_Geometry.GetGlassHeight();
+		}
+
 		if (width <= 0 || height <= 0)
 			return;
 
@@ -1241,12 +1711,26 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! Whether the break-in worked is the server's answer and arrives as a
 	//! replicated bool a moment later, so the lock screen goes back up and
 	//! PollLock takes it down again if the device opened.
+	//! The puzzle is over, one way or another.
+	//!
+	//! IT MUST LAND ON A SCREEN. Leaving the phone on none of them -- which is
+	//! what happened when the device came back unlocked -- means every flag
+	//! this class keeps says "not here", and the next tap on the home bar
+	//! walked off the end of the back chain into a null app. A finished
+	//! break-in goes to the lock screen if it failed and to the home screen if
+	//! it worked; there is no third answer.
 	protected void FinishHack()
 	{
 		CloseHack();
 
 		if (IsDeviceLocked())
+		{
 			ShowLock();
+			return;
+		}
+
+		m_Content.GetApps(m_aApps);
+		ShowHome();
 	}
 
 	protected void CloseHack()
@@ -1274,6 +1758,20 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			button.GetRootWidget().SetVisible(home);
 		}
 
+		foreach (SCR_ButtonTextComponent dockButton : m_aDockButtons)
+		{
+			dockButton.GetRootWidget().SetVisible(home);
+		}
+
+		if (m_wDockPanel)
+			m_wDockPanel.SetVisible(home);
+
+		if (m_wKeypad && (home || list || read))
+		{
+			m_wKeypad.SetVisible(false);
+			m_bOnKeypad = false;
+		}
+
 		foreach (TextWidget label : m_aAppLabels)
 		{
 			if (label)
@@ -1294,6 +1792,44 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	//! BACK steps back one level, and closes the phone from the home screen --
 	//! which is what a phone does, and means the button is never dead.
+	//! One tap back, two taps away.
+	//!
+	//! The gap is measured on the menu's own tick rather than from a clock,
+	//! because the tick is the only time source this screen already trusts --
+	//! and a double tap that misses simply reads as two ordinary steps back,
+	//! which is a harmless way to be wrong.
+	protected void OnHomeBarTapped()
+	{
+		if (m_fSinceHomeTap < HOME_DOUBLE_TAP)
+		{
+			Close();
+			return;
+		}
+
+		m_fSinceHomeTap = 0;
+
+		// A locked phone answers a tap the way a locked phone does: with the
+		// keypad. The code is the door; the puzzle behind it is the lock.
+		if (m_bOnLock)
+		{
+			ShowKeypad();
+			return;
+		}
+
+		if (m_bOnKeypad)
+		{
+			ShowLock();
+			return;
+		}
+
+		// On the home screen there is nowhere behind: a single tap there does
+		// nothing, and the second tap of a double is what closes.
+		if (m_bOnHome)
+			return;
+
+		OnBackClicked(null);
+	}
+
 	protected void OnBackClicked(SCR_ButtonTextComponent button)
 	{
 		// Backing out of the puzzle returns to the lock screen, not out of the
@@ -1334,6 +1870,15 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		}
 
 		if (m_bOnList)
+		{
+			ShowHome();
+			return;
+		}
+
+		// The last step back from an entry is its own app's list. With no app
+		// open there is nothing behind but the home screen, and asking for a
+		// list of nothing is how this crashed.
+		if (!m_OpenApp)
 		{
 			ShowHome();
 			return;
@@ -1441,12 +1986,39 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_HackScreen)
 		{
 			if (m_bHackDone)
+			{
 				FinishHack();
+			}
 			else
+			{
+				// Re-fitted every frame while it is up. The glass has no size at
+				// all on the frame the panel is created, and a puzzle that was
+				// measured then stays that size for the rest of the break-in.
+				FitHackPanel();
 				m_HackScreen.Update();
+			}
 		}
 
 		PollLock();
+
+		// The drawn phone is re-placed every frame: it costs three slot calls
+		// and it survives a window resize, which the measured fit never did.
+		FitDrawnPhone();
+
+		m_fSinceHomeTap = m_fSinceHomeTap + tDelta;
+
+		// The status bar carries the mission's own clock, so it has to be
+		// re-read rather than set once at open. Once a second is enough for a
+		// clock that only shows minutes, and cheap enough not to think about.
+		m_fStatusTick = m_fStatusTick + tDelta;
+		if (m_fStatusTick >= 1.0)
+		{
+			m_fStatusTick = 0;
+			RefreshStatus();
+
+			if (m_bOnHome)
+				ShowClock(true);
+		}
 
 		if (m_bFitted || m_iFitFrame > FIT_GIVE_UP_FRAME)
 			return;
@@ -1615,12 +2187,80 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		return value.ToString();
 	}
 
-	protected string StatusLine()
+	//! The two ends of the status bar, refreshed on a slow tick.
+	//!
+	//! A status bar is the cheapest authenticity a screen has, and the easiest
+	//! to get wrong. Nothing in the framework reads any of this -- but a phone
+	//! that says 100% on the same line as every other phone in the mission
+	//! reads as a mock-up, and one that says 41% here and 88% over there reads
+	//! as two phones somebody owned.
+	protected void RefreshStatus()
+	{
+		if (m_wStatusBar)
+			m_wStatusBar.SetText(ClockText());
+
+		if (m_wStatusRight)
+			m_wStatusRight.SetText(StatusRightText());
+	}
+
+	protected string StatusRightText()
 	{
 		if (m_eView == MCF_EIntelView.LAPTOP)
-			return "MCF          AC POWER";
+			return "ETH    AC POWER";
 
-		return "MCF          LTE          100%";
+		// The signal and battery GLYPHS sit beside this text in the layout, so
+		// the words for them would be a second helping of the same fact.
+		return BatteryPercent().ToString() + "%";
+	}
+
+	//! A number that belongs to this device and to no other, and that every
+	//! player gets the same answer from.
+	//!
+	//! Derived from what the device is called and which profile it carries,
+	//! because both are authored and both replicate. NOT from Math.RandomInt,
+	//! which is broken on wide ranges here (see the Enfusion lessons), and not
+	//! from anything per-client: two players looking at the same phone over
+	//! someone's shoulder must not see two different batteries.
+	protected int DeviceSeed()
+	{
+		string source;
+		if (m_Carrier)
+			source = m_Carrier.GetDeviceName() + "/" + m_Carrier.GetProfileId();
+
+		if (source.IsEmpty())
+			source = "device";
+
+		int seed = 17;
+		int count = source.Length();
+		for (int i = 0; i < count; i++)
+		{
+			seed = (seed * 31 + source.Get(i).ToAscii()) % 100003;
+		}
+
+		return seed;
+	}
+
+	//! Never 100, never flat. A dead phone would have to explain why it still
+	//! lights up, and a full one looks like a default.
+	protected int BatteryPercent()
+	{
+		return 11 + (DeviceSeed() % 78);
+	}
+
+	protected string SignalLabel()
+	{
+		int band = DeviceSeed() % 9;
+
+		if (band == 0)
+			return "NO SERVICE";
+
+		if (band < 3)
+			return "3G";
+
+		if (band < 6)
+			return "4G";
+
+		return "LTE";
 	}
 
 	protected int LocalPlayerId()

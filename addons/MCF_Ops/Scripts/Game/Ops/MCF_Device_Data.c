@@ -97,6 +97,27 @@ class MCF_Device_Item
 
 		return m_sTimestamp + "   " + label;
 	}
+
+	//! Two lines for a device's own list: what it is, then when it was.
+	//!
+	//! Deliberately not DescribeShort, which the two authoring screens use in
+	//! a numbered single-line list where a second line would only make the
+	//! list harder to scan. This one is for the phone, where an inbox reads
+	//! subject first and stamp underneath, the way every inbox does.
+	//!
+	//! The newline is safe because MCF_IntelRow wraps rather than clips; on a
+	//! wide screen it simply breaks where it is told to.
+	string DescribeRow()
+	{
+		string label = m_sHeading;
+		if (label.IsEmpty())
+			label = "(no subject)";
+
+		if (m_sTimestamp.IsEmpty())
+			return label;
+
+		return label + "\n<color rgba=\"255,255,255,140\">" + m_sTimestamp + "</color>";
+	}
 }
 
 //! One app, and what is filed under it.
@@ -203,5 +224,94 @@ class MCF_Device_Names
 		}
 
 		return "Nothing here.";
+	}
+
+
+	//! A two- or three-letter mark for the tile on the home screen.
+	//!
+	//! WHY LETTERS AND NOT ICONS. An icon is an imported texture per app, and
+	//! eight of them is eight resources to keep, translate and re-import. A
+	//! short mark on a coloured tile reads as an app grid at phone size and
+	//! costs nothing -- and it stays legible on the laptop, where the same
+	//! tiles are drawn much larger.
+	//! The sprite this app draws on its tile, from the base game's own icon
+	//! atlas -- see MCF_Intel_ShellMenu.ICON_SET.
+	//!
+	//! WHY VANILLA SPRITES AND NOT OUR OWN ART. Every shipped image in an
+	//! addon has to be imported by the Workbench and referenced by GUID, and
+	//! this project cannot drive the Workbench headlessly -- eight icons is
+	//! eight manual imports and eight chances of a metafile without a
+	//! resource. The atlas is already installed on every machine that runs the
+	//! game, its sprites are white masks that tint to any colour, and it costs
+	//! one line each.
+	//!
+	//! An EMPTY string means "no sprite I am sure of". The tile then falls
+	//! back to its letter mark, which is why MAIL and FILES still read "@" and
+	//! "DIR": the atlas is binary to every tool here, so the only names usable
+	//! are the ones the base game's own layouts are seen using, and neither a
+	//! mail nor a folder glyph is among them. Two names away from complete --
+	//! open the atlas in the Workbench's Resource Browser and fill them in.
+	//! The icon this app draws on its tile: one of MCF's own textures, drawn
+	//! white and tinted by nothing -- the tile underneath carries the colour.
+	//!
+	//! WHY OUR OWN ART AND NOT THE GAME'S ATLAS. The base game's icon atlas
+	//! has a settings cog and a camera and not much else a phone wants; there
+	//! is no envelope and no folder in any sprite name its own layouts use.
+	//! Ours are eleven small PNGs under UI/images/MCF_Phone, imported the same
+	//! way the models were -- write the file, write a .edds.meta beside it,
+	//! give the Workbench focus and it builds the .edds. That recipe is in
+	//! HANDOVER; it is what makes shipping our own UI art cheap.
+	static string IconFor(int kind)
+	{
+		switch (kind)
+		{
+			case MCF_EIntelApp.MESSAGES: return "{6A1C4F0B39D35200}UI/images/MCF_Phone/icon_messages.edds";
+			case MCF_EIntelApp.CALLS:    return "{6A1C4F0B39D35201}UI/images/MCF_Phone/icon_calls.edds";
+			case MCF_EIntelApp.CONTACTS: return "{6A1C4F0B39D35202}UI/images/MCF_Phone/icon_contacts.edds";
+			case MCF_EIntelApp.EMAIL:    return "{6A1C4F0B39D35203}UI/images/MCF_Phone/icon_mail.edds";
+			case MCF_EIntelApp.NOTES:    return "{6A1C4F0B39D35204}UI/images/MCF_Phone/icon_notes.edds";
+			case MCF_EIntelApp.PHOTOS:   return "{6A1C4F0B39D35205}UI/images/MCF_Phone/icon_photos.edds";
+			case MCF_EIntelApp.FILES:    return "{6A1C4F0B39D35206}UI/images/MCF_Phone/icon_files.edds";
+			case MCF_EIntelApp.SETTINGS: return "{6A1C4F0B39D35207}UI/images/MCF_Phone/icon_settings.edds";
+		}
+
+		return "";
+	}
+
+	static string GlyphFor(int kind)
+	{
+		switch (kind)
+		{
+			case MCF_EIntelApp.MESSAGES: return "SMS";
+			case MCF_EIntelApp.CALLS:    return "TEL";
+			case MCF_EIntelApp.CONTACTS: return "ABC";
+			case MCF_EIntelApp.EMAIL:    return "@";
+			case MCF_EIntelApp.NOTES:    return "TXT";
+			case MCF_EIntelApp.PHOTOS:   return "IMG";
+			case MCF_EIntelApp.FILES:    return "DIR";
+			case MCF_EIntelApp.SETTINGS: return "SET";
+		}
+
+		return "APP";
+	}
+
+	//! The tile's colour, ARGB. Muted rather than saturated: this is a phone
+	//! seen in a dim room through a game's colour grading, and full-strength
+	//! primaries read as a toy.
+	static int ColorFor(int kind)
+	{
+		switch (kind)
+		{
+			case MCF_EIntelApp.MESSAGES: return 0xFF1E7A3A;
+			case MCF_EIntelApp.CALLS:    return 0xFF17569C;
+			case MCF_EIntelApp.CONTACTS: return 0xFF5A4C8C;
+			case MCF_EIntelApp.EMAIL:    return 0xFF9A3F1E;
+			case MCF_EIntelApp.NOTES:    return 0xFF9A7A16;
+			case MCF_EIntelApp.PHOTOS:   return 0xFF167878;
+			case MCF_EIntelApp.FILES:    return 0xFF3E4A57;
+			case MCF_EIntelApp.SETTINGS: return 0xFF32373D;
+		}
+
+		return 0xFF44494F;
 	}
 }

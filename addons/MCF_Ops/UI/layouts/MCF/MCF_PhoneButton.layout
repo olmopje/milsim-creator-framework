@@ -1,0 +1,63 @@
+// A button that belongs on a phone: a rounded fill that lifts on hover, and
+// nothing else. No orange, no border, no 18pt.
+//
+// It replaces MCF_PlanningBoard_TaskEntry everywhere a control sits on a
+// device screen -- the break-in keys, the puzzle controls, the unlock button.
+// That row was built for the operations board: 18pt text, a hard orange
+// selected state and Clipping False, which on a 250-pixel-wide handset reads
+// as a menu bolted onto a phone.
+//
+// The rounded corners come from the same tile texture the app icons use, so
+// every corner radius on the device is one file.
+ButtonWidgetClass {
+ Name "Button"
+ Slot LayoutSlot "{6A1C4F0B39D35121}" {
+  Padding 0 0 0 0
+  SizeMode Fill
+ }
+ Clipping True
+ components {
+  SCR_ButtonTextComponent "{6A1C4F0B39D35122}" {
+   m_bCanBeToggled 1
+   m_BackgroundDefault 1 1 1 0.10
+   m_BackgroundHovered 1 1 1 0.22
+   m_BackgroundSelected 0.76 0.39 0.08 0.85
+   m_BackgroundSelectedHovered 0.90 0.54 0.18 0.9
+   m_BackgroundClicked 1 1 1 0.34
+   m_sText ""
+  }
+ }
+ style blank
+ {
+  OverlayWidgetClass "{6A1C4F0B39D35123}" {
+   Name "Overlay"
+   Slot ButtonWidgetSlot "{6A1C4F0B39D35124}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+    Padding 0 0 0 0
+   }
+   {
+    ImageWidgetClass "{6A1C4F0B39D35125}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35126}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+     Image ""
+    }
+    TextWidgetClass "{6A1C4F0B39D35127}" {
+     Name "Text"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35128}" {
+      HorizontalAlign 1
+      VerticalAlign 1
+      Padding 6 3 6 3
+     }
+     Text ""
+     "Font Size" 12
+     "Min Font Size" 12
+    }
+   }
+  }
+ }
+}

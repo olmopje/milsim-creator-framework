@@ -19,7 +19,7 @@ FrameWidgetClass {
   TextWidgetClass "{6A1C4F0B39D3416D}" {
    Name "Title"
    Slot FrameWidgetSlot "{6A1C4F0B39D3416E}" {
-    Anchor 0.2500 0.0400 0.7500 0.1000
+    Anchor 0.0600 0.0450 0.9400 0.0950
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -30,13 +30,13 @@ FrameWidgetClass {
     OffsetBottom 0
    }
    Text "SECURED DEVICE"
-   "Font Size" 28
-   "Min Font Size" 28
+   "Font Size" 15
+   "Min Font Size" 15
   }
   TextWidgetClass "{6A1C4F0B39D3416F}" {
    Name "Status"
    Slot FrameWidgetSlot "{6A1C4F0B39D34170}" {
-    Anchor 0.2500 0.1050 0.7500 0.1550
+    Anchor 0.0600 0.1000 0.9400 0.1450
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -47,13 +47,13 @@ FrameWidgetClass {
     OffsetBottom 0
    }
    Text "WATCH"
-   "Font Size" 22
-   "Min Font Size" 22
+   "Font Size" 12
+   "Min Font Size" 12
   }
   FrameWidgetClass "{6A1C4F0B39D34171}" {
    Name "PanelKeypad"
    Slot FrameWidgetSlot "{6A1C4F0B39D34172}" {
-    Anchor 0.3750 0.2000 0.6250 0.7200
+    Anchor 0.1400 0.5100 0.8600 0.7900
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -64,7 +64,7 @@ FrameWidgetClass {
     OffsetBottom 0
    }
    {
-   ButtonWidgetClass "{6A1C4F0B39D34000}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34000}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell0"
     Slot FrameWidgetSlot "{6A1C4F0B39D34001}" {
      Anchor 0.0600 0.0600 0.3200 0.3200
@@ -84,7 +84,7 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34003}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34003}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell1"
     Slot FrameWidgetSlot "{6A1C4F0B39D34004}" {
      Anchor 0.3800 0.0600 0.6400 0.3200
@@ -104,7 +104,7 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34006}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34006}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell2"
     Slot FrameWidgetSlot "{6A1C4F0B39D34007}" {
      Anchor 0.7000 0.0600 0.9600 0.3200
@@ -124,7 +124,7 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34009}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34009}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell3"
     Slot FrameWidgetSlot "{6A1C4F0B39D3400A}" {
      Anchor 0.0600 0.3800 0.3200 0.6400
@@ -144,7 +144,7 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D3400C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3400C}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell4"
     Slot FrameWidgetSlot "{6A1C4F0B39D3400D}" {
      Anchor 0.3800 0.3800 0.6400 0.6400
@@ -164,7 +164,7 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D3400F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3400F}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell5"
     Slot FrameWidgetSlot "{6A1C4F0B39D34010}" {
      Anchor 0.7000 0.3800 0.9600 0.6400
@@ -184,7 +184,7 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34012}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34012}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell6"
     Slot FrameWidgetSlot "{6A1C4F0B39D34013}" {
      Anchor 0.0600 0.7000 0.3200 0.9600
@@ -204,7 +204,7 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34015}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34015}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell7"
     Slot FrameWidgetSlot "{6A1C4F0B39D34016}" {
      Anchor 0.3800 0.7000 0.6400 0.9600
@@ -224,7 +224,7 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34018}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34018}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Cell8"
     Slot FrameWidgetSlot "{6A1C4F0B39D34019}" {
      Anchor 0.7000 0.7000 0.9600 0.9600
@@ -249,7 +249,7 @@ FrameWidgetClass {
   FrameWidgetClass "{6A1C4F0B39D34173}" {
    Name "PanelWave"
    Slot FrameWidgetSlot "{6A1C4F0B39D34174}" {
-    Anchor 0.1400 0.1900 0.8600 0.7300
+    Anchor 0.0550 0.1700 0.9450 0.4300
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2439,7 +2439,7 @@ FrameWidgetClass {
    TextWidgetClass "{6A1C4F0B39D3413D}" {
     Name "Dials"
     Slot FrameWidgetSlot "{6A1C4F0B39D3413E}" {
-     Anchor 0.0200 0.6600 0.9800 0.7400
+     Anchor 0.0600 0.4450 0.9400 0.4950
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2450,13 +2450,13 @@ FrameWidgetClass {
      OffsetBottom 0
     }
     Text "FREQ 1   GAIN 1"
-    "Font Size" 20
-    "Min Font Size" 20
+    "Font Size" 12
+    "Min Font Size" 12
    }
-   ButtonWidgetClass "{6A1C4F0B39D3413F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3413F}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "FreqDown"
     Slot FrameWidgetSlot "{6A1C4F0B39D34140}" {
-     Anchor 0.0600 0.7600 0.2400 0.9400
+     Anchor 0.0600 0.8200 0.2700 0.9250
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2473,10 +2473,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34142}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34142}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "FreqUp"
     Slot FrameWidgetSlot "{6A1C4F0B39D34143}" {
-     Anchor 0.2600 0.7600 0.4400 0.9400
+     Anchor 0.2900 0.8200 0.5000 0.9250
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2493,10 +2493,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34145}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34145}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "GainDown"
     Slot FrameWidgetSlot "{6A1C4F0B39D34146}" {
-     Anchor 0.4800 0.7600 0.6600 0.9400
+     Anchor 0.5200 0.8200 0.7300 0.9250
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2513,10 +2513,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34148}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34148}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "GainUp"
     Slot FrameWidgetSlot "{6A1C4F0B39D34149}" {
-     Anchor 0.6800 0.7600 0.8600 0.9400
+     Anchor 0.7500 0.8200 0.9600 0.9250
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2538,7 +2538,7 @@ FrameWidgetClass {
   FrameWidgetClass "{6A1C4F0B39D34175}" {
    Name "PanelPorts"
    Slot FrameWidgetSlot "{6A1C4F0B39D34176}" {
-    Anchor 0.2000 0.1800 0.8000 0.7400
+    Anchor 0.0600 0.1700 0.9400 0.7400
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2549,10 +2549,10 @@ FrameWidgetClass {
     OffsetBottom 0
    }
    {
-   TextWidgetClass "{6A1C4F0B39D3414B}" {
+   RichTextWidgetClass "{6A1C4F0B39D3414B}" {
     Name "Rule"
     Slot FrameWidgetSlot "{6A1C4F0B39D3414C}" {
-     Anchor 0.0200 0.0100 0.9800 0.0900
+     Anchor 0.0200 -0.0200 0.9800 0.0820
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2562,14 +2562,17 @@ FrameWidgetClass {
      SizeY 0
      OffsetBottom 0
     }
+    Clipping Ancestor
+    Wrap 1
     Text "OPEN EVERY PORT WHOSE RESPONSE IS EVEN"
-    "Font Size" 19
-    "Min Font Size" 19
+    "Font Size" 13
+    "Min Font Size" 13
+    "Line Spacing" 17
    }
-   ButtonWidgetClass "{6A1C4F0B39D3414D}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3414D}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port0"
     Slot FrameWidgetSlot "{6A1C4F0B39D3414E}" {
-     Anchor 0.0300 0.1300 0.4800 0.2600
+     Anchor 0.0200 0.1000 0.9800 0.1740
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2586,10 +2589,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34150}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34150}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port1"
     Slot FrameWidgetSlot "{6A1C4F0B39D34151}" {
-     Anchor 0.5200 0.1300 0.9700 0.2600
+     Anchor 0.0200 0.1890 0.9800 0.2630
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2606,10 +2609,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34153}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34153}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port2"
     Slot FrameWidgetSlot "{6A1C4F0B39D34154}" {
-     Anchor 0.0300 0.2850 0.4800 0.4150
+     Anchor 0.0200 0.2780 0.9800 0.3520
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2626,10 +2629,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34156}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34156}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port3"
     Slot FrameWidgetSlot "{6A1C4F0B39D34157}" {
-     Anchor 0.5200 0.2850 0.9700 0.4150
+     Anchor 0.0200 0.3670 0.9800 0.4410
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2646,10 +2649,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34159}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34159}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port4"
     Slot FrameWidgetSlot "{6A1C4F0B39D3415A}" {
-     Anchor 0.0300 0.4400 0.4800 0.5700
+     Anchor 0.0200 0.4560 0.9800 0.5300
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2666,10 +2669,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D3415C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3415C}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port5"
     Slot FrameWidgetSlot "{6A1C4F0B39D3415D}" {
-     Anchor 0.5200 0.4400 0.9700 0.5700
+     Anchor 0.0200 0.5450 0.9800 0.6190
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2686,10 +2689,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D3415F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3415F}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port6"
     Slot FrameWidgetSlot "{6A1C4F0B39D34160}" {
-     Anchor 0.0300 0.5950 0.4800 0.7250
+     Anchor 0.0200 0.6340 0.9800 0.7080
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2706,10 +2709,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34162}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34162}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port7"
     Slot FrameWidgetSlot "{6A1C4F0B39D34163}" {
-     Anchor 0.5200 0.5950 0.9700 0.7250
+     Anchor 0.0200 0.7230 0.9800 0.7970
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2726,10 +2729,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34165}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34165}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port8"
     Slot FrameWidgetSlot "{6A1C4F0B39D34166}" {
-     Anchor 0.0300 0.7500 0.4800 0.8800
+     Anchor 0.0200 0.8120 0.9800 0.8860
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2746,10 +2749,10 @@ FrameWidgetClass {
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34168}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34168}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
     Name "Port9"
     Slot FrameWidgetSlot "{6A1C4F0B39D34169}" {
-     Anchor 0.5200 0.7500 0.9700 0.8800
+     Anchor 0.0200 0.9010 0.9800 0.9750
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2771,7 +2774,7 @@ FrameWidgetClass {
   TextWidgetClass "{6A1C4F0B39D34177}" {
    Name "Timer"
    Slot FrameWidgetSlot "{6A1C4F0B39D34178}" {
-    Anchor 0.3000 0.7550 0.7000 0.8050
+    Anchor 0.0600 0.7600 0.9400 0.8100
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2785,10 +2788,10 @@ FrameWidgetClass {
    "Font Size" 26
    "Min Font Size" 26
   }
-  ButtonWidgetClass "{6A1C4F0B39D34179}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+  ButtonWidgetClass "{6A1C4F0B39D34179}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
    Name "ButtonSubmit"
    Slot FrameWidgetSlot "{6A1C4F0B39D3417A}" {
-    Anchor 0.3500 0.8150 0.5000 0.8750
+    Anchor 0.1000 0.8300 0.5000 0.9050
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2805,10 +2808,10 @@ FrameWidgetClass {
     }
    }
   }
-  ButtonWidgetClass "{6A1C4F0B39D3417C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+  ButtonWidgetClass "{6A1C4F0B39D3417C}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
    Name "ButtonClose"
    Slot FrameWidgetSlot "{6A1C4F0B39D3417D}" {
-    Anchor 0.5200 0.8150 0.6700 0.8750
+    Anchor 0.5200 0.8300 0.9000 0.9050
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2828,7 +2831,7 @@ FrameWidgetClass {
   TextWidgetClass "{6A1C4F0B39D3417F}" {
    Name "Hint"
    Slot FrameWidgetSlot "{6A1C4F0B39D34180}" {
-    Anchor 0.1200 0.8900 0.8800 0.9500
+    Anchor 0.0600 0.9150 0.9400 0.9650
     PositionX 0
     OffsetLeft 0
     PositionY 0

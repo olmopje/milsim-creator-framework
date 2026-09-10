@@ -1,0 +1,81 @@
+// One tile on a device's home screen: a coloured square with a short mark on
+// it, and the app's name drawn underneath by the shell.
+//
+// WHY NOT REUSE MCF_PlanningBoard_TaskEntry, WHICH THE TILES USED BEFORE.
+// SCR_ButtonTextComponent owns the widget named "Background": it repaints it
+// on hover, on click and on select from m_BackgroundDefault and friends. A tile
+// colour written there from script survives exactly until the first mouse-over.
+//
+// So the colour lives on its own widget, "Tile", which the component knows
+// nothing about and therefore never touches. "Background" stays, empty by
+// default, and does the hover wash on top of the colour -- so the tile still
+// answers the mouse, and the app's colour is ours.
+ButtonWidgetClass {
+ Name "Button"
+ Slot LayoutSlot "{6A1C4F0B39D35101}" {
+  Padding 0 0 0 0
+  SizeMode Fill
+ }
+ Clipping True
+ components {
+  SCR_ButtonTextComponent "{6A1C4F0B39D35102}" {
+   m_bCanBeToggled 0
+   m_BackgroundDefault 1 1 1 0
+   m_BackgroundHovered 1 1 1 0.22
+   m_BackgroundSelected 1 1 1 0.3
+   m_BackgroundSelectedHovered 1 1 1 0.4
+   m_BackgroundClicked 1 1 1 0.45
+   m_sText ""
+  }
+ }
+ style blank
+ {
+  OverlayWidgetClass "{6A1C4F0B39D35103}" {
+   Name "Overlay"
+   Slot ButtonWidgetSlot "{6A1C4F0B39D35104}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+    Padding 0 0 0 0
+   }
+   {
+    ImageWidgetClass "{6A1C4F0B39D35105}" {
+     Name "Tile"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35106}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Color 0.27 0.29 0.31 1
+     Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+     Image ""
+    }
+    ImageWidgetClass "{6A1C4F0B39D35107}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35108}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+    }
+    ImageWidgetClass "{6A1C4F0B39D3510B}" {
+     Name "Icon"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D3510C}" {
+      HorizontalAlign 1
+      VerticalAlign 1
+     }
+     Color 1 1 1 1
+     Size 38 38
+     "Is Visible" 0
+    }
+    TextWidgetClass "{6A1C4F0B39D35109}" {
+     Name "Text"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D3510A}" {
+      HorizontalAlign 1
+      VerticalAlign 1
+     }
+     Text ""
+     "Font Size" 15
+     "Min Font Size" 15
+    }
+   }
+  }
+ }
+}

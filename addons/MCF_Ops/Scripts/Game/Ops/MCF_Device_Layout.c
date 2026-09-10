@@ -321,6 +321,22 @@ class MCF_Device_Layout
 		float boxW, boxH;
 		m_wModel.GetScreenSize(boxW, boxH);
 
+		// UNITS, AND THIS ONE HID FOR WEEKS BECAUSE IT ONLY BITES IN A SMALL
+		// WINDOW. GetScreenSize answers in PHYSICAL pixels; NodePoint answers
+		// in the REFERENCE resolution. They agree only when the DPI scale is 1,
+		// which is why a full-size window fitted the glass to the phone and a
+		// 1335x615 window did not: the guard below saw 850 against a box of
+		// 584, called it a different coordinate space, and left the glass at
+		// 86% of the whole preview BOX -- a screen with no phone around it.
+		// FitToScreenQuad learned this at line 364 and converts; this path
+		// never did.
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (workspace)
+		{
+			boxW = workspace.DPIUnscale(boxW);
+			boxH = workspace.DPIUnscale(boxH);
+		}
+
 		MCF_Core_Log.Debug("device in widget space: " + deviceW.ToString() + "x" + deviceH.ToString()
 			+ " against a box of " + boxW.ToString() + "x" + boxH.ToString());
 

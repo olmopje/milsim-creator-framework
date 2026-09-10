@@ -162,3 +162,82 @@ conversations already prove works.
   blocking it.
 - Whether a Game Master can write a profile onto a device that has none, or
   only pick from existing profiles. The first is more useful and more work.
+
+---
+
+## 9. Authoring inside the phone, and what "unread" means
+
+Added 2026-09-11, from the project owner, after the phone shell became a real
+handset. Status: **design**. Nothing below is built.
+
+### 9.1 The Game Master edits the device on the device
+
+There is no separate authoring screen. "Edit phone" opens **the phone**, the
+same shell a player sees, in an author mode: the same tiles, the same list, the
+same navigation, plus a few controls per screen — new message, delete, mark
+unread, edit text. APPLY already exists and already goes over MCF's own RPC.
+
+Why this and not the panel we have: the panel is a second screen that edits the
+same object and is named almost the same thing. That is exactly the confusion
+that cost a day on Edit intel versus Edit device (see HANDOVER step 1). One
+screen cannot disagree with itself. On the way, `MCF_Device_EditorMenu` — 19 KB
+of parallel UI — stops being needed.
+
+The same shell already draws the letter and the notepad, so the day this works
+for a phone it very nearly works for those too, and for the laptop once its
+screen is redrawn.
+
+**The decision that shapes it: object or profile.** A carrier holds either its
+own entries or the id of a shared device profile (`smuggler_phone`). Editing
+the object changes that one handset on that one table; editing the profile
+changes every device in the mission carrying it. Both are wanted. Neither may
+happen by accident, so the author screen has to say which one it has open
+before a single key is typed, and switching between them is a deliberate act —
+that is what the old panel's LOAD NEXT button was groping at.
+
+**The one genuinely new mechanism** is text entry on a 250-pixel-wide glass.
+Everything else is rearranging what exists. Expect it to be its own screen —
+tap a message, get an edit screen with an `SCR_EditBoxComponent` and a done
+button — rather than an edit box inside a scrolling list.
+
+### 9.2 Read and unread, which does not exist yet
+
+The shell has no notion of read state at all today. It needs one, because
+without it there is nothing for a badge to count and no way for a Game Master
+to say "this message should look new".
+
+Two different facts are being confused whenever this is discussed, and they
+belong in different places:
+
+1. **Authored-new.** The mission maker says an item starts unread. This is
+   content: it belongs on the item, travels in the wire format, and is the same
+   for everybody. A fifth field on the entry, appended — never inserted, the
+   format is already in saved missions.
+2. **Read by me.** Whether *this player* has opened it. This is not content and
+   must not be replicated as if it were: two players who both pick up the same
+   phone have genuinely different answers, and a phone that marks itself read
+   on the server the moment one player opens it steals the discovery from the
+   other. It belongs per client, keyed by device and item, in
+   `MCF_Core_PersistentStore` — which already survives restarts and already
+   lives outside the engine's save system.
+
+A badge shows where **authored-new AND not read by me**. So a fresh phone is
+loud, a phone you have been through is quiet, and the player next to you sees
+their own answer.
+
+### 9.3 Where the badges go
+
+The HTML preview built on 2026-09-10 draws all three; they are the same red
+pill at three sizes:
+
+- **App tile**: a count, top-right, overlapping the tile by about a quarter.
+  Red, white text, a ring in the screen's own background colour so it reads as
+  raised.
+- **List row**: a dot at the leading edge, in the accent, on the row's vertical
+  centre. No number — the row is one item.
+- **Lock screen**: notification cards, sender and time, never the body. A
+  locked phone that shows the message has given away what breaking in was for.
+
+The counting is the presenter's job, not the shell's: it already knows which
+items belong to which app, and it is the only thing that should ever have to
+answer "how many".

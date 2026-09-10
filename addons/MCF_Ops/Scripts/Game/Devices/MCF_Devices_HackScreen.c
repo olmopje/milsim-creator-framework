@@ -79,7 +79,7 @@ class MCF_Devices_HackScreen
 	protected TextWidget m_wTimer;
 	protected TextWidget m_wHint;
 	protected TextWidget m_wDials;
-	protected TextWidget m_wRule;
+	protected RichTextWidget m_wRule;
 	protected Widget m_wPanelKeypad;
 	protected Widget m_wPanelWave;
 	protected Widget m_wPanelPorts;
@@ -480,7 +480,7 @@ class MCF_Devices_HackScreen
 		table.Build(m_iSeed, m_iDifficulty, m_aPorts, rule);
 		m_iRule = rule;
 
-		m_wRule = TextWidget.Cast(root.FindAnyWidget(W_RULE));
+		m_wRule = RichTextWidget.Cast(root.FindAnyWidget(W_RULE));
 		if (m_wRule)
 			m_wRule.SetText(table.RuleText(m_iRule));
 
