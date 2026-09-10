@@ -240,9 +240,18 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wLockScreen = root.FindAnyWidget(W_LOCK_SCREEN);
 		m_wLockTitle = TextWidget.Cast(root.FindAnyWidget(W_LOCK_TITLE));
 		m_wLockNote = RichTextWidget.Cast(root.FindAnyWidget(W_LOCK_NOTE));
+		// BOUND WHILE VISIBLE, THEN HIDDEN. SCR_ButtonTextComponent.GetButtonText
+		// does not find a button inside a subtree marked hidden in the layout,
+		// which is why the lock screen came up blank with only
+		// "widget not found: SCR_ButtonTextComponent ButtonUnlock" in the log.
+		// So the layout ships the lock screen visible and script hides it here,
+		// after everything inside it has been found.
 		m_UnlockButton = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_UNLOCK, root);
 		if (m_UnlockButton)
 			m_UnlockButton.m_OnClicked.Insert(OnUnlockClicked);
+
+		if (m_wLockScreen)
+			m_wLockScreen.SetVisible(false);
 
 		// THE BUTTON TAKES THE CLICK, NOT THE IMAGE. An ImageWidget does not
 		// accept cursor input, so a handler on it is attached, never called, and

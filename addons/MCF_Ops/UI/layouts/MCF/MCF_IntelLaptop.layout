@@ -753,7 +753,6 @@ FrameWidgetClass {
        SizeY 0
        OffsetBottom 0
       }
-      "Is Visible" 0
       {
        ImageWidgetClass "{6A1C4F0B39D37092}" {
         Name "LockDim"
