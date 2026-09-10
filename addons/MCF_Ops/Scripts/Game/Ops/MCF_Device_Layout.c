@@ -64,6 +64,7 @@ class MCF_Device_Layout
 	protected float m_fScreenHeight = PHONE_HEIGHT;
 	protected float m_fGlassX = PHONE_GLASS_X;
 	protected float m_fGlassY = PHONE_GLASS_Y;
+	protected float m_fGlassUp;
 
 	//! How much of the glass the text columns use, leaving the margin you would
 	//! expect down each side of a screen.
@@ -75,11 +76,18 @@ class MCF_Device_Layout
 	//!                     look held rather than overlaid: at 0.92 x 0.94 the
 	//!                     phone's screen covered the body almost edge to edge
 	//!                     and what was left read as a glow around a panel.
-	void Configure(float screenHeight, float glassX, float glassY)
+	//! \param glassUp     How far ABOVE the middle of the device the glass sits,
+	//!                    as a fraction of the device's height. Zero for
+	//!                    anything whose whole face is screen. A laptop is not
+	//!                    that: its silhouette is a screen standing on a
+	//!                    keyboard, so a centred glass covers the keyboard and
+	//!                    leaves a strip of dead screen along the top.
+	void Configure(float screenHeight, float glassX, float glassY, float glassUp = 0)
 	{
 		m_fScreenHeight = screenHeight;
 		m_fGlassX = glassX;
 		m_fGlassY = glassY;
+		m_fGlassUp = glassUp;
 	}
 
 	//! Below this the preview has not drawn yet and is answering with a
@@ -278,7 +286,7 @@ class MCF_Device_Layout
 		m_fGlassHeight = glassH;
 
 		if (m_wScreenArea)
-			PlaceCentred(m_wScreenArea, glassW, glassH);
+			PlaceCentred(m_wScreenArea, glassW, glassH, -deviceH * m_fGlassUp);
 
 		CapWidth(W_LIST_WIDTH, glassW);
 		CapWidth(W_READ_WIDTH, glassW);
@@ -307,11 +315,11 @@ class MCF_Device_Layout
 	//!
 	//! The anchors collapse to a point first. A slot whose anchors are stretched
 	//! takes its size from them and ignores SetSize, silently.
-	protected void PlaceCentred(notnull Widget widget, float width, float height)
+	protected void PlaceCentred(notnull Widget widget, float width, float height, float shiftY = 0)
 	{
 		FrameSlot.SetAnchor(widget, 0.5, 0.5);
 		FrameSlot.SetSize(widget, width, height);
-		FrameSlot.SetPos(widget, -width * 0.5, -height * 0.5);
+		FrameSlot.SetPos(widget, -width * 0.5, -height * 0.5 + shiftY);
 	}
 
 	//! One point on the model, in the model's own space, as a position in the
