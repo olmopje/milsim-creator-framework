@@ -65,6 +65,8 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 	protected static const string W_STATUS = "Status";
 	protected static const string W_TASK_LIST = "TaskList";
 	protected static const string W_DETAIL_BODY = "DetailBody";
+	protected static const string W_DETAIL_IMAGE = "DetailImage";
+	protected static const string W_DETAIL_IMAGE_NOTE = "DetailImageNote";
 	protected static const string W_EDIT_PANE = "EditPane";
 
 	protected static const string W_BUTTON_NEW = "ButtonNew";
@@ -90,6 +92,21 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 	protected TextWidget m_wStatus;
 	protected VerticalLayoutWidget m_wTaskList;
 	protected RichTextWidget m_wDetailBody;
+	protected ImageWidget m_wDetailImage;
+	protected TextWidget m_wDetailImageNote;
+
+	//! The picture the selected report is waiting for, empty when it is not
+	//! waiting. The board polls the cache the same way the device shell does,
+	//! and for the same reason: the fetch finishes on a callback that knows
+	//! nothing about menus.
+	protected string m_sPictureKey;
+	protected float m_fPictureTick;
+	protected float m_fPictureWaited;
+	protected int m_iPictureDots;
+
+	protected static const float PICTURE_DOT_SECONDS = 0.35;
+	protected static const float PICTURE_GIVE_UP_SECONDS = 30.0;
+	protected static const float PICTURE_WIDTH = 420.0;
 	protected Widget m_wEditPane;
 
 	protected SCR_ButtonTextComponent m_ButtonNew;
@@ -153,6 +170,8 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		m_wStatus = TextWidget.Cast(root.FindAnyWidget(W_STATUS));
 		m_wTaskList = VerticalLayoutWidget.Cast(root.FindAnyWidget(W_TASK_LIST));
 		m_wDetailBody = RichTextWidget.Cast(root.FindAnyWidget(W_DETAIL_BODY));
+		m_wDetailImage = ImageWidget.Cast(root.FindAnyWidget(W_DETAIL_IMAGE));
+		m_wDetailImageNote = TextWidget.Cast(root.FindAnyWidget(W_DETAIL_IMAGE_NOTE));
 		m_wEditPane = root.FindAnyWidget(W_EDIT_PANE);
 
 		// Bound one by one rather than through a helper taking a function
@@ -386,6 +405,8 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 	{
 		if (!m_wDetailBody)
 			return;
+
+		ShowRecordPicture(null);
 
 		if (!task)
 		{
@@ -823,6 +844,7 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 		if (!record)
 		{
 			m_wDetailBody.SetText("No report selected.");
+			ShowRecordPicture(null);
 			UpdateIntelButtons(null);
 			return;
 		}
@@ -841,7 +863,133 @@ class MCF_PlanningBoardMenu : ChimeraMenuBase
 			body = body + "\n\n" + record.m_sBody;
 
 		m_wDetailBody.SetText(body);
+		ShowRecordPicture(record);
 		UpdateIntelButtons(record);
+	}
+
+	//! The photograph filed with a report, if there is one and if this machine
+	//! has it yet.
+	//!
+	//! EACH MACHINE FETCHES ITS OWN. The record carries an address, not a
+	//! picture, so a commander opening the board is doing the same work the
+	//! player with the phone did -- and a commander behind a firewall reads the
+	//! report without the photograph, which is a report, not an error.
+	protected void ShowRecordPicture(MCF_Intel_Record record)
+	{
+		StopWaitingForPicture();
+
+		if (!m_wDetailImage)
+			return;
+
+		m_wDetailImage.SetVisible(false);
+		SetPictureNote("");
+
+		if (!record)
+			return;
+
+		string key = MCF_Device_Script.Trim(record.m_sImageUrl);
+		if (key.IsEmpty())
+			return;
+
+		if (MCF_Device_ImageCache.Show(m_wDetailImage, key))
+		{
+			DrawRecordPicture(key);
+			return;
+		}
+
+		if (MCF_Device_ImageCache.StateOf(key) != MCF_EImageState.LOADING)
+			MCF_Device_ImageCache.FetchUrl(key);
+
+		m_sPictureKey = key;
+		SetPictureNote(LoadingLine());
+	}
+
+	protected void DrawRecordPicture(string key)
+	{
+		if (!m_wDetailImage)
+			return;
+
+		float aspect = MCF_Device_ImageCache.Aspect(key);
+		if (aspect <= 0)
+			aspect = 4.0 / 3.0;
+
+		m_wDetailImage.SetVisible(true);
+		m_wDetailImage.SetSize(PICTURE_WIDTH, PICTURE_WIDTH / aspect);
+
+		SetPictureNote("");
+	}
+
+	protected void StopWaitingForPicture()
+	{
+		m_sPictureKey = "";
+		m_fPictureTick = 0;
+		m_fPictureWaited = 0;
+		m_iPictureDots = 0;
+	}
+
+	protected void SetPictureNote(string text)
+	{
+		if (!m_wDetailImageNote)
+			return;
+
+		m_wDetailImageNote.SetText(text);
+		m_wDetailImageNote.SetVisible(!text.IsEmpty());
+	}
+
+	protected string LoadingLine()
+	{
+		string line = "Loading photo";
+
+		for (int i = 0; i < m_iPictureDots; i++)
+		{
+			line = line + ".";
+		}
+
+		return line;
+	}
+
+	override void OnMenuUpdate(float tDelta)
+	{
+		super.OnMenuUpdate(tDelta);
+
+		if (m_sPictureKey.IsEmpty())
+			return;
+
+		int state = MCF_Device_ImageCache.StateOf(m_sPictureKey);
+
+		if (state == MCF_EImageState.READY)
+		{
+			if (m_wDetailImage && MCF_Device_ImageCache.Show(m_wDetailImage, m_sPictureKey))
+				DrawRecordPicture(m_sPictureKey);
+			else
+				SetPictureNote("Photo unavailable");
+
+			m_sPictureKey = "";
+			return;
+		}
+
+		if (state == MCF_EImageState.FAILED)
+		{
+			SetPictureNote("Photo unavailable");
+			m_sPictureKey = "";
+			return;
+		}
+
+		m_fPictureWaited = m_fPictureWaited + tDelta;
+		if (m_fPictureWaited > PICTURE_GIVE_UP_SECONDS)
+		{
+			SetPictureNote("Photo unavailable");
+			m_sPictureKey = "";
+			return;
+		}
+
+		m_fPictureTick = m_fPictureTick + tDelta;
+		if (m_fPictureTick < PICTURE_DOT_SECONDS)
+			return;
+
+		m_fPictureTick = 0;
+		m_iPictureDots = (m_iPictureDots + 1) % 4;
+		SetPictureNote(LoadingLine());
 	}
 
 	//! In intel mode the tasking buttons mean nothing, so they go dark rather

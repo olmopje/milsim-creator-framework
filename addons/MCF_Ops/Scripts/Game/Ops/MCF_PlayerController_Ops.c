@@ -441,9 +441,9 @@ modded class SCR_PlayerController
 
 	//! Client side. Asks the server to enter what this player just read into
 	//! the system, where the rest of the force can use it.
-	void MCF_RequestLogIntel(string source, string heading, string timestamp, string body)
+	void MCF_RequestLogIntel(string source, string heading, string timestamp, string body, string imageUrl = "")
 	{
-		Rpc(MCF_RpcAsk_LogIntel, source, heading, timestamp, body);
+		Rpc(MCF_RpcAsk_LogIntel, source, heading, timestamp, body, imageUrl);
 	}
 
 	//! Runs on the server. Enters a piece of intel into the shared store.
@@ -458,7 +458,7 @@ modded class SCR_PlayerController
 	//! evidence: length-capped, and attributed to the player who sent it so
 	//! that anything odd has a name against it.
 	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
-	void MCF_RpcAsk_LogIntel(string source, string heading, string timestamp, string body)
+	void MCF_RpcAsk_LogIntel(string source, string heading, string timestamp, string body, string imageUrl)
 	{
 		if (!Replication.IsServer())
 			return;
@@ -488,7 +488,7 @@ modded class SCR_PlayerController
 			return;
 		}
 
-		MCF_Intel_Record record = MCF_Intel_Store.GetInstance().Log(Cap(source, 64), Cap(heading, 128), Cap(timestamp, 32), Cap(body, 2000), playerId, MCF_Core_FactionHelper.GetPlayerFactionKey(playerId));
+		MCF_Intel_Record record = MCF_Intel_Store.GetInstance().Log(Cap(source, 64), Cap(heading, 128), Cap(timestamp, 32), Cap(body, 2000), playerId, MCF_Core_FactionHelper.GetPlayerFactionKey(playerId), Cap(imageUrl, 512));
 		if (!record)
 			return;
 

@@ -52,7 +52,12 @@ class MCF_Intel_Store
 
 	//! Enters a piece of intel into the system. Server only -- ids must be
 	//! handed out in one place or two machines will issue the same reference.
-	MCF_Intel_Record Log(string source, string heading, string timestamp, string body, int loggedByPlayerId, string factionKey)
+	//! \param imageUrl Optional. Defaulted rather than required because most
+	//!                 things that log intel -- a signal source, a document --
+	//!                 have no photograph, and making every one of them pass an
+	//!                 empty string would be noise at four call sites to serve
+	//!                 one.
+	MCF_Intel_Record Log(string source, string heading, string timestamp, string body, int loggedByPlayerId, string factionKey, string imageUrl = "")
 	{
 		if (!Replication.IsServer())
 		{
@@ -70,6 +75,7 @@ class MCF_Intel_Store
 		record.m_sBody = body;
 		record.m_iLoggedByPlayerId = loggedByPlayerId;
 		record.m_sFactionKey = factionKey;
+		record.m_sImageUrl = imageUrl;
 
 		m_mRecords.Set(record.m_sId, record);
 		MCF_Core_Log.Debug("IntelStore logged " + record.Describe());

@@ -50,6 +50,15 @@ class MCF_Intel_Record
 	//! silently hiding intel a mission already had would look like data loss.
 	string m_sFactionKey;
 
+	//! The address of a photograph that belongs with this report, if there is
+	//! one. The ADDRESS, not the picture: a texture cannot travel over an RPC
+	//! and would not be worth persisting if it could, because every machine that
+	//! displays it fetches and caches its own copy already.
+	//!
+	//! Empty on every record written before pictures existed, which is exactly
+	//! what a report without one looks like anyway.
+	string m_sImageUrl;
+
 	//! One-line summary for logs and lists.
 	string Describe()
 	{
@@ -83,6 +92,7 @@ class MCF_Intel_Record
 		parts.Insert("body=" + Escape(m_sBody));
 		parts.Insert("by=" + m_iLoggedByPlayerId.ToString());
 		parts.Insert("faction=" + Escape(m_sFactionKey));
+		parts.Insert("image=" + Escape(m_sImageUrl));
 
 		string result = "";
 		foreach (int i, string part : parts)
@@ -122,6 +132,7 @@ class MCF_Intel_Record
 				case "body":    record.m_sBody = Unescape(value); break;
 				case "by":      record.m_iLoggedByPlayerId = value.ToInt(); break;
 				case "faction": record.m_sFactionKey = Unescape(value); break;
+				case "image":   record.m_sImageUrl = Unescape(value); break;
 			}
 		}
 

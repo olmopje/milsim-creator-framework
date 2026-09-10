@@ -336,9 +336,11 @@ the size at zero and every widget vanishes with no error.
 2026-09-10, every link.** The obvious ones are all shut:
 `ImageWidget.LoadImageTexture` refuses an http address outright;
 `RestContext.FILE`, the only file download, is `[Obsolete("Not supported")]` and
-INERT -- it never calls back, never errors and never writes the file; and there
-is no API to build a texture from bytes (`ScreenshotTextureData` is an engine
-pointer with no constructor).
+never called back in any test here; and there is no API to build a texture from
+bytes (`ScreenshotTextureData` is an engine pointer with no constructor). Treat
+FILE as untrustworthy rather than proven dead -- the probe that condemned it had
+the same callback fault described below, so it may never have been given a fair
+hearing.
 
 What works is a chain of four supported calls:
 
@@ -358,3 +360,53 @@ and that has to read as normal rather than as an error.
 it skips the resource database, so a path is handed to the file system instead
 of looked up as an imported asset. `.png` loads directly -- no `.edds`
 conversion needed.
+
+**RestApi: four ways to be silent, and only one of them is an error.** Getting
+the chain above to actually fire took most of an afternoon on 2026-09-10, and
+every fault presented identically -- the request goes out and nothing ever comes
+back, no success, no error, not even the timeout set on the context. Written out
+because none of it is guessable and all of it is cheap once known:
+
+1. **Hold the object that owns the handlers, not just the callback.** The docs
+   say "If callback is not stored as ref then it will be deleted after its
+   execution finishes", which is true and is half of it. `SetOnSuccess(OnSuccess)`
+   binds a METHOD, so the object that method lives on must survive too. Hold the
+   `RestCallback` alone and it lives on with nothing left to call: the request
+   completes, the server answers 200, and script hears nothing.
+2. **The handler prototype is `RestCallbackFunc` -- one argument, the callback
+   itself.** The body is asked for afterwards with `GetData()`. The compiler
+   names this if you get it wrong: a handler shaped like the obsolete virtual
+   (`string data, int dataSize`) is "too many arguments". `SetOnTimeout` does not
+   exist, so a request that dies quietly dies quietly -- keep a deadline of your
+   own in the UI.
+3. **The wiki's REST API Usage page is older than the engine.** It shows a
+   `RestCallback` subclass overriding `OnSuccess`/`OnError`/`OnTimeout`; those
+   virtuals compile with "'OnSuccess' is obsolete: Use
+   RestCallback.SetOnSuccess() instead". Its `GetContext("")` returns nothing at
+   all. Trust the compiler over the page.
+4. **A `RestContext` cannot be held as a ref** -- "Method '~RestContext' is
+   private". The engine owns it, so a local is correct and there is no lifetime
+   to manage.
+
+`GetContext("https://host")` with the path passed to `GET` works, and so do the
+two other splittings; the address shape was never the problem in any of this.
+
+**Trim every authored string, especially urls.** A url pasted with a leading
+space is still a url to a person and is not one to RestApi: the request answers
+`http 0`, which reads as a network failure rather than as a typing mistake.
+`MCF_Device_Script.Clean` trims on the way in and `MCF_Device_Item.ImageUrl`
+trims on the way out, because data written before the fix is already in the
+store.
+
+**`Substring` truncated a 35 611 character string to about 8 190.** Silently.
+The decoder was cutting the payload out of the response with `Substring` and
+decoding the copy; the result was a truncated jpeg that still began with the
+right signature, passed validation, reached disk, and was refused by the texture
+loader with no message. Prefer passing the original string with a pair of
+indices over copying a large one out of it.
+
+**A `LayoutSlot` with `HorizontalAlign 3` fills its parent's width and ignores
+`SetSize`.** `SizeToContent 1` does not stop it. Use `HorizontalAlign 0` for
+anything sized in script. This hid on the phone for a while because the column
+there is capped to roughly the width the image was being set to, so the stretch
+was invisible -- on a wide column it is immediate.

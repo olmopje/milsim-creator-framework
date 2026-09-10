@@ -102,6 +102,49 @@ class MCF_Device_ImageCache
 		return FOLDER + Sanitise(key) + ".png";
 	}
 
+	//! Where a picture's dimensions are remembered.
+	//!
+	//! A SEPARATE LITTLE FILE, because the shape has to survive a restart. The
+	//! aspect is known only while decoding, and a player who opens the same phone
+	//! tomorrow has the picture on disk and no idea what shape it is. Guessing
+	//! 4:3 for a 16:9 photograph is visible from across the room.
+	protected static string SizePathFor(string key)
+	{
+		return FOLDER + Sanitise(key) + ".size";
+	}
+
+	//! Width divided by height, or 0 when it is not known.
+	static float Aspect(string key)
+	{
+		if (key.IsEmpty())
+			return 0;
+
+		string path = SizePathFor(key);
+		if (!FileIO.FileExists(path))
+			return 0;
+
+		FileHandle file = FileIO.OpenFile(path, FileMode.READ);
+		if (!file)
+			return 0;
+
+		string line;
+		file.ReadLine(line);
+		file.Close();
+
+		array<string> parts = {};
+		line.Split(" ", parts, true);
+		if (parts.Count() < 2)
+			return 0;
+
+		float width = parts[0].ToInt();
+		float height = parts[1].ToInt();
+
+		if (width <= 0 || height <= 0)
+			return 0;
+
+		return width / height;
+	}
+
 	static bool IsCached(string key)
 	{
 		return FileIO.FileExists(PathFor(key));
@@ -139,22 +182,8 @@ class MCF_Device_ImageCache
 			return false;
 		}
 
-		// WHERE THE PAYLOAD IS, NOT A COPY OF IT. Cutting it out with Substring
-		// and decoding the copy lost all but the first 8 190 characters of a
-		// 35 611 character response -- a truncated jpeg that still began with the
-		// right three bytes, passed the signature check, was written to disk, and
-		// was then refused by the loader with no explanation. Nothing in the chain
-		// said a word. So the decoder is given the original string and two indices
-		// and never copies anything.
-		int from, to;
-		Bounds(encoded, from, to);
-
-		MCF_Core_Log.Debug("device image '" + key + "': " + encoded.Length().ToString()
-			+ " character(s), payload " + (to - from).ToString() + " at [" + from.ToString()
-			+ ", " + to.ToString() + ")");
-
 		array<int> bytes = {};
-		if (!Decode(encoded, from, to, bytes))
+		if (!Decode(Payload(encoded), bytes))
 		{
 			MCF_Core_Log.Warn("device image '" + key + "' is not valid base64");
 			return false;
@@ -195,7 +224,19 @@ class MCF_Device_ImageCache
 			return false;
 		}
 
-		MCF_Core_Log.Debug("device image '" + key + "' cached, " + written.ToString() + " byte(s)");
+		int width, height;
+		if (Measure(bytes, width, height))
+		{
+			WriteSize(key, width, height);
+			MCF_Core_Log.Debug("device image '" + key + "' cached, " + written.ToString()
+				+ " byte(s), " + width.ToString() + "x" + height.ToString());
+		}
+		else
+		{
+			MCF_Core_Log.Debug("device image '" + key + "' cached, " + written.ToString()
+				+ " byte(s), dimensions unreadable");
+		}
+
 		return true;
 	}
 
@@ -218,6 +259,38 @@ class MCF_Device_ImageCache
 	//!
 	//! The host and the path are separate because RestApi wants a context per
 	//! host and a request path per call.
+	//! Fetches a picture named by its whole address.
+	//!
+	//! THE ONE DOOR. Two screens want pictures now -- a phone and the planning
+	//! board -- and a third will. Splitting the url at each call site is how the
+	//! two drift apart, so the splitting lives here and a caller passes what a
+	//! mission maker typed.
+	static void FetchUrl(string url)
+	{
+		string address = MCF_Device_Script.Trim(url);
+		if (address.IsEmpty())
+			return;
+
+		int schemeEnd = address.IndexOf("//");
+		if (schemeEnd < 0)
+		{
+			MCF_Core_Log.Warn("picture url '" + address + "' has no scheme -- it needs one, e.g. https://host/file.txt");
+			return;
+		}
+
+		int slash = address.IndexOfFrom(schemeEnd + 2, "/");
+		if (slash < 0)
+		{
+			MCF_Core_Log.Warn("picture url '" + address + "' has no path -- it needs one, e.g. https://host/file.txt");
+			return;
+		}
+
+		string host = address.Substring(0, slash);
+		string path = address.Substring(slash, address.Length() - slash);
+
+		Fetch(host, path, address);
+	}
+
 	static void Fetch(string host, string path, string key)
 	{
 		// EVERY EXIT SAYS WHY. This method used to return silently in six places,
@@ -297,28 +370,26 @@ class MCF_Device_ImageCache
 		foreach (string key : keys)
 		{
 			FileIO.DeleteFile(PathFor(key));
+			FileIO.DeleteFile(SizePathFor(key));
 		}
 	}
 
 	// ------------------------------------------------------------- internals
 
-	//! Where the payload starts and ends inside the response, or the whole of it
-	//! if there are no markers. Indices rather than a substring -- see the note
-	//! in StoreFromBase64 about what copying it cost.
-	protected static void Bounds(string text, out int from, out int to)
+	//! What is between the markers, or everything if there are none.
+	protected static string Payload(string text)
 	{
-		from = 0;
-		to = text.Length();
-
 		int start = text.IndexOf(MARKER);
 		if (start < 0)
-			return;
+			return text;
 
-		from = start + MARKER.Length();
+		start = start + MARKER.Length();
 
-		int end = text.IndexOfFrom(from, MARKER);
-		if (end >= 0)
-			to = end;
+		int end = text.IndexOfFrom(start, MARKER);
+		if (end < 0)
+			return text.Substring(start, text.Length() - start);
+
+		return text.Substring(start, end - start);
 	}
 
 	//! The first bytes of a png are 137 80 78 71; of a jpeg, 255 216 255.
@@ -350,6 +421,76 @@ class MCF_Device_ImageCache
 		return result;
 	}
 
+	//! The picture's own idea of its size, read out of its header.
+	//!
+	//! Both formats say it plainly and neither needs decoding to find out. A png
+	//! puts it in the IHDR chunk at a fixed offset; a jpeg puts it in whichever
+	//! start-of-frame marker it happens to use, so the markers are walked until
+	//! one of them is a frame header.
+	protected static bool Measure(notnull array<int> bytes, out int width, out int height)
+	{
+		width = 0;
+		height = 0;
+
+		int count = bytes.Count();
+
+		if (count > 24 && bytes[0] == 137 && bytes[1] == 80)
+		{
+			width = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+			height = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
+			return width > 0 && height > 0;
+		}
+
+		if (count < 4 || bytes[0] != 255 || bytes[1] != 216)
+			return false;
+
+		int i = 2;
+		while (i + 9 < count)
+		{
+			if (bytes[i] != 255)
+			{
+				i++;
+				continue;
+			}
+
+			int marker = bytes[i + 1];
+
+			// C0 to CF are the frame headers, except C4 (huffman tables), C8 and
+			// CC, which are not frames at all despite sitting in the same range.
+			if (marker >= 192 && marker <= 207 && marker != 196 && marker != 200 && marker != 204)
+			{
+				height = (bytes[i + 5] << 8) | bytes[i + 6];
+				width = (bytes[i + 7] << 8) | bytes[i + 8];
+				return width > 0 && height > 0;
+			}
+
+			// These carry no length field, so there is nothing to skip over.
+			if (marker == 1 || marker == 216 || marker == 217 || (marker >= 208 && marker <= 215))
+			{
+				i = i + 2;
+				continue;
+			}
+
+			int length = (bytes[i + 2] << 8) | bytes[i + 3];
+			if (length < 2)
+				return false;
+
+			i = i + 2 + length;
+		}
+
+		return false;
+	}
+
+	protected static void WriteSize(string key, int width, int height)
+	{
+		FileHandle file = FileIO.OpenFile(SizePathFor(key), FileMode.WRITE);
+		if (!file)
+			return;
+
+		file.WriteLine(width.ToString() + " " + height.ToString());
+		file.Close();
+	}
+
 	//! A key becomes a filename, so it may not contain anything a path cannot.
 	protected static string Sanitise(string key)
 	{
@@ -369,7 +510,7 @@ class MCF_Device_ImageCache
 	//! The alphabet becomes a 128-entry table once, so the inner loop is an
 	//! index rather than a search. Measured at 5216 characters in 7 ms, which
 	//! is where MAX_ENCODED comes from rather than from a guess.
-	protected static bool Decode(string encoded, int from, int to, notnull array<int> outBytes)
+	protected static bool Decode(string encoded, notnull array<int> outBytes)
 	{
 		BuildAlphabet();
 
@@ -377,8 +518,9 @@ class MCF_Device_ImageCache
 
 		int accumulator;
 		int bits;
+		int length = encoded.Length();
 
-		for (int i = from; i < to; i++)
+		for (int i = 0; i < length; i++)
 		{
 			int code = encoded.Get(i).ToAscii();
 			if (code < 0 || code > 127)

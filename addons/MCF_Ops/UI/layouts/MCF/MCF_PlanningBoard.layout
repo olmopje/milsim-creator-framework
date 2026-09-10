@@ -172,6 +172,27 @@ FrameWidgetClass {
        "Font Size" 17
        "Min Font Size" 17
       }
+      ImageWidgetClass "{6A1C4F0B39D2A160}" {
+       Name "DetailImage"
+       Slot LayoutSlot "{6A1C4F0B39D2A161}" {
+        HorizontalAlign 0
+        Padding 8 0 8 8
+       }
+       "Is Visible" 0
+       Color 1 1 1 1
+      }
+      TextWidgetClass "{6A1C4F0B39D2A162}" {
+       Name "DetailImageNote"
+       Slot LayoutSlot "{6A1C4F0B39D2A163}" {
+        HorizontalAlign 3
+        Padding 8 0 8 8
+       }
+       "Is Visible" 0
+       Text ""
+       "Font Size" 13
+       "Min Font Size" 13
+       Color 0.6 0.6 0.6 1
+      }
       VerticalLayoutWidgetClass "{6A1C4F0B39D2A140}" {
        Name "EditPane"
        Slot LayoutSlot "{6A1C4F0B39D2A141}" {

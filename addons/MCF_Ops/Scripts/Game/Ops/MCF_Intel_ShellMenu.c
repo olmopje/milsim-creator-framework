@@ -39,6 +39,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_READ_BODY = "ReadBody";
 	protected static const string W_READ_IMAGE = "ReadImage";
 	protected static const string W_READ_IMAGE_NOTE = "ReadImageNote";
+	protected static const string W_PHOTO_OVERLAY = "PhotoOverlay";
+	protected static const string W_PHOTO_BACKDROP = "PhotoBackdrop";
+	protected static const string W_PHOTO_FULL = "PhotoFull";
 	protected static const string W_READ_HEADING = "ReadHeading";
 	protected static const string W_READ_TIMESTAMP = "ReadTimestamp";
 	protected static const string W_BUTTON_BACK = "ButtonBack";
@@ -109,6 +112,18 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected RichTextWidget m_wReadBody;
 	protected ImageWidget m_wReadImage;
 	protected RichTextWidget m_wReadImageNote;
+	protected Widget m_wPhotoOverlay;
+	protected ImageWidget m_wPhotoFull;
+
+	//! Held because a handler that is not referenced is collected, and a
+	//! collected handler stops handling -- quietly, exactly like the callback
+	//! that cost this feature an afternoon.
+	protected ref MCF_Device_ImageClick m_PhotoClick;
+	protected ref MCF_Device_ImageClick m_BackdropClick;
+
+	//! The picture currently drawn, so its shape can be looked up. Empty when
+	//! what is drawn came from the mod rather than from a url.
+	protected string m_sPictureShown;
 	protected TextWidget m_wDeviceName;
 	protected TextWidget m_wStatusBar;
 	protected RichTextWidget m_wReadHeading;
@@ -193,6 +208,25 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wReadBody = RichTextWidget.Cast(root.FindAnyWidget(W_READ_BODY));
 		m_wReadImage = ImageWidget.Cast(root.FindAnyWidget(W_READ_IMAGE));
 		m_wReadImageNote = RichTextWidget.Cast(root.FindAnyWidget(W_READ_IMAGE_NOTE));
+		m_wPhotoOverlay = root.FindAnyWidget(W_PHOTO_OVERLAY);
+		m_wPhotoFull = ImageWidget.Cast(root.FindAnyWidget(W_PHOTO_FULL));
+
+		if (m_wReadImage)
+		{
+			m_PhotoClick = new MCF_Device_ImageClick();
+			m_PhotoClick.m_OnClicked.Insert(OnPhotoClicked);
+			m_wReadImage.AddHandler(m_PhotoClick);
+		}
+
+		Widget backdrop = root.FindAnyWidget(W_PHOTO_BACKDROP);
+		if (backdrop)
+		{
+			m_BackdropClick = new MCF_Device_ImageClick();
+			m_BackdropClick.m_OnClicked.Insert(ClosePhoto);
+			backdrop.AddHandler(m_BackdropClick);
+		}
+
+		ClosePhoto();
 		m_wReadHeading = RichTextWidget.Cast(root.FindAnyWidget(W_READ_HEADING));
 		m_wReadTimestamp = RichTextWidget.Cast(root.FindAnyWidget(W_READ_TIMESTAMP));
 		m_wHint = TextWidget.Cast(root.FindAnyWidget(W_HINT));
@@ -550,6 +584,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		if (shown)
 		{
+			m_sPictureShown = key;
 			DrawPicture();
 			return;
 		}
@@ -593,9 +628,77 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wReadImage.SetVisible(true);
 
 		float width = GlassWidth() * 0.88;
-		m_wReadImage.SetSize(width, width * 0.75);
+		m_wReadImage.SetSize(width, width / PictureAspect());
 
 		SetPictureNote("");
+	}
+
+	//! The drawn picture's width over its height.
+	//!
+	//! The cache read it out of the file's own header when it stored it. An
+	//! imported texture has no entry there and neither does a picture cached
+	//! before this existed, so there is a fallback -- but a photograph squashed
+	//! into the wrong shape is obvious at a glance, which is why it is worth
+	//! asking rather than assuming.
+	protected float PictureAspect()
+	{
+		float aspect = MCF_Device_ImageCache.Aspect(m_sPictureShown);
+		if (aspect > 0)
+			return aspect;
+
+		return 4.0 / 3.0;
+	}
+
+	//! Opens the picture over the whole screen.
+	//!
+	//! OVER EVERYTHING, PHONE INCLUDED. A photograph is the one thing on a device
+	//! that a player actually has to study -- a number plate, a face, a map
+	//! corner -- and studying it through a phone-sized window is the difference
+	//! between intel and decoration.
+	protected void OnPhotoClicked()
+	{
+		if (!m_wPhotoOverlay || !m_wPhotoFull || m_sPictureShown.IsEmpty())
+			return;
+
+		if (!MCF_Device_ImageCache.Show(m_wPhotoFull, m_sPictureShown))
+			return;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return;
+
+		float screenW = workspace.DPIUnscale(workspace.GetWidth());
+		float screenH = workspace.DPIUnscale(workspace.GetHeight());
+
+		float aspect = PictureAspect();
+
+		// Fit inside the screen rather than fill it: whichever side runs out
+		// first decides, so nothing is cropped and nothing is stretched.
+		float height = screenH * 0.86;
+		float width = height * aspect;
+
+		if (width > screenW * 0.94)
+		{
+			width = screenW * 0.94;
+			height = width / aspect;
+		}
+
+		FrameSlot.SetAnchor(m_wPhotoFull, 0.5, 0.5);
+		FrameSlot.SetSize(m_wPhotoFull, width, height);
+		FrameSlot.SetPos(m_wPhotoFull, -width * 0.5, -height * 0.5);
+
+		m_wPhotoOverlay.SetVisible(true);
+	}
+
+	protected void ClosePhoto()
+	{
+		if (m_wPhotoOverlay)
+			m_wPhotoOverlay.SetVisible(false);
+	}
+
+	protected bool IsPhotoOpen()
+	{
+		return m_wPhotoOverlay && m_wPhotoOverlay.IsVisible();
 	}
 
 	//! Ticked every frame while an item with a picture is open.
@@ -614,9 +717,14 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (state == MCF_EImageState.READY)
 		{
 			if (m_wReadImage && MCF_Device_ImageCache.Show(m_wReadImage, m_sPictureKey))
+			{
+				m_sPictureShown = m_sPictureKey;
 				DrawPicture();
+			}
 			else
+			{
 				SetPictureNote("Photo unavailable");
+			}
 
 			m_sPictureKey = "";
 			return;
@@ -652,6 +760,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected void StopWaitingForPicture()
 	{
 		m_sPictureKey = "";
+		m_sPictureShown = "";
+		ClosePhoto();
 		m_fPictureTick = 0;
 		m_fPictureWaited = 0;
 		m_iPictureDots = 0;
@@ -686,16 +796,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! is one place a URL is taken apart.
 	protected void FetchPicture(notnull MCF_Device_Item item)
 	{
-		string url = item.ImageUrl();
-		if (url.IsEmpty())
-			return;
-
-		string host, path;
-		if (SplitUrl(url, host, path))
-			MCF_Device_ImageCache.Fetch(host, path, item.ImageKey());
-		else
-			MCF_Core_Log.Warn("device image url '" + url
-				+ "' is not host + path -- it needs a scheme and a path, e.g. https://host/file.txt");
+		MCF_Device_ImageCache.FetchUrl(item.ImageUrl());
 	}
 
 	//! Asks a picture's source to fetch itself, so it is on disk by the time
@@ -721,22 +822,6 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			+ asked.ToString() + " with a picture url");
 	}
 
-	//! "https://host/some/path" into its two halves, because RestApi wants a
-	//! context per host and a request path per call.
-	protected bool SplitUrl(string url, out string host, out string path)
-	{
-		int schemeEnd = url.IndexOf("//");
-		if (schemeEnd < 0)
-			return false;
-
-		int slash = url.IndexOfFrom(schemeEnd + 2, "/");
-		if (slash < 0)
-			return false;
-
-		host = url.Substring(0, slash);
-		path = url.Substring(slash, url.Length() - slash);
-		return true;
-	}
 
 	protected float GlassWidth()
 	{
@@ -777,6 +862,15 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! which is what a phone does, and means the button is never dead.
 	protected void OnBackClicked(SCR_ButtonTextComponent button)
 	{
+		// The photograph is a layer over the screen, not a screen of its own, so
+		// backing out of it puts you where you already were rather than one step
+		// further back than you asked for.
+		if (IsPhotoOpen())
+		{
+			ClosePhoto();
+			return;
+		}
+
 		if (m_bPageMode)
 		{
 			Close();
@@ -811,7 +905,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			return;
 
 		MCF_Device_Item entry = m_aVisible[m_iOpenEntry];
-		controller.MCF_RequestLogIntel(m_Carrier.GetDeviceName(), entry.m_sHeading, entry.m_sTimestamp, entry.m_sBody);
+		// The picture goes with it. A report that says "photograph attached" and
+		// has none is worse than one that never mentioned it, and the address is
+		// all that has to travel -- every machine fetches its own copy anyway.
+		controller.MCF_RequestLogIntel(m_Carrier.GetDeviceName(), entry.m_sHeading, entry.m_sTimestamp, entry.m_sBody, entry.ImageUrl());
 	}
 
 	//! Hidden unless a message is open, and greyed with the reason on it when
