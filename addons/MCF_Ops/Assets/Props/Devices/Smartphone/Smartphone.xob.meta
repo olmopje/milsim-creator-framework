@@ -14,9 +14,6 @@ MetaFileClass {
    }
    GeometryParams {
     GeometryParam UTM_Smartphone {
-     SurfaceProperties {
-      "{536BF67B2052B869}material/metal.gamemat"
-     }
      Mass 0
      Margin 0
     }

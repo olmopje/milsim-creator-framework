@@ -21,6 +21,12 @@ class MCF_Intel_ReadAction : ScriptedUserAction
 {
 	protected MCF_Intel_CarrierComponent m_Carrier;
 
+	// The lid, on devices that have one. Resolved lazily rather than in Init:
+	// the child entity is not reliably attached yet when the parent's actions
+	// initialise, and a null cached there would be cached forever.
+	protected DoorComponent m_Lid;
+	protected bool m_bLidSearched;
+
 	override void Init(IEntity pOwnerEntity, GenericComponent pManagerComponent)
 	{
 		m_Carrier = MCF_Intel_CarrierComponent.Cast(pOwnerEntity.FindComponent(MCF_Intel_CarrierComponent));
@@ -46,9 +52,58 @@ class MCF_Intel_ReadAction : ScriptedUserAction
 	//! A locked device is NOT empty. It has content the player cannot reach
 	//! yet, and hiding the prompt would make a phone worth breaking into look
 	//! like a phone worth ignoring.
+	//! Hidden while the lid is shut, so you cannot reach through a closed
+	//! laptop to use the screen inside it. A device with no lid is never
+	//! considered shut, which keeps every existing prop behaving as before.
+	protected DoorComponent FindLid()
+	{
+		if (m_bLidSearched)
+			return m_Lid;
+
+		m_bLidSearched = true;
+
+		IEntity owner = GetOwner();
+		if (!owner)
+		{
+			// Nothing to search yet -- try again next time rather than
+			// remembering a "no" that was only ever "not yet".
+			m_bLidSearched = false;
+			return null;
+		}
+
+		IEntity child = owner.GetChildren();
+		while (child)
+		{
+			DoorComponent door = DoorComponent.Cast(child.FindComponent(DoorComponent));
+			if (door)
+			{
+				m_Lid = door;
+				return m_Lid;
+			}
+
+			child = child.GetSibling();
+		}
+
+		return null;
+	}
+
+	protected bool IsLidClosed()
+	{
+		DoorComponent lid = FindLid();
+		if (!lid)
+			return false;
+
+		// Same test the vanilla door action uses to decide between "Open" and
+		// "Close": half open counts as open.
+		return Math.AbsFloat(lid.GetControlValue()) < 0.5;
+	}
+
 	override bool CanBeShownScript(IEntity user)
 	{
-		return m_Carrier && m_Carrier.HasContent();
+		if (!m_Carrier || !m_Carrier.HasContent())
+			return false;
+
+		return !IsLidClosed();
 	}
 
 	override bool GetActionNameScript(out string outName)
