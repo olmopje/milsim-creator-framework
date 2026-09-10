@@ -63,10 +63,10 @@ modded class SCR_PlayerController
 		if (!lock)
 			return;
 
-		// The answer is capped before it is looked at. A sequence is never
-		// longer than MAX_STEPS digits, and an unbounded string off the wire
-		// is somebody else's problem to have.
-		if (answer.Length() > MCF_Devices_Challenge.MAX_STEPS)
+		// The answer is capped before it is looked at. No puzzle here produces
+		// one anywhere near this long, and an unbounded string off the wire is
+		// somebody else's problem to have.
+		if (answer.Length() > MCF_Devices_Challenge.MAX_ANSWER_LENGTH)
 		{
 			MCF_SendMessage("That did not work.");
 			return;

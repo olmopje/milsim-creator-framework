@@ -1,10 +1,10 @@
 FrameWidgetClass {
  Name "rootFrame"
  {
-  ImageWidgetClass "{6A1C4F0B39D30001}" {
+  ImageWidgetClass "{6A1C4F0B39D3416B}" {
    Name "Background"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30002}" {
-    Anchor 0 0 1 1
+   Slot FrameWidgetSlot "{6A1C4F0B39D3416C}" {
+    Anchor 0.0000 0.0000 1.0000 1.0000
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -16,10 +16,10 @@ FrameWidgetClass {
    }
    Color 0.02 0.03 0.03 0.98
   }
-  TextWidgetClass "{6A1C4F0B39D30003}" {
+  TextWidgetClass "{6A1C4F0B39D3416D}" {
    Name "Title"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30004}" {
-    Anchor 0.30 0.10 0.70 0.16
+   Slot FrameWidgetSlot "{6A1C4F0B39D3416E}" {
+    Anchor 0.2500 0.0400 0.7500 0.1000
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -33,10 +33,10 @@ FrameWidgetClass {
    "Font Size" 28
    "Min Font Size" 28
   }
-  TextWidgetClass "{6A1C4F0B39D30005}" {
+  TextWidgetClass "{6A1C4F0B39D3416F}" {
    Name "Status"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30006}" {
-    Anchor 0.30 0.17 0.70 0.23
+   Slot FrameWidgetSlot "{6A1C4F0B39D34170}" {
+    Anchor 0.2500 0.1050 0.7500 0.1550
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -50,10 +50,2728 @@ FrameWidgetClass {
    "Font Size" 22
    "Min Font Size" 22
   }
-  TextWidgetClass "{6A1C4F0B39D30007}" {
+  FrameWidgetClass "{6A1C4F0B39D34171}" {
+   Name "PanelKeypad"
+   Slot FrameWidgetSlot "{6A1C4F0B39D34172}" {
+    Anchor 0.3750 0.2000 0.6250 0.7200
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+   ButtonWidgetClass "{6A1C4F0B39D34000}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell0"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34001}" {
+     Anchor 0.0600 0.0600 0.3200 0.3200
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34002}" {
+      m_bCanBeToggled 1
+      m_sText "1"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34003}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell1"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34004}" {
+     Anchor 0.3800 0.0600 0.6400 0.3200
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34005}" {
+      m_bCanBeToggled 1
+      m_sText "2"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34006}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell2"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34007}" {
+     Anchor 0.7000 0.0600 0.9600 0.3200
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34008}" {
+      m_bCanBeToggled 1
+      m_sText "3"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34009}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell3"
+    Slot FrameWidgetSlot "{6A1C4F0B39D3400A}" {
+     Anchor 0.0600 0.3800 0.3200 0.6400
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D3400B}" {
+      m_bCanBeToggled 1
+      m_sText "4"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D3400C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell4"
+    Slot FrameWidgetSlot "{6A1C4F0B39D3400D}" {
+     Anchor 0.3800 0.3800 0.6400 0.6400
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D3400E}" {
+      m_bCanBeToggled 1
+      m_sText "5"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D3400F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell5"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34010}" {
+     Anchor 0.7000 0.3800 0.9600 0.6400
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34011}" {
+      m_bCanBeToggled 1
+      m_sText "6"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34012}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell6"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34013}" {
+     Anchor 0.0600 0.7000 0.3200 0.9600
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34014}" {
+      m_bCanBeToggled 1
+      m_sText "7"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34015}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell7"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34016}" {
+     Anchor 0.3800 0.7000 0.6400 0.9600
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34017}" {
+      m_bCanBeToggled 1
+      m_sText "8"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34018}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Cell8"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34019}" {
+     Anchor 0.7000 0.7000 0.9600 0.9600
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D3401A}" {
+      m_bCanBeToggled 1
+      m_sText "9"
+     }
+    }
+   }
+   }
+  }
+  FrameWidgetClass "{6A1C4F0B39D34173}" {
+   Name "PanelWave"
+   Slot FrameWidgetSlot "{6A1C4F0B39D34174}" {
+    Anchor 0.1400 0.1900 0.8600 0.7300
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+   FrameWidgetClass "{6A1C4F0B39D3413B}" {
+    Name "WaveGrid"
+    Slot FrameWidgetSlot "{6A1C4F0B39D3413C}" {
+     Anchor 0.0200 0.0200 0.9800 0.6200
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    {
+    ImageWidgetClass "{6A1C4F0B39D3401B}" {
+     Name "Wave0_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3401C}" {
+      Anchor 0.0020 0.0060 0.0605 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3401D}" {
+     Name "Wave1_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3401E}" {
+      Anchor 0.0645 0.0060 0.1230 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3401F}" {
+     Name "Wave2_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34020}" {
+      Anchor 0.1270 0.0060 0.1855 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34021}" {
+     Name "Wave3_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34022}" {
+      Anchor 0.1895 0.0060 0.2480 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34023}" {
+     Name "Wave4_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34024}" {
+      Anchor 0.2520 0.0060 0.3105 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34025}" {
+     Name "Wave5_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34026}" {
+      Anchor 0.3145 0.0060 0.3730 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34027}" {
+     Name "Wave6_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34028}" {
+      Anchor 0.3770 0.0060 0.4355 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34029}" {
+     Name "Wave7_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3402A}" {
+      Anchor 0.4395 0.0060 0.4980 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3402B}" {
+     Name "Wave8_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3402C}" {
+      Anchor 0.5020 0.0060 0.5605 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3402D}" {
+     Name "Wave9_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3402E}" {
+      Anchor 0.5645 0.0060 0.6230 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3402F}" {
+     Name "Wave10_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34030}" {
+      Anchor 0.6270 0.0060 0.6855 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34031}" {
+     Name "Wave11_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34032}" {
+      Anchor 0.6895 0.0060 0.7480 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34033}" {
+     Name "Wave12_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34034}" {
+      Anchor 0.7520 0.0060 0.8105 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34035}" {
+     Name "Wave13_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34036}" {
+      Anchor 0.8145 0.0060 0.8730 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34037}" {
+     Name "Wave14_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34038}" {
+      Anchor 0.8770 0.0060 0.9355 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34039}" {
+     Name "Wave15_0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3403A}" {
+      Anchor 0.9395 0.0060 0.9980 0.1051
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3403B}" {
+     Name "Wave0_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3403C}" {
+      Anchor 0.0020 0.1171 0.0605 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3403D}" {
+     Name "Wave1_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3403E}" {
+      Anchor 0.0645 0.1171 0.1230 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3403F}" {
+     Name "Wave2_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34040}" {
+      Anchor 0.1270 0.1171 0.1855 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34041}" {
+     Name "Wave3_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34042}" {
+      Anchor 0.1895 0.1171 0.2480 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34043}" {
+     Name "Wave4_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34044}" {
+      Anchor 0.2520 0.1171 0.3105 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34045}" {
+     Name "Wave5_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34046}" {
+      Anchor 0.3145 0.1171 0.3730 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34047}" {
+     Name "Wave6_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34048}" {
+      Anchor 0.3770 0.1171 0.4355 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34049}" {
+     Name "Wave7_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3404A}" {
+      Anchor 0.4395 0.1171 0.4980 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3404B}" {
+     Name "Wave8_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3404C}" {
+      Anchor 0.5020 0.1171 0.5605 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3404D}" {
+     Name "Wave9_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3404E}" {
+      Anchor 0.5645 0.1171 0.6230 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3404F}" {
+     Name "Wave10_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34050}" {
+      Anchor 0.6270 0.1171 0.6855 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34051}" {
+     Name "Wave11_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34052}" {
+      Anchor 0.6895 0.1171 0.7480 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34053}" {
+     Name "Wave12_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34054}" {
+      Anchor 0.7520 0.1171 0.8105 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34055}" {
+     Name "Wave13_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34056}" {
+      Anchor 0.8145 0.1171 0.8730 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34057}" {
+     Name "Wave14_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34058}" {
+      Anchor 0.8770 0.1171 0.9355 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34059}" {
+     Name "Wave15_1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3405A}" {
+      Anchor 0.9395 0.1171 0.9980 0.2162
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3405B}" {
+     Name "Wave0_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3405C}" {
+      Anchor 0.0020 0.2282 0.0605 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3405D}" {
+     Name "Wave1_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3405E}" {
+      Anchor 0.0645 0.2282 0.1230 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3405F}" {
+     Name "Wave2_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34060}" {
+      Anchor 0.1270 0.2282 0.1855 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34061}" {
+     Name "Wave3_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34062}" {
+      Anchor 0.1895 0.2282 0.2480 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34063}" {
+     Name "Wave4_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34064}" {
+      Anchor 0.2520 0.2282 0.3105 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34065}" {
+     Name "Wave5_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34066}" {
+      Anchor 0.3145 0.2282 0.3730 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34067}" {
+     Name "Wave6_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34068}" {
+      Anchor 0.3770 0.2282 0.4355 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34069}" {
+     Name "Wave7_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3406A}" {
+      Anchor 0.4395 0.2282 0.4980 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3406B}" {
+     Name "Wave8_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3406C}" {
+      Anchor 0.5020 0.2282 0.5605 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3406D}" {
+     Name "Wave9_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3406E}" {
+      Anchor 0.5645 0.2282 0.6230 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3406F}" {
+     Name "Wave10_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34070}" {
+      Anchor 0.6270 0.2282 0.6855 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34071}" {
+     Name "Wave11_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34072}" {
+      Anchor 0.6895 0.2282 0.7480 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34073}" {
+     Name "Wave12_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34074}" {
+      Anchor 0.7520 0.2282 0.8105 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34075}" {
+     Name "Wave13_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34076}" {
+      Anchor 0.8145 0.2282 0.8730 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34077}" {
+     Name "Wave14_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34078}" {
+      Anchor 0.8770 0.2282 0.9355 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34079}" {
+     Name "Wave15_2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3407A}" {
+      Anchor 0.9395 0.2282 0.9980 0.3273
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3407B}" {
+     Name "Wave0_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3407C}" {
+      Anchor 0.0020 0.3393 0.0605 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3407D}" {
+     Name "Wave1_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3407E}" {
+      Anchor 0.0645 0.3393 0.1230 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3407F}" {
+     Name "Wave2_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34080}" {
+      Anchor 0.1270 0.3393 0.1855 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34081}" {
+     Name "Wave3_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34082}" {
+      Anchor 0.1895 0.3393 0.2480 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34083}" {
+     Name "Wave4_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34084}" {
+      Anchor 0.2520 0.3393 0.3105 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34085}" {
+     Name "Wave5_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34086}" {
+      Anchor 0.3145 0.3393 0.3730 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34087}" {
+     Name "Wave6_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34088}" {
+      Anchor 0.3770 0.3393 0.4355 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34089}" {
+     Name "Wave7_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3408A}" {
+      Anchor 0.4395 0.3393 0.4980 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3408B}" {
+     Name "Wave8_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3408C}" {
+      Anchor 0.5020 0.3393 0.5605 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3408D}" {
+     Name "Wave9_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3408E}" {
+      Anchor 0.5645 0.3393 0.6230 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3408F}" {
+     Name "Wave10_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34090}" {
+      Anchor 0.6270 0.3393 0.6855 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34091}" {
+     Name "Wave11_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34092}" {
+      Anchor 0.6895 0.3393 0.7480 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34093}" {
+     Name "Wave12_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34094}" {
+      Anchor 0.7520 0.3393 0.8105 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34095}" {
+     Name "Wave13_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34096}" {
+      Anchor 0.8145 0.3393 0.8730 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34097}" {
+     Name "Wave14_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34098}" {
+      Anchor 0.8770 0.3393 0.9355 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34099}" {
+     Name "Wave15_3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3409A}" {
+      Anchor 0.9395 0.3393 0.9980 0.4384
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3409B}" {
+     Name "Wave0_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3409C}" {
+      Anchor 0.0020 0.4504 0.0605 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3409D}" {
+     Name "Wave1_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3409E}" {
+      Anchor 0.0645 0.4504 0.1230 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3409F}" {
+     Name "Wave2_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340A0}" {
+      Anchor 0.1270 0.4504 0.1855 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340A1}" {
+     Name "Wave3_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340A2}" {
+      Anchor 0.1895 0.4504 0.2480 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340A3}" {
+     Name "Wave4_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340A4}" {
+      Anchor 0.2520 0.4504 0.3105 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340A5}" {
+     Name "Wave5_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340A6}" {
+      Anchor 0.3145 0.4504 0.3730 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340A7}" {
+     Name "Wave6_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340A8}" {
+      Anchor 0.3770 0.4504 0.4355 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340A9}" {
+     Name "Wave7_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340AA}" {
+      Anchor 0.4395 0.4504 0.4980 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340AB}" {
+     Name "Wave8_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340AC}" {
+      Anchor 0.5020 0.4504 0.5605 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340AD}" {
+     Name "Wave9_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340AE}" {
+      Anchor 0.5645 0.4504 0.6230 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340AF}" {
+     Name "Wave10_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340B0}" {
+      Anchor 0.6270 0.4504 0.6855 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340B1}" {
+     Name "Wave11_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340B2}" {
+      Anchor 0.6895 0.4504 0.7480 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340B3}" {
+     Name "Wave12_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340B4}" {
+      Anchor 0.7520 0.4504 0.8105 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340B5}" {
+     Name "Wave13_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340B6}" {
+      Anchor 0.8145 0.4504 0.8730 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340B7}" {
+     Name "Wave14_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340B8}" {
+      Anchor 0.8770 0.4504 0.9355 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340B9}" {
+     Name "Wave15_4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340BA}" {
+      Anchor 0.9395 0.4504 0.9980 0.5496
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340BB}" {
+     Name "Wave0_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340BC}" {
+      Anchor 0.0020 0.5616 0.0605 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340BD}" {
+     Name "Wave1_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340BE}" {
+      Anchor 0.0645 0.5616 0.1230 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340BF}" {
+     Name "Wave2_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340C0}" {
+      Anchor 0.1270 0.5616 0.1855 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340C1}" {
+     Name "Wave3_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340C2}" {
+      Anchor 0.1895 0.5616 0.2480 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340C3}" {
+     Name "Wave4_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340C4}" {
+      Anchor 0.2520 0.5616 0.3105 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340C5}" {
+     Name "Wave5_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340C6}" {
+      Anchor 0.3145 0.5616 0.3730 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340C7}" {
+     Name "Wave6_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340C8}" {
+      Anchor 0.3770 0.5616 0.4355 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340C9}" {
+     Name "Wave7_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340CA}" {
+      Anchor 0.4395 0.5616 0.4980 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340CB}" {
+     Name "Wave8_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340CC}" {
+      Anchor 0.5020 0.5616 0.5605 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340CD}" {
+     Name "Wave9_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340CE}" {
+      Anchor 0.5645 0.5616 0.6230 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340CF}" {
+     Name "Wave10_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340D0}" {
+      Anchor 0.6270 0.5616 0.6855 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340D1}" {
+     Name "Wave11_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340D2}" {
+      Anchor 0.6895 0.5616 0.7480 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340D3}" {
+     Name "Wave12_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340D4}" {
+      Anchor 0.7520 0.5616 0.8105 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340D5}" {
+     Name "Wave13_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340D6}" {
+      Anchor 0.8145 0.5616 0.8730 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340D7}" {
+     Name "Wave14_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340D8}" {
+      Anchor 0.8770 0.5616 0.9355 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340D9}" {
+     Name "Wave15_5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340DA}" {
+      Anchor 0.9395 0.5616 0.9980 0.6607
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340DB}" {
+     Name "Wave0_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340DC}" {
+      Anchor 0.0020 0.6727 0.0605 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340DD}" {
+     Name "Wave1_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340DE}" {
+      Anchor 0.0645 0.6727 0.1230 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340DF}" {
+     Name "Wave2_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340E0}" {
+      Anchor 0.1270 0.6727 0.1855 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340E1}" {
+     Name "Wave3_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340E2}" {
+      Anchor 0.1895 0.6727 0.2480 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340E3}" {
+     Name "Wave4_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340E4}" {
+      Anchor 0.2520 0.6727 0.3105 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340E5}" {
+     Name "Wave5_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340E6}" {
+      Anchor 0.3145 0.6727 0.3730 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340E7}" {
+     Name "Wave6_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340E8}" {
+      Anchor 0.3770 0.6727 0.4355 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340E9}" {
+     Name "Wave7_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340EA}" {
+      Anchor 0.4395 0.6727 0.4980 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340EB}" {
+     Name "Wave8_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340EC}" {
+      Anchor 0.5020 0.6727 0.5605 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340ED}" {
+     Name "Wave9_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340EE}" {
+      Anchor 0.5645 0.6727 0.6230 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340EF}" {
+     Name "Wave10_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340F0}" {
+      Anchor 0.6270 0.6727 0.6855 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340F1}" {
+     Name "Wave11_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340F2}" {
+      Anchor 0.6895 0.6727 0.7480 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340F3}" {
+     Name "Wave12_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340F4}" {
+      Anchor 0.7520 0.6727 0.8105 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340F5}" {
+     Name "Wave13_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340F6}" {
+      Anchor 0.8145 0.6727 0.8730 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340F7}" {
+     Name "Wave14_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340F8}" {
+      Anchor 0.8770 0.6727 0.9355 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340F9}" {
+     Name "Wave15_6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340FA}" {
+      Anchor 0.9395 0.6727 0.9980 0.7718
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340FB}" {
+     Name "Wave0_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340FC}" {
+      Anchor 0.0020 0.7838 0.0605 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340FD}" {
+     Name "Wave1_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D340FE}" {
+      Anchor 0.0645 0.7838 0.1230 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D340FF}" {
+     Name "Wave2_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34100}" {
+      Anchor 0.1270 0.7838 0.1855 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34101}" {
+     Name "Wave3_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34102}" {
+      Anchor 0.1895 0.7838 0.2480 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34103}" {
+     Name "Wave4_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34104}" {
+      Anchor 0.2520 0.7838 0.3105 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34105}" {
+     Name "Wave5_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34106}" {
+      Anchor 0.3145 0.7838 0.3730 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34107}" {
+     Name "Wave6_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34108}" {
+      Anchor 0.3770 0.7838 0.4355 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34109}" {
+     Name "Wave7_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3410A}" {
+      Anchor 0.4395 0.7838 0.4980 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3410B}" {
+     Name "Wave8_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3410C}" {
+      Anchor 0.5020 0.7838 0.5605 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3410D}" {
+     Name "Wave9_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3410E}" {
+      Anchor 0.5645 0.7838 0.6230 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3410F}" {
+     Name "Wave10_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34110}" {
+      Anchor 0.6270 0.7838 0.6855 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34111}" {
+     Name "Wave11_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34112}" {
+      Anchor 0.6895 0.7838 0.7480 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34113}" {
+     Name "Wave12_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34114}" {
+      Anchor 0.7520 0.7838 0.8105 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34115}" {
+     Name "Wave13_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34116}" {
+      Anchor 0.8145 0.7838 0.8730 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34117}" {
+     Name "Wave14_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34118}" {
+      Anchor 0.8770 0.7838 0.9355 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34119}" {
+     Name "Wave15_7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3411A}" {
+      Anchor 0.9395 0.7838 0.9980 0.8829
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3411B}" {
+     Name "Wave0_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3411C}" {
+      Anchor 0.0020 0.8949 0.0605 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3411D}" {
+     Name "Wave1_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3411E}" {
+      Anchor 0.0645 0.8949 0.1230 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3411F}" {
+     Name "Wave2_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34120}" {
+      Anchor 0.1270 0.8949 0.1855 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34121}" {
+     Name "Wave3_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34122}" {
+      Anchor 0.1895 0.8949 0.2480 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34123}" {
+     Name "Wave4_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34124}" {
+      Anchor 0.2520 0.8949 0.3105 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34125}" {
+     Name "Wave5_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34126}" {
+      Anchor 0.3145 0.8949 0.3730 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34127}" {
+     Name "Wave6_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34128}" {
+      Anchor 0.3770 0.8949 0.4355 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34129}" {
+     Name "Wave7_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3412A}" {
+      Anchor 0.4395 0.8949 0.4980 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3412B}" {
+     Name "Wave8_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3412C}" {
+      Anchor 0.5020 0.8949 0.5605 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3412D}" {
+     Name "Wave9_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3412E}" {
+      Anchor 0.5645 0.8949 0.6230 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D3412F}" {
+     Name "Wave10_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34130}" {
+      Anchor 0.6270 0.8949 0.6855 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34131}" {
+     Name "Wave11_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34132}" {
+      Anchor 0.6895 0.8949 0.7480 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34133}" {
+     Name "Wave12_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34134}" {
+      Anchor 0.7520 0.8949 0.8105 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34135}" {
+     Name "Wave13_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34136}" {
+      Anchor 0.8145 0.8949 0.8730 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34137}" {
+     Name "Wave14_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D34138}" {
+      Anchor 0.8770 0.8949 0.9355 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    ImageWidgetClass "{6A1C4F0B39D34139}" {
+     Name "Wave15_8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3413A}" {
+      Anchor 0.9395 0.8949 0.9980 0.9940
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.10 0.13 0.13 0.55
+    }
+    }
+   }
+   TextWidgetClass "{6A1C4F0B39D3413D}" {
+    Name "Dials"
+    Slot FrameWidgetSlot "{6A1C4F0B39D3413E}" {
+     Anchor 0.0200 0.6600 0.9800 0.7400
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    Text "FREQ 1   GAIN 1"
+    "Font Size" 20
+    "Min Font Size" 20
+   }
+   ButtonWidgetClass "{6A1C4F0B39D3413F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "FreqDown"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34140}" {
+     Anchor 0.0600 0.7600 0.2400 0.9400
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34141}" {
+      m_bCanBeToggled 0
+      m_sText "< FREQ"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34142}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "FreqUp"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34143}" {
+     Anchor 0.2600 0.7600 0.4400 0.9400
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34144}" {
+      m_bCanBeToggled 0
+      m_sText "FREQ >"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34145}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "GainDown"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34146}" {
+     Anchor 0.4800 0.7600 0.6600 0.9400
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34147}" {
+      m_bCanBeToggled 0
+      m_sText "< GAIN"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34148}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "GainUp"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34149}" {
+     Anchor 0.6800 0.7600 0.8600 0.9400
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D3414A}" {
+      m_bCanBeToggled 0
+      m_sText "GAIN >"
+     }
+    }
+   }
+   }
+  }
+  FrameWidgetClass "{6A1C4F0B39D34175}" {
+   Name "PanelPorts"
+   Slot FrameWidgetSlot "{6A1C4F0B39D34176}" {
+    Anchor 0.2000 0.1800 0.8000 0.7400
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   {
+   TextWidgetClass "{6A1C4F0B39D3414B}" {
+    Name "Rule"
+    Slot FrameWidgetSlot "{6A1C4F0B39D3414C}" {
+     Anchor 0.0200 0.0100 0.9800 0.0900
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    Text "OPEN EVERY PORT WHOSE RESPONSE IS EVEN"
+    "Font Size" 19
+    "Min Font Size" 19
+   }
+   ButtonWidgetClass "{6A1C4F0B39D3414D}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port0"
+    Slot FrameWidgetSlot "{6A1C4F0B39D3414E}" {
+     Anchor 0.0300 0.1300 0.4800 0.2600
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D3414F}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34150}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port1"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34151}" {
+     Anchor 0.5200 0.1300 0.9700 0.2600
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34152}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34153}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port2"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34154}" {
+     Anchor 0.0300 0.2850 0.4800 0.4150
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34155}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34156}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port3"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34157}" {
+     Anchor 0.5200 0.2850 0.9700 0.4150
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34158}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34159}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port4"
+    Slot FrameWidgetSlot "{6A1C4F0B39D3415A}" {
+     Anchor 0.0300 0.4400 0.4800 0.5700
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D3415B}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D3415C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port5"
+    Slot FrameWidgetSlot "{6A1C4F0B39D3415D}" {
+     Anchor 0.5200 0.4400 0.9700 0.5700
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D3415E}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D3415F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port6"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34160}" {
+     Anchor 0.0300 0.5950 0.4800 0.7250
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34161}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34162}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port7"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34163}" {
+     Anchor 0.5200 0.5950 0.9700 0.7250
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34164}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34165}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port8"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34166}" {
+     Anchor 0.0300 0.7500 0.4800 0.8800
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D34167}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   ButtonWidgetClass "{6A1C4F0B39D34168}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+    Name "Port9"
+    Slot FrameWidgetSlot "{6A1C4F0B39D34169}" {
+     Anchor 0.5200 0.7500 0.9700 0.8800
+     PositionX 0
+     OffsetLeft 0
+     PositionY 0
+     OffsetTop 0
+     SizeX 0
+     OffsetRight 0
+     SizeY 0
+     OffsetBottom 0
+    }
+    components {
+     SCR_ButtonTextComponent "{6A1C4F0B39D3416A}" {
+      m_bCanBeToggled 1
+      m_sText "----"
+     }
+    }
+   }
+   }
+  }
+  TextWidgetClass "{6A1C4F0B39D34177}" {
    Name "Timer"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30008}" {
-    Anchor 0.30 0.76 0.70 0.82
+   Slot FrameWidgetSlot "{6A1C4F0B39D34178}" {
+    Anchor 0.3000 0.7550 0.7000 0.8050
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -67,10 +2785,10 @@ FrameWidgetClass {
    "Font Size" 26
    "Min Font Size" 26
   }
-  ButtonWidgetClass "{6A1C4F0B39D30009}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell0"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3000A}" {
-    Anchor 0.365 0.280 0.450 0.410
+  ButtonWidgetClass "{6A1C4F0B39D34179}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonSubmit"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3417A}" {
+    Anchor 0.3500 0.8150 0.5000 0.8750
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -81,176 +2799,16 @@ FrameWidgetClass {
     OffsetBottom 0
    }
    components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D3000B}" {
-     m_bCanBeToggled 1
-     m_sText "1"
+    SCR_ButtonTextComponent "{6A1C4F0B39D3417B}" {
+     m_bCanBeToggled 0
+     m_sText "ACCEPT"
     }
    }
   }
-  ButtonWidgetClass "{6A1C4F0B39D3000C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell1"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3000D}" {
-    Anchor 0.460 0.280 0.545 0.410
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D3000E}" {
-     m_bCanBeToggled 1
-     m_sText "2"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D3000F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell2"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30010}" {
-    Anchor 0.555 0.280 0.640 0.410
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D30011}" {
-     m_bCanBeToggled 1
-     m_sText "3"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D30012}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell3"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30013}" {
-    Anchor 0.365 0.430 0.450 0.560
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D30014}" {
-     m_bCanBeToggled 1
-     m_sText "4"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D30015}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell4"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30016}" {
-    Anchor 0.460 0.430 0.545 0.560
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D30017}" {
-     m_bCanBeToggled 1
-     m_sText "5"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D30018}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell5"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30019}" {
-    Anchor 0.555 0.430 0.640 0.560
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D3001A}" {
-     m_bCanBeToggled 1
-     m_sText "6"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D3001B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell6"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3001C}" {
-    Anchor 0.365 0.580 0.450 0.710
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D3001D}" {
-     m_bCanBeToggled 1
-     m_sText "7"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D3001E}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell7"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3001F}" {
-    Anchor 0.460 0.580 0.545 0.710
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D30020}" {
-     m_bCanBeToggled 1
-     m_sText "8"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D30021}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "Cell8"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30022}" {
-    Anchor 0.555 0.580 0.640 0.710
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D30023}" {
-     m_bCanBeToggled 1
-     m_sText "9"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D30024}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+  ButtonWidgetClass "{6A1C4F0B39D3417C}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
    Name "ButtonClose"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30025}" {
-    Anchor 0.40 0.85 0.60 0.91
+   Slot FrameWidgetSlot "{6A1C4F0B39D3417D}" {
+    Anchor 0.5200 0.8150 0.6700 0.8750
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -261,16 +2819,16 @@ FrameWidgetClass {
     OffsetBottom 0
    }
    components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D30026}" {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3417E}" {
      m_bCanBeToggled 0
      m_sText "STOP"
     }
    }
   }
-  TextWidgetClass "{6A1C4F0B39D30027}" {
+  TextWidgetClass "{6A1C4F0B39D3417F}" {
    Name "Hint"
-   Slot FrameWidgetSlot "{6A1C4F0B39D30028}" {
-    Anchor 0.20 0.92 0.80 0.97
+   Slot FrameWidgetSlot "{6A1C4F0B39D34180}" {
+    Anchor 0.1200 0.8900 0.8800 0.9500
     PositionX 0
     OffsetLeft 0
     PositionY 0

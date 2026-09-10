@@ -54,23 +54,26 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
   }
   MCF_Intel_CarrierComponent "{6A1C4F0B39D30106}" {
    m_sDeviceName "Mobile phone"
-   m_eView DEVICE
+   m_eView PHONE
    m_sActionVerb "Search"
    m_aEntries {
     MCF_Intel_Entry "{6A1C4F0B39D30107}" {
      m_sHeading "M. - 02:14"
      m_sTimestamp "14 MAR"
      m_sBody "Truck is loaded. We move at first light, not before. Tell your cousin to keep the dogs in."
+     m_eApp MESSAGES
     }
     MCF_Intel_Entry "{6A1C4F0B39D30108}" {
      m_sHeading "Unknown number - 09:40"
      m_sTimestamp "15 MAR"
      m_sBody "Do not use this number again. The mill is watched."
+     m_eApp MESSAGES
     }
     MCF_Intel_Entry "{6A1C4F0B39D30109}" {
      m_sHeading "Draft, not sent"
      m_sTimestamp "15 MAR"
      m_sBody "If anything happens to me the papers are behind the stove at my mother's."
+     m_eApp NOTES
     }
    }
   }
