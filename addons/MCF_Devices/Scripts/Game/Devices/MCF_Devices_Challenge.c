@@ -97,12 +97,15 @@ class MCF_Devices_Challenge
 	//! and what the rest of MCF already does (see MCF_Task.Serialize).
 	static string Encode(notnull array<int> sequence)
 	{
-		string out = "";
+		// Not named "out": Enforce reserves that for parameter direction, and
+		// using it as a local is a "Broken expression (missing ';'?)" with no
+		// hint as to why. Same family as `reference`.
+		string encoded = "";
 		foreach (int cell : sequence)
 		{
-			out = out + cell.ToString();
+			encoded = encoded + cell.ToString();
 		}
-		return out;
+		return encoded;
 	}
 
 	static int Clamp(int value, int low, int high)
