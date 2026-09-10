@@ -1,0 +1,70 @@
+// One line in a device list: a message, a call, a contact, a file.
+//
+// WHY THIS EXISTS INSTEAD OF REUSING MCF_PlanningBoard_TaskEntry. That row is
+// built for the operations board, which is as wide as the screen: it carries
+// Clipping False and 18pt text, and Clipping False on a button means the button
+// does NOT clip its children. On a board nothing ever reaches the edge, so it
+// never showed. On a phone 224 pixels across, a line like
+// "15 MAR   Unknown number - 09:40" simply drew straight out past the side of
+// the handset.
+//
+// So: the button clips, and the text inside it wraps rather than being cut.
+// Two lines in a phone list is what a phone does anyway -- a sender on one, the
+// preview on the next.
+//
+// Wrap 1 is what does the folding. Clipping only decides whether the overflow
+// is drawn or cut off; it never creates a second line. Vanilla's
+// RichText_BodySmall.layout is where both come from.
+ButtonWidgetClass {
+ Name "Button"
+ Slot LayoutSlot "{6A1C4F0B39D34501}" {
+  Padding 0 0 0 3
+  SizeMode Fill
+ }
+ Clipping True
+ components {
+  SCR_ButtonTextComponent "{6A1C4F0B39D34502}" {
+   m_bCanBeToggled 1
+   m_BackgroundDefault 1 1 1 0.06
+   m_BackgroundHovered 1 1 1 0.22
+   m_BackgroundSelected 0.761 0.386 0.08 1
+   m_BackgroundSelectedHovered 0.896 0.539 0.184 1
+   m_BackgroundClicked 0.761 0.386 0.08 1
+   m_sText "Entry"
+  }
+ }
+ style blank
+ {
+  OverlayWidgetClass "{6A1C4F0B39D34503}" {
+   Name "Overlay"
+   Slot ButtonWidgetSlot "{6A1C4F0B39D34504}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+    Padding 2 2 2 2
+   }
+   {
+    ImageWidgetClass "{6A1C4F0B39D34505}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D34506}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+    }
+    RichTextWidgetClass "{6A1C4F0B39D34507}" {
+     Name "Text"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D34508}" {
+      HorizontalAlign 3
+      VerticalAlign 1
+      Padding 8 5 8 5
+     }
+     Clipping Ancestor
+     Wrap 1
+     Text "Entry"
+     "Font Size" 12
+     "Min Font Size" 12
+     "Line Spacing" 17
+    }
+   }
+  }
+ }
+}

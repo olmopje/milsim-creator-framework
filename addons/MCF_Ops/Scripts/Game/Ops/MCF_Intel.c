@@ -61,7 +61,21 @@ enum MCF_EIntelApp
 	EMAIL,
 	NOTES,
 	PHOTOS,
-	FILES
+	FILES,
+
+	// APPENDED, NEVER REORDERED -- same rule as MCF_EIntelView above, and for
+	// the same reason: these numbers are written into the wire format and into
+	// the persistent store, so inserting one would re-file every saved entry.
+
+	//! The call log. Who this person rang, when, and for how long -- often
+	//! worth more than anything they wrote down.
+	CALLS,
+	//! The address book. Names against numbers.
+	CONTACTS,
+	//! What the device says about itself. Wi-Fi it has joined, an account it is
+	//! signed in to, a number it is registered under. Left empty, the shell
+	//! fills it in from what it knows.
+	SETTINGS
 }
 
 //! One readable item inside an intel object.

@@ -24,7 +24,10 @@
 
 class MCF_Intel_ShellMenu : ChimeraMenuBase
 {
-	protected static const ResourceName ROW_LAYOUT = "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout";
+	//! One line in a device list. NOT the planning board's row: that one carries
+	//! Clipping False and 18pt text because the board is as wide as the screen,
+	//! and on a phone it drew straight out past the side of the handset.
+	protected static const ResourceName ROW_LAYOUT = "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout";
 
 	protected static const string W_DEVICE_NAME = "DeviceName";
 	protected static const string W_STATUS_BAR = "StatusBar";
@@ -33,6 +36,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_ENTRY_LIST = "EntryList";
 	protected static const string W_READ_SCROLL = "ReadScroll";
 	protected static const string W_READ_COLUMN = "ReadColumn";
+	protected static const string W_READ_BODY = "ReadBody";
+	protected static const string W_LIST_WIDTH = "ListWidth";
+	protected static const string W_READ_WIDTH = "ReadWidth";
+
+	//! How much of the glass the text columns use. The rest is the margin you
+	//! would expect down each side of a phone screen.
+	protected static const float TEXT_WIDTH = 0.90;
 	protected static const string W_READ_HEADING = "ReadHeading";
 	protected static const string W_READ_TIMESTAMP = "ReadTimestamp";
 	protected static const string W_BUTTON_BACK = "ButtonBack";
@@ -67,7 +77,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const float PHONE_HALF_X = 0.035;
 	protected static const float PHONE_HALF_Z = 0.0745;
 
-	protected static const int APP_SLOTS = 6;
+	protected static const int APP_SLOTS = 9;
 
 	protected static MCF_Intel_CarrierComponent s_PendingCarrier;
 	protected static MCF_EIntelView s_PendingView;
@@ -104,8 +114,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected RichTextWidget m_wReadBody;
 	protected TextWidget m_wDeviceName;
 	protected TextWidget m_wStatusBar;
-	protected TextWidget m_wReadHeading;
-	protected TextWidget m_wReadTimestamp;
+	protected RichTextWidget m_wReadHeading;
+	protected RichTextWidget m_wReadTimestamp;
 	protected TextWidget m_wHint;
 	protected TextWidget m_wClockTime;
 	protected TextWidget m_wClockDate;
@@ -182,8 +192,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wReadScroll = root.FindAnyWidget(W_READ_SCROLL);
 		m_wEntryList = VerticalLayoutWidget.Cast(root.FindAnyWidget(W_ENTRY_LIST));
 		m_wReadColumn = VerticalLayoutWidget.Cast(root.FindAnyWidget(W_READ_COLUMN));
-		m_wReadHeading = TextWidget.Cast(root.FindAnyWidget(W_READ_HEADING));
-		m_wReadTimestamp = TextWidget.Cast(root.FindAnyWidget(W_READ_TIMESTAMP));
+		m_wReadBody = RichTextWidget.Cast(root.FindAnyWidget(W_READ_BODY));
+		m_wReadHeading = RichTextWidget.Cast(root.FindAnyWidget(W_READ_HEADING));
+		m_wReadTimestamp = RichTextWidget.Cast(root.FindAnyWidget(W_READ_TIMESTAMP));
 		m_wHint = TextWidget.Cast(root.FindAnyWidget(W_HINT));
 		m_wClockTime = TextWidget.Cast(root.FindAnyWidget(W_CLOCK_TIME));
 		m_wClockDate = TextWidget.Cast(root.FindAnyWidget(W_CLOCK_DATE));
@@ -230,15 +241,6 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			// Inserted even when null, so a label always shares its tile's
 			// index and a missing widget cannot shift every name by one.
 			m_aAppLabels.Insert(TextWidget.Cast(root.FindAnyWidget(W_APP_LABEL_PREFIX + i.ToString())));
-		}
-
-		// The body text is created rather than laid out, so that a long
-		// message scrolls instead of running off the bottom of the phone.
-		if (m_wReadColumn)
-		{
-			Widget made = GetGame().GetWorkspace().CreateWidgets(ROW_LAYOUT, m_wReadColumn);
-			if (made)
-				made.RemoveFromHierarchy();
 		}
 
 		if (!m_Carrier)
@@ -376,6 +378,30 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		PlaceCentred(m_wModel, boxW, boxH);
 		PlaceCentred(screenArea, boxW * GLASS_X, boxH * GLASS_Y);
+		CapTextWidth(root, boxW * GLASS_X);
+	}
+
+	//! Tells the two scrolling columns how wide they are allowed to be.
+	//!
+	//! WITHOUT THIS NOTHING WRAPS. Text with Clipping False grows to whatever
+	//! width it is offered, and a scroll offers as much as is asked for -- so a
+	//! long sentence does not fold onto a second line, it draws sideways out of
+	//! the phone. The SizeLayoutWidget in each scroll is the cap, and the cap
+	//! can only be known once the glass has been measured, which is here.
+	protected void CapTextWidth(notnull Widget root, float glassWidth)
+	{
+		CapOne(root, W_LIST_WIDTH, glassWidth);
+		CapOne(root, W_READ_WIDTH, glassWidth);
+	}
+
+	protected void CapOne(notnull Widget root, string name, float glassWidth)
+	{
+		SizeLayoutWidget sizer = SizeLayoutWidget.Cast(root.FindAnyWidget(name));
+		if (!sizer)
+			return;
+
+		sizer.EnableWidthOverride(true);
+		sizer.SetWidthOverride(glassWidth * TEXT_WIDTH);
 	}
 
 	//! Asks the preview where the phone actually ended up, and puts the glass
@@ -458,6 +484,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		}
 
 		PlaceCentred(screenArea, phoneW * GLASS_X, phoneH * GLASS_Y);
+		CapTextWidth(root, phoneW * GLASS_X);
 		return true;
 	}
 
@@ -522,22 +549,51 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	// ----------------------------------------------------------- the apps
 
-	//! Which apps have anything in them, in enum order.
+	//! What is on the home screen.
+	//!
+	//! A FIXED SET, AND EMPTY ONES STAY. The first version listed only the apps
+	//! that had something in them, on the reasoning that an icon opening on
+	//! nothing is worse than no icon. That reasoning was wrong about what the
+	//! object is: a phone found in a field has Settings and a call log whether
+	//! or not this particular one has been used, and a home screen that changes
+	//! shape per device reads as a menu that happens to be phone-coloured.
+	//!
+	//! An empty app opens and says so. That is also information -- a phone with
+	//! no contacts and no call history is a phone somebody was careful with.
+	//!
+	//! Order is the order they appear, left to right, and is deliberate:
+	//! the three that carry conversation first, then what was written down,
+	//! then the device itself.
 	protected void CollectApps()
 	{
 		m_aApps.Clear();
 
-		for (int app = 0; app <= MCF_EIntelApp.FILES; app++)
+		m_aApps.Insert(MCF_EIntelApp.MESSAGES);
+		m_aApps.Insert(MCF_EIntelApp.CALLS);
+		m_aApps.Insert(MCF_EIntelApp.CONTACTS);
+		m_aApps.Insert(MCF_EIntelApp.EMAIL);
+		m_aApps.Insert(MCF_EIntelApp.NOTES);
+		m_aApps.Insert(MCF_EIntelApp.PHOTOS);
+		m_aApps.Insert(MCF_EIntelApp.FILES);
+		m_aApps.Insert(MCF_EIntelApp.SETTINGS);
+
+		// GENERAL is not an app, it is "no app named" -- what every entry
+		// written before apps existed reads as. It earns a tile only when
+		// something is actually filed there, so old content stays reachable
+		// without putting a nameless icon on every phone.
+		if (HasEntriesFor(MCF_EIntelApp.GENERAL))
+			m_aApps.Insert(MCF_EIntelApp.GENERAL);
+	}
+
+	protected bool HasEntriesFor(int app)
+	{
+		foreach (MCF_Intel_Entry entry : m_aEntries)
 		{
-			foreach (MCF_Intel_Entry entry : m_aEntries)
-			{
-				if (entry.m_eApp == app)
-				{
-					m_aApps.Insert(app);
-					break;
-				}
-			}
+			if (entry.m_eApp == app)
+				return true;
 		}
+
+		return false;
 	}
 
 	protected void ShowHome()
@@ -625,6 +681,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_aRowButtons.Insert(rowButton);
 		}
 
+		if (m_aVisible.IsEmpty())
+			ShowEmptyApp(app);
+
 		if (m_wDeviceName)
 			m_wDeviceName.SetText(AppLabel(app));
 
@@ -632,7 +691,66 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_ButtonBack.SetText("HOME");
 
 		UpdateLogButton();
-		SetHint(m_aVisible.Count().ToString() + " item(s)");
+
+		if (m_aVisible.IsEmpty())
+			SetHint(EmptyText(app));
+		else
+			SetHint(m_aVisible.Count().ToString() + " item(s)");
+	}
+
+	//! Settings is the one app that has something to say about a device nobody
+	//! has written anything into: what it is, and whether it was locked. A
+	//! mission maker who files real entries under SETTINGS -- a joined network,
+	//! an account, a registered number -- replaces this entirely.
+	protected void ShowEmptyApp(int app)
+	{
+		if (app != MCF_EIntelApp.SETTINGS || !m_Carrier)
+			return;
+
+		AddSyntheticRow("Device", m_Carrier.GetDeviceName());
+		AddSyntheticRow("Security", "Screen lock was in use");
+		AddSyntheticRow("Storage", m_aEntries.Count().ToString() + " item(s) on this device");
+	}
+
+	protected void AddSyntheticRow(string heading, string body)
+	{
+		MCF_Intel_Entry entry = new MCF_Intel_Entry();
+		entry.m_sHeading = heading;
+		entry.m_sBody = body;
+		m_aVisible.Insert(entry);
+
+		if (!m_wEntryList)
+			return;
+
+		Widget row = GetGame().GetWorkspace().CreateWidgets(ROW_LAYOUT, m_wEntryList);
+		if (!row)
+			return;
+
+		SCR_ButtonTextComponent rowButton = SCR_ButtonTextComponent.FindButtonTextComponent(row);
+		if (!rowButton)
+			return;
+
+		rowButton.SetText(entry.DescribeShort());
+		rowButton.m_OnClicked.Insert(OnRowClicked);
+		m_aRowButtons.Insert(rowButton);
+	}
+
+	//! Said in the app's own terms rather than as one blank "nothing here",
+	//! because which drawer is empty is itself worth knowing.
+	protected string EmptyText(int app)
+	{
+		switch (app)
+		{
+			case MCF_EIntelApp.MESSAGES: return "No messages.";
+			case MCF_EIntelApp.CALLS:    return "No calls in the log.";
+			case MCF_EIntelApp.CONTACTS: return "No contacts saved.";
+			case MCF_EIntelApp.EMAIL:    return "No mail.";
+			case MCF_EIntelApp.NOTES:    return "No notes.";
+			case MCF_EIntelApp.PHOTOS:   return "No photos.";
+			case MCF_EIntelApp.FILES:    return "No files.";
+		}
+
+		return "Nothing here.";
 	}
 
 	protected void OnRowClicked(SCR_ButtonTextComponent button)
@@ -663,21 +781,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_wReadTimestamp)
 			m_wReadTimestamp.SetText(entry.m_sTimestamp);
 
-		if (m_wReadColumn)
-		{
-			ClearChildren(m_wReadColumn);
-
-			Widget row = GetGame().GetWorkspace().CreateWidgets(ROW_LAYOUT, m_wReadColumn);
-			if (row)
-			{
-				SCR_ButtonTextComponent bodyButton = SCR_ButtonTextComponent.FindButtonTextComponent(row);
-				if (bodyButton)
-				{
-					bodyButton.SetText(entry.m_sBody);
-					bodyButton.SetEnabled(false);
-				}
-			}
-		}
+		// A wrapping text widget, laid out once, rather than a row created per
+		// message. The shared row layout is a button: one line, no wrapping,
+		// and a sentence of any length simply ran off the side of the phone.
+		if (m_wReadBody)
+			m_wReadBody.SetText(entry.m_sBody);
 
 		if (m_ButtonBack)
 			m_ButtonBack.SetText("BACK");
@@ -711,11 +819,6 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_wReadScroll)
 			m_wReadScroll.SetVisible(read);
 
-		if (m_wReadHeading)
-			m_wReadHeading.SetVisible(read);
-
-		if (m_wReadTimestamp)
-			m_wReadTimestamp.SetVisible(read);
 	}
 
 	//! BACK steps back one level, and closes the phone from the home screen --
@@ -782,9 +885,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_ButtonLog.SetText("NO NET");
 
 		if (atBoard)
-			SetHint("Enter it on the board to share it with the force.");
+			SetHint("Log it at the board.");
 		else
-			SetHint("Take it to the operations board to share it.");
+			SetHint("Not at the board.");
 	}
 
 	protected void OnPrevClicked(SCR_ButtonTextComponent button)
@@ -965,10 +1068,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		switch (app)
 		{
 			case MCF_EIntelApp.MESSAGES: return "MESSAGES";
+			case MCF_EIntelApp.CALLS:    return "PHONE";
+			case MCF_EIntelApp.CONTACTS: return "CONTACTS";
 			case MCF_EIntelApp.EMAIL:    return "MAIL";
 			case MCF_EIntelApp.NOTES:    return "NOTES";
 			case MCF_EIntelApp.PHOTOS:   return "PHOTOS";
 			case MCF_EIntelApp.FILES:    return "FILES";
+			case MCF_EIntelApp.SETTINGS: return "SETTINGS";
 		}
 
 		return "INBOX";

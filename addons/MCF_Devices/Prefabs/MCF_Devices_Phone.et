@@ -115,6 +115,49 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
      m_sBody "If anything happens to me the papers are behind the stove at my mother's."
      m_eApp NOTES
     }
+    MCF_Intel_Entry "{6A1C4F0B39D30114}" {
+     m_sHeading "Outgoing - 0412"
+     m_sTimestamp "15 MAR"
+     m_sBody "M. - 4 min 12 s. Third call to this number today."
+     m_eApp CALLS
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D30115}" {
+     m_sHeading "Missed - 0455"
+     m_sTimestamp "15 MAR"
+     m_sBody "Unknown number. No voicemail."
+     m_eApp CALLS
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D30116}" {
+     m_sHeading "Incoming - 2140"
+     m_sTimestamp "14 MAR"
+     m_sBody "The mill - 47 s."
+     m_eApp CALLS
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D30117}" {
+     m_sHeading "M."
+     m_sBody "Saved under one letter and nothing else. Called more than anyone."
+     m_eApp CONTACTS
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D30118}" {
+     m_sHeading "The mill"
+     m_sBody "A landline. Same number as the one warned about in messages."
+     m_eApp CONTACTS
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D30119}" {
+     m_sHeading "Mother"
+     m_sBody "Not called since the fourth."
+     m_eApp CONTACTS
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D3011A}" {
+     m_sHeading "Wi-Fi"
+     m_sBody "Joined: MILL-OFFICE. Saved, connects automatically."
+     m_eApp SETTINGS
+    }
+    MCF_Intel_Entry "{6A1C4F0B39D3011B}" {
+     m_sHeading "Account"
+     m_sBody "Signed in as k.varga. Backup last ran 11 MAR."
+     m_eApp SETTINGS
+    }
    }
   }
   MCF_Devices_LockComponent "{6A1C4F0B39D3010A}" {
