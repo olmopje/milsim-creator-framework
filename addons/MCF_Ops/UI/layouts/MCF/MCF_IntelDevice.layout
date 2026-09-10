@@ -610,6 +610,21 @@ FrameWidgetClass {
            "Is Visible" 0
            Color 1 1 1 1
           }
+          RichTextWidgetClass "{6A1C4F0B39D35070}" {
+           Name "ReadImageNote"
+           Slot AlignableSlot "{6A1C4F0B39D35071}" {
+            HorizontalAlign 3
+            VerticalAlign 0
+           }
+           Clipping Ancestor
+           Wrap 1
+           "Is Visible" 0
+           Text ""
+           "Font Size" 11
+           "Min Font Size" 11
+           "Line Spacing" 20
+           Color 0.6 0.6 0.6 1
+          }
           RichTextWidgetClass "{6A1C4F0B39D35044}" {
            Name "ReadBody"
            Slot AlignableSlot "{6A1C4F0B39D35045}" {

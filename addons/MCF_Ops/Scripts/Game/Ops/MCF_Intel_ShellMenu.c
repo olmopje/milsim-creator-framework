@@ -38,6 +38,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_READ_COLUMN = "ReadColumn";
 	protected static const string W_READ_BODY = "ReadBody";
 	protected static const string W_READ_IMAGE = "ReadImage";
+	protected static const string W_READ_IMAGE_NOTE = "ReadImageNote";
 	protected static const string W_READ_HEADING = "ReadHeading";
 	protected static const string W_READ_TIMESTAMP = "ReadTimestamp";
 	protected static const string W_BUTTON_BACK = "ButtonBack";
@@ -82,6 +83,22 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 	protected MCF_Device_App m_OpenApp;
 	protected int m_iOpenEntry = -1;
+
+	//! The picture the open item is still waiting for, empty when it is not
+	//! waiting for one. Everything about the spinner hangs off this being set.
+	protected string m_sPictureKey;
+	protected float m_fPictureTick;
+	protected float m_fPictureWaited;
+	protected int m_iPictureDots;
+
+	//! How fast the dots move, and how long the shell keeps hoping.
+	//!
+	//! THE DEADLINE IS NOT DECORATION. A fetch that never calls back at all --
+	//! no success, no error -- would otherwise leave the spinner turning for the
+	//! rest of the session, which is the worst of the three outcomes because it
+	//! is the one that looks like it is still working.
+	protected static const float PICTURE_DOT_SECONDS = 0.35;
+	protected static const float PICTURE_GIVE_UP_SECONDS = 30.0;
 	protected ref array<ref MCF_Device_Item> m_aVisible = {};
 	protected ref array<SCR_ButtonTextComponent> m_aRowButtons = {};
 
@@ -91,6 +108,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected VerticalLayoutWidget m_wReadColumn;
 	protected RichTextWidget m_wReadBody;
 	protected ImageWidget m_wReadImage;
+	protected RichTextWidget m_wReadImageNote;
 	protected TextWidget m_wDeviceName;
 	protected TextWidget m_wStatusBar;
 	protected RichTextWidget m_wReadHeading;
@@ -174,6 +192,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wReadColumn = VerticalLayoutWidget.Cast(root.FindAnyWidget(W_READ_COLUMN));
 		m_wReadBody = RichTextWidget.Cast(root.FindAnyWidget(W_READ_BODY));
 		m_wReadImage = ImageWidget.Cast(root.FindAnyWidget(W_READ_IMAGE));
+		m_wReadImageNote = RichTextWidget.Cast(root.FindAnyWidget(W_READ_IMAGE_NOTE));
 		m_wReadHeading = RichTextWidget.Cast(root.FindAnyWidget(W_READ_HEADING));
 		m_wReadTimestamp = RichTextWidget.Cast(root.FindAnyWidget(W_READ_TIMESTAMP));
 		m_wHint = TextWidget.Cast(root.FindAnyWidget(W_HINT));
@@ -359,6 +378,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_bOnList = false;
 		m_OpenApp = null;
 		m_iOpenEntry = -1;
+		StopWaitingForPicture();
 
 		SetScreens(true, false, false);
 
@@ -406,6 +426,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_bOnList = true;
 		m_OpenApp = app;
 		m_iOpenEntry = -1;
+		StopWaitingForPicture();
 
 		SetScreens(false, true, false);
 
@@ -512,6 +533,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! must not read as one.
 	protected void ShowPicture(notnull MCF_Device_Item item)
 	{
+		StopWaitingForPicture();
+
 		if (!m_wReadImage)
 			return;
 
@@ -520,19 +543,159 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (!item.m_sImage.IsEmpty())
 			shown = m_wReadImage.LoadImageTexture(0, item.m_sImage);
 
-		if (!shown && !item.m_sImageUrl.IsEmpty())
-			shown = MCF_Device_ImageCache.Show(m_wReadImage, item.ImageKey());
+		string key = item.ImageKey();
 
-		m_wReadImage.SetVisible(shown);
+		if (!shown && !key.IsEmpty())
+			shown = MCF_Device_ImageCache.Show(m_wReadImage, key);
 
-		if (!shown)
+		if (shown)
+		{
+			DrawPicture();
+			return;
+		}
+
+		m_wReadImage.SetVisible(false);
+
+		// No picture and none coming: an ordinary item, nothing to say.
+		if (key.IsEmpty())
+		{
+			SetPictureNote("");
+			return;
+		}
+
+		int state = MCF_Device_ImageCache.StateOf(key);
+
+		// NONE means nobody ever asked -- the prefetch at open time missed it,
+		// or this item was authored while the phone was already on screen.
+		// FAILED means somebody asked and it did not arrive, and opening the
+		// item again is the plainest retry there is: no button to explain, and
+		// it costs one request that the player asked for by looking at it.
+		if (state != MCF_EImageState.LOADING)
+			FetchPicture(item);
+
+		m_sPictureKey = key;
+		m_fPictureTick = 0;
+		m_fPictureWaited = 0;
+		m_iPictureDots = 0;
+		SetPictureNote(LoadingLine());
+	}
+
+	//! Puts the picture on screen at the size the glass allows.
+	//!
+	//! Sized to the glass rather than to the picture: a photograph wider than
+	//! the screen would push the text off the side, and one much narrower would
+	//! look like a thumbnail somebody forgot to finish.
+	protected void DrawPicture()
+	{
+		if (!m_wReadImage)
 			return;
 
-		// Sized to the glass rather than to the picture: a photograph wider than
-		// the screen would push the text off the side, and one much narrower
-		// would look like a thumbnail somebody forgot to finish.
+		m_wReadImage.SetVisible(true);
+
 		float width = GlassWidth() * 0.88;
 		m_wReadImage.SetSize(width, width * 0.75);
+
+		SetPictureNote("");
+	}
+
+	//! Ticked every frame while an item with a picture is open.
+	//!
+	//! POLLED, NOT NOTIFIED. The fetch finishes on a callback that knows nothing
+	//! about menus, and a menu that has been closed in the meantime must not be
+	//! called into. Asking the cache once a frame costs a file-exists check and
+	//! cannot outlive the screen that does the asking.
+	protected void UpdatePicture(float tDelta)
+	{
+		if (m_sPictureKey.IsEmpty())
+			return;
+
+		int state = MCF_Device_ImageCache.StateOf(m_sPictureKey);
+
+		if (state == MCF_EImageState.READY)
+		{
+			if (m_wReadImage && MCF_Device_ImageCache.Show(m_wReadImage, m_sPictureKey))
+				DrawPicture();
+			else
+				SetPictureNote("Photo unavailable");
+
+			m_sPictureKey = "";
+			return;
+		}
+
+		if (state == MCF_EImageState.FAILED)
+		{
+			SetPictureNote("Photo unavailable");
+			m_sPictureKey = "";
+			return;
+		}
+
+		m_fPictureWaited = m_fPictureWaited + tDelta;
+		if (m_fPictureWaited > PICTURE_GIVE_UP_SECONDS)
+		{
+			MCF_Core_Log.Warn("device image '" + m_sPictureKey + "' never came back after "
+				+ PICTURE_GIVE_UP_SECONDS.ToString() + "s -- giving up on screen");
+
+			SetPictureNote("Photo unavailable");
+			m_sPictureKey = "";
+			return;
+		}
+
+		m_fPictureTick = m_fPictureTick + tDelta;
+		if (m_fPictureTick < PICTURE_DOT_SECONDS)
+			return;
+
+		m_fPictureTick = 0;
+		m_iPictureDots = (m_iPictureDots + 1) % 4;
+		SetPictureNote(LoadingLine());
+	}
+
+	protected void StopWaitingForPicture()
+	{
+		m_sPictureKey = "";
+		m_fPictureTick = 0;
+		m_fPictureWaited = 0;
+		m_iPictureDots = 0;
+	}
+
+	//! The spinner. Dots rather than a rotating glyph, because the note sits in
+	//! a text column and a character that is not in the font is invisible
+	//! rather than wrong -- which would put us back to an empty space meaning
+	//! two different things.
+	protected string LoadingLine()
+	{
+		string line = "Loading photo";
+
+		for (int i = 0; i < m_iPictureDots; i++)
+		{
+			line = line + ".";
+		}
+
+		return line;
+	}
+
+	protected void SetPictureNote(string text)
+	{
+		if (!m_wReadImageNote)
+			return;
+
+		m_wReadImageNote.SetText(text);
+		m_wReadImageNote.SetVisible(!text.IsEmpty());
+	}
+
+	//! Starts one item's fetch. Shares its splitting with the prefetch so there
+	//! is one place a URL is taken apart.
+	protected void FetchPicture(notnull MCF_Device_Item item)
+	{
+		string url = item.ImageUrl();
+		if (url.IsEmpty())
+			return;
+
+		string host, path;
+		if (SplitUrl(url, host, path))
+			MCF_Device_ImageCache.Fetch(host, path, item.ImageKey());
+		else
+			MCF_Core_Log.Warn("device image url '" + url
+				+ "' is not host + path -- it needs a scheme and a path, e.g. https://host/file.txt");
 	}
 
 	//! Asks a picture's source to fetch itself, so it is on disk by the time
@@ -543,15 +706,19 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		array<ref MCF_Device_Item> items = {};
 		m_Content.GetAllItems(items);
 
+		int asked;
+
 		foreach (MCF_Device_Item item : items)
 		{
-			if (item.m_sImageUrl.IsEmpty())
+			if (item.ImageUrl().IsEmpty())
 				continue;
 
-			string host, path;
-			if (SplitUrl(item.m_sImageUrl, host, path))
-				MCF_Device_ImageCache.Fetch(host, path, item.ImageKey());
+			FetchPicture(item);
+			asked++;
 		}
+
+		MCF_Core_Log.Debug("device shell: " + items.Count().ToString() + " item(s), "
+			+ asked.ToString() + " with a picture url");
 	}
 
 	//! "https://host/some/path" into its two halves, because RestApi wants a
@@ -716,6 +883,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	override void OnMenuUpdate(float tDelta)
 	{
 		super.OnMenuUpdate(tDelta);
+
+		// BEFORE the geometry early-out below. The fit finishes after three
+		// frames and stops running; a picture can arrive seconds later.
+		UpdatePicture(tDelta);
 
 		if (m_iFitFrame > 2)
 			return;

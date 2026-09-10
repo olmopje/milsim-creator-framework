@@ -69,10 +69,20 @@ class MCF_Device_Item
 	//! should share one file rather than fetching it twice.
 	string ImageKey()
 	{
+		return ImageUrl();
+	}
+
+	//! The address, without whatever whitespace came with it.
+	//!
+	//! TRIMMED HERE AS WELL AS ON THE WAY IN, because profiles written before
+	//! Clean trimmed are already in the store, and a mission maker should not
+	//! have to retype a url to fix a space they cannot see.
+	string ImageUrl()
+	{
 		if (m_sImageUrl.IsEmpty())
 			return "";
 
-		return m_sImageUrl;
+		return MCF_Device_Script.Trim(m_sImageUrl);
 	}
 
 	//! One line for a list.

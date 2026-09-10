@@ -200,6 +200,43 @@ class MCF_Device_Script
 		result.Replace(SEP_FIELD, " ");
 		result.Replace("\n", " ");
 		result.Replace("\r", "");
-		return result;
+		return Trim(result);
+	}
+
+	//! Space off both ends.
+	//!
+	//! WHY THIS IS NOT COSMETIC. A url typed or pasted with a stray space in
+	//! front is still a url to a human and is not one to RestApi: the request
+	//! goes out and comes back with http 0, which reads as a network failure
+	//! rather than as a typing mistake. Nothing between the edit box and the
+	//! socket would have caught it. Every authored field goes through Clean, so
+	//! this is the one place that has to know.
+	//!
+	//! Written out rather than calling the engine's trim, because this runs on
+	//! every field of every profile and the loop is three lines.
+	static string Trim(string value)
+	{
+		int first = 0;
+		int last = value.Length() - 1;
+
+		while (first <= last && IsSpace(value.Get(first)))
+		{
+			first++;
+		}
+
+		while (last >= first && IsSpace(value.Get(last)))
+		{
+			last--;
+		}
+
+		if (last < first)
+			return "";
+
+		return value.Substring(first, last - first + 1);
+	}
+
+	protected static bool IsSpace(string character)
+	{
+		return character == " " || character == "\t" || character == "\n" || character == "\r";
 	}
 }

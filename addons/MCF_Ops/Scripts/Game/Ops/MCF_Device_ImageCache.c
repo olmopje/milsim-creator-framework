@@ -16,7 +16,9 @@
 //! What IS open, and what this class is built out of, every link measured on
 //! 2026-09-10 rather than assumed:
 //!
-//!   RestContext.GET                text from a URL, supported, not obsolete
+//!   RestContext.GET                text from a URL, http 200 in 70 ms
+//!                                  -- see MCF_Device_ImageFetch for the two
+//!                                  things that have to be right about it.
 //!   base64 -> array<int>           in script, 5216 chars in 7 ms
 //!   FileHandle.WriteArray          raw bytes to $profile:, one byte per element
 //!   LoadImageTexture(.., true)     png from disk, no import, no conversion
@@ -35,6 +37,21 @@
 //! ON WRITING TO A PLAYER'S DISK. $profile: is the sanctioned place for a mod to
 //! write and the only one FileIO.DeleteFile will accept, which is why the cache
 //! lives there and why it can be cleaned up.
+
+//! Where one picture has got to.
+//!
+//! WHY THE UI NEEDS THIS AT ALL. A photograph that has not arrived and one that
+//! is never going to arrive look identical on screen: an empty space. The first
+//! time that happened it was read as a bug, and it took a log dive to find out
+//! that nothing had gone wrong at all -- the fetch simply had not finished. So
+//! the cache reports its own state and the shell says which of the two it is.
+enum MCF_EImageState
+{
+	NONE,     //!< Never asked for, or asked for and forgotten.
+	LOADING,  //!< A request is out.
+	READY,    //!< On disk, drawable.
+	FAILED    //!< Asked for, came back wrong or not at all.
+}
 
 class MCF_Device_ImageCache
 {
@@ -59,7 +76,21 @@ class MCF_Device_ImageCache
 	protected static const string MARKER = "MCFIMG";
 
 	protected static ref array<int> s_aAlphabet;
-	protected static ref map<string, ref RestCallback> s_aPending = new map<string, ref RestCallback>();
+	//! The requests that are out, by key.
+	//!
+	//! THE FETCH OBJECT, NOT THE CALLBACK. Holding the RestCallback alone is not
+	//! enough and the difference is invisible: the handlers are methods ON the
+	//! fetch object, so when that object is collected the callback survives with
+	//! nothing left to call. The request completes, http 200, and script never
+	//! hears about it. Measured on 2026-09-10 -- a probe holding its own wrapper
+	//! got the same URL back in 70 ms while this map, holding only the callback,
+	//! had been silent for half an afternoon.
+	protected static ref map<string, ref MCF_Device_ImageFetch> s_aPending = new map<string, ref MCF_Device_ImageFetch>();
+
+	//! Keys that were asked for and did not arrive. Remembered so the shell can
+	//! stop waiting and say so, and cleared whenever the same key is asked for
+	//! again -- a player whose network came back deserves a second try.
+	protected static ref map<string, bool> s_aFailed = new map<string, bool>();
 
 	//! Where a cached image lives, whether or not it is there yet.
 	//!
@@ -76,6 +107,24 @@ class MCF_Device_ImageCache
 		return FileIO.FileExists(PathFor(key));
 	}
 
+	//! Where one picture has got to. See MCF_EImageState.
+	static int StateOf(string key)
+	{
+		if (key.IsEmpty())
+			return MCF_EImageState.NONE;
+
+		if (IsCached(key))
+			return MCF_EImageState.READY;
+
+		if (s_aPending.Contains(key))
+			return MCF_EImageState.LOADING;
+
+		if (s_aFailed.Contains(key))
+			return MCF_EImageState.FAILED;
+
+		return MCF_EImageState.NONE;
+	}
+
 	//! Rebuilds an image from base64 text and puts it in the cache.
 	//! \return True if the file is now on disk.
 	static bool StoreFromBase64(string key, string encoded)
@@ -90,8 +139,22 @@ class MCF_Device_ImageCache
 			return false;
 		}
 
+		// WHERE THE PAYLOAD IS, NOT A COPY OF IT. Cutting it out with Substring
+		// and decoding the copy lost all but the first 8 190 characters of a
+		// 35 611 character response -- a truncated jpeg that still began with the
+		// right three bytes, passed the signature check, was written to disk, and
+		// was then refused by the loader with no explanation. Nothing in the chain
+		// said a word. So the decoder is given the original string and two indices
+		// and never copies anything.
+		int from, to;
+		Bounds(encoded, from, to);
+
+		MCF_Core_Log.Debug("device image '" + key + "': " + encoded.Length().ToString()
+			+ " character(s), payload " + (to - from).ToString() + " at [" + from.ToString()
+			+ ", " + to.ToString() + ")");
+
 		array<int> bytes = {};
-		if (!Decode(Payload(encoded), bytes))
+		if (!Decode(encoded, from, to, bytes))
 		{
 			MCF_Core_Log.Warn("device image '" + key + "' is not valid base64");
 			return false;
@@ -157,41 +220,74 @@ class MCF_Device_ImageCache
 	//! host and a request path per call.
 	static void Fetch(string host, string path, string key)
 	{
+		// EVERY EXIT SAYS WHY. This method used to return silently in six places,
+		// and when a picture failed to appear the log had not one line about it --
+		// which made an ordinary missing field indistinguishable from a broken
+		// engine call. Diagnosability is cheap here and was expensive to be
+		// without.
 		if (host.IsEmpty() || path.IsEmpty() || key.IsEmpty())
+		{
+			MCF_Core_Log.Warn("device image fetch asked for with an empty host, path or key -- host='"
+				+ host + "' path='" + path + "' key='" + key + "'");
 			return;
+		}
 
 		if (IsCached(key))
+		{
+			MCF_Core_Log.Debug("device image '" + key + "' already on disk");
 			return;
+		}
 
 		// One request per key at a time. Two devices showing the same photograph
 		// would otherwise both fetch it, and the second write could land while
 		// the first is still open.
 		if (s_aPending.Contains(key))
+		{
+			MCF_Core_Log.Debug("device image '" + key + "' already being fetched");
 			return;
+		}
+
+		// A retry clears the previous verdict, so a player whose network came
+		// back is not told forever that the picture is unavailable.
+		s_aFailed.Remove(key);
 
 		RestApi rest = GetGame().GetRestApi();
 		if (!rest)
+		{
+			MCF_Core_Log.Warn("device image '" + key + "': no RestApi in this context -- nothing can be fetched here");
+			s_aFailed.Insert(key, true);
 			return;
+		}
 
 		RestContext context = rest.GetContext(host);
 		if (!context)
+		{
+			MCF_Core_Log.Warn("device image '" + key + "': no RestContext for " + host);
+			s_aFailed.Insert(key, true);
 			return;
+		}
 
 		context.SetTimeout(20);
 
-		// Held in a map because RestCallback's own documentation says it is
-		// deleted the moment it is not referenced: "If callback is not stored
-		// as ref then it will be deleted after its execution finishes."
 		MCF_Device_ImageFetch fetch = new MCF_Device_ImageFetch(key);
-		s_aPending.Insert(key, fetch.GetCallback());
+		s_aPending.Insert(key, fetch);
 
 		context.GET(fetch.GetCallback(), path);
+
+		MCF_Core_Log.Debug("device image '" + key + "': GET " + host + path);
 	}
 
 	//! Called by the fetch when it is over, either way.
-	static void FinishFetch(string key)
+	//!
+	//! The verdict is remembered, not just the fact that it finished: a shell
+	//! that is showing a spinner has to be told to stop, and the only difference
+	//! between "keep waiting" and "give up" is this flag.
+	static void FinishFetch(string key, bool ok)
 	{
 		s_aPending.Remove(key);
+
+		if (!ok)
+			s_aFailed.Insert(key, true);
 	}
 
 	//! Throws the whole cache away. Nothing calls this yet; it exists because a
@@ -206,20 +302,23 @@ class MCF_Device_ImageCache
 
 	// ------------------------------------------------------------- internals
 
-	//! What is between the markers, or everything if there are none.
-	protected static string Payload(string text)
+	//! Where the payload starts and ends inside the response, or the whole of it
+	//! if there are no markers. Indices rather than a substring -- see the note
+	//! in StoreFromBase64 about what copying it cost.
+	protected static void Bounds(string text, out int from, out int to)
 	{
+		from = 0;
+		to = text.Length();
+
 		int start = text.IndexOf(MARKER);
 		if (start < 0)
-			return text;
+			return;
 
-		start = start + MARKER.Length();
+		from = start + MARKER.Length();
 
-		int end = text.IndexOfFrom(start, MARKER);
-		if (end < 0)
-			return text.Substring(start, text.Length() - start);
-
-		return text.Substring(start, end - start);
+		int end = text.IndexOfFrom(from, MARKER);
+		if (end >= 0)
+			to = end;
 	}
 
 	//! The first bytes of a png are 137 80 78 71; of a jpeg, 255 216 255.
@@ -270,7 +369,7 @@ class MCF_Device_ImageCache
 	//! The alphabet becomes a 128-entry table once, so the inner loop is an
 	//! index rather than a search. Measured at 5216 characters in 7 ms, which
 	//! is where MAX_ENCODED comes from rather than from a guess.
-	protected static bool Decode(string encoded, notnull array<int> outBytes)
+	protected static bool Decode(string encoded, int from, int to, notnull array<int> outBytes)
 	{
 		BuildAlphabet();
 
@@ -278,9 +377,8 @@ class MCF_Device_ImageCache
 
 		int accumulator;
 		int bits;
-		int length = encoded.Length();
 
-		for (int i = 0; i < length; i++)
+		for (int i = from; i < to; i++)
 		{
 			int code = encoded.Get(i).ToAscii();
 			if (code < 0 || code > 127)
@@ -327,9 +425,33 @@ class MCF_Device_ImageCache
 
 //! One in-flight fetch.
 //!
-//! A class rather than a pair of static functions because the callback has to
-//! remember which key it was fetching, and RestCallback carries no state of its
-//! own beyond the response.
+//! THE SETTERS, NOT A SUBCLASS. Bohemia's REST API Usage page shows a
+//! RestCallback subclass overriding OnSuccess / OnError / OnTimeout. That page
+//! is older than the engine: those virtuals compile with "'OnSuccess' is
+//! obsolete: Use RestCallback.SetOnSuccess() instead."
+//!
+//! THE HANDLER SHAPE IS FIXED AND THE COMPILER WILL NAME IT. The setters take a
+//! method matching the prototype 'RestCallbackFunc', which is one argument, the
+//! callback itself. Anything else is rejected by name:
+//!
+//!   OnSuccess(string data, int dataSize)  ->  "too many arguments"
+//!   OnError(int errorCode)                ->  "argument 'errorCode' is not
+//!                                              compatible"
+//!   SetOnTimeout                          ->  "Undefined function"
+//!
+//! So the body is asked for afterwards, through the callback that was handed
+//! back, and there is no timeout hook at all -- a request that dies quietly
+//! dies quietly, which is why the shell keeps a deadline of its own.
+//!
+//! AND THE OBJECT OWNING THE HANDLERS HAS TO OUTLIVE THE CALL -- not just the
+//! callback. The documentation says "If callback is not stored as ref then it
+//! will be deleted after its execution finishes", which is true and is only
+//! half of it. The handlers are methods on THIS object; hold the RestCallback
+//! alone and it survives with nothing left to call. There is no error for that.
+//! The request completes, the server answers 200, and script hears nothing --
+//! which is indistinguishable from a request that never went out, and cost most
+//! of an afternoon to tell apart. So the pending map holds the fetch, and the
+//! fetch holds the callback.
 class MCF_Device_ImageFetch
 {
 	protected string m_sKey;
@@ -349,19 +471,24 @@ class MCF_Device_ImageFetch
 		return m_Callback;
 	}
 
-	protected void OnSuccess(RestCallback cb)
+	void OnSuccess(RestCallback callback)
 	{
-		MCF_Device_ImageCache.StoreFromBase64(m_sKey, cb.GetData());
-		MCF_Device_ImageCache.FinishFetch(m_sKey);
+		string data = callback.GetData();
+
+		MCF_Core_Log.Debug("device image '" + m_sKey + "': " + data.Length().ToString()
+			+ " character(s) came back, http " + callback.GetHttpCode().ToString());
+
+		bool ok = MCF_Device_ImageCache.StoreFromBase64(m_sKey, data);
+		MCF_Device_ImageCache.FinishFetch(m_sKey, ok);
 	}
 
 	//! A failed fetch is not an error worth shouting about. A player behind a
 	//! firewall has no photograph, which the shell has to treat as normal.
-	protected void OnError(RestCallback cb)
+	void OnError(RestCallback callback)
 	{
 		MCF_Core_Log.Debug("device image '" + m_sKey + "' could not be fetched, http "
-			+ cb.GetHttpCode().ToString());
+			+ callback.GetHttpCode().ToString());
 
-		MCF_Device_ImageCache.FinishFetch(m_sKey);
+		MCF_Device_ImageCache.FinishFetch(m_sKey, false);
 	}
 }
