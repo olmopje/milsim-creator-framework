@@ -451,8 +451,10 @@ document somebody must find and carry back; **SIGNAL** enters it on a faction's
 board directly and requires a faction key. Leave **Once** on unless you really
 want one document per trigger crossing.
 
-⚠️ Faction-scoped intel needs a two-faction test that has not been run, and
-dropped intel objects do not survive a server restart.
+⚠️ Dropped intel objects do not survive a server restart — the record on the
+board does, the physical document in the world does not respawn. Faction scoping
+itself is proven: a self test on two peers on two factions watched each side
+hold its own record and not the other's.
 
 ---
 

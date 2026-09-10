@@ -1,14 +1,10 @@
 # MCF — Handover
 
-**Read this first when starting a new chat for this project.**
+Last updated: 2026-09-10, after the documentation sweep.
 
-This document exists in two places and they must be kept identical: as a doc in
-the Claude project (which a new chat surfaces on its own) and as `HANDOVER.md`
-in the repository root, which is tracked in git (it was gitignored until
-`f80bff5`; the older text saying otherwise is stale). When you update one,
-update the other.
-
-Last updated: 2026-09-10, after the modularisation was completed.
+**Read this first, then stop reading and go look at the thing you are changing.**
+This file is the map, not the territory. Everything it claims is claimed
+somewhere else in more detail, and that somewhere else is named.
 
 ---
 
@@ -22,11 +18,15 @@ without scripting.
 | Thing | Where |
 |---|---|
 | Repository root | `G:\MCF` |
-| The addons | `G:\MCF\addons\` — `MCF` (Core), `MCF_Ops`, `MCF_Dialogue`, `MCF_AI`, `MCF_Objectives`, `MCF_Dev`. Six. |
-| Workbench project | open **`addons/MCF_Dev/addon.gproj`** — the only one that depends on all five others, and it holds the test world |
+| The addons | `G:\MCF\addons\` — `MCF` (Core), `MCF_Ops`, `MCF_Dialogue`, `MCF_AI`, `MCF_Objectives`, `MCF_Dev`. Six |
+| Workbench project | **`addons/MCF_Dev/addon.gproj`** — the only one that depends on all five others, and it holds the test world |
 | Test world | `G:\MCF\addons\MCF_Dev\worlds\arland\MCFTestworld.ent` |
 | GitHub | `olmopje/milsim-creator-framework`, branch `main` |
-| Wiki | `.../wiki` — 11 pages, the public-facing documentation |
+| Wiki | a separate repository, cloned at `G:\MCF\.wiki` (gitignored) so it can be edited in the same session as the code |
+
+**Core is the mod.** Not one addon among six: it is the framework a server
+installs and the thing everything else plugs into. The four modules are what
+extends it. `MCF_Dev` is the test environment and is never distributed.
 
 ## Standing instructions from the user
 
@@ -44,258 +44,150 @@ Nothing important should live only in a chat. In order of authority:
 
 | Document | What it is |
 |---|---|
-| `docs/architecture/STRUCTURE.md` | **The structure of record.** What the six addons are, the measured dependency graph, which namespace lives where, and the Core rule. If anything else disagrees with it, it is stale. |
-| `docs/architecture/PROJECT_STATUS.md` | The chronological record, ~1400 lines. Every session including the dead ends. **The primary source for how we got here.** |
-| `docs/ROADMAP.md` | What is verified, what is missing, what comes next |
-| `docs/architecture/ARCHITECTURE.md` | The plan: layering, the core, the integration contract |
+| `docs/architecture/STRUCTURE.md` | **The structure of record.** The six addons, the measured dependency graph, which addon owns which namespace, the Core rule, which `.gproj` to open, where a new module goes. If anything else disagrees with it, it is stale |
+| `docs/architecture/PROJECT_STATUS.md` | The chronological record, every session including the dead ends. **Not** the current state — it says so at the top |
+| `docs/architecture/ARCHITECTURE.md` | The plan and the reasoning: layers, the Core, the integration contract |
+| `docs/guides/GM_PROPERTIES.md` | **Generated.** All 186 settable properties across 47 components. Never edit by hand — re-run `tools/generate_gm_reference.ps1` |
 | `docs/guides/MISSION_MAKER_GUIDE.md` | Plain-language reference to every node and player-facing system |
-| The GitHub wiki | The same material, organised for a reader who is not us. `Enfusion-Lessons` is the highest-value page |
+| `docs/architecture/DEVICES.md` | Intel devices: locks, break-in games, the model pipeline |
+| `docs/ROADMAP.md` | What is verified, what is missing, what comes next |
 | `CHANGELOG.md` | Release-by-release summary; current version 0.3.0 |
+| The GitHub wiki | The same material organised for a reader who is not us. `Enfusion-Lessons` is the highest-value page; `Game-Master` explains the three places MCF is configured |
 
-If you learn something that cost time to discover, it belongs in
-`PROJECT_STATUS.md` and, if it is not MCF-specific, on the wiki's
-`Enfusion-Lessons` page.
+### The measurement scripts, which outrank all of the above
+
+Documents drift. These do not, because they read the code:
+
+| Script | Answers |
+|---|---|
+| `tools/measure_addon_graph.ps1` | Which addon depends on which, counted from real code references. **Comment lines are stripped** — counting them once reported five illegal edges that were five comments |
+| `tools/generate_gm_reference.ps1` | Every `[Attribute(...)]` in the framework, and regenerates `GM_PROPERTIES.md` |
+
+**Run the first one before believing any structural claim anywhere.** This
+project's structure document has been wrong twice: once because nobody
+re-measured for a week, once because it was updated in a copy and not in the
+repository.
+
+### Two traps in how the documentation itself is kept
+
+1. **The wiki is a separate git repository.** It cannot be updated in the same
+   commit as the code, which is exactly why its pages spent a day describing an
+   addon layout that no longer existed. Structure facts belong in the repo;
+   the wiki links to them. `G:\MCF\.wiki` is a working clone — commit and push
+   it separately.
+2. **The Claude project's knowledge base holds copies** of `STRUCTURE.md`,
+   `HANDOVER.md` and `DEVICES.md`. That is how the eight-versus-six divergence
+   happened. When you change one of those three, update both.
 
 ---
 
 ## State as of 2026-09-10
 
+### Proven by the automated self test, on two peers on two factions
+
+```
+SELFTEST start -- 2 player(s): 2 (USSR), 3 (US)
+faction-intel:  PASS -- player 2 (USSR) holds its own record and not the other's
+line-audience:  PASS -- player 3 (US) filtered out a line for USSR
+device-profile: PASS -- player 2 sees the profile the server wrote
+picture-fetch:  PASS -- player 3 has the picture on disk
+SELFTEST done -- 8 passed, 0 failed
+```
+
+Faction-scoped intel in both directions, the audience filter on text lines,
+device profiles over `RplProp` reaching a non-host client, and two clients
+fetching the same picture independently.
+
+**How to run it:** put `MCF_Dev_SelfTestComponent` on the game mode, tick
+`m_bEnabled`, start two peers **on different factions**, read the log. Nothing to
+click. It waits for **factions, not players** — the first version started as soon
+as two players existed, before either had picked a side, and every filter check
+then compared nothing against nothing.
+
 ### Proven in a live session
 
-- The event-driven core: event bus, tick manager, budget caps, persistence via
-  `$profile:` (outside the engine's own saves, so a mod update cannot wipe it).
-- All twelve placeable node types, each observed firing.
-- The operations board: taskings and intel, read/amend split, create and edit.
-- Conversations with any AI, gated on trust and fear, authored from a Game
-  Master library. Reaches every character through an override of vanilla
-  `Character_Base` rather than an MCF prefab.
-- A custom keybind (H / U) appended to vanilla's input config. This was
-  previously unproven for any Arma Reforger mod.
-- Shout → surrender → restrain → interrogate → escort, end to end.
-- `RplProp` on a ScriptComponent over a real wire, with `BumpMe()` sufficient.
+Twelve placeable nodes, every one watched firing. The operations board with its
+read/amend split. Conversations with any character, vanilla or modded, through
+the `Character_Base` override. Shout, surrender, restrain and escort on a real
+custom keybind. Four readable objects — letter, notepad, phone, laptop — each
+drawn as the thing it is, with break-in on the device's own screen.
 
-All of it was re-confirmed in a live session after the phase-0 refactor on
-2026-09-10.
+Persistence through `$profile:` and `FileIO`, deliberately outside the engine's
+world and session saves, so a mod update cannot wipe a campaign.
 
-### Proven by the self test, 2026-09-10
+### Still open, and honest about why
 
-All four of these had been "believed correct, never watched" for weeks. They are
-now watched, automatically, on two peers on two factions:
-
-    SELFTEST start -- 2 player(s): 2 (USSR), 3 (US)
-    faction-intel:  PASS -- player 2 (USSR) holds its own record and not the other's
-    line-audience:  PASS -- player 3 (US) filtered out a line for USSR
-    device-profile: PASS -- player 2 sees the profile the server wrote
-    picture-fetch:  PASS -- player 3 has the picture on disk
-    SELFTEST done -- 8 passed, 0 failed
-
-- **Faction-scoped intel**, in both directions.
-- **The audience filter** on text lines, shown to the faction addressed and
-  filtered out by the other.
-- **Device profiles over RplProp**, seen by clients that are not the host.
-- **Per-client picture fetching**, two clients fetching the same url
-  independently -- the shared pending map does not get in their way.
-
-### How to run it
-
-Put `MCF_Dev_SelfTestComponent` on the game mode, tick `m_bEnabled`, start two
-peers **on different factions**, and read the log. Nothing to click. It is in
-MCF_Dev and never ships.
-
-WAIT FOR FACTIONS, NOT FOR PLAYERS -- that is the trap it was built around. The
-first run started as soon as two players existed, which was before either had
-picked a side, and every filter check then compared nothing against nothing.
-The component now waits for people who are actually on a team, and says so if
-they never arrive.
-
-The run writes one intel record per faction, and deletes them when it finishes.
-
-### Still not proven
-
-- **Late join.** The self test asks everyone who was present when it began; a
-  client connecting to a mission that already has authored content is a
-  different question and still an open one.
-
-### Known gaps, deliberately open
-
-- **The restrained pose is empty.** Restraining works and escape is disabled,
-  but there is no hands-behind-back animation. The game ships none, and
-  mounting the 23 KB narrative graph as a loiter attachment **crashes the
-  Workbench natively** (vanilla's officer graph is 475 bytes). Needs a
-  purpose-built one-clip graph.
-- `m_bEveryoneMayDoEverything` in `MCF_Task_Permissions` is still `true`. Role
-  resolution is written but switched off until roles have been watched in a
-  session with real people in real slots.
-- Conversation flags, trust and fear do not survive a server restart.
-- Dropped intel objects do not respawn after a restart.
-- `m_bVisibleOnMap` on objectives does nothing; there is no map integration.
+- **Late join.** A client arriving into a mission that already has authored
+  content. The self test cannot help: it asks the players who were already
+  there. **Parked** — the user cannot realistically test this right now.
+- **Role enforcement.** `MCF_Task_Permissions` resolves roles correctly and
+  logs them, but `m_bEveryoneMayDoEverything` is `true`, so every check except
+  DESTROY is bypassed. Nothing has ever been refused. Deliberate — watch it be
+  right before letting it say no.
+- **The restrained pose is empty.** Restraining works and escape is disabled;
+  the pose needs a one-clip animation graph. Build it small — the crash was a
+  size problem, not a concept problem. `arms_back` is the clip. Preview in
+  `anims/workspaces/player/player_main.aw`.
+- **MAP intel view** exists in the data model and does nothing.
+- **GROUP-assigned tasks** go only to their author until squad membership lands.
+- **Dropped intel objects do not respawn** after a restart. The board record
+  survives; the physical document does not.
 
 ---
 
-## The modularisation — done
+## The next steps, in the order I would take them
 
-**MCF is six addons, and Core is the mod.** Core is the framework a server
-installs; the other five plug into it. Every module depends on Core and on
-nothing else. `MCF_Dev` is the test environment, not a distribution addon: it
-depends on everything precisely because a harness must reach everywhere, and
-that is only safe because it never ships.
+### 1. Close the Edit intel / Edit device overlap — one line
 
-The full design, the measured graph and the namespace map are in
-`docs/architecture/STRUCTURE.md`; the chronology is in `PROJECT_STATUS.md`.
-`tools/measure_addon_graph.ps1` re-measures it — run that before believing any
-of it. What to carry in your head:
+`MCF_Intel_EditContextAction.CanBeShown` has no view filter, so "Edit intel" is
+offered on **every** carrier including phones and laptops. Its VIEW toggle only
+knows DOCUMENT and DEVICE, so pressing APPLY there silently rewrites a phone into
+a flat document. `MCF_Device_EditContextAction` already has the filter that
+should be mirrored here, inverted.
 
-**The measured fact it all rests on.** A prefab that names a script class from
-an addon that is not loaded still loads: the unresolvable component is dropped,
-the rest of the entity is intact, and it costs one `WORLD (E)` line. The same
-holds for a config entry naming a missing class (silent) and a menu preset
-naming a missing layout (one `RESOURCES (E)`, config still loads).
+Silent data loss for a mission maker who picks the wrong one of two screens with
+similar names. Cheapest real fix on the list.
 
-**The rule.** Exactly one MCF addon may override a vanilla GUID, and that addon
-is Core. There are four — `Character_Base.et`, `EditorModeEdit.et`,
-`chimeraMenus.conf`, `chimeraInputCommon.conf` — and each is a **manifest**
-naming every module's contribution whether or not that module is installed.
-Core's editor configs (attributes, context actions, placeables) work the same
-way. Modules never override vanilla.
+### 2. Kill the `metal.gamemat` noise
 
-**What is Core, and why.** Core holds what more than one module needs, plus
-what can only live in a vanilla manifest: the event bus, logging, tick and game
-loop, budget, persistent store, validation registry, tags and identity,
-factions, the line/HUD channel, the player-controller message channel,
-`MCF_Core_Roles` (who is in the chain of command), hostility and disposition,
-and the AAR manager. A thing that only ever exists as somebody's dependency is
-a library, and libraries go in Core.
+`{536BF67B2052B869}` resolves to nothing and is re-injected into every
+`.xob.meta` on reimport, so every model load costs two `RESOURCES (E)` lines.
+This is not cosmetic: those lines are read past dozens of times per debugging
+session, and error noise is how a real error gets missed.
 
-**Verified end to end.** All addons loaded:
-`Module: Game; loaded 5746x files; 11270x classes`, no `(E)`, and the test
-world in `MCF_Dev` initialised prefabs from four different addons.
+### 3. Turn `m_bEveryoneMayDoEverything` off and play a session
 
-### Watched running, and it holds
+The permission system is fully written and completely unexercised — it has never
+once said no. Roles come from vanilla's command hierarchy, so even solo you can
+watch resolution and confirm DESTROY is gated. Do this before anything is built
+on top of the tasking model.
 
-A live session with every addon loaded exercised every module across an addon
-boundary: the listen-server race and the deferral, both stores loading from
-module addons on Core's event, the join push and faction re-push, all three
-detection triggers registering through Core's watcher registry and firing, the
-planning board opening from a preset in Core's manifest with a layout in
-`MCF_Ops`, a conversation assigned and opened (`trust=50 fear=0` — the
-disposition component from Core's `Character_Base` manifest, read by the
-dialogue module, with the Game-Master check going through `MCF_Core_Roles`),
-and `shout keys bound` from `MCF_AI` against Core's input manifest.
+### 4. Dedicated server, then packed to `.pak`
 
-**The `modded class SCR_PlayerController` merges across four addons at
-runtime**, not merely at compile time. No `Wrong GUID/name`, no
-`Unknown class`; every `(E)` in the session is pre-existing or vanilla.
+The two remaining modularisation unknowns — whether an unresolvable component is
+dropped gracefully at runtime on a dedicated server, and whether it still is once
+packed — were only ever measured in the World Editor, unpacked. Both are testable
+without a second person, and both must be answered before any publish. The
+manifest pattern that lets Core name every module's contributions rests on this
+behaviour.
 
-Not exercised: an actual shout (only the key binding), and the restrain/escort
-chain.
+### 5. The namespace rename, with a fresh head
 
-### The devices module — functional 2026-09-10
+`MCF_Devices_` → `MCF_Lock_`, so it stops differing from `MCF_Device_` by one
+letter while meaning something else. And decide what to do about `MCF_AI_` and
+`MCF_Interact_` spanning two addons each. Mechanical across roughly sixty files —
+which is exactly why it should not be done at the end of a long session.
 
-Break-in and intel presentation both run in a live session. See
-`docs/architecture/DEVICES.md` for the design and the open list.
+### Deliberately not next
 
-- **It is all one addon now.** `MCF_Devices` was its own addon holding the lock
-  and the games while the carrier and the shell stayed in Ops — one feature
-  split down the middle, and the only illegal edge the framework ever had. Both
-  halves live in `MCF_Ops`; `MCF_Devices_` survives only as a class namespace,
-  and section 4 of `STRUCTURE.md` records why that name should change.
-- **`MCF_Intel_ShellMenu` draws four skins** — paper, notepad, phone, laptop —
-  chosen by the object's own `MCF_EIntelView`. A letter that looks like paper
-  has nothing to do with hacking, which is why presentation is intel's job.
-- **Three break-in games**, and the seed decides which: keypad, signal lock,
-  port table. Nothing about the puzzle travels except the seed, so a fourth
-  game touches three places and none of them is the wire format.
-- **The break-in is drawn on the device's own screen**, not in a window over it:
-  `MCF_Devices_HackScreen` binds to a widget it is handed and the shell creates
-  that panel inside the device's `ScreenArea`. The old `MCF_Devices_HackMenu`
-  and its menu preset are gone.
-- Confirmed working, not polished. The smartphone and laptop models are both
-  imported; the laptop's preview framing and its flat-colour materials are
-  parked mid-tuning, and nobody has tuned the difficulty curve.
+**The laptop.** It works; the preview framing and the flat-colour materials are
+parked mid-tuning at the user's request. It blocks nothing, and it is the kind of
+work that eats an evening without closing an open question.
 
-### Next, in order
+**MAP intel, GROUP tasks, the restrained pose.** These are new features, not
+finishing what exists.
 
-1. **A two-peer, two-faction session.** Unblocks faction-scoped intel,
-   late-join replication and the audience filter — and can fold in the two
-   remaining modularisation unknowns: the dropped-component behaviour at
-   runtime on a dedicated server, and the same packed to `.pak`.
-2. **Decide how it gets published.** The shape is settled — Core is the headline
-   entry, the four modules are dependent entries, MCF_Dev is never published.
-   What is not settled is whether Reforger's Workshop dependency handling makes
-   four separate module entries pleasant enough to be worth it, or whether the
-   first release is one entry with the split kept only in the repository.
-3. Turn off `m_bEveryoneMayDoEverything` and watch role resolution.
-4. A one-clip animation graph for the restrained pose. Build it small — the
-   crash is a size problem, not a concept problem. `arms_back` was the clip the
-   user picked. Preview in `anims/workspaces/player/player_main.aw`.
-
-### The mission data screen — working 2026-09-10
-
-Game Master, right-click the operations board, "Mission data". Shows every
-registered persistent set with a live count, clears them one at a time or all
-at once behind a two-click confirmation, and keeps named whole-store snapshots.
-Watched working: 16 keys cleared to 1 across four sets with the clients going to
-zero taskings without a restart, and a snapshot restored both before and after a
-server restart.
-
-To add a fifth kind of persisted data, call `MCF_Core_DataSets.Register` in the
-module that owns it and insert that module's reload into
-`MCF_Core_DataSets.GetOnReloaded()`. Nothing in Core needs to change.
-
-**`m_bEveryoneMayDoEverything` is still `true`, but this screen is not behind
-it.** Clearing and restoring ask for `MCF_ETaskAction.DESTROY`, which is the one
-action that ignores the master switch and always resolves the role properly.
-COMMANDER only.
-
-Reading the counts, and saving a snapshot, are gated as ordinary authoring
-instead: looking is how somebody decides whether anything needs clearing, and
-saving a copy takes nothing away. A person who may not clear can still keep a
-snapshot and fetch someone who may.
-
-WHY THIS ONE SCREEN IS STRICTER THAN THE REST, since that inconsistency will
-otherwise read as an accident. The screen hangs off a Game Master context
-action, and Game Master access is already granted per player by the server -- so
-on any normal server a player cannot reach it. What the permission adds is that
-the RPCs are not behind the button: MCF_RequestClearAllData is callable by any
-client that talks to the server directly, without the UI. For every other
-authoring screen the worst case is text somebody has to type back. Here it is a
-week of planning with nothing to put it back, and MCF is going to other units'
-servers. Weighed and chosen 2026-09-10; the alternative -- keeping it consistent
-with the other authoring RPCs until roles are enforced everywhere -- is one line
-in MCF_PlayerController_Data.
-
-### ANSWERED: MCF snapshots cannot be paired with the engine's own saves
-
-Asked on 2026-09-10, because "see all the save data in one place" is a fair
-thing to want. The entry point does not exist in 1.8.0.13:
-
-    ArmaReforgerScripted.GetSaveManager    Undefined function
-    SCR_SaveManagerCore                    Unknown type
-    SCR_SaveLoadComponent                  Unknown type
-    SCR_SaveWorkshopManager                Unknown type
-
-and fourteen further plausible renames -- SCR_SaveManager, SaveManager,
-SCR_GameSaveManager, SCR_SessionSaveManager, SCR_MissionSaveManager,
-SCR_SaveGameManager, SCR_SavesManager, SCR_SaveFileManager,
-SCR_ScenarioSaveManager, SCR_SaveLoadManager, SCR_PersistenceManager,
-SCR_SessionStorage, SCR_SaveManagerComponent, SCR_GameModeSaveManagerComponent
--- are all absent too. `SCR_CreateNewSaveDialog` and `SCR_MissionHeader` DO
-exist, so saving has been renamed rather than removed, but the name is not
-guessable and the engine's own scripts are inside data.pak.
-
-Do not repeat this search from the published API documentation. That is
-generated from **1.1.0.42** and this machine runs **1.8.0.13**; every signature
-it gives for the save system is wrong. The fallback, if the overview is still
-wanted, is to list `$saves:` with `FileIO` -- read-only, no engine API, cannot
-break on a rename.
-
-**Technique worth keeping: the compiler is a type lookup.** A file declaring one
-variable per candidate type, in a method that is never called, costs one
-Workbench start and answers for all of them at once -- "Unknown type 'X'" names
-everything absent, and silence names everything present. Include one type you
-know exists as a control, so a round that reports everything missing can be told
-apart from a round where the probe itself was broken. This is far cheaper than
-one guess per restart, which is how the RestApi afternoon went.
+---
 
 ## Environment quirks that will otherwise cost you an hour
 
