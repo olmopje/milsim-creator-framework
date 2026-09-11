@@ -83,10 +83,13 @@ class MCF_Map_BoardComponent : ScriptComponent
 	protected bool m_bPrimed;
 	protected bool m_bPriming;
 
-	//! Whether a real map has been open since the board last set itself up.
-	//! Zoom, pan and grid are the entity's, so a player leaves them wherever
-	//! they finished and the board has to set itself up again.
-	protected bool m_bSawOpen;
+	//! THE BOARD'S OWN VIEW, in the four numbers the map entity keeps rather
+	//! than the widget. Read once, off the fitted map, and put back every
+	//! tick -- which is what makes the board independent of whatever a player
+	//! last did with their own map.
+	protected float m_fZoomLevel;
+	protected vector m_vPan;
+	protected int m_iLayer = -1;
 
 	//! The world rectangle the board draws, read off the map after it was
 	//! zoomed out to fit the island.
@@ -213,31 +216,25 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// Fully white means there is nothing to see and nothing to pay for.
 		bool wanted = m_fWhite < 1;
 
-		// SOMEBODY'S REAL MAP IS OPEN. Their frame is the entity's frame and
-		// their visualisation is the entity's visualisation; a board is not
-		// worth taking either off them. We stop touching anything until they
-		// are done, and note that the flag is theirs now, not ours.
+		// SOMEBODY'S REAL MAP IS OPEN. Their frame, their zoom, their grid --
+		// the board is not worth taking any of it off them, and it is only
+		// for as long as they are reading. We touch nothing.
+		//
+		// OURS, during the one-off setup, is not somebody's: that is what the
+		// widget comparison is for. Reading our own open as a player's is
+		// what made the board prime itself over and over, once a second,
+		// forever -- and an open map four times a second is also exactly what
+		// stops M from working.
 		if (m_MapEntity.IsOpen())
 		{
-			m_bVisualising = false;
-			m_bSawOpen = true;
+			if (m_MapEntity.GetMapWidget() != m_wMapWidget)
+				m_bVisualising = false;
+
 			return;
 		}
 
 		if (m_bPriming)
 			return;
-
-		// THEIR MAP HAS JUST CLOSED, AND IT DID NOT PUT ANYTHING BACK. Zoom,
-		// pan and the grid all live on the entity, so the board inherits
-		// wherever the player left off -- the island half out of frame, with
-		// their grid over it. Priming again is the cheapest honest fix: it is
-		// the same open-fit-close that set the board up in the first place,
-		// and it takes under a second.
-		if (m_bSawOpen)
-		{
-			m_bSawOpen = false;
-			m_bPrimed = false;
-		}
 
 		if (!m_bPrimed)
 		{
@@ -260,11 +257,28 @@ class MCF_Map_BoardComponent : ScriptComponent
 			return;
 		}
 
-		// THE TWO CALLS THAT ARE THE WHOLE FEATURE. Neither of them touches
-		// m_bIsOpen, so as far as the rest of the game is concerned no map is
-		// open and M does what it always did.
+		// THE BOARD'S OWN VIEW, RE-STATED. Zoom, pan, layer and grid live on
+		// the map entity rather than on the widget, so a player who closes
+		// their map leaves all four wherever they finished. Rather than
+		// setting the board up again every time that happens -- which is a
+		// second of flicker and a second of the map being open -- the board
+		// remembers its own four numbers and puts them back.
+		//
+		// None of these touches m_bIsOpen, so as far as the rest of the game
+		// is concerned no map is open and M does what it always did.
 		m_MapEntity.EnableVisualisation(true);
+
+		if (m_iLayer >= 0 && m_MapEntity.GetLayerIndex() != m_iLayer)
+			m_MapEntity.SetLayer(m_iLayer);
+
+		m_MapEntity.EnableGrid(m_bShowGrid);
+
+		if (m_fZoomLevel > 0)
+			m_MapEntity.ZoomChange(m_fZoomLevel);
+
+		m_MapEntity.PosChange(m_vPan[0], m_vPan[1]);
 		m_MapEntity.SetFrame(m_vFrameMin, m_vFrameMax);
+
 		m_bVisualising = true;
 	}
 
@@ -337,17 +351,24 @@ class MCF_Map_BoardComponent : ScriptComponent
 		m_MapEntity.UpdateViewPort();
 		m_MapEntity.GetMapVisibleFrame(m_vFrameMin, m_vFrameMax);
 
-		m_MapEntity.CloseMap();
+		// The view, in the entity's own terms, so it can be re-stated later.
+		// ZoomChange takes a RATIO, not a pixels-per-metre: SetZoom computes it
+		// as target over the widget's PixelPerUnit, and PixelPerUnit is the
+		// widget's fixed layout scale (1024 px over 4096 m = 0.25), so the
+		// ratio is stable. GetCurrentPan is already DPI-scaled, which is
+		// exactly what PosChange wants back.
+		m_vPan = m_MapEntity.GetCurrentPan();
+		m_iLayer = m_MapEntity.GetLayerIndex();
 
-		// The grid is the entity's, not the widget's, so it is set here --
-		// after the open, which turned it off along with everything else this
-		// board did not ask for. Two boards that disagree about the grid will
-		// take turns winning; there is one grid.
-		m_MapEntity.EnableGrid(m_bShowGrid);
+		float base = m_wMapWidget.PixelPerUnit();
+		if (base > 0)
+			m_fZoomLevel = m_MapEntity.GetCurrentZoom() / base;
+
+		m_MapEntity.CloseMap();
 
 		m_bPrimed = true;
 
-		MCF_Core_Log.Debug("map board primed, frame " + m_vFrameMin.ToString() + " .. " + m_vFrameMax.ToString());
+		MCF_Core_Log.Debug("map board primed at zoom ratio " + m_fZoomLevel.ToString() + ", layer " + m_iLayer.ToString());
 	}
 
 	//------------------------------------------------------------------------
