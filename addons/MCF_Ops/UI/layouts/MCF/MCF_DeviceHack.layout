@@ -2538,7 +2538,7 @@ FrameWidgetClass {
   FrameWidgetClass "{6A1C4F0B39D34175}" {
    Name "PanelPorts"
    Slot FrameWidgetSlot "{6A1C4F0B39D34176}" {
-    Anchor 0.0600 0.1700 0.9400 0.7400
+    Anchor 0.0600 0.1650 0.9400 0.7400
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2552,27 +2552,27 @@ FrameWidgetClass {
    RichTextWidgetClass "{6A1C4F0B39D3414B}" {
     Name "Rule"
     Slot FrameWidgetSlot "{6A1C4F0B39D3414C}" {
-     Anchor 0.0200 -0.0200 0.9800 0.0820
-     PositionX 0
-     OffsetLeft 0
-     PositionY 0
-     OffsetTop 0
-     SizeX 0
-     OffsetRight 0
-     SizeY 0
-     OffsetBottom 0
-    }
+      Anchor 0.0200 0.0080 0.9800 0.1180
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
     Clipping Ancestor
     Wrap 1
     Text "OPEN EVERY PORT WHOSE RESPONSE IS EVEN"
     "Font Size" 13
     "Min Font Size" 13
-    "Line Spacing" 17
+    "Line Spacing" 18
    }
-   ButtonWidgetClass "{6A1C4F0B39D3414D}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3414D}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port0"
     Slot FrameWidgetSlot "{6A1C4F0B39D3414E}" {
-     Anchor 0.0200 0.1000 0.9800 0.1740
+     Anchor 0.0200 0.1450 0.9800 0.2170
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2585,14 +2585,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D3414F}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34150}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34150}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port1"
     Slot FrameWidgetSlot "{6A1C4F0B39D34151}" {
-     Anchor 0.0200 0.1890 0.9800 0.2630
+     Anchor 0.0200 0.2300 0.9800 0.3020
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2605,14 +2610,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D34152}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34153}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34153}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port2"
     Slot FrameWidgetSlot "{6A1C4F0B39D34154}" {
-     Anchor 0.0200 0.2780 0.9800 0.3520
+     Anchor 0.0200 0.3150 0.9800 0.3870
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2625,14 +2635,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D34155}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34156}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34156}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port3"
     Slot FrameWidgetSlot "{6A1C4F0B39D34157}" {
-     Anchor 0.0200 0.3670 0.9800 0.4410
+     Anchor 0.0200 0.4000 0.9800 0.4720
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2645,14 +2660,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D34158}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34159}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34159}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port4"
     Slot FrameWidgetSlot "{6A1C4F0B39D3415A}" {
-     Anchor 0.0200 0.4560 0.9800 0.5300
+     Anchor 0.0200 0.4850 0.9800 0.5570
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2665,14 +2685,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D3415B}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D3415C}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3415C}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port5"
     Slot FrameWidgetSlot "{6A1C4F0B39D3415D}" {
-     Anchor 0.0200 0.5450 0.9800 0.6190
+     Anchor 0.0200 0.5700 0.9800 0.6420
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2685,14 +2710,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D3415E}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D3415F}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D3415F}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port6"
     Slot FrameWidgetSlot "{6A1C4F0B39D34160}" {
-     Anchor 0.0200 0.6340 0.9800 0.7080
+     Anchor 0.0200 0.6550 0.9800 0.7270
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2705,14 +2735,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D34161}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34162}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34162}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port7"
     Slot FrameWidgetSlot "{6A1C4F0B39D34163}" {
-     Anchor 0.0200 0.7230 0.9800 0.7970
+     Anchor 0.0200 0.7400 0.9800 0.8120
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2725,14 +2760,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D34164}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34165}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34165}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port8"
     Slot FrameWidgetSlot "{6A1C4F0B39D34166}" {
-     Anchor 0.0200 0.8120 0.9800 0.8860
+     Anchor 0.0200 0.8250 0.9800 0.8970
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2745,14 +2785,19 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D34167}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
    }
-   ButtonWidgetClass "{6A1C4F0B39D34168}" : "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout" {
+   ButtonWidgetClass "{6A1C4F0B39D34168}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
     Name "Port9"
     Slot FrameWidgetSlot "{6A1C4F0B39D34169}" {
-     Anchor 0.0200 0.9010 0.9800 0.9750
+     Anchor 0.0200 0.9100 0.9800 0.9820
      PositionX 0
      OffsetLeft 0
      PositionY 0
@@ -2765,6 +2810,11 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39D3416A}" {
       m_bCanBeToggled 1
+      m_BackgroundDefault 1 1 1 0.08
+      m_BackgroundHovered 1 1 1 0.18
+      m_BackgroundSelected 0.76 0.39 0.08 0.85
+      m_BackgroundSelectedHovered 0.90 0.54 0.18 0.90
+      m_BackgroundClicked 1 1 1 0.26
       m_sText "----"
      }
     }
@@ -2774,7 +2824,7 @@ FrameWidgetClass {
   TextWidgetClass "{6A1C4F0B39D34177}" {
    Name "Timer"
    Slot FrameWidgetSlot "{6A1C4F0B39D34178}" {
-    Anchor 0.0600 0.7600 0.9400 0.8100
+    Anchor 0.0600 0.7580 0.9400 0.8080
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2785,13 +2835,14 @@ FrameWidgetClass {
     OffsetBottom 0
    }
    Text ""
-   "Font Size" 26
-   "Min Font Size" 26
+   "Font Size" 22
+   "Min Font Size" 22
+   Alignment 0.5 0
   }
   ButtonWidgetClass "{6A1C4F0B39D34179}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
    Name "ButtonSubmit"
    Slot FrameWidgetSlot "{6A1C4F0B39D3417A}" {
-    Anchor 0.1000 0.8300 0.5000 0.9050
+    Anchor 0.1300 0.8180 0.4800 0.8790
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2811,7 +2862,7 @@ FrameWidgetClass {
   ButtonWidgetClass "{6A1C4F0B39D3417C}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
    Name "ButtonClose"
    Slot FrameWidgetSlot "{6A1C4F0B39D3417D}" {
-    Anchor 0.5200 0.8300 0.9000 0.9050
+    Anchor 0.5200 0.8180 0.8700 0.8790
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2828,10 +2879,10 @@ FrameWidgetClass {
     }
    }
   }
-  TextWidgetClass "{6A1C4F0B39D3417F}" {
+  RichTextWidgetClass "{6A1C4F0B39D3417F}" {
    Name "Hint"
    Slot FrameWidgetSlot "{6A1C4F0B39D34180}" {
-    Anchor 0.0600 0.9150 0.9400 0.9650
+    Anchor 0.0600 0.8900 0.9400 0.9780
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -2841,9 +2892,14 @@ FrameWidgetClass {
     SizeY 0
     OffsetBottom 0
    }
+   Clipping Ancestor
+   Wrap 1
+   Alignment 0.5 0
    Text "Watch the sequence, then repeat it before the timer runs out."
-   "Font Size" 15
-   "Min Font Size" 15
+   "Font Size" 11
+   "Min Font Size" 11
+   "Line Spacing" 15
+   Color 0.62 0.65 0.69 1
   }
  }
 }

@@ -77,7 +77,10 @@ class MCF_Devices_HackScreen
 	protected TextWidget m_wTitle;
 	protected TextWidget m_wStatus;
 	protected TextWidget m_wTimer;
-	protected TextWidget m_wHint;
+	// A RICH text widget, because the instruction is a sentence and a plain
+	// TextWidget does not wrap: "...no more, no fewer -- then ac" ran off the
+	// side of the handset for as long as this screen has existed.
+	protected RichTextWidget m_wHint;
 	protected TextWidget m_wDials;
 	protected RichTextWidget m_wRule;
 	protected Widget m_wPanelKeypad;
@@ -133,7 +136,7 @@ class MCF_Devices_HackScreen
 		m_wTitle = TextWidget.Cast(root.FindAnyWidget(W_TITLE));
 		m_wStatus = TextWidget.Cast(root.FindAnyWidget(W_STATUS));
 		m_wTimer = TextWidget.Cast(root.FindAnyWidget(W_TIMER));
-		m_wHint = TextWidget.Cast(root.FindAnyWidget(W_HINT));
+		m_wHint = RichTextWidget.Cast(root.FindAnyWidget(W_HINT));
 		m_wPanelKeypad = root.FindAnyWidget(W_PANEL_KEYPAD);
 		m_wPanelWave = root.FindAnyWidget(W_PANEL_WAVE);
 		m_wPanelPorts = root.FindAnyWidget(W_PANEL_PORTS);
