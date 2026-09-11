@@ -127,6 +127,10 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	protected bool m_bLauncherOpen;
 	protected ref array<SCR_ButtonTextComponent> m_aPins = {};
 	protected ref array<int> m_aPinSlots = {};
+	//! The Return-and-wrap handlers, one per editor body. Held rather than
+	//! dropped: see MCF_Device_TextInput.
+	protected ref array<ref MCF_Device_TextInput> m_aTextInputs = {};
+
 	protected ref array<SCR_ButtonTextComponent> m_aTasks = {};
 	protected ref array<int> m_aTaskSlots = {};
 	protected ref array<SCR_ButtonTextComponent> m_aLauncherApps = {};
@@ -548,6 +552,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	{
 		m_aWindows.Clear();
 		m_aDragHandlers.Clear();
+		m_aTextInputs.Clear();
 
 		AddWindow(root, 0, "Files", MCF_EIntelApp.FILES, PANE_FILES, 0.611, 0.578);
 		AddWindow(root, 1, "Mail", MCF_EIntelApp.EMAIL, PANE_MAIL, 0.604, 0.606);
@@ -2577,6 +2582,14 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		SCR_ButtonTextComponent write = SCR_ButtonTextComponent.GetButtonText(p + "Write", root);
 		if (write)
 			write.m_OnClicked.Insert(OnWriteClicked);
+
+		// Return starts a new line, and a long one wraps. Neither happens on
+		// its own: MultilineEditBoxWidget is a TextWidget, and a TextWidget
+		// wraps only with the WRAP_TEXT flag and does not insert a newline of
+		// its own. See MCF_Device_TextInput.
+		MCF_Device_TextInput typing = MCF_Device_TextInput.Attach(root.FindAnyWidget(p + "BodyEdit"));
+		if (typing)
+			m_aTextInputs.Insert(typing);
 
 		SCR_ButtonTextComponent page = SCR_ButtonTextComponent.GetButtonText(p + "Preview", root);
 		if (page)

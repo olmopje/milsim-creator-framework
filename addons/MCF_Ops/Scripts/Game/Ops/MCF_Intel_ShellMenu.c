@@ -400,6 +400,12 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! Whether the Game Master is writing on the page or looking at it.
 	protected bool m_bPaperTyping;
 
+	//! The Return-and-wrap handlers. HELD, NOT DROPPED: a handler is attached
+	//! to the widget but owned by script, and one nobody keeps is collected --
+	//! after which the box goes back to swallowing Return, minutes later, as
+	//! what looks like a different bug.
+	protected ref array<ref MCF_Device_TextInput> m_aTextInputs = {};
+
 	protected SCR_ButtonTextComponent m_ButtonPrev;
 	protected SCR_ButtonTextComponent m_ButtonNext;
 	protected TextWidget m_wPageNumber;
@@ -3841,6 +3847,15 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wStampEdit = root.FindAnyWidget(W_STAMP_EDIT);
 		m_wBodyEdit = root.FindAnyWidget(W_BODY_EDIT);
 		m_wAuthorNote = root.FindAnyWidget(W_AUTHOR_NOTE);
+
+		// Return starts a new line, and a long one wraps instead of running
+		// off to the right. Neither happens on its own -- see
+		// MCF_Device_TextInput for why, and for what the caret cannot do.
+		m_aTextInputs.Clear();
+
+		MCF_Device_TextInput typing = MCF_Device_TextInput.Attach(m_wBodyEdit);
+		if (typing)
+			m_aTextInputs.Insert(typing);
 
 		m_ButtonType = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_TYPE, root);
 		if (m_ButtonType)

@@ -1070,3 +1070,45 @@ So: **every widget drawn on a light surface must be given an explicit `Color`**,
 and a helper that can be placed on one needs the parameter — `editbox(colour=)`
 and `flatbtn(ink=)` exist for that reason. On a dark surface the default happens
 to be right, which is what makes the omission so easy to miss.
+
+### MultilineEditBoxWidget is a TextWidget, and EditBoxWidget is not
+
+Read it from the engine's own generated API rather than guessing --
+`scripts/Core/generated/UI/` in the game data has one file per widget class,
+and `game_read` reaches them straight out of the .pak. That folder answers
+more questions in a minute than an afternoon of reading the binary.
+
+```
+sealed class EditBoxWidget: UIWidget          // GetText, SetText, ActivateWriteMode, IsInWriteMode
+sealed class MultilineEditBoxWidget: TextWidget   // ActivateWriteMode, IsInWriteMode
+```
+
+Three consequences, every one of which cost a build:
+
+- **`EditBoxWidget.Cast` on a multiline box returns null.** They share no
+  parent. The engine's own SCR_EditBoxComponent carries a field for each and
+  says so: "Why aren't these derived from a common parent :(". Anything that
+  reads or writes a box has to try both.
+- **A multiline box does not wrap unless it is told to.** TextWidget's own
+  doc comment: "Automatic wrapping is turned on by the WRAP_TEXT flag." So
+  `SetTextWrapping(true)`, or the text runs off to the right forever.
+- **It does not insert a newline when Return is pressed.** The character
+  arrives as `OnChar(w, 13)` on a `ScriptedWidgetEventHandler` attached to
+  the widget -- the documented route for "the user types on a focused widget
+  that accepts text input" -- and returning true there stops the widget using
+  Return to leave write mode. `MCF_Device_TextInput` does both jobs and is
+  attached to every body box on the phone, the laptop and the paper visuals.
+
+  There is **no caret API**: nothing in the scripted class reports or moves
+  it. So a newline can only go on the end, which is right for composing and
+  wrong for editing the middle of a page. If that ever matters, the answer is
+  a different widget, not a cleverer handler.
+
+Because it is a TextWidget, a multiline box also inherits `SetBold`,
+`SetItalic`, `SetExactFontSize`, `GetNumLines` and the rest -- so the
+formatting bar could be made to work on the edit side as well as the page,
+which would remove the need for the TYPE / PAGE pair.
+
+**A handler must be kept alive by the caller.** `Widget.AddHandler` attaches
+it but script owns it; one nobody holds is collected and the box quietly goes
+back to its old behaviour some minutes later, which reads as a new bug.
