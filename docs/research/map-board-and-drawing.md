@@ -85,13 +85,97 @@ are squad-scoped. Worth reading before inventing a scheme. MCF also has its
 own permission system (`MCF_Task_Permissions`) and its own RPC route, which is
 where the commander / squad leader / soldier split belongs.
 
+## ANSWERED: the live in-game map cannot be the thing on the board
+
+`SCR_MapEntity.c` was read in full. The good half first:
+
+**Opening a map into a widget tree of your own is fine.** `OpenMap` takes the
+root widget straight off the config and does exactly one thing with it:
+
+```c
+m_wMapRoot = config.RootWidgetRef;
+SetMapWidget(config.RootWidgetRef.FindAnyWidget(SCR_MapConstants.MAP_WIDGET_NAME));
+```
+
+It never asks a menu for anything. Per-frame work is driven by the entity's
+own `EOnFrame`, not by a menu. All sizing goes through
+`m_MapWidget.GetScreenSize()`, so a small widget is measured correctly. A map
+in our widget instead of the map menu's is just a different `RootWidgetRef`.
+
+**But there can only ever be one, and it is the player's.** Four things in the
+file, each fatal on its own:
+
+- `protected static SCR_MapEntity s_MapInstance;` assigned unconditionally in
+  the constructor and nulled in the destructor. A second entity steals the
+  global that everything resolves through, and its destruction breaks the
+  first.
+- All thirteen invokers are `static`, and the destructor calls `.Clear()` on
+  every one of them. Events carry no instance, so every existing map module
+  would react to our map's pan and zoom as well.
+- ```c
+  if (m_bIsOpen)
+  {
+      Print("SCR_MapEntity: Attempted opening a map while it is already open", LogLevel.WARNING);
+      CloseMap();
+  }
+  ```
+  Two maps on one entity is impossible: the second open tears the first down.
+- `SetupMapConfig` returns and mutates the *shared* `m_ActiveMapCfg` when the
+  mode matches, so asking for a config for our widget rewrites the
+  `RootWidgetRef` of the config the open map is using.
+
+And the one that ends the discussion even for a board that keeps a map open
+permanently -- from `OpenMap`, not gated on fullscreen:
+
+```c
+if (plc && GetGame().GetCameraManager().CurrentCamera() == plc.GetPlayerCamera())
+    plc.SetCharacterCameraRenderActive(false);
+```
+
+**Opening a map switches off the character camera.** A board holding a map
+open would black out the player's own view of the world.
+
+So "the board shows the live in-game map, markers and all" is not available.
+Not hard -- unavailable, unless the class itself is replaced.
+
+## What is available, and is arguably better
+
+Build the board out of the two things that are proven, and own the data:
+
+- **`RenderTargetWidget.SetWorld(world, camera)`** -- a camera looking
+  straight down at the real world, rendered into a texture. This is exactly
+  what `SCR_MapRTWBaseUI` does for the compass and the watch, pointed at the
+  world instead of a preview. A live aerial view, which for a whiteboard or a
+  beamer board is the right look anyway.
+- **`RTTextureWidget.SetRenderTarget(entity)`** -- that widget tree becomes
+  `$rendertarget` in the board's material.
+- **Our own overlay** in the same widget tree: markers and freeform drawings
+  as widgets on top of the render.
+
+`RTTextureWidget` carries `SetMaxFPS` and `SetResolutionScale` (with FSR),
+which says BI expected this to be used for exactly this kind of thing and
+gives the two dials needed to keep it cheap. Render only when somebody is
+near, cap the frame rate, drop the resolution.
+
+**And this is what the next step needs anyway.** A map of the enemy's, found
+in a house, carrying *their* markings, must not be the live map -- it is a
+snapshot with somebody else's information on it. Owning the overlay is the
+whole feature, not a workaround for one.
+
 ## The order that carries the least risk
 
-1. The prop: frames, scale, placement. Certain work, useful on its own.
-2. The interact route -- walk up, the real map opens. Delivers 4 and 5 in full.
-3. Try `RTTextureWidget` on the board. If it renders, the board becomes live
-   and step 2 stays as the fallback for anyone who wants the full screen.
-4. Freeform drawing, one channel, everyone sees it.
-5. Channels and permissions.
+## Open questions before building
 
-Each step is worth having on its own, and no step throws away the one before.
+- Does `RenderTargetWidget.SetWorld` accept the **real** world with a second
+  camera index, or does it want a world of its own the way the compass tool
+  builds one? The compass creates a preview `BaseWorld`; nothing says the
+  real one is refused. Try it first -- it decides whether a board is cheap or
+  needs its own world.
+- What a board costs with several of them in a command post. `SetMaxFPS` and
+  `SetResolutionScale` are the dials; "render only while somebody is within
+  N metres" is the third.
+- Where the cartographic imagery lives, if a paper frame should look like a
+  map rather than an aerial photograph. The map layers are native
+  (`InitializeLayers`, `SetImagesetMapping`) and not visible from script.
+- Whether a material can be written that samples `$rendertarget` per entity
+  instance, or whether every board needs its own material.
