@@ -4,20 +4,20 @@ MetaFileClass {
   FBXResourceClass PC {
    MaterialAssigns {
     MaterialAssignClass "{6A1C4F0B39E13020}" {
-     SourceMaterial "LaptopLid_Screen"
+     SourceMaterial "MapBoard_Surface"
      AssignedMaterial "{6A1C4F0B39E13010}Assets/Props/Intel/MapBoard/Data/MapBoard_Surface.emat"
     }
     MaterialAssignClass "{6A1C4F0B39E13021}" {
-     SourceMaterial "LaptopLid_Leather"
+     SourceMaterial "MapBoard_Frame"
      AssignedMaterial "{6A1C4F0B39E13011}Assets/Props/Intel/MapBoard/Data/MapBoard_Frame.emat"
     }
    }
    MeshParams {
-    MeshParam LOD0 {
+    MeshParam MapBoard {
     }
    }
    GeometryParams {
-    GeometryParam UBX_Laptop_Lid {
+    GeometryParam UBX_MapBoard {
      Mass 0
      Margin 0
     }
