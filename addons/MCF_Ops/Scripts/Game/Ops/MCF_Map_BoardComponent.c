@@ -59,6 +59,9 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "5", uiwidget: UIWidgets.EditBox, desc: "Over how many metres the map fades out to white before the activation distance. 5 means it starts going at 35 m and is white at 40 m.", params: "0 200")]
 	protected float m_fFadeBand;
 
+	[Attribute(defvalue: "0", uiwidget: UIWidgets.CheckBox, desc: "Draw the map's grid on the board. The grid belongs to the map entity rather than to this board, so two boards that disagree about it will take turns winning.")]
+	protected bool m_bShowGrid;
+
 	//! How often the board looks at where the viewer is and whether it still
 	//! has to say "keep drawing".
 	protected static const int TICK_MS = 250;
@@ -79,6 +82,11 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//! known. Until then the board has nothing to re-state.
 	protected bool m_bPrimed;
 	protected bool m_bPriming;
+
+	//! Whether a real map has been open since the board last set itself up.
+	//! Zoom, pan and grid are the entity's, so a player leaves them wherever
+	//! they finished and the board has to set itself up again.
+	protected bool m_bSawOpen;
 
 	//! The world rectangle the board draws, read off the map after it was
 	//! zoomed out to fit the island.
@@ -212,11 +220,24 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (m_MapEntity.IsOpen())
 		{
 			m_bVisualising = false;
+			m_bSawOpen = true;
 			return;
 		}
 
 		if (m_bPriming)
 			return;
+
+		// THEIR MAP HAS JUST CLOSED, AND IT DID NOT PUT ANYTHING BACK. Zoom,
+		// pan and the grid all live on the entity, so the board inherits
+		// wherever the player left off -- the island half out of frame, with
+		// their grid over it. Priming again is the cheapest honest fix: it is
+		// the same open-fit-close that set the board up in the first place,
+		// and it takes under a second.
+		if (m_bSawOpen)
+		{
+			m_bSawOpen = false;
+			m_bPrimed = false;
+		}
 
 		if (!m_bPrimed)
 		{
@@ -317,6 +338,13 @@ class MCF_Map_BoardComponent : ScriptComponent
 		m_MapEntity.GetMapVisibleFrame(m_vFrameMin, m_vFrameMax);
 
 		m_MapEntity.CloseMap();
+
+		// The grid is the entity's, not the widget's, so it is set here --
+		// after the open, which turned it off along with everything else this
+		// board did not ask for. Two boards that disagree about the grid will
+		// take turns winning; there is one grid.
+		m_MapEntity.EnableGrid(m_bShowGrid);
+
 		m_bPrimed = true;
 
 		MCF_Core_Log.Debug("map board primed, frame " + m_vFrameMin.ToString() + " .. " + m_vFrameMax.ToString());
