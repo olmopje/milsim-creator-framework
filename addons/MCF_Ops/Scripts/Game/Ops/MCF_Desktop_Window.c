@@ -79,6 +79,13 @@ class MCF_Desktop_Window
 	//! what it is showing. Null for every window that is an app.
 	MCF_Device_Item m_Doc;
 
+	//! The spreadsheet's cells, row-major, and which one is selected. The grid
+	//! is fixed in the layout, so this is built once when the window is bound
+	//! and never rebuilt.
+	ref array<SCR_ButtonTextComponent> m_aCells = {};
+	int m_iCellRow = -1;
+	int m_iCellCol = -1;
+
 	ref array<ref MCF_Device_Item> m_aVisible = {};
 	ref array<SCR_ButtonTextComponent> m_aRows = {};
 

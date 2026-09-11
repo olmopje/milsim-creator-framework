@@ -177,6 +177,34 @@ def txt(name, a, ind, size, colour=None, align=None, text="", rich=False,
     return s
 
 
+def editbox(name, a, ind, size=12, limit=4000, spacing=None):
+    """A field you can type in.
+
+    `style blank` and our own EditBoxWidgetClass rather than an override of
+    SCR_EditBoxComponent: the override route wants the base component's own
+    GUID reused or it silently paints a label reading "Editbox" at half width,
+    which cost the handset an evening.
+    """
+    p = " " * ind
+    s = p + 'EditBoxWidgetClass "%s" {\n' % g()
+    s += p + ' Name "%s"\n' % name
+    s += slot(a, ind + 1)
+    s += p + " Clipping True\n"
+    s += p + " components {\n"
+    s += p + '  EditBoxFilterComponent "%s" {\n' % g()
+    s += p + "   m_iCharacterLimit %d\n" % limit
+    s += p + "  }\n"
+    s += p + " }\n"
+    s += p + " style blank\n"
+    s += p + ' Text ""\n'
+    s += p + ' "Font Size" %d\n' % size
+    s += p + ' "Min Font Size" %d\n' % size
+    if spacing:
+        s += p + ' "Line Spacing" %d\n' % spacing
+    s += p + "}\n"
+    return s
+
+
 def frame(name, a, ind, body, visible=True):
     p = " " * ind
     s = p + 'FrameWidgetClass "%s" {\n' % g()
@@ -509,8 +537,19 @@ def pane_text(p, ind):
     s += txt(p + "Gutter", (0.022, 0.122, 0.062, 0.972), ind, 11,
              colour=FAINT_INK, align="Right", rich=True, spacing=20)
     s += img(p + "GutterRule", (0.070, 0.112, 0.0712, 0.980), ind, colour=LINE)
-    s += scroll(p + "BodyScroll", (0.080, 0.118, 0.978, 0.972), ind,
+
+    # TWO BODIES, ONE SHOWING. A player reads; a Game Master types. An edit box
+    # that is always there would let a player rewrite the evidence they were
+    # sent to find, and a read-only pane would leave the Game Master with
+    # nowhere to write it in the first place.
+    s += scroll(p + "BodyScroll", (0.080, 0.118, 0.978, 0.930), ind,
                 p + "Body", kind="rich", size=12, colour="0.84 0.87 0.89 1")
+    s += editbox(p + "BodyEdit", (0.080, 0.118, 0.978, 0.930), ind, 12, 6000, 19)
+    s += img(p + "BarFill", (0.016, 0.934, 0.984, 0.980), ind, colour="1 1 1 0.05")
+    s += txt(p + "Status", (0.030, 0.940, 0.700, 0.976), ind, 10, colour=FAINT_INK)
+    s += flatbtn(p + "Save", (0.800, 0.938, 0.972, 0.976), ind, label="SAVE",
+                 size=11, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
+                 label_align="centre")
     return s
 
 
@@ -520,12 +559,26 @@ def pane_sheet(p, ind):
     the header row -- which is a convention a mission maker can type into a
     config without learning anything, and is what a spreadsheet is."""
     s = pane_head(p, ind)
-    s += img(p + "Paper", (0.016, 0.112, 0.984, 0.980), ind, colour="0.93 0.94 0.95 1")
+
+    # The formula bar. ONE edit box for seventy-eight cells: a spreadsheet is
+    # the one editor where the field you type in is not where the value lives,
+    # and copying that is both correct and seventy-seven widgets cheaper.
+    s += img(p + "BarFill", (0.016, 0.108, 0.984, 0.156), ind, colour="1 1 1 0.06")
+    s += txt(p + "Ref", (0.026, 0.114, 0.080, 0.150), ind, 11, align="Center")
+    s += img(p + "RefRule", (0.086, 0.112, 0.0872, 0.152), ind, colour=LINE)
+    s += editbox(p + "Formula", (0.098, 0.114, 0.828, 0.150), ind, 11, 200)
+    s += flatbtn(p + "Commit", (0.838, 0.112, 0.906, 0.152), ind, icon="check",
+                 icon_px=15, bg="1 1 1 0.08", bg_hi="1 1 1 0.18", tex="tile")
+    s += flatbtn(p + "Save", (0.914, 0.112, 0.978, 0.152), ind, label="SAVE",
+                 size=10, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
+                 label_align="centre")
+
+    s += img(p + "Paper", (0.016, 0.166, 0.984, 0.980), ind, colour="0.93 0.94 0.95 1")
 
     COLS = 6
     ROWS = 13
     x0, gutter, cw = 0.016, 0.046, 0.153
-    y0, hh, rh = 0.112, 0.042, 0.0585
+    y0, hh, rh = 0.166, 0.042, 0.0555
 
     # the header strip and the row-number strip, in the grey a spreadsheet uses
     s += img(p + "HeadFill", (x0, y0, 0.984, y0 + hh), ind, colour="0.80 0.82 0.84 1")
@@ -548,9 +601,11 @@ def pane_sheet(p, ind):
 
         for c in range(COLS):
             cx = x0 + gutter + c * cw
-            s += txt(p + "Cell%d_%d" % (r, c),
-                     (cx + 0.008, ry + 0.010, cx + cw - 0.006, ry + rh - 0.006),
-                     ind, 10, colour="0.13 0.15 0.17 1")
+            s += flatbtn(p + "Cell%d_%d" % (r, c),
+                         (cx + 0.0012, ry + 0.0012, cx + cw, ry + rh),
+                         ind, label="", text_l=8, size=10,
+                         bg="1 1 1 0", bg_hi="0.55 0.62 0.72 0.35",
+                         bg_sel="0.29 0.47 0.72 0.45")
 
     return s
 
@@ -565,11 +620,17 @@ def pane_doc(p, ind):
     s += img(p + "Page", (0.170, 0.128, 0.830, 0.980), ind, colour="0.97 0.97 0.96 1")
     s += txt(p + "Title", (0.206, 0.160, 0.794, 0.216), ind, 17,
              colour="0.10 0.11 0.13 1", rich=True, wrap=True, spacing=22)
+    s += editbox(p + "TitleEdit", (0.206, 0.160, 0.794, 0.216), ind, 16, 200)
     s += img(p + "Rule", (0.206, 0.226, 0.794, 0.2275), ind, colour="0.72 0.72 0.70 1")
     s += txt(p + "Stamp", (0.206, 0.236, 0.794, 0.272), ind, 10,
              colour="0.42 0.43 0.44 1")
-    s += scroll(p + "BodyScroll", (0.200, 0.290, 0.800, 0.962), ind,
+    s += scroll(p + "BodyScroll", (0.200, 0.290, 0.800, 0.930), ind,
                 p + "Body", kind="rich", size=12, colour="0.13 0.14 0.16 1")
+    s += editbox(p + "BodyEdit", (0.206, 0.290, 0.794, 0.930), ind, 12, 6000, 20)
+    s += flatbtn(p + "Save", (0.626, 0.938, 0.798, 0.976), ind, label="SAVE",
+                 size=11, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
+                 label_align="centre")
+    s += txt(p + "Status", (0.206, 0.940, 0.610, 0.976), ind, 10, colour=FAINT_INK)
     return s
 
 

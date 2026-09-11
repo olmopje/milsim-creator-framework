@@ -155,6 +155,9 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	protected SCR_ButtonTextComponent m_EditorSave;
 	protected SCR_ButtonTextComponent m_EditorCancel;
 	protected string m_sEditKind;
+
+	//! Whether naming a just-created file should open it afterwards.
+	protected bool m_bOpenAfterNaming;
 	protected int m_iEditSlot = -1;
 	protected MCF_Device_Item m_EditItem;
 
@@ -235,6 +238,15 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 		if (m_Carrier)
 			m_Content.Bind(m_Carrier);
+
+		// THE DRAFT IS MADE AT OPEN, NOT AT THE FIRST EDIT. Draft() swaps the
+		// presenter's profile for a copy, and anything already holding an item
+		// from the old one goes on editing a copy nobody will ever send. Doing
+		// it before a single window is filled means every item the shell hands
+		// around for the rest of the session is a draft item, and an editor can
+		// simply write to the thing it was given.
+		if (m_bAuthor)
+			Draft();
 
 		BindWindows(root);
 		BindPanel(root);
@@ -598,6 +610,9 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			titleText.SetText(title);
 
 		BindToolbar(root, win);
+
+		if (slot >= APP_WINDOWS)
+			BindEditorWindow(root, win);
 
 		if (win.m_wRoot)
 			win.m_wRoot.SetVisible(false);
@@ -2158,6 +2173,285 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		return "archive.tar";
 	}
 
+	// ======================================================= editing a file
+
+	//! Binds one editor window's controls.
+	protected void BindEditorWindow(notnull Widget root, notnull MCF_Desktop_Window win)
+	{
+		string p = win.Prefix();
+
+		SCR_ButtonTextComponent save = SCR_ButtonTextComponent.GetButtonText(p + "Save", root);
+		if (save)
+			save.m_OnClicked.Insert(OnFileSave);
+
+		if (win.m_sPane != PANE_SHEET)
+			return;
+
+		SCR_ButtonTextComponent commit = SCR_ButtonTextComponent.GetButtonText(p + "Commit", root);
+		if (commit)
+			commit.m_OnClicked.Insert(OnCellCommit);
+
+		// Every cell is a button, so a click can say which one. The grid is
+		// fixed in the layout, so this list is built once and never rebuilt.
+		win.m_aCells.Clear();
+
+		for (int r = 0; r < SHEET_ROWS; r++)
+		{
+			for (int c = 0; c < SHEET_COLS; c++)
+			{
+				SCR_ButtonTextComponent cell = SCR_ButtonTextComponent.GetButtonText(
+					p + "Cell" + r.ToString() + "_" + c.ToString(), root);
+
+				win.m_aCells.Insert(cell);
+
+				if (cell)
+					cell.m_OnClicked.Insert(OnCellClicked);
+			}
+		}
+	}
+
+	//! Which half of an editor is showing.
+	//!
+	//! A PLAYER READS AND A GAME MASTER TYPES. An edit box that is always there
+	//! would let a player rewrite the evidence they were sent to find, and a
+	//! read-only pane would leave the Game Master with nowhere to write it in
+	//! the first place -- so each editor carries both and shows one.
+	protected void ShowEditingChrome(notnull MCF_Desktop_Window win)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string p = win.Prefix();
+
+		ShowWidget(root, p + "BodyEdit", m_bAuthor);
+		ShowWidget(root, p + "BodyScroll", !m_bAuthor);
+		ShowWidget(root, p + "TitleEdit", m_bAuthor);
+		ShowWidget(root, p + "Title", !m_bAuthor);
+		ShowButton(root, p + "Save", m_bAuthor);
+		ShowButton(root, p + "Commit", m_bAuthor);
+		ShowWidget(root, p + "Formula", m_bAuthor);
+
+		if (!m_bAuthor)
+			SetText(root, p + "Status", "Read only.");
+		else
+			SetText(root, p + "Status", "");
+	}
+
+	//! A1, B7 -- the name of a cell, said the way a spreadsheet says it.
+	protected string CellName(int row, int col)
+	{
+		string letters = "ABCDEF";
+
+		if (col < 0 || col >= letters.Length())
+			return "";
+
+		return letters.Substring(col, 1) + (row + 1).ToString();
+	}
+
+	protected void OnCellClicked(SCR_ButtonTextComponent button)
+	{
+		MCF_Desktop_Window win = WindowAt(11);
+		if (!win || !win.m_bOpen)
+			return;
+
+		int index = win.m_aCells.Find(button);
+		if (index < 0)
+			return;
+
+		FocusWindow(11);
+
+		win.m_iCellRow = index / SHEET_COLS;
+		win.m_iCellCol = index - win.m_iCellRow * SHEET_COLS;
+
+		foreach (SCR_ButtonTextComponent cell : win.m_aCells)
+		{
+			if (cell)
+				cell.SetToggled(cell == button, false, false);
+		}
+
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string p = win.Prefix();
+		SetText(root, p + "Ref", CellName(win.m_iCellRow, win.m_iCellCol));
+
+		EditBoxWidget formula = EditBoxWidget.Cast(root.FindAnyWidget(p + "Formula"));
+		if (formula)
+			formula.SetText(CellValue(win, win.m_iCellRow, win.m_iCellCol));
+	}
+
+	protected string CellValue(notnull MCF_Desktop_Window win, int row, int col)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return "";
+
+		TextWidget text = TextWidget.Cast(root.FindAnyWidget(
+			win.Prefix() + "Cell" + row.ToString() + "_" + col.ToString() + "Text"));
+
+		if (!text)
+			return "";
+
+		return text.GetText();
+	}
+
+	//! The formula bar's tick: writes what was typed into the selected cell and
+	//! rebuilds the file's body from the whole grid.
+	protected void OnCellCommit(SCR_ButtonTextComponent button)
+	{
+		MCF_Desktop_Window win = WindowAt(11);
+		if (!win || !win.m_bOpen || !win.m_Doc || win.m_iCellRow < 0)
+			return;
+
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string p = win.Prefix();
+
+		EditBoxWidget formula = EditBoxWidget.Cast(root.FindAnyWidget(p + "Formula"));
+		if (!formula)
+			return;
+
+		// A comma in a cell would become a column break the next time the file
+		// is read, so it does not get to be a comma.
+		string typed = formula.GetText();
+		typed.Replace(",", ";");
+
+		SetText(root, p + "Cell" + win.m_iCellRow.ToString() + "_" + win.m_iCellCol.ToString() + "Text", typed);
+		win.m_Doc.m_sBody = SheetToText(win);
+
+		SetText(root, p + "Status", "Edited. Press SAVE to write it to the device.");
+	}
+
+	//! The grid, back into the comma-separated body it came from.
+	//!
+	//! Trailing empty rows and columns are dropped. A table typed into three
+	//! cells should not save as thirteen lines of commas -- and a mission maker
+	//! who opens the config afterwards should recognise what they wrote.
+	protected string SheetToText(notnull MCF_Desktop_Window win)
+	{
+		array<string> lines = {};
+		int lastRow = -1;
+
+		for (int r = 0; r < SHEET_ROWS; r++)
+		{
+			string line;
+			int lastCol = -1;
+			array<string> cells = {};
+
+			for (int c = 0; c < SHEET_COLS; c++)
+			{
+				string value = CellValue(win, r, c);
+				cells.Insert(value);
+
+				if (!value.IsEmpty())
+					lastCol = c;
+			}
+
+			for (int k = 0; k <= lastCol; k++)
+			{
+				if (k > 0)
+					line = line + ",";
+
+				line = line + cells[k];
+			}
+
+			lines.Insert(line);
+
+			if (lastCol >= 0)
+				lastRow = r;
+		}
+
+		string body;
+
+		for (int i = 0; i <= lastRow; i++)
+		{
+			if (i > 0)
+				body = body + "\n";
+
+			body = body + lines[i];
+		}
+
+		return body;
+	}
+
+	//! SAVE, on any of the three editors.
+	//!
+	//! IT GOES THE SAME WAY EVERYTHING ELSE GOES: onto the draft, then over
+	//! MCF_RequestWriteDeviceProfile to the server, which writes it onto the
+	//! object and replicates it. There is no separate save path for files, and
+	//! there should not be -- a file is an item in an app like everything else
+	//! on this device.
+	protected void OnFileSave(SCR_ButtonTextComponent button)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		MCF_Desktop_Window win = EditorOfSave(button);
+		if (!win || !win.m_Doc)
+			return;
+
+		string p = win.Prefix();
+
+		if (win.m_sPane == PANE_SHEET)
+		{
+			win.m_Doc.m_sBody = SheetToText(win);
+		}
+		else
+		{
+			EditBoxWidget body = EditBoxWidget.Cast(root.FindAnyWidget(p + "BodyEdit"));
+			if (body)
+				win.m_Doc.m_sBody = body.GetText();
+
+			EditBoxWidget title = EditBoxWidget.Cast(root.FindAnyWidget(p + "TitleEdit"));
+			if (title && win.m_sPane == PANE_DOC)
+			{
+				// The document's title IS its filename, so typing over it
+				// renames the file -- which is what a person would expect and
+				// what the file manager will show a second later.
+				string named = MCF_Device_Script.Trim(title.GetText());
+
+				if (!named.IsEmpty())
+					win.m_Doc.m_sHeading = MCF_Device_Text.Join(
+						MCF_Device_Text.FolderOf(win.m_Doc.m_sHeading), named);
+			}
+		}
+
+		SendDraft();
+		SetText(root, p + "Status", "Saved to the device.");
+
+		FillWindow(win);
+
+		// The file manager is showing a name and a date that may have just
+		// changed underneath it.
+		MCF_Desktop_Window files = WindowAt(0);
+		if (files && files.m_bOpen)
+			FillWindow(files);
+	}
+
+	protected MCF_Desktop_Window EditorOfSave(SCR_ButtonTextComponent button)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return null;
+
+		foreach (MCF_Desktop_Window win : m_aWindows)
+		{
+			if (!win || win.m_iSlot < APP_WINDOWS)
+				continue;
+
+			SCR_ButtonTextComponent candidate = SCR_ButtonTextComponent.GetButtonText(win.Prefix() + "Save", root);
+			if (candidate == button)
+				return win;
+		}
+
+		return null;
+	}
+
 	// ====================================================== the file manager
 
 	//! The tree on the left, and the folder's contents on the right.
@@ -2468,6 +2762,9 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		{
 			SetText(root, p + "Stamp", win.m_Doc.m_sTimestamp);
 			SetText(root, p + "Body", body);
+			SetText(root, p + "TitleEdit", name);
+			SetText(root, p + "BodyEdit", body);
+			ShowEditingChrome(win);
 			return;
 		}
 
@@ -2492,6 +2789,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 		SetText(root, p + "Gutter", numbers);
 		SetText(root, p + "Body", body);
+		SetText(root, p + "BodyEdit", body);
+		ShowEditingChrome(win);
 	}
 
 	//! A comma-separated body, in a grid.
@@ -2525,9 +2824,17 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 				if (c < cells.Count())
 					value = MCF_Device_Script.Trim(cells[c]);
 
-				SetText(root, p + "Cell" + r.ToString() + "_" + c.ToString(), value);
+				SetText(root, p + "Cell" + r.ToString() + "_" + c.ToString() + "Text", value);
 			}
 		}
+
+		// Nothing is selected until something is clicked, and the formula bar
+		// says so rather than showing the last file's A1.
+		win.m_iCellRow = -1;
+		win.m_iCellCol = -1;
+		SetText(root, p + "Ref", "");
+		SetText(root, p + "Formula", "");
+		ShowEditingChrome(win);
 	}
 
 	// ========================================================== the file tree
@@ -2792,7 +3099,10 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		FillWindow(win);
 
 		// Straight into the name, because "new_file.txt" is not a name anybody
-		// wants and the only reason to make one is to call it something.
+		// wants and the only reason to make one is to call it something. A
+		// folder stops there; a file then opens in its own editor, which is
+		// what making one was for.
+		m_bOpenAfterNaming = !folder;
 		ShowEditor(win, "path", "Name", item.m_sHeading, item);
 	}
 
@@ -3094,6 +3404,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		{
 			// A rename that keeps the folder: the Game Master typed a name, not
 			// a path, unless they deliberately typed one.
+			MCF_Device_Item named = m_EditItem;
 			m_EditItem.m_sHeading = value;
 			OnEditorCancel(null);
 
@@ -3102,6 +3413,12 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			{
 				renamed.m_App = DraftApp(renamed);
 				FillWindow(renamed);
+			}
+
+			if (m_bOpenAfterNaming)
+			{
+				m_bOpenAfterNaming = false;
+				OpenDocument(named);
 			}
 
 			return;
@@ -3477,7 +3794,14 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 		RichTextWidget rich = RichTextWidget.Cast(found);
 		if (rich)
+		{
 			rich.SetText(value);
+			return;
+		}
+
+		EditBoxWidget box = EditBoxWidget.Cast(found);
+		if (box)
+			box.SetText(value);
 	}
 
 	protected void ShowWidget(notnull Widget root, string name, bool visible)
