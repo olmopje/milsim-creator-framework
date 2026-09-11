@@ -74,6 +74,14 @@ class MCF_Device_Item
 	[Attribute(defvalue: "0", uiwidget: UIWidgets.CheckBox, desc: "Show this as new until the player opens it.")]
 	bool m_bNew;
 
+	//! How the document editor draws this item, for the files that open in one.
+	//!
+	//! "b1 i0 s13 a1" -- bold, italic, exact font size, alignment (0 left,
+	//! 1 centre, 2 right). Empty means the plain default, which is what every
+	//! item written before formatting existed says.
+	[Attribute(defvalue: "", uiwidget: UIWidgets.EditBox, desc: "Formatting for the document editor, e.g. \"b1 i0 s13 a1\". Leave empty for plain.")]
+	string m_sStyle;
+
 	//! What the read log files this item under.
 	//!
 	//! Heading and stamp rather than an index: an item that moves in the list

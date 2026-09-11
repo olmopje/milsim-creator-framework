@@ -198,9 +198,18 @@ def editbox(name, a, ind, size=12, limit=4000, spacing=None, colour=None,
     s += slot(a, ind + 1)
     s += p + " Clipping True\n"
     s += p + " components {\n"
-    s += p + '  EditBoxFilterComponent "%s" {\n' % g()
-    s += p + "   m_iCharacterLimit %d\n" % limit
+    # The event handler is what gives a field its focus and confirm events --
+    # vanilla's SCR_EditBoxComponent finds exactly this on the widget and
+    # hooks GetOnFocus / GetOnFocusLost / GetOnChangeFinal to it.
+    s += p + '  SCR_EventHandlerComponent "%s" {\n' % g()
     s += p + "  }\n"
+    # AND THE FILTER GOES ON SINGLE-LINE BOXES ONLY. The engine's own comment
+    # on SCR_EditBoxComponent says it: "EditBoxFilterComponent does not work
+    # on MultilineEditBoxWidget".
+    if not multiline:
+        s += p + '  EditBoxFilterComponent "%s" {\n' % g()
+        s += p + "   m_iCharacterLimit %d\n" % limit
+        s += p + "  }\n"
     s += p + " }\n"
     s += p + " style blank\n"
     s += p + ' Text ""\n'
@@ -552,27 +561,76 @@ def pane_files(p, ind):
 
 
 # ------------------------------------------------------------- the text editor
+def format_bar(p, ind, y0, y1, x0=0.080):
+    """The document formatting row: bold, italic, size, alignment.
+
+    THESE ARE REAL, not decoration. TextWidget carries SetBold, SetItalic and
+    SetExactFontSize in its scripted API, and alignment is a widget flag at
+    runtime -- so every button here changes the drawn page rather than writing
+    a marker into the text and hoping something renders it.
+    """
+    s = ""
+    w = 0.042
+    gap = 0.006
+    x = x0
+
+    for name, label in [("Bold", "B"), ("Italic", "I")]:
+        s += flatbtn(p + name, (x, y0, x + w, y1), ind, label=label, size=12,
+                     bg="1 1 1 0.08", bg_hi="1 1 1 0.18",
+                     bg_sel="0.85 0.47 0.14 1", tex="tile", label_align="centre")
+        x += w + gap
+
+    x += gap
+    for name, label in [("Smaller", "A-"), ("Bigger", "A+")]:
+        s += flatbtn(p + name, (x, y0, x + w, y1), ind, label=label, size=11,
+                     bg="1 1 1 0.08", bg_hi="1 1 1 0.18", tex="tile",
+                     label_align="centre")
+        x += w + gap
+
+    s += txt(p + "FontSize", (x, y0, x + 0.036, y1), ind, 10, colour=DIM_INK,
+             align="Center")
+    x += 0.036 + gap * 2
+
+    for name, label in [("AlignL", "|<"), ("AlignC", "><"), ("AlignR", ">|")]:
+        s += flatbtn(p + name, (x, y0, x + w, y1), ind, label=label, size=10,
+                     bg="1 1 1 0.08", bg_hi="1 1 1 0.18",
+                     bg_sel="0.85 0.47 0.14 1", tex="tile", label_align="centre")
+        x += w + gap
+
+    return s
+
+
 def pane_text(p, ind):
     """A plain-text editor: a dark field, a numbered gutter, one column of
     monospaced-looking text. It is the cheapest of the three to draw and the
     one a player will open most, because most of what is worth finding on a
     seized machine was typed into a text file."""
     s = pane_head(p, ind, tools=False)
-    s += img(p + "Glass", (0.016, 0.112, 0.984, 0.980), ind, colour=TERM_BG)
-    s += txt(p + "Gutter", (0.022, 0.122, 0.062, 0.972), ind, 11,
+    s += img(p + "ToolFill", (0.016, 0.106, 0.984, 0.158), ind, colour="1 1 1 0.05")
+    s += format_bar(p, ind, 0.112, 0.152, x0=0.026)
+    s += img(p + "Glass", (0.016, 0.166, 0.984, 0.980), ind, colour=TERM_BG)
+    s += txt(p + "Gutter", (0.022, 0.176, 0.062, 0.972), ind, 11,
              colour=FAINT_INK, align="Right", rich=True, spacing=20)
-    s += img(p + "GutterRule", (0.070, 0.112, 0.0712, 0.980), ind, colour=LINE)
+    s += img(p + "GutterRule", (0.070, 0.166, 0.0712, 0.980), ind, colour=LINE)
 
     # TWO BODIES, ONE SHOWING. A player reads; a Game Master types. An edit box
     # that is always there would let a player rewrite the evidence they were
     # sent to find, and a read-only pane would leave the Game Master with
     # nowhere to write it in the first place.
-    s += scroll(p + "BodyScroll", (0.080, 0.118, 0.978, 0.930), ind,
+    s += scroll(p + "BodyScroll", (0.080, 0.172, 0.978, 0.930), ind,
                 p + "FileBody", kind="rich", size=12, colour="0.84 0.87 0.89 1")
-    s += editbox(p + "BodyEdit", (0.080, 0.118, 0.978, 0.930), ind, 12, 6000, 19,
+    s += editbox(p + "BodyEdit", (0.080, 0.172, 0.978, 0.930), ind, 12, 6000, 19,
                  multiline=True)
     s += img(p + "BarFill", (0.016, 0.934, 0.984, 0.980), ind, colour="1 1 1 0.05")
-    s += txt(p + "Status", (0.030, 0.940, 0.700, 0.976), ind, 10, colour=FAINT_INK)
+    s += txt(p + "Status", (0.030, 0.940, 0.470, 0.976), ind, 10, colour=FAINT_INK)
+    s += txt(p + "Count", (0.480, 0.940, 0.700, 0.976), ind, 10, colour=FAINT_INK,
+             align="Right")
+    s += flatbtn(p + "Preview", (0.624, 0.938, 0.708, 0.976), ind, label="PAGE",
+                 size=10, bg="1 1 1 0.10", bg_hi="1 1 1 0.20", tex="tile",
+                 label_align="centre")
+    s += flatbtn(p + "Write", (0.716, 0.938, 0.788, 0.976), ind, label="TYPE",
+                 size=10, bg="1 1 1 0.10", bg_hi="1 1 1 0.20", tex="tile",
+                 label_align="centre")
     s += flatbtn(p + "FileSave", (0.800, 0.938, 0.972, 0.976), ind, label="SAVE",
                  size=11, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
                  label_align="centre")
@@ -643,26 +701,36 @@ def pane_doc(p, ind):
     -- which is all that separates a word processor from a text editor to look
     at, and it is enough for a player to know which one they are holding."""
     s = pane_head(p, ind, tools=False)
-    s += img(p + "Desk", (0.016, 0.112, 0.984, 0.980), ind, colour="0.11 0.12 0.14 1")
-    s += img(p + "Page", (0.170, 0.128, 0.830, 0.980), ind, colour="0.97 0.97 0.96 1")
+    s += img(p + "ToolFill", (0.016, 0.106, 0.984, 0.158), ind, colour="1 1 1 0.05")
+    s += format_bar(p, ind, 0.112, 0.152, x0=0.170)
+    s += img(p + "Desk", (0.016, 0.166, 0.984, 0.980), ind, colour="0.11 0.12 0.14 1")
+    s += img(p + "Page", (0.170, 0.176, 0.830, 0.980), ind, colour="0.97 0.97 0.96 1")
     # DocTitle, not Title: the window's own title bar is already called
     # `<W>Title`, and two widgets with one name in one window is how the SAVE
     # button ended up bound to something invisible.
-    s += txt(p + "DocTitle", (0.206, 0.160, 0.794, 0.216), ind, 17,
+    s += txt(p + "DocTitle", (0.206, 0.208, 0.794, 0.264), ind, 17,
              colour="0.10 0.11 0.13 1", rich=True, wrap=True, spacing=22)
-    s += editbox(p + "TitleEdit", (0.206, 0.160, 0.794, 0.216), ind, 16, 200,
+    s += editbox(p + "TitleEdit", (0.206, 0.208, 0.794, 0.264), ind, 16, 200,
                  colour="0.10 0.11 0.13 1")
-    s += img(p + "Rule", (0.206, 0.226, 0.794, 0.2275), ind, colour="0.72 0.72 0.70 1")
-    s += txt(p + "Stamp", (0.206, 0.236, 0.794, 0.272), ind, 10,
+    s += img(p + "Rule", (0.206, 0.274, 0.794, 0.2755), ind, colour="0.72 0.72 0.70 1")
+    s += txt(p + "Stamp", (0.206, 0.284, 0.794, 0.320), ind, 10,
              colour="0.42 0.43 0.44 1")
-    s += scroll(p + "BodyScroll", (0.200, 0.290, 0.800, 0.930), ind,
+    s += scroll(p + "BodyScroll", (0.200, 0.336, 0.800, 0.930), ind,
                 p + "FileBody", kind="rich", size=12, colour="0.13 0.14 0.16 1")
-    s += editbox(p + "BodyEdit", (0.206, 0.290, 0.794, 0.930), ind, 12, 6000, 20,
+    s += editbox(p + "BodyEdit", (0.206, 0.336, 0.794, 0.930), ind, 12, 6000, 20,
                  colour="0.13 0.14 0.16 1", multiline=True)
+    s += flatbtn(p + "Preview", (0.446, 0.938, 0.530, 0.976), ind, label="PAGE",
+                 size=10, bg="1 1 1 0.10", bg_hi="1 1 1 0.20", tex="tile",
+                 label_align="centre")
+    s += flatbtn(p + "Write", (0.538, 0.938, 0.614, 0.976), ind, label="TYPE",
+                 size=10, bg="1 1 1 0.10", bg_hi="1 1 1 0.20", tex="tile",
+                 label_align="centre")
     s += flatbtn(p + "FileSave", (0.626, 0.938, 0.798, 0.976), ind, label="SAVE",
                  size=11, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
                  label_align="centre")
-    s += txt(p + "Status", (0.206, 0.940, 0.610, 0.976), ind, 10, colour=FAINT_INK)
+    s += txt(p + "Status", (0.170, 0.940, 0.470, 0.976), ind, 10, colour=FAINT_INK)
+    s += txt(p + "Count", (0.480, 0.940, 0.700, 0.976), ind, 10, colour=FAINT_INK,
+             align="Right")
     return s
 
 

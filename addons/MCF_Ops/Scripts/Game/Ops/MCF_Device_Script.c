@@ -84,7 +84,8 @@ class MCF_Device_Script
 				+ Clean(item.m_sBody) + SEP_FIELD
 				+ Clean(item.m_sImage) + SEP_FIELD
 				+ Clean(item.m_sImageUrl) + SEP_FIELD
-				+ Flag(item.m_bNew);
+				+ Flag(item.m_bNew) + SEP_FIELD
+				+ Clean(item.m_sStyle);
 		}
 
 		return result;
@@ -182,6 +183,9 @@ class MCF_Device_Script
 
 			if (fields.Count() > 5)
 				item.m_bNew = fields[5].ToInt() != 0;
+
+			if (fields.Count() > 6)
+				item.m_sStyle = fields[6];
 
 			app.m_aItems.Insert(item);
 		}

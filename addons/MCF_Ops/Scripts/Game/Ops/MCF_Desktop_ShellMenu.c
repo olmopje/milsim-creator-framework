@@ -2186,6 +2186,378 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		return "archive.tar";
 	}
 
+	// ====================================== what a document looks like
+
+	//! Reads a style string into a window.
+	//!
+	//! THE STYLE IS STORED ON THE ITEM, as one more field on the wire. The
+	//! format appends and the reader counts, so a profile written before
+	//! formatting existed has six fields and comes back unstyled rather than
+	//! broken -- which is the whole reason the format was written that way.
+	//!
+	//! "b1 i0 s13 a0" -- bold, italic, exact font size, alignment. Short
+	//! enough that a mission maker who opens the config can see what it says
+	//! and change it without a manual.
+	protected void ReadStyle(notnull MCF_Desktop_Window win, string style)
+	{
+		win.m_bBold = false;
+		win.m_bItalic = false;
+		win.m_fFont = 12;
+		win.m_iAlign = 0;
+
+		array<string> parts = {};
+		style.Split(" ", parts, true);
+
+		foreach (string part : parts)
+		{
+			if (part.Length() < 2)
+				continue;
+
+			string head = part.Substring(0, 1);
+			string tail = part.Substring(1, part.Length() - 1);
+
+			if (head == "b")
+				win.m_bBold = tail.ToInt() != 0;
+			else if (head == "i")
+				win.m_bItalic = tail.ToInt() != 0;
+			else if (head == "s")
+				win.m_fFont = tail.ToInt();
+			else if (head == "a")
+				win.m_iAlign = tail.ToInt();
+		}
+
+		if (win.m_fFont < 8)
+			win.m_fFont = 8;
+
+		if (win.m_fFont > 28)
+			win.m_fFont = 28;
+	}
+
+	protected string WriteStyle(notnull MCF_Desktop_Window win)
+	{
+		string bold = "b0";
+		if (win.m_bBold)
+			bold = "b1";
+
+		string italic = "i0";
+		if (win.m_bItalic)
+			italic = "i1";
+
+		return bold + " " + italic + " s" + Math.Round(win.m_fFont).ToString()
+			+ " a" + win.m_iAlign.ToString();
+	}
+
+	//! Puts the style on the page.
+	//!
+	//! ON THE RENDERED BODY, NOT THE EDIT BOX. A MultilineEditBoxWidget is not
+	//! a TextWidget and has none of these methods; the page you are formatting
+	//! is the one the reader sees, which is why the editors have a TYPE and a
+	//! PREVIEW side rather than one box pretending to be both.
+	protected void PaintStyle(notnull MCF_Desktop_Window win)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string p = win.Prefix();
+
+		TextWidget body = TextWidget.Cast(root.FindAnyWidget(p + "FileBody"));
+		if (body)
+		{
+			body.SetBold(win.m_bBold);
+			body.SetItalic(win.m_bItalic);
+			body.SetExactFontSize(win.m_fFont);
+
+			// Alignment is a widget flag at runtime, not a property: the
+			// layout's "Horizontal Alignment" is read once when the file is
+			// parsed and there is no setter for it.
+			body.ClearFlags(WidgetFlags.CENTER | WidgetFlags.RALIGN);
+
+			if (win.m_iAlign == 1)
+				body.SetFlags(WidgetFlags.CENTER);
+			else if (win.m_iAlign == 2)
+				body.SetFlags(WidgetFlags.RALIGN);
+		}
+
+		SetToggle(root, p + "Bold", win.m_bBold);
+		SetToggle(root, p + "Italic", win.m_bItalic);
+		SetToggle(root, p + "AlignL", win.m_iAlign == 0);
+		SetToggle(root, p + "AlignC", win.m_iAlign == 1);
+		SetToggle(root, p + "AlignR", win.m_iAlign == 2);
+
+		SetText(root, p + "FontSize", Math.Round(win.m_fFont).ToString());
+	}
+
+	protected void SetToggle(notnull Widget root, string name, bool on)
+	{
+		SCR_ButtonTextComponent button = SCR_ButtonTextComponent.GetButtonText(name, root);
+		if (button)
+			button.SetToggled(on, false, false);
+	}
+
+	//! Any of the seven formatting buttons. They all land here because they
+	//! all do the same thing: change one number and repaint.
+	protected void OnFormat(SCR_ButtonTextComponent button)
+	{
+		MCF_Desktop_Window win = EditorOfButton(button, "Bold");
+		string what = "Bold";
+
+		if (!win)
+		{
+			win = EditorOfButton(button, "Italic");
+			what = "Italic";
+		}
+
+		if (!win)
+		{
+			win = EditorOfButton(button, "Smaller");
+			what = "Smaller";
+		}
+
+		if (!win)
+		{
+			win = EditorOfButton(button, "Bigger");
+			what = "Bigger";
+		}
+
+		if (!win)
+		{
+			win = EditorOfButton(button, "AlignL");
+			what = "AlignL";
+		}
+
+		if (!win)
+		{
+			win = EditorOfButton(button, "AlignC");
+			what = "AlignC";
+		}
+
+		if (!win)
+		{
+			win = EditorOfButton(button, "AlignR");
+			what = "AlignR";
+		}
+
+		if (!win || !win.m_Doc)
+			return;
+
+		FocusWindow(win.m_iSlot);
+
+		if (what == "Bold")
+			win.m_bBold = !win.m_bBold;
+		else if (what == "Italic")
+			win.m_bItalic = !win.m_bItalic;
+		else if (what == "Smaller")
+			win.m_fFont = win.m_fFont - 1;
+		else if (what == "Bigger")
+			win.m_fFont = win.m_fFont + 1;
+		else if (what == "AlignL")
+			win.m_iAlign = 0;
+		else if (what == "AlignC")
+			win.m_iAlign = 1;
+		else if (what == "AlignR")
+			win.m_iAlign = 2;
+
+		if (win.m_fFont < 8)
+			win.m_fFont = 8;
+
+		if (win.m_fFont > 28)
+			win.m_fFont = 28;
+
+		win.m_Doc.m_sStyle = WriteStyle(win);
+		PaintStyle(win);
+
+		// Formatting is only visible on the page, so changing it puts you
+		// there. Typing again is one button away and the text is not lost.
+		if (win.m_bTyping)
+			ShowPage(win);
+
+		Widget root = GetRootWidget();
+		if (root)
+			SetText(root, win.Prefix() + "Status", "Formatting changed. SAVE writes it to the device.");
+	}
+
+	//! PREVIEW: stop typing and show the page, carrying the unsaved text over
+	//! so the preview is of what was typed rather than of what was loaded.
+	protected void ShowPage(notnull MCF_Desktop_Window win)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string p = win.Prefix();
+		string typed = BoxText(root.FindAnyWidget(p + "BodyEdit"));
+
+		SetText(root, p + "FileBody", typed);
+		PaintCounts(win, typed);
+
+		win.m_bTyping = false;
+		ShowEditingChrome(win);
+		PaintStyle(win);
+	}
+
+	protected void OnPreviewClicked(SCR_ButtonTextComponent button)
+	{
+		MCF_Desktop_Window win = EditorOfButton(button, "Preview");
+		if (!win)
+			return;
+
+		FocusWindow(win.m_iSlot);
+		ShowPage(win);
+
+		Widget root = GetRootWidget();
+		if (root)
+			SetText(root, win.Prefix() + "Status", "Preview. Nothing is saved until SAVE.");
+	}
+
+	// ============================================ typing into an editor
+
+	//! MULTILINE IS A DIFFERENT CLASS, NOT A FLAG.
+	//!
+	//! `MultilineEditBoxWidget` and `EditBoxWidget` do not share a parent. The
+	//! engine's own SCR_EditBoxComponent carries one field for each and
+	//! apologises for it in a comment -- "Why aren't these derived from a
+	//! common parent :(" -- and `EditBoxWidget.Cast` on a multiline box
+	//! returns null. Every read and write has to try both, or the box fills
+	//! with nothing and saves nothing, silently, which is exactly what the
+	//! first multiline build did.
+	protected string BoxText(Widget found)
+	{
+		if (!found)
+			return "";
+
+		EditBoxWidget one = EditBoxWidget.Cast(found);
+		if (one)
+			return one.GetText();
+
+		MultilineEditBoxWidget many = MultilineEditBoxWidget.Cast(found);
+		if (many)
+			return many.GetText();
+
+		return "";
+	}
+
+	protected void SetBoxText(Widget found, string value)
+	{
+		if (!found)
+			return;
+
+		EditBoxWidget one = EditBoxWidget.Cast(found);
+		if (one)
+		{
+			one.SetText(value);
+			return;
+		}
+
+		MultilineEditBoxWidget many = MultilineEditBoxWidget.Cast(found);
+		if (many)
+			many.SetText(value);
+	}
+
+	//! Puts the caret in a field and starts write mode.
+	//!
+	//! CLICKING IS NOT ENOUGH ON ITS OWN. An edit box takes keystrokes only in
+	//! write mode, and the engine raises no event when it starts -- vanilla's
+	//! SCR_EditBoxComponent polls IsInWriteMode() on a 50 ms timer and calls
+	//! ActivateWriteMode() from its own pencil button. This is that pencil,
+	//! and on the spreadsheet it is what clicking a cell does.
+	protected void FocusBox(Widget found)
+	{
+		if (!found)
+			return;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (workspace)
+			workspace.SetFocusedWidget(found);
+
+		EditBoxWidget one = EditBoxWidget.Cast(found);
+		if (one)
+		{
+			one.ActivateWriteMode();
+			return;
+		}
+
+		MultilineEditBoxWidget many = MultilineEditBoxWidget.Cast(found);
+		if (many)
+			many.ActivateWriteMode();
+	}
+
+	//! The pencil: start typing in whichever body this editor has.
+	protected void OnWriteClicked(SCR_ButtonTextComponent button)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		MCF_Desktop_Window win = EditorOfButton(button, "Write");
+		if (!win)
+			return;
+
+		FocusWindow(win.m_iSlot);
+		win.m_bTyping = true;
+		ShowEditingChrome(win);
+		FocusBox(root.FindAnyWidget(win.Prefix() + "BodyEdit"));
+		SetText(root, win.Prefix() + "Status", "Typing. PAGE shows the formatted result; SAVE writes it.");
+	}
+
+	//! Lines, words and characters, the way a text editor says them.
+	//!
+	//! Counted off the text rather than asked of the widget, because the
+	//! widget's own GetNumLines() reports the lines it DREW -- wrapped ones
+	//! included -- and a person counting the lines of a file means the ones
+	//! they typed.
+	protected void PaintCounts(notnull MCF_Desktop_Window win, string body)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		array<string> lines = {};
+		body.Split("\n", lines, false);
+
+		array<string> words = {};
+		string flat = body;
+		flat.Replace("\n", " ");
+		flat.Split(" ", words, true);
+
+		int spoken;
+		foreach (string word : words)
+		{
+			if (!word.IsEmpty())
+				spoken++;
+		}
+
+		int rows = lines.Count();
+		if (rows < 1)
+			rows = 1;
+
+		SetText(root, win.Prefix() + "Count",
+			rows.ToString() + " lines   " + spoken.ToString() + " words   "
+			+ body.Length().ToString() + " characters");
+	}
+
+	//! Which editor a button belongs to. The three editors carry the same
+	//! control names under their own prefix, so the button itself is the only
+	//! thing that says which window was clicked.
+	protected MCF_Desktop_Window EditorOfButton(SCR_ButtonTextComponent button, string suffix)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return null;
+
+		foreach (MCF_Desktop_Window win : m_aWindows)
+		{
+			if (!win || win.m_iSlot < APP_WINDOWS)
+				continue;
+
+			SCR_ButtonTextComponent candidate = SCR_ButtonTextComponent.GetButtonText(win.Prefix() + suffix, root);
+			if (candidate == button)
+				return win;
+		}
+
+		return null;
+	}
+
 	// ======================================================= editing a file
 
 	//! Binds one editor window's controls.
@@ -2201,6 +2573,23 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		SCR_ButtonTextComponent save = SCR_ButtonTextComponent.GetButtonText(p + "FileSave", root);
 		if (save)
 			save.m_OnClicked.Insert(OnFileSave);
+
+		SCR_ButtonTextComponent write = SCR_ButtonTextComponent.GetButtonText(p + "Write", root);
+		if (write)
+			write.m_OnClicked.Insert(OnWriteClicked);
+
+		SCR_ButtonTextComponent page = SCR_ButtonTextComponent.GetButtonText(p + "Preview", root);
+		if (page)
+			page.m_OnClicked.Insert(OnPreviewClicked);
+
+		array<string> formats = {"Bold", "Italic", "Smaller", "Bigger", "AlignL", "AlignC", "AlignR"};
+
+		foreach (string format : formats)
+		{
+			SCR_ButtonTextComponent knob = SCR_ButtonTextComponent.GetButtonText(p + format, root);
+			if (knob)
+				knob.m_OnClicked.Insert(OnFormat);
+		}
 
 		if (win.m_sPane != PANE_SHEET)
 			return;
@@ -2242,11 +2631,25 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 		string p = win.Prefix();
 
-		ShowWidget(root, p + "BodyEdit", m_bAuthor);
-		ShowWidget(root, p + "BodyScroll", !m_bAuthor);
+		// A player always reads. A Game Master reads or types, and the button
+		// says which -- because formatting is only visible on the page and an
+		// edit box cannot be drawn bold.
+		bool typing = m_bAuthor && win.m_bTyping;
+
+		ShowWidget(root, p + "BodyEdit", typing);
+		ShowWidget(root, p + "BodyScroll", !typing);
 		ShowWidget(root, p + "TitleEdit", m_bAuthor);
 		ShowWidget(root, p + "DocTitle", !m_bAuthor);
 		ShowButton(root, p + "FileSave", m_bAuthor);
+		ShowButton(root, p + "Write", m_bAuthor && !win.m_bTyping);
+		ShowButton(root, p + "Preview", m_bAuthor && win.m_bTyping);
+
+		array<string> knobs = {"Bold", "Italic", "Smaller", "Bigger", "AlignL", "AlignC", "AlignR"};
+
+		foreach (string knob : knobs)
+		{
+			ShowButton(root, p + knob, m_bAuthor);
+		}
 		ShowButton(root, p + "Commit", m_bAuthor);
 		ShowWidget(root, p + "Formula", m_bAuthor);
 
@@ -2295,9 +2698,17 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		string p = win.Prefix();
 		SetText(root, p + "Ref", CellName(win.m_iCellRow, win.m_iCellCol));
 
-		EditBoxWidget formula = EditBoxWidget.Cast(root.FindAnyWidget(p + "Formula"));
-		if (formula)
-			formula.SetText(CellValue(win, win.m_iCellRow, win.m_iCellCol));
+		Widget formula = root.FindAnyWidget(p + "Formula");
+		SetBoxText(formula, CellValue(win, win.m_iCellRow, win.m_iCellCol));
+
+		// A SPREADSHEET PUTS THE CARET WHERE THE VALUE GOES. Selecting a cell
+		// and then having to click the formula bar as well is a click nobody
+		// makes in a real one, and without write mode the field takes no
+		// keystrokes at all -- which read as "you cannot edit anything".
+		if (m_bAuthor)
+			FocusBox(formula);
+
+		SetText(root, p + "Status", "Type, then the tick. SAVE writes it to the device.");
 	}
 
 	protected string CellValue(notnull MCF_Desktop_Window win, int row, int col)
@@ -2421,9 +2832,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		}
 		else
 		{
-			EditBoxWidget body = EditBoxWidget.Cast(root.FindAnyWidget(p + "BodyEdit"));
-			if (body)
-				win.m_Doc.m_sBody = MCF_Device_Text.Encode(body.GetText());
+			win.m_Doc.m_sBody = MCF_Device_Text.Encode(
+				BoxText(root.FindAnyWidget(p + "BodyEdit")));
 
 			EditBoxWidget title = EditBoxWidget.Cast(root.FindAnyWidget(p + "TitleEdit"));
 			if (title && win.m_sPane == PANE_DOC)
@@ -2733,6 +3143,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			return;
 
 		win.m_Doc = item;
+		win.m_bTyping = false;
 
 		if (!OpenWindow(slot))
 			return;
@@ -2764,6 +3175,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		string name = MCF_Device_Text.LeafOf(win.m_Doc.m_sHeading);
 		SetText(root, p + "Head", name);
 
+		ReadStyle(win, win.m_Doc.m_sStyle);
+
 		TextWidget bar = TextWidget.Cast(root.FindAnyWidget(p + "Title"));
 		if (bar)
 			bar.SetText(name);
@@ -2783,7 +3196,9 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			SetText(root, p + "DocTitle", name);
 			SetText(root, p + "TitleEdit", name);
 			SetText(root, p + "BodyEdit", body);
+			PaintCounts(win, body);
 			ShowEditingChrome(win);
+			PaintStyle(win);
 			return;
 		}
 
@@ -2809,7 +3224,9 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		SetText(root, p + "Gutter", numbers);
 		SetText(root, p + "FileBody", body);
 		SetText(root, p + "BodyEdit", body);
+		PaintCounts(win, body);
 		ShowEditingChrome(win);
+		PaintStyle(win);
 	}
 
 	//! A comma-separated body, in a grid.
@@ -3820,7 +4237,16 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 		EditBoxWidget box = EditBoxWidget.Cast(found);
 		if (box)
+		{
 			box.SetText(value);
+			return;
+		}
+
+		// A MULTILINE BOX IS NOT AN EDIT BOX. The two classes share no parent,
+		// so the cast above returns null for one and this one has to exist.
+		MultilineEditBoxWidget multi = MultilineEditBoxWidget.Cast(found);
+		if (multi)
+			multi.SetText(value);
 	}
 
 	protected void ShowWidget(notnull Widget root, string name, bool visible)

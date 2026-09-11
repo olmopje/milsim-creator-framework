@@ -86,6 +86,16 @@ class MCF_Desktop_Window
 	int m_iCellRow = -1;
 	int m_iCellCol = -1;
 
+	//! How the open document is formatted, and whether this editor is showing
+	//! its edit box or its page. An editor has two sides because a
+	//! MultilineEditBoxWidget is not a TextWidget and cannot be drawn bold --
+	//! you type on one side and read the formatted result on the other.
+	bool m_bBold;
+	bool m_bItalic;
+	float m_fFont = 12;
+	int m_iAlign;
+	bool m_bTyping;
+
 	ref array<ref MCF_Device_Item> m_aVisible = {};
 	ref array<SCR_ButtonTextComponent> m_aRows = {};
 
