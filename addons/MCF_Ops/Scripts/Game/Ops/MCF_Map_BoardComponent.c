@@ -57,6 +57,21 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "0", uiwidget: UIWidgets.CheckBox, desc: "Debug only: also hang the board's widget tree on the screen, to see whether the map draws there.")]
 	protected bool m_bDebugOnScreen;
 
+	//! MEASURED IN GAME, AND IT NARROWS THE WHOLE PROBLEM. With the Game
+	//! Master's editor camera the map draws; the moment the same player
+	//! spawns into a character it goes blank. The only thing that separates
+	//! those two states is the character camera, which OpenMap deliberately
+	//! switches off and which this component switched back on.
+	//!
+	//! So the line in OpenMap is very likely not an optimisation at all: the
+	//! map looks like a top-down render of the world, and the engine renders
+	//! one scene view at a time -- the character's, or the map's.
+	//!
+	//! Turning this off proves it. The world stops being drawn, which is why
+	//! nobody would ship it that way; it is here to settle the question.
+	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Keep the character camera rendering. Off means the world is not drawn at all -- a test, not a setting.")]
+	protected bool m_bKeepCharacterCamera;
+
 	//! The ballistic table carries this and its material reads it. Ours uses
 	//! that mesh for now, so it carries it too, set to visible.
 	int m_iOpacityMapId = 1;
@@ -206,11 +221,12 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		m_MapEntity.OpenMap(config);
 
-		// OpenMap switches the character camera off -- an optimisation for a
-		// map that fills the screen, which this one does not. Measured: the
-		// map carries on perfectly well with it back on.
+		// OpenMap switches the character camera off, and putting it back was
+		// the first guess. It is now the prime suspect instead: see
+		// m_bKeepCharacterCamera. With the editor camera the map draws, with
+		// a character it does not, and this line is the difference.
 		PlayerController controller = GetGame().GetPlayerController();
-		if (controller)
+		if (controller && m_bKeepCharacterCamera)
 			controller.SetCharacterCameraRenderActive(true);
 
 		// Not now: SCR_MapEntity counts down FRAME_DELAY frames after an open

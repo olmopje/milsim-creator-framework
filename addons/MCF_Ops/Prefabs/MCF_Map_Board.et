@@ -23,6 +23,7 @@ GenericEntity {
   }
   MCF_Map_BoardComponent "{6A1C4F0B39E12004}" {
    m_bDebugOnScreen 1
+   m_bKeepCharacterCamera 0
   }
   SCR_EditableEntityComponent "{6A1C4F0B39E12005}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_EntityType OBJECT
