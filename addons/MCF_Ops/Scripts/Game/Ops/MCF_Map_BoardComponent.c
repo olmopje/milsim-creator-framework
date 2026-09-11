@@ -62,7 +62,20 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the map's grid on the board. The grid belongs to the map entity rather than to this board, so two boards that disagree about it will take turns winning.")]
 	protected bool m_bShowGrid;
 
-	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Give this board a map entity of its own, so its view is independent of every player's map. Off falls back to driving the shared map entity, which works but is always in somebody's way.")]
+	//! MEASURED, AND THE ANSWER IS NO -- leave this off.
+	//!
+	//! The idea was sound and worth trying: SCR_MapEntity is the singleton,
+	//! MapEntity is not, so a board could spawn one of its own and have a
+	//! view nobody else can disturb. It does not work. There is one native
+	//! map renderer behind every MapEntity, and a second entity writes into
+	//! the same state. Calling InitializeLayers on it rebuilt the layers the
+	//! REAL map was using: the board and the player's own map both lost their
+	//! terrain and were left with contours, roads and descriptors on a flat
+	//! ground.
+	//!
+	//! There is no API that binds a MapWidget to a particular MapEntity, and
+	//! this is why. Do not try it again without new evidence.
+	[Attribute(defvalue: "0", uiwidget: UIWidgets.CheckBox, desc: "Measured and does not work: a second map entity writes into the same native state and destroys the real map's layers. Left here as the record, not as a setting.")]
 	protected bool m_bOwnMapEntity;
 
 	//! How often the board looks at where the viewer is and whether it still

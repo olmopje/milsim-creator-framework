@@ -1,4 +1,20 @@
-//! A map of the board's own, and nobody else's.
+//! A map of the board's own -- AND IT DOES NOT WORK. Kept as the record.
+//!
+//! THE ANSWER, MEASURED IN GAME: there is one native map renderer behind
+//! every MapEntity, and a second entity writes into the same state rather
+//! than keeping its own. InitializeLayers on this one rebuilt the layers the
+//! REAL map was using; the board and the player's own map both lost their
+//! terrain and were left with contours, roads and descriptors on a flat
+//! ground. Nothing about the view was independent.
+//!
+//! That also explains the thing that looked like an oversight: there is no
+//! API binding a MapWidget to a particular MapEntity, because a widget does
+//! not choose one. Do not try this again without new evidence.
+//!
+//! MCF_Map_BoardComponent.m_bOwnMapEntity is off, and this class is only
+//! constructed when somebody turns it on.
+//!
+//! The reasoning that led here, which was not wrong -- only the conclusion:
 //!
 //! WHY THIS EXISTS. SCR_MapEntity is a singleton: one static instance, one
 //! open flag, one set of invokers, one frame, one zoom. A board that shares
