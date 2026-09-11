@@ -1527,12 +1527,20 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (right)
 			right.SetText(trailing);
 
+		// NOT SetVisible(false) ON THE DISC. The disc is what gives this row
+		// its height -- 40 units plus the overlay's padding -- and a hidden
+		// widget contributes nothing to a layout. Hiding it collapsed the row
+		// to the height of one line, and the title and the preview drew on top
+		// of each other in every app that has no faces in it. Transparent
+		// keeps the space and shows nothing, which is what was wanted.
 		if (avatar)
 		{
-			avatar.SetVisible(showAvatar);
+			avatar.SetVisible(true);
 
 			if (showAvatar)
 				avatar.SetColor(Color.FromInt(MCF_Device_Text.AvatarColour(title)));
+			else
+				avatar.SetColor(Color.FromInt(0x00000000));
 		}
 
 		if (avatarText)
@@ -1666,7 +1674,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		string p = win.Prefix();
 		SetText(root, p + "ReadHeading", entry.m_sHeading);
 		SetText(root, p + "ReadStamp", entry.m_sTimestamp);
-		SetText(root, p + "ReadBody", entry.m_sBody);
+		SetText(root, p + "ReadBody", MCF_Device_Text.Body(entry.m_sBody));
 		SetText(root, p + "Hint", "");
 	}
 
@@ -1681,7 +1689,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		SetText(root, p + "From", MCF_Device_Text.SenderOf(entry.m_sHeading));
 		SetText(root, p + "Date", entry.m_sTimestamp);
 		SetText(root, p + "Subject", MCF_Device_Text.SubjectOf(entry.m_sHeading));
-		SetText(root, p + "ReadBody", entry.m_sBody);
+		SetText(root, p + "ReadBody", MCF_Device_Text.Body(entry.m_sBody));
 	}
 
 	protected void ShowChat(notnull MCF_Desktop_Window win, notnull MCF_Device_Item entry)
@@ -1734,8 +1742,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (!workspace)
 			return;
 
-		string said = entry.m_sBody;
-		said.Replace("\\n", "\n");
+		string said = MCF_Device_Text.Body(entry.m_sBody);
 
 		array<string> lines = {};
 		said.Split("\n", lines, true);
@@ -1809,7 +1816,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		else
 			SetText(root, p + "NoteLabel", "NOTE");
 
-		SetText(root, p + "Note", entry.m_sBody);
+		SetText(root, p + "Note", MCF_Device_Text.Body(entry.m_sBody));
 
 		// A CALL button on a contact with no number is a control that cannot do
 		// anything, and a device that offers it is lying about what it knows.

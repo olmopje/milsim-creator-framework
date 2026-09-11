@@ -1539,12 +1539,18 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (right)
 			right.SetText(trailing);
 
+		// NOT SetVisible(false) -- see the note in MCF_Desktop_ShellMenu. The
+		// disc is what gives the row its height, a hidden widget contributes
+		// nothing to a layout, and the two text lines end up on top of each
+		// other in notes, files and settings. Transparent keeps the space.
 		if (avatar)
 		{
-			avatar.SetVisible(showAvatar);
+			avatar.SetVisible(true);
 
 			if (showAvatar)
 				avatar.SetColor(Color.FromInt(AvatarColour(title)));
+			else
+				avatar.SetColor(Color.FromInt(0x00000000));
 		}
 
 		if (avatarText)
@@ -1583,6 +1589,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected string Preview(string body)
 	{
 		string flat = body;
+		flat.Replace("\\n", " ");
 		flat.Replace("\n", " ");
 
 		if (flat.Length() > 52)
@@ -1959,7 +1966,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// message. The shared row layout is a button: one line, no wrapping,
 		// and a sentence of any length simply ran off the side of the phone.
 		if (m_wReadBody)
-			m_wReadBody.SetText(entry.m_sBody);
+			m_wReadBody.SetText(MCF_Device_Text.Body(entry.m_sBody));
 
 		ShowPicture(entry);
 
@@ -2574,8 +2581,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// A config file that carried the newline through as two characters
 		// rather than one would otherwise put "\n" in the middle of a bubble.
 		// Harmless when the parser already did the right thing.
-		string said = entry.m_sBody;
-		said.Replace("\\n", "\n");
+		string said = MCF_Device_Text.Body(entry.m_sBody);
 
 		array<string> lines = {};
 		said.Split("\n", lines, true);
@@ -2669,7 +2675,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		RichTextWidget body = RichTextWidget.Cast(root.FindAnyWidget("MailBody"));
 		if (body)
-			body.SetText(entry.m_sBody);
+			body.SetText(MCF_Device_Text.Body(entry.m_sBody));
 
 		if (m_wDeviceName)
 			m_wDeviceName.SetVisible(false);
@@ -2741,7 +2747,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		RichTextWidget note = RichTextWidget.Cast(root.FindAnyWidget("ContactNote"));
 		if (note)
-			note.SetText(entry.m_sBody);
+			note.SetText(MCF_Device_Text.Body(entry.m_sBody));
 
 		// A CALL button on a contact with no number saved is a control that
 		// cannot do anything, and a phone that offers it is lying about what it

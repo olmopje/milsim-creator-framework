@@ -112,10 +112,28 @@ class MCF_Device_Text
 		return 0xFF4C5560;
 	}
 
+	//! A body, as it is meant to be read.
+	//!
+	//! THE CONFIG PARSER DOES NOT TURN "\n" INTO A NEWLINE. A mission maker
+	//! writing a paragraph break into MCF_DeviceProfiles.conf gets the two
+	//! characters through to the screen, and the device prints them at the
+	//! reader: "signed for nine.\n\nIf anything happens to me". Every place
+	//! that shows a body has to undo that, so it lives here rather than in
+	//! each of the eleven of them.
+	static string Body(string text)
+	{
+		// `out` IS A RESERVED WORD -- it is the out-parameter marker, and this
+		// is the third local called that in one day. Named for what it holds.
+		string plain = text;
+		plain.Replace("\\n", "\n");
+		return plain;
+	}
+
 	//! One line of a body, short enough to sit under a sender.
 	static string Preview(string body, int limit)
 	{
 		string flat = body;
+		flat.Replace("\\n", " ");
 		flat.Replace("\n", " ");
 
 		if (flat.Length() > limit)
