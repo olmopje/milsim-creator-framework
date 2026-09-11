@@ -1,0 +1,62 @@
+// What gets drawn onto a map board in the world.
+//
+// NEVER PARENTED TO THE SCREEN. The component creates this with
+// CreateWidgets(layout) and no parent, so it lives outside the screen
+// hierarchy and is only ever seen through the board's material sampling
+// $rendertarget. That is how vanilla's ballistic table puts a page on a
+// surface, and the shape here is copied from its
+// UI/layouts/Gadgets/BallisticTable/BallisticTableRenderTarget.layout.
+//
+// SQUARE AND 1024. The map is measured into the widget's own unit space, so
+// the texture's aspect is the board's aspect. Square keeps north up and the
+// scale even in both directions; the frame it is cropped into is the mesh's
+// business, not this file's.
+//
+// The slots deliberately carry no Anchor. Anchor plus a size gives 0 x 0, and
+// a render target sized zero asks the driver for a texture sized zero -- which
+// reads in the log as "Out of memory when requested 0, Type: Video" and is a
+// layout fault wearing a graphics fault's coat.
+FrameWidgetClass {
+ Name "rootFrame"
+ Slot FrameWidgetSlot "{6A1C4F0B39E11001}" {
+  SizeX 1024
+  OffsetRight -1024
+  SizeY 1024
+  OffsetBottom -1024
+ }
+ {
+  RTTextureWidgetClass "{6A1C4F0B39E11002}" {
+   Name "RTTexture0"
+   Slot FrameWidgetSlot "{6A1C4F0B39E11003}" {
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 1024
+    OffsetRight -1024
+    SizeY 1024
+    OffsetBottom -1024
+   }
+   {
+    MapWidgetClass "{0000000060029FBB}" {
+     Name "MapWidget"
+     Slot FrameWidgetSlot "{6A1C4F0B39E11004}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 1024
+      OffsetRight -1024
+      SizeY 1024
+      OffsetBottom -1024
+     }
+     Color 1 1 1 1
+     SizeInUnits 1024 1024
+     OffsetPixels 0 0
+     Clear 1
+     ClearColor 0.173 0.344 0.62 1
+    }
+   }
+  }
+ }
+}
