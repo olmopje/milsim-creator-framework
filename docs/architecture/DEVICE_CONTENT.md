@@ -360,3 +360,149 @@ The status bar, the home screen and the lock screen all read
 player's. All three are re-read on the one-second status tick. The lock screen's
 clock used to be set once when the screen opened and drifted away from the world
 the longer the phone stayed up.
+
+## 12. The laptop is a machine, not a bigger phone
+
+The phone and the laptop read the same `MCF_Device_Profile`, run the same
+`MCF_Device_Content` presenter and draw the same rows. What changed for the
+laptop is what a person expects to be able to *do*: on a handset you read what
+is there, on a machine you open folders, open files in programs, type into them
+and save. Section 11 is still the whole truth about the data; this section is
+about the shell built on top of it.
+
+### 12.1 Folders are paths in a heading, not a new field
+
+`MCF_Device_Item` gained nothing. A file's folder is the part of `m_sHeading`
+before the last `/`, exactly the way a path works everywhere else:
+
+```
+manifest_8841.pdf              -> the root
+Documents/ledger_feb.xlsx      -> Documents
+scans/scan_receipt_0412.jpg    -> scans
+backup/                        -> an empty folder, and nothing else
+```
+
+A trailing `/` is the only way to say "this folder exists but has nothing in
+it", because an empty folder has no file to infer it from. `MCF_Device_Text`
+owns the whole vocabulary -- `FolderOf`, `LeafOf`, `IsFolderMark`, `Join`,
+`Under`, `ExtOf` -- and nothing else is allowed to split a heading by hand.
+
+**Nothing in the config format changed**, which was the point. A mission maker
+who has never heard of the file manager writes `m_sHeading "readme.txt"` and
+gets a file in the root; one who wants a tree types a path. The phone, which
+has no file manager, shows the leaf and is unaffected.
+
+### 12.2 The file manager has two halves, and they are not a list and a reader
+
+The first build put folders on top of files in one column with a reading pane
+beside it. That is a message app with a breadcrumb. A file manager's left half
+is **where you are** -- every folder on the device, indented by depth -- and the
+right half is **what is in the folder you picked**. The tree is rebuilt from
+every path on the device on each fill, walking each path segment by segment so
+that a file at `a/b/c.txt` proves both `a` and `a/b` exist, and sorted so the
+tree does not reshuffle between two openings of the same device.
+
+Both halves use `MCF_DesktopRow.layout` -- one line, an icon, a name, a right
+column -- not the phone's two-line `MCF_PhoneRow`, because a filename is not a
+message with a preview under it.
+
+### 12.3 The extension is the whole rule
+
+`MCF_Device_Text.EditorSlot()` decides which window a file opens in, and it
+looks at nothing but the extension:
+
+| extension                      | window        |
+| ------------------------------ | ------------- |
+| `xls` `xlsx` `csv` `tsv`       | Spreadsheet   |
+| `doc` `docx` `rtf` `pdf` `odt` | Document      |
+| anything else, including none  | Text editor   |
+
+This is how a real machine decides and how a mission maker would expect it to.
+Nothing else about an item says what kind of thing it is, and nothing else
+should have to: name a file `ledger_feb.xlsx` and it opens in a grid.
+
+The slot numbers are window indices in `MCF_Desktop_ShellMenu`'s table. Unlike
+`MCF_EIntelApp` they are **not persisted anywhere**, so they are safe to move.
+
+### 12.4 Thirteen windows, ten of which are apps
+
+`WINDOWS = 13`, `APP_WINDOWS = 10`. The last three are the editors. They are
+not applications the device has -- they are where a file goes when you open it
+-- so the launcher and the taskbar only ever offer the first ten. Offering
+"Spreadsheet" in a launcher with nothing to put in it is a menu entry that
+opens a blank.
+
+An editor window's title is its file, not its kind, which is why `TitleOf()`
+asks `m_Doc` before it falls back to the pane name.
+
+### 12.5 A player reads and a Game Master types
+
+Each editor carries **both halves of its body in the same box** -- a read-only
+pane and an edit box -- and shows one. An edit box that is always there would
+let a player rewrite the evidence they were sent to find; a read-only pane
+would leave the Game Master with nowhere to write it in the first place.
+`ShowEditingChrome()` is the single place that decides, off `m_bAuthor`, and it
+also hides SAVE and the formula bar and writes "Read only." into the status
+line for a player.
+
+### 12.6 Saving goes the way everything else goes
+
+There is no separate save path for files, and there should not be -- a file is
+an item in an app like everything else on the device. SAVE writes onto the
+**draft** profile and sends `MCF_RequestWriteDeviceProfile`; the server upserts
+it onto the object and replicates it.
+
+One thing had to move for that to work. `Draft()` used to run at the first
+edit, which swapped the presenter's profile for a copy -- and anything already
+holding an item from the old one went on editing a copy nobody would ever send.
+It now runs **in `OnMenuOpen` when `m_bAuthor`**, so every item the shell hands
+around for the rest of the session is already a draft item and an editor can
+simply write to the thing it was given.
+
+### 12.7 The three editors
+
+**Text editor.** A gutter carrying every line number as one widget -- which
+lines up with the body for free as long as both use the same line spacing, and
+costs one widget instead of forty -- beside the body or the edit box.
+
+**Spreadsheet.** The body is comma-separated; the first line is the header,
+written into the row that would otherwise be row 1, which is exactly where a
+person putting a table into a spreadsheet puts it. The 78 cells are
+`SCR_ButtonTextComponent`s rather than text widgets, because a click has to be
+able to say *which* cell it was; the grid is fixed in the layout, so the list is
+built once when the window is bound and never rebuilt. A formula bar (the cell
+reference, an edit box, a commit tick) writes into the selected cell and
+rebuilds the body from the whole grid.
+
+Two rules keep the round trip honest: **a comma typed into a cell becomes a
+semicolon**, because it would otherwise be a column break the next time the
+file is read; and **trailing empty rows and columns are dropped**, because a
+table typed into three cells should not save as thirteen lines of commas, and a
+mission maker who opens the config afterwards should recognise what they wrote.
+
+**Document.** The title *is* the filename, so typing over it renames the file --
+which is what a person would expect, and what the file manager shows a second
+later, because SAVE re-fills the Files window too.
+
+### 12.8 Right-click, the way a PC does it
+
+`OnMouseButtonDown` with `button == 1` opens the context menu. Create file,
+create folder, rename, delete -- Game Master only. A newly created file goes
+straight into the rename prompt, because `new_file.txt` is not a name anybody
+wants and the only reason to make one is to call it something; a *file* then
+opens in its editor afterwards (`m_bOpenAfterNaming`), a folder stops there.
+
+### 12.9 What the shell is made of
+
+| piece                     | file                                            |
+| ------------------------- | ----------------------------------------------- |
+| the menu, ~3,000 lines    | `MCF_Desktop_ShellMenu.c`                       |
+| one window's state        | `MCF_Desktop_Window.c`                          |
+| paths, extensions, bodies | `MCF_Device_Text.c` (shared with the phone)     |
+| the layout, ~19,000 lines | generated by `tools/generate_desktop_layout.py` |
+| the art, 36 pieces        | generated by `tools/generate_desktop_art.py`    |
+
+**The layout is generated and must stay generated.** Hand-editing
+`MCF_IntelDesktop.layout` and then regenerating loses the edit silently.
+Thirteen windows with three editors in them is more GUIDs than a person should
+be asked to keep unique by hand.

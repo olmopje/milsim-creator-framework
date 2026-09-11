@@ -2180,7 +2180,12 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	{
 		string p = win.Prefix();
 
-		SCR_ButtonTextComponent save = SCR_ButtonTextComponent.GetButtonText(p + "Save", root);
+		// FileSave, NOT Save. The pane's heading strip used to carry the Game
+		// Master's toolbar, whose fourth button is also called `<W>Save`, so
+		// this bound the handler to the toolbar's hidden tick and left the
+		// visible SAVE button doing nothing. The editors have no toolbar now
+		// and their button has its own name.
+		SCR_ButtonTextComponent save = SCR_ButtonTextComponent.GetButtonText(p + "FileSave", root);
 		if (save)
 			save.m_OnClicked.Insert(OnFileSave);
 
@@ -2227,8 +2232,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		ShowWidget(root, p + "BodyEdit", m_bAuthor);
 		ShowWidget(root, p + "BodyScroll", !m_bAuthor);
 		ShowWidget(root, p + "TitleEdit", m_bAuthor);
-		ShowWidget(root, p + "Title", !m_bAuthor);
-		ShowButton(root, p + "Save", m_bAuthor);
+		ShowWidget(root, p + "DocTitle", !m_bAuthor);
+		ShowButton(root, p + "FileSave", m_bAuthor);
 		ShowButton(root, p + "Commit", m_bAuthor);
 		ShowWidget(root, p + "Formula", m_bAuthor);
 
@@ -2444,7 +2449,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			if (!win || win.m_iSlot < APP_WINDOWS)
 				continue;
 
-			SCR_ButtonTextComponent candidate = SCR_ButtonTextComponent.GetButtonText(win.Prefix() + "Save", root);
+			SCR_ButtonTextComponent candidate = SCR_ButtonTextComponent.GetButtonText(win.Prefix() + "FileSave", root);
 			if (candidate == button)
 				return win;
 		}
@@ -2761,7 +2766,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (win.m_sPane == PANE_DOC)
 		{
 			SetText(root, p + "Stamp", win.m_Doc.m_sTimestamp);
-			SetText(root, p + "Body", body);
+			SetText(root, p + "FileBody", body);
+			SetText(root, p + "DocTitle", name);
 			SetText(root, p + "TitleEdit", name);
 			SetText(root, p + "BodyEdit", body);
 			ShowEditingChrome(win);
@@ -2788,7 +2794,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		}
 
 		SetText(root, p + "Gutter", numbers);
-		SetText(root, p + "Body", body);
+		SetText(root, p + "FileBody", body);
 		SetText(root, p + "BodyEdit", body);
 		ShowEditingChrome(win);
 	}

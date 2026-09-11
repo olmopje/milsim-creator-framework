@@ -177,7 +177,7 @@ def txt(name, a, ind, size, colour=None, align=None, text="", rich=False,
     return s
 
 
-def editbox(name, a, ind, size=12, limit=4000, spacing=None):
+def editbox(name, a, ind, size=12, limit=4000, spacing=None, colour=None):
     """A field you can type in.
 
     `style blank` and our own EditBoxWidgetClass rather than an override of
@@ -201,6 +201,10 @@ def editbox(name, a, ind, size=12, limit=4000, spacing=None):
     s += p + ' "Min Font Size" %d\n' % size
     if spacing:
         s += p + ' "Line Spacing" %d\n' % spacing
+    if colour:
+        # AN EDIT BOX'S TEXT IS WHITE UNLESS IT IS TOLD OTHERWISE, and two of
+        # these sit on a white page. Nobody reads white on white.
+        s += p + " Color %s\n" % col(colour)
     s += p + "}\n"
     return s
 
@@ -221,7 +225,7 @@ def frame(name, a, ind, body, visible=True):
 
 def flatbtn(name, a, ind, icon=None, label=None, icon_px=22, pad_l=10,
             text_l=40, size=12, bg="1 1 1 0", bg_hi="1 1 1 0.10",
-            bg_sel=None, tex=None, label_align=None):
+            bg_sel=None, tex=None, label_align=None, ink=None):
     """A blank button with an overlay inside it.
 
     THE OVERLAY IS NOT OPTIONAL. A ButtonWidget's children sit in
@@ -292,6 +296,10 @@ def flatbtn(name, a, ind, icon=None, label=None, icon_px=22, pad_l=10,
         s += p + '     Text "%s"\n' % label
         s += p + '     "Font Size" %d\n' % size
         s += p + '     "Min Font Size" %d\n' % size
+        if ink:
+            # A BUTTON'S LABEL IS WHITE BY DEFAULT. Seventy-eight of these are
+            # spreadsheet cells on a paper-white grid, where white is nothing.
+            s += p + "     Color %s\n" % col(ink)
         s += p + "    }\n"
     s += p + "   }\n"
     s += p + "  }\n"
@@ -399,10 +407,20 @@ def toolbar(p, ind):
     return s
 
 
-def pane_head(p, ind, title=""):
+def pane_head(p, ind, title="", tools=True):
+    """The heading strip. `tools` is the Game Master's Add/Edit/Del/Save row.
+
+    THE EDITORS MUST NOT HAVE IT. Its fourth button is called `<W>Save`, which
+    is the name the editors gave their own SAVE -- two widgets with one name in
+    one window, and FindAnyWidget returns whichever it reaches first. The
+    editors bound their handler to the toolbar's hidden tick and the visible
+    SAVE button did nothing at all. An editor has no list to add to or delete
+    from either, so the row was wrong twice over.
+    """
     s = txt(p + "Head", (0.022, 0.020, 0.690, 0.086), ind, 14, text=title)
     s += img(p + "HeadRule", (0.022, 0.098, 0.978, 0.1005), ind, colour=LINE)
-    s += toolbar(p, ind)
+    if tools:
+        s += toolbar(p, ind)
     return s
 
 
@@ -532,7 +550,7 @@ def pane_text(p, ind):
     monospaced-looking text. It is the cheapest of the three to draw and the
     one a player will open most, because most of what is worth finding on a
     seized machine was typed into a text file."""
-    s = pane_head(p, ind)
+    s = pane_head(p, ind, tools=False)
     s += img(p + "Glass", (0.016, 0.112, 0.984, 0.980), ind, colour=TERM_BG)
     s += txt(p + "Gutter", (0.022, 0.122, 0.062, 0.972), ind, 11,
              colour=FAINT_INK, align="Right", rich=True, spacing=20)
@@ -543,11 +561,11 @@ def pane_text(p, ind):
     # sent to find, and a read-only pane would leave the Game Master with
     # nowhere to write it in the first place.
     s += scroll(p + "BodyScroll", (0.080, 0.118, 0.978, 0.930), ind,
-                p + "Body", kind="rich", size=12, colour="0.84 0.87 0.89 1")
+                p + "FileBody", kind="rich", size=12, colour="0.84 0.87 0.89 1")
     s += editbox(p + "BodyEdit", (0.080, 0.118, 0.978, 0.930), ind, 12, 6000, 19)
     s += img(p + "BarFill", (0.016, 0.934, 0.984, 0.980), ind, colour="1 1 1 0.05")
     s += txt(p + "Status", (0.030, 0.940, 0.700, 0.976), ind, 10, colour=FAINT_INK)
-    s += flatbtn(p + "Save", (0.800, 0.938, 0.972, 0.976), ind, label="SAVE",
+    s += flatbtn(p + "FileSave", (0.800, 0.938, 0.972, 0.976), ind, label="SAVE",
                  size=11, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
                  label_align="centre")
     return s
@@ -558,7 +576,7 @@ def pane_sheet(p, ind):
     """A grid. The body is read as comma-separated lines -- the first line is
     the header row -- which is a convention a mission maker can type into a
     config without learning anything, and is what a spreadsheet is."""
-    s = pane_head(p, ind)
+    s = pane_head(p, ind, tools=False)
 
     # The formula bar. ONE edit box for seventy-eight cells: a spreadsheet is
     # the one editor where the field you type in is not where the value lives,
@@ -569,7 +587,7 @@ def pane_sheet(p, ind):
     s += editbox(p + "Formula", (0.098, 0.114, 0.828, 0.150), ind, 11, 200)
     s += flatbtn(p + "Commit", (0.838, 0.112, 0.906, 0.152), ind, icon="check",
                  icon_px=15, bg="1 1 1 0.08", bg_hi="1 1 1 0.18", tex="tile")
-    s += flatbtn(p + "Save", (0.914, 0.112, 0.978, 0.152), ind, label="SAVE",
+    s += flatbtn(p + "FileSave", (0.914, 0.112, 0.978, 0.152), ind, label="SAVE",
                  size=10, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
                  label_align="centre")
 
@@ -605,7 +623,8 @@ def pane_sheet(p, ind):
                          (cx + 0.0012, ry + 0.0012, cx + cw, ry + rh),
                          ind, label="", text_l=8, size=10,
                          bg="1 1 1 0", bg_hi="0.55 0.62 0.72 0.35",
-                         bg_sel="0.29 0.47 0.72 0.45")
+                         bg_sel="0.29 0.47 0.72 0.45",
+                         ink="0.12 0.13 0.15 1")
 
     return s
 
@@ -615,19 +634,24 @@ def pane_doc(p, ind):
     """A page on a desk. White, inset, with its title set larger than its body
     -- which is all that separates a word processor from a text editor to look
     at, and it is enough for a player to know which one they are holding."""
-    s = pane_head(p, ind)
+    s = pane_head(p, ind, tools=False)
     s += img(p + "Desk", (0.016, 0.112, 0.984, 0.980), ind, colour="0.11 0.12 0.14 1")
     s += img(p + "Page", (0.170, 0.128, 0.830, 0.980), ind, colour="0.97 0.97 0.96 1")
-    s += txt(p + "Title", (0.206, 0.160, 0.794, 0.216), ind, 17,
+    # DocTitle, not Title: the window's own title bar is already called
+    # `<W>Title`, and two widgets with one name in one window is how the SAVE
+    # button ended up bound to something invisible.
+    s += txt(p + "DocTitle", (0.206, 0.160, 0.794, 0.216), ind, 17,
              colour="0.10 0.11 0.13 1", rich=True, wrap=True, spacing=22)
-    s += editbox(p + "TitleEdit", (0.206, 0.160, 0.794, 0.216), ind, 16, 200)
+    s += editbox(p + "TitleEdit", (0.206, 0.160, 0.794, 0.216), ind, 16, 200,
+                 colour="0.10 0.11 0.13 1")
     s += img(p + "Rule", (0.206, 0.226, 0.794, 0.2275), ind, colour="0.72 0.72 0.70 1")
     s += txt(p + "Stamp", (0.206, 0.236, 0.794, 0.272), ind, 10,
              colour="0.42 0.43 0.44 1")
     s += scroll(p + "BodyScroll", (0.200, 0.290, 0.800, 0.930), ind,
-                p + "Body", kind="rich", size=12, colour="0.13 0.14 0.16 1")
-    s += editbox(p + "BodyEdit", (0.206, 0.290, 0.794, 0.930), ind, 12, 6000, 20)
-    s += flatbtn(p + "Save", (0.626, 0.938, 0.798, 0.976), ind, label="SAVE",
+                p + "FileBody", kind="rich", size=12, colour="0.13 0.14 0.16 1")
+    s += editbox(p + "BodyEdit", (0.206, 0.290, 0.794, 0.930), ind, 12, 6000, 20,
+                 colour="0.13 0.14 0.16 1")
+    s += flatbtn(p + "FileSave", (0.626, 0.938, 0.798, 0.976), ind, label="SAVE",
                  size=11, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
                  label_align="centre")
     s += txt(p + "Status", (0.206, 0.940, 0.610, 0.976), ind, 10, colour=FAINT_INK)
@@ -928,4 +952,25 @@ META = '''MetaFileClass {
 with open(OUT + ".meta", "w") as fh:
     fh.write(META)
 
-print("bytes:", len(doc), "guids:", _n[0], "lines:", doc.count("\n"))
+# ---------------------------------------------- two widgets, one name
+# THIS IS THE MOST EXPENSIVE FAULT THIS FILE CAN PRODUCE and it is silent.
+# FindAnyWidget and GetButtonText return whichever match they reach first, so
+# a second widget with the same name does not fail -- it quietly steals every
+# lookup. It cost the editors their SAVE button (bound to the Game Master
+# toolbar's hidden tick, which is also called `<W>Save`) and their body text
+# (written into the pane's container, also called `<W>Body`).
+#
+# `Background` is the one legitimate repeat: a button's fill MUST be called
+# that, it is the only child SCR_ButtonTextComponent tints, and it is only ever
+# looked up through its own button.
+import re as _re
+_names = _re.findall(r'Name\s+"([^"]+)"', doc)
+_seen = {}
+for _name in _names:
+    _seen[_name] = _seen.get(_name, 0) + 1
+_dupes = sorted(n for n, c in _seen.items() if c > 1 and n != "Background")
+if _dupes:
+    raise SystemExit("DUPLICATE WIDGET NAMES: " + ", ".join(_dupes))
+
+print("bytes:", len(doc), "guids:", _n[0], "lines:", doc.count("\n"),
+      "names:", len(_names))

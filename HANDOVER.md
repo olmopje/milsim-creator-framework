@@ -319,7 +319,52 @@ files and settings keep the plain reader and should. DEVICE_CONTENT §11 has the
 authoring conventions — in particular that `" - "` in a heading splits it into
 who and when.
 
-### 6. The namespace rename, with a fresh head
+### 6. The laptop desktop — DONE 2026-09-11
+
+The laptop is no longer a phone on a bigger screen. It is a KDE-shaped desktop
+with a panel, a launcher, real draggable stacking windows, a lock screen, a file
+manager with a folder tree, and three editors a file opens into and can be typed
+into and saved from. DEVICE_CONTENT §12 is the design; this is what it cost.
+
+**It reuses everything and reinvents nothing.** Same `MCF_Device_Profile`, same
+`MCF_Device_Content` presenter, same rows where a row makes sense. The phone's
+fixes — the linear colours, the `Background` child on a button, the always-visible
+`Sizer` that declares a row's height, `"Horizontal Alignment"` — were all already
+paid for and are simply used.
+
+**The layout is generated.** `tools/generate_desktop_layout.py` writes
+`MCF_IntelDesktop.layout`: ~19,000 lines, 2,630 GUIDs off the stem
+`6A1C4F0B39E0xxxx`. `tools/generate_desktop_art.py` writes all 36 art pieces at
+4× and downsamples. **Hand-editing either output and then regenerating loses the
+edit silently.**
+
+**Folders are paths in `m_sHeading`.** Nothing was added to the data. A trailing
+`/` is an empty folder. `MCF_Device_Text` owns every split; nothing else may cut
+a heading by hand.
+
+**A file's extension is the whole rule** for which editor it opens in. Those
+window slots are not persisted anywhere, unlike `MCF_EIntelApp`, so they are safe
+to move.
+
+**Thirteen windows, ten of them apps.** The launcher and the taskbar iterate
+`APP_WINDOWS`, not `WINDOWS`, or they offer "Spreadsheet" with nothing in it.
+
+**A player reads, a Game Master types.** Every editor carries a read-only pane
+and an edit box in the same box and shows one, off `m_bAuthor`.
+
+**`Draft()` now runs at `OnMenuOpen`, not at the first edit.** It swaps the
+presenter's profile for a copy, so anything already holding an item from the old
+one goes on editing a copy nobody will ever send. Making the draft before a
+single window is filled means every item the shell hands around is a draft item.
+
+**Dragging works the way §"Dragging a widget" describes** — there is no
+`OnMouseMove` and no mouse capture, so a per-frame tick polls the mouse and a
+transparent full-screen catcher takes the release.
+
+Verified: `Module: Game`, 5778 files, 11341 classes, no errors. Not yet verified
+in a live session with a second client.
+
+### 7. The namespace rename, with a fresh head
 
 `MCF_Devices_` → `MCF_Lock_`, so it stops differing from `MCF_Device_` by one
 letter while meaning something else. And decide what to do about `MCF_AI_` and
@@ -328,9 +373,13 @@ which is exactly why it should not be done at the end of a long session.
 
 ### Deliberately not next
 
-**The laptop.** It works; the preview framing and the flat-colour materials are
-parked mid-tuning at the user's request. It blocks nothing, and it is the kind of
-work that eats an evening without closing an open question.
+**The phone.** Parked at the user's request on 2026-09-11: "dat zijn de functies
+zoals ik ze wou hebben". Its layouts are still in sRGB rather than linear, which
+is cosmetic and deliberately deferred.
+
+**The laptop's 3D side.** The desktop UI is done; the preview framing and the
+flat-colour materials on the model are still parked mid-tuning. They block
+nothing.
 
 **MAP intel, GROUP tasks, the restrained pose.** These are new features, not
 finishing what exists.
@@ -895,3 +944,79 @@ children, they are not "highest Z wins" in the way a CSS stacking context is.
 So a screen that must cover another one hides it rather than covering it. That
 is also the more honest model: a locked machine has no taskbar and no shortcuts,
 it has the way in and nothing else.
+
+### `Size` on an OverlayWidget is ignored; on an ImageWidget it works
+
+Two lines of text in a phone row overlapped, and the obvious fix — set the row's
+height — did nothing, because the row is an OverlayWidget and `Size` on one is
+not read. The second attempt made the row's avatar transparent so it would still
+declare the height; that failed too, and the failure is the more useful fact:
+
+**A hidden widget contributes nothing to a layout.** Hiding the avatar collapsed
+the row it was supposed to be holding open. Transparent is not hidden — but the
+avatar was being hidden, not tinted, and the row went with it.
+
+What works is a **`Sizer`**: an ImageWidget that is always visible, `Color 1 1 1 0`
+so it draws nothing, with an explicit `Size`. It declares the row's height and
+costs one widget. `MCF_PhoneRow.layout` and `MCF_DesktopRow.layout` both carry
+one, and any new row layout should.
+
+### The config parser does not unescape `\n`
+
+`m_sBody "line one\nline two"` in a `.conf` arrives in script as the six
+characters `l i n e ... \ n ...` — a literal backslash and a literal n, printed
+on screen exactly like that. The parser stores the bytes and does nothing else
+to them.
+
+So the unescape happens at display time, in `MCF_Device_Text.Body()`, and every
+place that puts a body on screen goes through it. Doing it at load time instead
+would mean touching the presenter, the draft path and the replication payload;
+doing it at display time is one function and one call site per pane.
+
+### An EditBoxWidget in a generated layout
+
+It needs its own `EditBoxWidgetClass` with an `EditBoxFilterComponent` and
+`style blank` — **not** an override of `SCR_EditBoxComponent`, which drags in
+chrome the layout does not have and paints over what is behind it. `SetText`
+does not reach one through `TextWidget.Cast` or `RichTextWidget.Cast`, so any
+shared text helper has to try `EditBoxWidget.Cast` as well; ours does, which is
+why the same `SetText(root, name, value)` fills a read-only pane and an edit box
+without the caller knowing which it hit.
+
+### Two widgets with one name: the most expensive silent fault a layout has
+
+`FindAnyWidget` and `SCR_ButtonTextComponent.GetButtonText` return **whichever
+match they reach first**. A second widget with the same name does not warn, does
+not fail and does not log — it quietly steals every lookup for that name, and
+the symptom shows up somewhere else entirely.
+
+It cost the desktop's editors two things at once:
+
+- **SAVE did nothing.** The pane's heading strip carried the Game Master's
+  toolbar, whose fourth button is `<W>Save`; the editors called their own SAVE
+  the same. The handler went onto the toolbar's tick, which `ShowToolbar` hides
+  for a window with no app kind, so the visible button had no handler at all.
+- **The body was blank.** A window's pane container is `<W>Body`, and the text
+  and document editors called their read-only rich text the same, so every
+  `SetText(root, p + "Body", …)` wrote into a FrameWidget and vanished.
+
+Both looked like logic bugs and neither was.
+
+**`generate_desktop_layout.py` now refuses to write a layout containing a
+duplicate name**, `Background` excepted — that one is mandatory (it is the only
+child `SCR_ButtonTextComponent` tints) and is only ever reached through its own
+button. Any generator that writes a layout should carry the same assertion; a
+hand-written layout should be swept for it whenever a lookup returns something
+surprising.
+
+### A widget's text colour defaults to white, everywhere
+
+`TextWidgetClass`, `RichTextWidgetClass` and `EditBoxWidgetClass` all draw white
+when no `Color` is given, and a generator that treats `colour` as optional will
+happily put white on a white page. The spreadsheet's seventy-eight cells and the
+document editor's two edit boxes all did exactly that and read as empty.
+
+So: **every widget drawn on a light surface must be given an explicit `Color`**,
+and a helper that can be placed on one needs the parameter — `editbox(colour=)`
+and `flatbtn(ink=)` exist for that reason. On a dark surface the default happens
+to be right, which is what makes the omission so easy to miss.
