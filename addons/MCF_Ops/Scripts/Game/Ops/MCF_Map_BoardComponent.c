@@ -11,18 +11,32 @@
 //!   3. RemoveRenderTarget(owner) on the way out. Not optional; the engine's
 //!      own comment says it must be called when the widget goes away.
 //!
-//! WHAT IS OURS RATHER THAN THEIRS is what goes in the tree: a MapWidget, and
-//! SCR_MapEntity opened into it. This works: the board shows the world's real
-//! map, the one with everybody's markers on it.
+//! THE BOARD DOES NOT OPEN THE MAP, and that is the whole design. There is
+//! one SCR_MapEntity and one open map, and while a board holds it open the
+//! player's M does the wrong thing -- whatever asks "is a map open" has
+//! already been told yes. Handing it back does not work either: closing the
+//! map calls EnableVisualisation(false) and the board goes blank.
 //!
-//! THE MAP IS NOT OURS TO KEEP, and that cost a day to find. SCR_MapEntity is
-//! a singleton with one open map. Two to four seconds after a board comes up,
-//! something else opens one -- the spawn screen, the Game Master, a player's
-//! own map -- and SCR_MapEntity closes ours to make room. Nothing ever hands
-//! it back. So the board watches, and takes the map the moment nobody else is
-//! holding it. It never takes it FROM anyone: if a map is open, it is
-//! somebody's, and we wait. A board is blank exactly while someone is reading
-//! a map, which is exactly when nobody is looking at the board.
+//! So the board splits the two things SCR_MapEntity does at once:
+//!
+//!   OPEN is bookkeeping -- m_bIsOpen, the widget it panned last, the
+//!   modules it activated, the character camera. That is the PLAYER'S, and
+//!   the board leaves it alone.
+//!
+//!   DRAWING is three native calls on the entity: EnableVisualisation(true),
+//!   SetFrame(worldRect), and the layer. Those have nothing to do with
+//!   m_bIsOpen, and a MapWidget draws whenever they are set.
+//!
+//! The board therefore opens the map ONCE, at birth, to have SCR_MapEntity
+//! do the setup no one should retype -- layers, props, descriptors, the
+//! widget's SizeInUnits, the zoom -- reads the island's frame off it, and
+//! closes it again. From then on it never touches the map's state: it only
+//! keeps visualisation on and re-states its own frame. IsOpen() stays false,
+//! so M works, and the board keeps drawing.
+//!
+//! While somebody's real map IS open the board touches nothing at all. Their
+//! frame is the entity's frame for those seconds and the board follows it --
+//! liveable, and the alternative is fighting them for it every frame.
 [ComponentEditorProps(category: "MCF/Ops", description: "Shows the world's own map on this object's surface.")]
 class MCF_Map_BoardComponentClass : ScriptComponentClass
 {
@@ -45,15 +59,9 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "5", uiwidget: UIWidgets.EditBox, desc: "Over how many metres the map fades out to white before the activation distance. 5 means it starts going at 35 m and is white at 40 m.", params: "0 200")]
 	protected float m_fFadeBand;
 
-	[Attribute(defvalue: "5", uiwidget: UIWidgets.EditBox, desc: "Seconds between refreshes. The board grabs the map for about a second, draws one picture and gives it straight back -- it never holds the map, because while it does nobody can open theirs.", params: "1 120")]
-	protected float m_fRefreshSeconds;
-
-	//! How often the board looks at where the viewer is and whose turn it is.
+	//! How often the board looks at where the viewer is and whether it still
+	//! has to say "keep drawing".
 	protected static const int TICK_MS = 250;
-
-	//! How many of those ticks one picture takes. FitBoard runs half a second
-	//! after the open, so this has to be comfortably more than that.
-	protected static const int HOLD_TICKS = 6;
 
 	protected Widget m_wRoot;
 	protected RTTextureWidget m_wRenderTarget;
@@ -67,19 +75,25 @@ class MCF_Map_BoardComponent : ScriptComponent
 	protected SCR_MapEntity m_MapEntity;
 	protected bool m_bRaised;
 
-	//! The widget the map was opened into, so the watchdog can tell ours from
-	//! somebody else's.
+	//! Whether the one-off setup open has happened and the island's frame is
+	//! known. Until then the board has nothing to re-state.
+	protected bool m_bPrimed;
+	protected bool m_bPriming;
+
+	//! The world rectangle the board draws, read off the map after it was
+	//! zoomed out to fit the island.
+	protected vector m_vFrameMin;
+	protected vector m_vFrameMax;
+
+	//! The widget the setup open ran against, so we can tell our own map
+	//! apart from a player's.
 	protected CanvasWidget m_wMapWidget;
 
-	//! Whether the board is currently holding the map to draw a picture.
-	protected bool m_bHolding;
+	//! Whether we are the reason visualisation is on.
+	protected bool m_bVisualising;
 
-	//! Ticks spent in whichever of the two states we are in.
-	protected int m_iTicks;
-
-	//! Ticks of drawing still owed for a change that is not the map -- the
-	//! fade. The texture keeps whatever was last drawn into it, so a board
-	//! that is fading has to be redrawn even when it holds no map.
+	//! Ticks of drawing still owed for something that is not the map -- the
+	//! fade. The texture keeps whatever was last drawn into it.
 	protected int m_iPaint;
 
 	//------------------------------------------------------------------------
@@ -145,14 +159,15 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// The two dials the engine hands over for exactly this, and the reason
 		// a board is affordable at all. A map is still; ten frames a second at
 		// half resolution is more than it needs.
+		if (m_iFramesPerSecond > 0)
+			m_wRenderTarget.SetMaxFPS(m_iFramesPerSecond);
+
 		if (m_fResolutionScale > 0 && m_fResolutionScale < 1)
 		{
 			m_wRenderTarget.SetResolutionScale(m_fResolutionScale);
 			m_wRenderTarget.ToggleFSR(true);
 		}
 
-		// Off until there is something to draw. Acquire turns it on.
-		m_wRenderTarget.SetEnabled(false);
 		m_bRaised = true;
 
 		// White until proven near. A board that flashes the whole island for
@@ -164,20 +179,6 @@ class MCF_Map_BoardComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------
-	//! Four times a second: how far away is the viewer, and whose turn it is
-	//! to hold the map.
-	//!
-	//! A BOARD MUST NOT KEEP THE MAP, and that is not politeness, it is the
-	//! only way the rest of the game still works. There is one map, and while
-	//! a board holds it open the player's own M does nothing -- whatever
-	//! reads "is the map open" to decide has already been told yes.
-	//!
-	//! So the board TAKES A PICTURE instead of holding a window. It grabs the
-	//! map for about a second, lets it draw, and gives it straight back; the
-	//! render target keeps the last frame it drew, so the board goes on
-	//! showing that picture until the next refresh. Which is what a map on a
-	//! wall is anyway -- paper does not update at ten frames a second, and
-	//! five seconds is fast enough for markers.
 	protected void Watch()
 	{
 		Decide();
@@ -185,6 +186,8 @@ class MCF_Map_BoardComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------
+	//! Four times a second: how far away is the viewer, and does the board
+	//! still have to tell the map to draw.
 	protected void Decide()
 	{
 		IEntity owner = GetOwner();
@@ -202,84 +205,121 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// Fully white means there is nothing to see and nothing to pay for.
 		bool wanted = m_fWhite < 1;
 
-		bool open = m_MapEntity.IsOpen();
-		bool ours = open && m_MapEntity.GetMapWidget() == m_wMapWidget;
-
-		if (m_bHolding)
+		// SOMEBODY'S REAL MAP IS OPEN. Their frame is the entity's frame and
+		// their visualisation is the entity's visualisation; a board is not
+		// worth taking either off them. We stop touching anything until they
+		// are done, and note that the flag is theirs now, not ours.
+		if (m_MapEntity.IsOpen())
 		{
-			// Taken off us mid-picture: somebody opened their own map. Their
-			// turn; we go back to waiting and keep whatever we had drawn.
-			if (!ours)
-			{
-				m_bHolding = false;
-				m_iTicks = 0;
-				MCF_Core_Log.Debug("map board: the map was taken mid-refresh");
-				return;
-			}
+			m_bVisualising = false;
+			return;
+		}
 
-			m_iTicks++;
+		if (m_bPriming)
+			return;
 
-			if (!wanted || m_iTicks >= HOLD_TICKS)
-				Release();
+		if (!m_bPrimed)
+		{
+			if (wanted)
+				Prime();
 
 			return;
 		}
 
-		// ---- resting, showing the last picture
 		if (!wanted)
+		{
+			// Nobody near. Stop drawing the world for a board nobody can see,
+			// but only if we are the one who asked for it.
+			if (m_bVisualising)
+			{
+				m_MapEntity.EnableVisualisation(false);
+				m_bVisualising = false;
+			}
+
 			return;
+		}
 
-		// Somebody else is reading a map. Never take it off them.
-		if (open)
-			return;
-
-		m_iTicks++;
-
-		if (m_iTicks * TICK_MS < m_fRefreshSeconds * 1000)
-			return;
-
-		Acquire(owner);
+		// THE TWO CALLS THAT ARE THE WHOLE FEATURE. Neither of them touches
+		// m_bIsOpen, so as far as the rest of the game is concerned no map is
+		// open and M does what it always did.
+		m_MapEntity.EnableVisualisation(true);
+		m_MapEntity.SetFrame(m_vFrameMin, m_vFrameMax);
+		m_bVisualising = true;
 	}
 
 	//------------------------------------------------------------------------
-	//! ONE PLACE DECIDES WHETHER THE BOARD IS BEING DRAWN, because the
-	//! texture keeps whatever was put in it last and two callers arguing over
-	//! SetEnabled is how a board ends up frozen on the wrong frame.
-	protected void Paint()
+	//! The one-off setup open.
+	//!
+	//! SCR_MapEntity.OpenMap does a page of work that nobody should retype:
+	//! it initialises the layers from the config, applies the map props and
+	//! the descriptor defaults, gives our widget its SizeInUnits in metres,
+	//! and works out the zoom bounds. We want all of it -- we just do not
+	//! want the map left open afterwards. So: open, fit, read the frame,
+	//! close.
+	protected void Prime()
 	{
-		bool draw = m_bHolding || m_iPaint > 0;
+		m_bPriming = true;
 
-		if (m_iPaint > 0)
-			m_iPaint--;
+		MapConfiguration config = new MapConfiguration();
+		config.RootWidgetRef = m_wRenderTarget;
+		config.MapEntityMode = EMapEntityMode.MINIMAP;
+		config.Modules = {};
+		config.Components = {};
+		config.OtherComponents = 0;
 
-		if (m_wRenderTarget)
-			m_wRenderTarget.SetEnabled(draw);
+		config.LayerConfig = SCR_MapLayersBase.Cast(LoadConfig(SCR_MapConstants.CFG_LAYERS_DEFAULT));
+		config.MapPropsConfig = SCR_MapPropsBase.Cast(LoadConfig(SCR_MapConstants.CFG_PROPS_DEFAULT));
+		config.DescriptorDefsConfig = SCR_MapDescriptorDefaults.Cast(LoadConfig(SCR_MapConstants.CFG_DESCTYPES_DEFAULT));
+		config.DescriptorVisibilityConfig = SCR_MapDescriptorVisibilityBase.Cast(LoadConfig(SCR_MapConstants.CFG_DESCVIEW_DEFAULT));
+
+		if (!config.LayerConfig)
+		{
+			MCF_Core_Log.Warn("map board: the default layers config would not load, and without layers there is no map");
+			m_bPriming = false;
+			return;
+		}
+
+		config.LayerCount = config.LayerConfig.m_aLayers.Count();
+
+		m_MapEntity.OpenMap(config);
+		m_wMapWidget = m_MapEntity.GetMapWidget();
+
+		// OpenMap switches the character camera's render off, which is right
+		// for a map that fills the screen and wrong for one on a board.
+		PlayerController controller = GetGame().GetPlayerController();
+		if (controller)
+			controller.SetCharacterCameraRenderActive(true);
+
+		// SCR_MapEntity counts down FRAME_DELAY frames after an open before it
+		// accepts a zoom or a pan, and UpdateViewPort needs a frame after that
+		// to have a visible frame worth reading.
+		GetGame().GetCallqueue().CallLater(FinishPriming, 700, false);
 	}
 
 	//------------------------------------------------------------------------
-	//! Take the map for one picture.
-	protected void Acquire(IEntity owner)
+	protected void FinishPriming()
 	{
-		m_bHolding = true;
-		m_iTicks = 0;
+		m_bPriming = false;
 
-		OpenMapOntoBoard(owner);
-	}
+		if (!m_MapEntity || !m_MapEntity.IsOpen())
+			return;
 
-	//------------------------------------------------------------------------
-	//! Give it back, and stop redrawing so the texture keeps the frame.
-	protected void Release()
-	{
-		m_bHolding = false;
-		m_iTicks = 0;
+		// Somebody opened their own map inside our 700 ms. Theirs; try again
+		// on a later tick.
+		if (m_MapEntity.GetMapWidget() != m_wMapWidget)
+			return;
 
-		if (m_MapEntity && m_MapEntity.IsOpen() && m_MapEntity.GetMapWidget() == m_wMapWidget)
-			m_MapEntity.CloseMap();
+		// The whole island, fitted to the widget's height: ZoomOut is minimum
+		// zoom plus CenterMap, and minimum zoom is screen height over map size
+		// in metres.
+		m_MapEntity.ZoomOut();
+		m_MapEntity.UpdateViewPort();
+		m_MapEntity.GetMapVisibleFrame(m_vFrameMin, m_vFrameMax);
 
-		// THE PICTURE HAS TO SURVIVE THIS. The tick below stops the render
-		// pass, and the texture the board samples is expected to keep the last
-		// frame drawn into it. If the board goes blue or black instead, that
-		// expectation is wrong and the refresh has to keep a copy another way.
+		m_MapEntity.CloseMap();
+		m_bPrimed = true;
+
+		MCF_Core_Log.Debug("map board primed, frame " + m_vFrameMin.ToString() + " .. " + m_vFrameMax.ToString());
 	}
 
 	//------------------------------------------------------------------------
@@ -355,98 +395,24 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (m_wWhiteout)
 			m_wWhiteout.SetOpacity(white);
 
-		// The fade changed, so the picture has to be drawn again even if no
-		// map is held. Three ticks is enough for the change to land.
+		// The fade changed, so the picture has to be drawn again even if the
+		// map is not being drawn at all. Three ticks is enough to land.
 		m_iPaint = 3;
-
-		if (!m_wRenderTarget)
-			return;
-
-		// A sheet of plain white does not need ten frames a second.
-		if (white >= 1)
-			m_wRenderTarget.SetMaxFPS(1);
-		else if (m_iFramesPerSecond > 0)
-			m_wRenderTarget.SetMaxFPS(m_iFramesPerSecond);
 	}
 
 	//------------------------------------------------------------------------
-	//! Opens the game's map into the board's own widget.
-	//!
-	//! THE CONFIGURATION IS BUILT HERE rather than taken from SetupMapConfig,
-	//! for two reasons that both matter. A board wants a map and nothing else
-	//! -- no cursor, no tool menu, no ruler -- and the components that come
-	//! with the gadget config go looking for widgets a board has no reason to
-	//! own and throw once a frame when they miss. And SetupMapConfig hands
-	//! back the shared m_ActiveMapCfg and rewrites its root widget, which is
-	//! the open map's configuration being altered under it.
-	protected void OpenMapOntoBoard(IEntity owner)
+	//! ONE PLACE DECIDES WHETHER THE BOARD IS BEING DRAWN, because the texture
+	//! keeps whatever was put in it last and two callers arguing over
+	//! SetEnabled is how a board ends up frozen on the wrong frame.
+	protected void Paint()
 	{
-		if (!m_MapEntity)
-			m_MapEntity = SCR_MapEntity.GetMapInstance();
+		bool draw = m_fWhite < 1 || m_iPaint > 0;
 
-		if (!m_MapEntity)
-		{
-			MCF_Core_Log.Warn("map board: this world has no map entity, so there is no map to show");
-			return;
-		}
+		if (m_iPaint > 0)
+			m_iPaint--;
 
-		MapConfiguration config = new MapConfiguration();
-		config.RootWidgetRef = m_wRenderTarget;
-		config.MapEntityMode = EMapEntityMode.MINIMAP;
-		config.Modules = {};
-		config.Components = {};
-		config.OtherComponents = 0;
-
-		config.LayerConfig = SCR_MapLayersBase.Cast(LoadConfig(SCR_MapConstants.CFG_LAYERS_DEFAULT));
-		config.MapPropsConfig = SCR_MapPropsBase.Cast(LoadConfig(SCR_MapConstants.CFG_PROPS_DEFAULT));
-		config.DescriptorDefsConfig = SCR_MapDescriptorDefaults.Cast(LoadConfig(SCR_MapConstants.CFG_DESCTYPES_DEFAULT));
-		config.DescriptorVisibilityConfig = SCR_MapDescriptorVisibilityBase.Cast(LoadConfig(SCR_MapConstants.CFG_DESCVIEW_DEFAULT));
-
-		if (!config.LayerConfig)
-		{
-			MCF_Core_Log.Warn("map board: the default layers config would not load, and without layers there is no map");
-			return;
-		}
-
-		config.LayerCount = config.LayerConfig.m_aLayers.Count();
-
-		m_MapEntity.OpenMap(config);
-		m_wMapWidget = m_MapEntity.GetMapWidget();
-
-		// OpenMap switches the character camera's render off, which is right
-		// for a map that fills the screen and wrong for one on a board: leave
-		// it off and the player is looking at nothing.
-		PlayerController controller = GetGame().GetPlayerController();
-		if (controller)
-			controller.SetCharacterCameraRenderActive(true);
-
-		GetGame().GetCallqueue().CallLater(FitBoard, 500, false);
-	}
-
-	//------------------------------------------------------------------------
-	//! The whole world on the board, once the map will listen.
-	//!
-	//! A BOARD IS NOT A MAP A PLAYER IS DRIVING. It opens at whatever zoom the
-	//! map happened to be left at, which for a thing hanging on a wall is the
-	//! wrong answer every time -- you walk up to a wall map to see where
-	//! everything is, not to read one grid square.
-	//!
-	//! ZoomOut() is vanilla's own: minimum zoom and then CenterMap(). Minimum
-	//! zoom is computed in UpdateZoomBounds as screen height over map size in
-	//! metres, so it is exactly "the whole island, fitted to the height" --
-	//! which is why the widget's spare width shows the map's sea colour.
-	//!
-	//! Half a second late, because SCR_MapEntity counts down FRAME_DELAY
-	//! frames after an open before it accepts a zoom or a pan.
-	protected void FitBoard()
-	{
-		if (!m_MapEntity || !m_MapEntity.IsOpen())
-			return;
-
-		if (m_MapEntity.GetMapWidget() != m_wMapWidget)
-			return;
-
-		m_MapEntity.ZoomOut();
+		if (m_wRenderTarget)
+			m_wRenderTarget.SetEnabled(draw);
 	}
 
 	//------------------------------------------------------------------------
@@ -469,13 +435,20 @@ class MCF_Map_BoardComponent : ScriptComponent
 		{
 			callqueue.Remove(Raise);
 			callqueue.Remove(Watch);
-			callqueue.Remove(FitBoard);
+			callqueue.Remove(FinishPriming);
 		}
 
-		// Only ours. Closing a map somebody else opened would blank their
-		// screen because a board was deleted.
-		if (m_MapEntity && m_MapEntity.IsOpen() && m_MapEntity.GetMapWidget() == m_wMapWidget)
-			m_MapEntity.CloseMap();
+		if (m_MapEntity)
+		{
+			// Only ours, and only if nobody is reading a map: turning
+			// visualisation off under an open map would blank their screen
+			// because a board was deleted.
+			if (m_bVisualising && !m_MapEntity.IsOpen())
+				m_MapEntity.EnableVisualisation(false);
+
+			if (m_MapEntity.IsOpen() && m_MapEntity.GetMapWidget() == m_wMapWidget)
+				m_MapEntity.CloseMap();
+		}
 
 		m_MapEntity = null;
 		m_wMapWidget = null;
