@@ -65,6 +65,29 @@ FrameWidgetClass {
      Clear 1
      ClearColor 0.173 0.344 0.62 1
     }
+    // THE FADE, AND IT IS A SHEET OF WHITE OVER THE MAP rather than anything
+    // done to the map itself. A map has no opacity of its own to turn down,
+    // and dimming the board's material would dim the frame with it. This is
+    // a plain white panel, last in the tree so it draws on top, and the
+    // component walks its opacity from 0 to 1 as the viewer walks away.
+    //
+    // At 1 the board reads as a blank white board -- which is exactly what
+    // it should look like from across a field.
+    ImageWidgetClass "{6A1C4F0B39E11005}" {
+     Name "Whiteout"
+     Slot FrameWidgetSlot "{6A1C4F0B39E11006}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 1024
+      OffsetRight -1024
+      SizeY 700
+      OffsetBottom -700
+     }
+     Color 1 1 1 1
+     Opacity 0
+    }
    }
   }
  }

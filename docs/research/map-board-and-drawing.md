@@ -366,3 +366,78 @@ whole feature, not a workaround for one.
   (`InitializeLayers`, `SetImagesetMapping`) and not visible from script.
 - Whether a material can be written that samples `$rendertarget` per entity
   instance, or whether every board needs its own material.
+
+---
+
+## SETTLED IN GAME: the board works, and what it cost to find out
+
+The last unknown in the chain -- whether the render target's texture actually
+receives the map's pixels -- is answered. It does. A board in the world shows
+the world's real map, the one with everybody's markers on it.
+
+Three wrong answers were paid for on the way, and each is worth keeping
+because each looked right:
+
+**"The board is blank, so the render target does not work."** No. The board
+was showing the map widget's ClearColor -- `0.173 0.344 0.62` in linear, which
+arrives as a pale steel blue on screen. A blank board that is *the right blue*
+is proof the whole chain works and only the content is missing. Check the
+colour before blaming the plumbing.
+
+**"Hang the widget tree on the screen and see whether the map draws."** That
+test cannot answer anything, and it took a round trip to see why: the thing in
+that tree is the `RTTextureWidget`, and an `RTTextureWidget` sends its subtree
+to the entity's mesh instead of to the screen. On the screen it is a hole. The
+test needs the same `MapWidget` with **no render target around it**.
+
+**"The character camera is the problem."** It is not. With
+`SetCharacterCameraRenderActive(false)` the board is still blank, and in Game
+Master the map and the world are visibly drawn at the same time -- so "one
+scene view at a time" is false. The line in `OpenMap` really is an
+optimisation.
+
+### What it actually was: the map is taken away
+
+Every run had it in the log and it was read past three times:
+
+```
+15:36:30  map board raised with 6 layer(s)
+15:36:31  fitted at zoom 0.170898
+15:36:32  dump: open true, frame covers the island
+15:36:33  SCR_MapEntity: Attempted opening a map while it is already open
+```
+
+Two to four seconds after a board comes up, something else opens a map -- the
+spawn screen, the Game Master, a player's own map -- and `SCR_MapEntity`
+closes ours to make room. Nothing ever hands it back, so the board is blank
+from then on, forever.
+
+The board therefore **watches and reclaims**: four times a second it asks
+whether a map is open and whether the open one is the widget in its own tree.
+If a map is open and it is not ours, somebody is reading it and we wait. If
+none is open, we take it. The board is blank exactly while somebody is reading
+a map, which is exactly when nobody is looking at the board.
+
+`GetMapWidget() == m_wMapWidget` is the whole test, and it is also what stops
+`OnDelete` from closing a map that belongs to a player.
+
+### Activation distance
+
+A live map on a surface is the most expensive thing MCF draws, and a mission
+can have several boards. So each one carries its own range:
+
+| attribute               | default | what it is                               |
+| ----------------------- | ------- | ---------------------------------------- |
+| `m_fActivationDistance` | 40 m    | past this the map is not drawn at all    |
+| `m_fFadeBand`           | 5 m     | metres of fade before that, so 35 -> 40  |
+
+The fade is **a white panel over the map inside the render texture**, walked
+from opacity 0 to 1 -- not anything done to the map or the material. A map has
+no opacity of its own to turn down, and dimming the board's material would
+take the frame with it. At 1 the board reads as a blank white board, which is
+what a map looks like from across a field anyway.
+
+At full white the map is closed and the render target drops to 1 FPS, so a
+board nobody is near costs a still frame of white. Distance is measured from
+the **current camera**, not the character, because a Game Master flying around
+has no character where their eyes are.
