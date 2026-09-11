@@ -86,6 +86,14 @@ class MCF_Map_BoardComponent : ScriptComponent
 	protected SCR_MapEntity m_MapEntity;
 	protected bool m_bRaised;
 
+	//! The widget the map was opened into, so the watchdog can tell ours
+	//! from somebody else's.
+	protected CanvasWidget m_wMapWidget;
+
+	//! Whether the map has been taken off us. Kept so the log says it once
+	//! rather than every two seconds.
+	protected bool m_bLost;
+
 	//------------------------------------------------------------------------
 	override void OnPostInit(IEntity owner)
 	{
@@ -220,6 +228,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 		config.LayerCount = config.LayerConfig.m_aLayers.Count();
 
 		m_MapEntity.OpenMap(config);
+		m_wMapWidget = m_MapEntity.GetMapWidget();
 
 		// OpenMap switches the character camera off, and putting it back was
 		// the first guess. It is now the prime suspect instead: see
@@ -260,6 +269,60 @@ class MCF_Map_BoardComponent : ScriptComponent
 		MCF_Core_Log.Debug("map board fitted at zoom " + m_MapEntity.GetCurrentZoom().ToString());
 
 		GetGame().GetCallqueue().CallLater(DumpBoard, 1500, false);
+
+		// THE MAP IS NOT OURS TO KEEP. SCR_MapEntity is a singleton with one
+		// open map, and the log says plainly what happens: two to four
+		// seconds after the board comes up, something else opens a map --
+		// the spawn screen, the Game Master, the player's own -- and
+		// SCR_MapEntity closes ours to make room. The board goes blank and
+		// stays blank, because nothing ever gives it back.
+		//
+		// So the board watches, and takes the map back the moment nobody
+		// else is holding it. It never takes it FROM anyone: if a map is
+		// open, it is somebody's and we wait. That is the honest shape of
+		// this feature -- the board is live whenever no one is reading a map,
+		// which is exactly when anybody is looking at the board.
+		GetGame().GetCallqueue().CallLater(Watch, 2000, true);
+	}
+
+	//------------------------------------------------------------------------
+	protected void Watch()
+	{
+		if (!m_MapEntity)
+			return;
+
+		if (m_MapEntity.IsOpen())
+		{
+			// Open, but is it ours? A widget that is not the one in our tree
+			// means somebody else is holding the map, and we leave it alone.
+			CanvasWidget held = m_MapEntity.GetMapWidget();
+
+			if (held != m_wMapWidget && !m_bLost)
+			{
+				m_bLost = true;
+
+				float w, h;
+				if (held)
+					held.GetScreenSize(w, h);
+
+				MCF_Core_Log.Warn("map board: the map was taken, now drawn into a "
+					+ w.ToString() + " x " + h.ToString() + " widget");
+			}
+
+			return;
+		}
+
+		// Nobody is holding it. Take it back.
+		if (!m_bLost)
+			return;
+
+		IEntity owner = GetOwner();
+		if (!owner)
+			return;
+
+		m_bLost = false;
+		MCF_Core_Log.Warn("map board: the map is free again, reclaiming it");
+		OpenMapOntoBoard(owner);
 	}
 
 	//------------------------------------------------------------------------
@@ -337,6 +400,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 			callqueue.Remove(Raise);
 			callqueue.Remove(FitBoard);
 			callqueue.Remove(DumpBoard);
+			callqueue.Remove(Watch);
 		}
 
 		if (m_MapEntity && m_MapEntity.IsOpen())
