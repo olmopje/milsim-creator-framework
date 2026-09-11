@@ -405,6 +405,11 @@ Two things that are easy to get wrong and were:
   turns a real newline into a space, so a body goes onto the draft through
   `MCF_Device_Text.Encode()` and comes back through `Body()`.
 
+**Typing on the visual is a solved problem now** -- see "Typing on a device:
+the pattern to copy" under the rules below. It is the same recipe for every
+device that gets an author half, and it is the part that took the longest to
+get right, so read it before building the next one.
+
 Still on the form: DOCUMENT and MAP. The obvious next one is DOCUMENT, which
 already has a visual in the viewer and needs only the author half.
 
@@ -1071,44 +1076,101 @@ and a helper that can be placed on one needs the parameter — `editbox(colour=)
 and `flatbtn(ink=)` exist for that reason. On a dark surface the default happens
 to be right, which is what makes the omission so easy to miss.
 
-### MultilineEditBoxWidget is a TextWidget, and EditBoxWidget is not
+### Typing on a device: the pattern to copy
 
-Read it from the engine's own generated API rather than guessing --
+**This is settled. Use it for every device that gets an author half — the
+laptop's editors, and anything new.** It took most of a day and six wrong
+turns; none of it needs repeating.
+
+#### Read the engine, do not guess
+
 `scripts/Core/generated/UI/` in the game data has one file per widget class,
 and `game_read` reaches them straight out of the .pak. That folder answers
-more questions in a minute than an afternoon of reading the binary.
+more in a minute than an afternoon of reading the binary.
 
 ```
-sealed class EditBoxWidget: UIWidget          // GetText, SetText, ActivateWriteMode, IsInWriteMode
-sealed class MultilineEditBoxWidget: TextWidget   // ActivateWriteMode, IsInWriteMode
+sealed class EditBoxWidget: UIWidget           // GetText, SetText, ActivateWriteMode, IsInWriteMode
+sealed class MultilineEditBoxWidget: TextWidget    // ActivateWriteMode, IsInWriteMode
 ```
 
-Three consequences, every one of which cost a build:
+#### The four facts everything else follows from
 
-- **`EditBoxWidget.Cast` on a multiline box returns null.** They share no
-  parent. The engine's own SCR_EditBoxComponent carries a field for each and
-  says so: "Why aren't these derived from a common parent :(". Anything that
-  reads or writes a box has to try both.
-- **A multiline box does not wrap unless it is told to.** TextWidget's own
-  doc comment: "Automatic wrapping is turned on by the WRAP_TEXT flag." So
-  `SetTextWrapping(true)`, or the text runs off to the right forever.
-- **It does not insert a newline when Return is pressed.** The character
-  arrives as `OnChar(w, 13)` on a `ScriptedWidgetEventHandler` attached to
-  the widget -- the documented route for "the user types on a focused widget
-  that accepts text input" -- and returning true there stops the widget using
-  Return to leave write mode. `MCF_Device_TextInput` does both jobs and is
-  attached to every body box on the phone, the laptop and the paper visuals.
+1. **They share no parent.** `EditBoxWidget.Cast` on a multiline box returns
+   null. The engine's own SCR_EditBoxComponent carries a field for each and
+   says so: *"Why aren't these derived from a common parent :("*. Every read
+   and write tries both — `BoxText` / `SetBoxText`.
+2. **A multiline box does not wrap unless told.** TextWidget's own doc
+   comment: *"Automatic wrapping is turned on by the WRAP_TEXT flag."* So
+   `SetTextWrapping(true)`, or a typed line runs off to the right forever.
+3. **Return does not insert a newline.** It arrives as `OnChar(w, 13)` on a
+   `ScriptedWidgetEventHandler` attached to the widget. Measured:
 
-  There is **no caret API**: nothing in the scripted class reports or moves
-  it. So a newline can only go on the end, which is right for composing and
-  wrong for editing the middle of a page. If that ever matters, the answer is
-  a different widget, not a cleverer handler.
+   ```
+   [MCF] text input: control character 13
+   [MCF] return pressed: had 183 chars, wrote 184, box now reports 184
+   ```
 
-Because it is a TextWidget, a multiline box also inherits `SetBold`,
-`SetItalic`, `SetExactFontSize`, `GetNumLines` and the rest -- so the
-formatting bar could be made to work on the edit side as well as the page,
-which would remove the need for the TYPE / PAGE pair.
+   So reading and writing work, even mid-edit. Returning **true** takes
+   Return away from the widget, which otherwise uses it to leave write mode.
+4. **There is no caret API and no way to send a keystroke.** Nothing in the
+   generated classes reports or moves the caret; `WidgetManager` has
+   `ReportMouse` and nothing for keys, so triggering a Right-arrow to collapse
+   a selection — the obvious fix — cannot be done from script.
 
-**A handler must be kept alive by the caller.** `Widget.AddHandler` attaches
-it but script owns it; one nobody holds is collected and the box quietly goes
-back to its old behaviour some minutes later, which reads as a new bug.
+#### The recipe
+
+- **Layout**: `MultilineEditBoxWidgetClass`, `style blank`, its own
+  `SCR_EventHandlerComponent`, an explicit `Color` (every widget draws white
+  by default, and half these sit on white paper), and **no**
+  `EditBoxFilterComponent` — the engine says it does not work on multiline.
+  Never an override of `SCR_EditBoxComponent`.
+- **Wrapping and Return**: `MCF_Device_TextInput.Attach(box)`, and **hold the
+  handler in a field**. `Widget.AddHandler` attaches it but script owns it;
+  one nobody keeps is collected and Return stops working minutes later, as
+  what looks like a different bug.
+- **Getting in**: a TYPE button that does `SetFocusedWidget` then
+  `ActivateWriteMode()`. A box takes keystrokes only in write mode and there
+  is no event for entering it — vanilla polls `IsInWriteMode()` and activates
+  from its own pencil button.
+- **Return itself**: write `text + "\n"`, then drop the focus and take it back
+  (`SetFocusedWidget(null)`, then the box). That is the nearest thing to a
+  click script can do, and a clicked box enters write mode *without* selecting
+  everything. `ActivateWriteMode()` is the fallback for when that does not
+  start write mode at all: a selection is bad, not typing is worse.
+- **Reading it back**: **not with `GetText` at save time.** By then a click has
+  moved the focus and the box's answer is unreliable. The handler watches
+  `OnChange`, which fires per character typed and per character deleted, so it
+  knows the text while it is being written. Seed it whenever the box is filled
+  programmatically — `SetText` raises no `OnChange`.
+- **Newlines on the wire**: `MCF_Device_Text.Encode()` on the way in and
+  `Body()` on the way out. `MCF_Device_Script.Clean()` turns a real newline
+  into a space, so a typed line break would otherwise arrive on the next
+  client as one paragraph.
+- **Saving**: at every moment the author stops typing — page turn, page view,
+  add, remove, menu close — and never per keystroke, because each one is an
+  RPC carrying the whole profile. Keep the explicit button too: it is the only
+  thing that reports back.
+
+#### The glitch that is accepted
+
+Return leaves the text selected in some cases. Accepted on 2026-09-11: you can
+write a whole letter with it. It is one place to fix if Bohemia ever finishes
+the widget — nothing else in MCF depends on the workaround.
+
+#### What a line-at-a-time input taught, and why it is gone
+
+An input that took one line at a time sidestepped the caret completely and was
+rejected on sight: *"dat wil ik niet, wil gewoon heel de inhoud universeel
+kunnen aanpassen en editen"*. An author edits text, they do not feed it in.
+Do not bring it back.
+
+#### Still to port
+
+The laptop's text and document editors have the wrapping and the casts but
+not the Return handling or the save-as-you-go. The laptop is parked; this
+goes in with its overhaul pass.
+
+**A handler must be kept alive by the caller.** Said twice on purpose.
+`Widget.AddHandler` attaches it, script owns it, and one nobody holds is
+collected — after which the widget quietly goes back to its old behaviour
+some minutes later.
