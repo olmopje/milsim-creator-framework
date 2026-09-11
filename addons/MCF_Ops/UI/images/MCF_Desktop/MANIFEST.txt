@@ -1,0 +1,39 @@
+MCF desktop art -- GUID reference
+================================================================
+
+"{6A1C4F0B39D35501}UI/images/MCF_Desktop/icon_files.edds"   icon_files
+"{6A1C4F0B39D35502}UI/images/MCF_Desktop/icon_folder.edds"   icon_folder
+"{6A1C4F0B39D35503}UI/images/MCF_Desktop/icon_mail.edds"   icon_mail
+"{6A1C4F0B39D35504}UI/images/MCF_Desktop/icon_messages.edds"   icon_messages
+"{6A1C4F0B39D35505}UI/images/MCF_Desktop/icon_contacts.edds"   icon_contacts
+"{6A1C4F0B39D35506}UI/images/MCF_Desktop/icon_photos.edds"   icon_photos
+"{6A1C4F0B39D35507}UI/images/MCF_Desktop/icon_notes.edds"   icon_notes
+"{6A1C4F0B39D35508}UI/images/MCF_Desktop/icon_terminal.edds"   icon_terminal
+"{6A1C4F0B39D35509}UI/images/MCF_Desktop/icon_settings.edds"   icon_settings
+"{6A1C4F0B39D3550A}UI/images/MCF_Desktop/icon_phone.edds"   icon_phone
+"{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"   icon_apps
+"{6A1C4F0B39D3550C}UI/images/MCF_Desktop/icon_doc.edds"   icon_doc
+"{6A1C4F0B39D3550D}UI/images/MCF_Desktop/icon_drive.edds"   icon_drive
+"{6A1C4F0B39D3550E}UI/images/MCF_Desktop/glyph_network.edds"   glyph_network
+"{6A1C4F0B39D3550F}UI/images/MCF_Desktop/glyph_volume.edds"   glyph_volume
+"{6A1C4F0B39D35510}UI/images/MCF_Desktop/glyph_battery.edds"   glyph_battery
+"{6A1C4F0B39D35511}UI/images/MCF_Desktop/glyph_power.edds"   glyph_power
+"{6A1C4F0B39D35512}UI/images/MCF_Desktop/glyph_search.edds"   glyph_search
+"{6A1C4F0B39D35513}UI/images/MCF_Desktop/glyph_lock.edds"   glyph_lock
+"{6A1C4F0B39D35514}UI/images/MCF_Desktop/glyph_chevron.edds"   glyph_chevron
+"{6A1C4F0B39D35515}UI/images/MCF_Desktop/glyph_add.edds"   glyph_add
+"{6A1C4F0B39D35516}UI/images/MCF_Desktop/glyph_delete.edds"   glyph_delete
+"{6A1C4F0B39D35517}UI/images/MCF_Desktop/glyph_edit.edds"   glyph_edit
+"{6A1C4F0B39D35518}UI/images/MCF_Desktop/glyph_check.edds"   glyph_check
+"{6A1C4F0B39D35519}UI/images/MCF_Desktop/glyph_addimage.edds"   glyph_addimage
+"{6A1C4F0B39D3551A}UI/images/MCF_Desktop/glyph_min.edds"   glyph_min
+"{6A1C4F0B39D3551B}UI/images/MCF_Desktop/glyph_max.edds"   glyph_max
+"{6A1C4F0B39D3551C}UI/images/MCF_Desktop/glyph_restore.edds"   glyph_restore
+"{6A1C4F0B39D3551D}UI/images/MCF_Desktop/glyph_close.edds"   glyph_close
+"{6A1C4F0B39D3551E}UI/images/MCF_Desktop/glyph_grip.edds"   glyph_grip
+"{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"   tile_window
+"{6A1C4F0B39D35520}UI/images/MCF_Desktop/tile_flat.edds"   tile_flat
+"{6A1C4F0B39D35521}UI/images/MCF_Desktop/bar_panel.edds"   bar_panel
+"{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"   bar_titlebar
+"{6A1C4F0B39D35523}UI/images/MCF_Desktop/bar_header.edds"   bar_header
+"{6A1C4F0B39D35524}UI/images/MCF_Desktop/wallpaper_desktop.edds"   wallpaper_desktop
