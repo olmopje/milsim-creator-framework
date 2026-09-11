@@ -138,6 +138,90 @@ open would black out the player's own view of the world.
 So "the board shows the live in-game map, markers and all" is not available.
 Not hard -- unavailable, unless the class itself is replaced.
 
+## CORRECTION: two of those obstacles are softer than they looked
+
+### There is no map texture to load
+
+Worth saying plainly, because it is the first thing anybody suggests: the map
+is not an image. `SCR_MapConfig` shows it is **drawn from terrain data**, per
+zoom layer, at runtime:
+
+```c
+MapGridProps gridProps = layer.GetGridProps();
+gridProps.SetGridStepSize(m_fGridSquareSize);
+
+MapContourProps contProps = layer.GetContourProps();
+contProps.SetContourDensity(m_fContourDensity);
+contProps.SetMajorDensity(m_fMajorContourDensity);
+
+MapLegendProps legendProps = layer.GetLegendProps();
+legendProps.SetTotalSegmentLength(m_fLegendScaleSize);
+```
+
+Contours, grid and legend are generated from the heightmap. There is no file
+anywhere that is "the map of Everon". So "just load the texture the game
+loads" has nothing to load.
+
+### But the camera does not have to stay off
+
+The line that looked fatal:
+
+```c
+if (plc && GetGame().GetCameraManager().CurrentCamera() == plc.GetPlayerCamera())
+    plc.SetCharacterCameraRenderActive(false);
+```
+
+is one call with a public counterpart — `CloseMap` turns it back on with
+`plc.SetCharacterCameraRenderActive(true)`. Nothing stops us calling that
+ourselves immediately after opening a map into a board. It is an optimisation
+for a fullscreen map, not a requirement of the renderer. **Probably removable,
+and cheap to test.**
+
+### And the map widget is an ordinary CanvasWidget
+
+`SCR_MapConstants.MAP_WIDGET_NAME` resolves to a plain `CanvasWidget`. Its
+base carries exactly the API `SCR_MapEntity` uses on it:
+
+```c
+sealed class CanvasWidgetBase: Widget
+{
+    proto external float PixelPerUnit();
+    proto external vector GetSizeInUnits();
+    proto external void SetSizeInUnits(vector newSize);
+    proto external void SetZoom(float zoomLevel);
+    proto external vector GetOffsetPx();
+    ...
+}
+```
+
+So the widget is a zoomable coordinate space that the map's world is measured
+into — `SetSizeInUnits(terrain size in metres)`, then `PixelPerUnit()` back.
+Script never issues a draw command on it; the pixels are produced natively.
+
+**Whether those pixels are composited into the widget's place in the UI tree
+(capturable by a render target) or drawn straight to the screen cannot be
+answered by reading.** Nothing in script passes a widget handle or a screen
+rect across to the native side. `SetFrame` takes *world* coordinates and is a
+culling frame, not a viewport.
+
+### So the question is down to one experiment
+
+Put the map layout's subtree under an `RTTextureWidget`, call `OpenMap` with
+that root, call `SetCharacterCameraRenderActive(true)` straight after, and
+look at the board.
+
+- Terrain appears on the board -> the whole live-map idea is on, and only the
+  one-map-at-a-time limit remains (the board goes dark while that client has
+  their own map open, which is the moment they are not looking at the board).
+- Nothing on the board but the map appears over the screen -> it renders to
+  the screen and cannot be captured. Fall back to the world render below.
+- **The tell either way**: `m_MapWidget.PixelPerUnit()`. If it comes back <= 0
+  the widget is not being laid out inside the render target at all, the
+  `pixelPerUnit = 0.01; // should never happen` fallback fires, and nothing
+  downstream can be right.
+
+Half an hour, and it decides the shape of the feature.
+
 ## What is available, and is arguably better
 
 Build the board out of the two things that are proven, and own the data:
