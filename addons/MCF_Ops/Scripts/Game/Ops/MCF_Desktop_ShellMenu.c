@@ -1883,7 +1883,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			host = "device";
 
 		string prompt = "<color rgba=\"#7FCF8AFF\">" + user + "@" + host + "</color>:<color rgba=\"#7FAFE0FF\">~</color>$ ";
-		string out = prompt + "ls\n";
+		string dump = prompt + "ls\n";
 
 		array<MCF_Device_App> apps = {};
 		m_Content.GetApps(apps);
@@ -1909,17 +1909,17 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (listing.IsEmpty())
 			listing = "(empty)";
 
-		out = out + listing + "\n\n";
-		out = out + prompt + "whoami\n" + user + "\n\n";
-		out = out + prompt + "uptime\n" + " up " + ClockText() + ",  1 user,  load average: 0.14 0.09 0.05\n\n";
-		out = out + prompt + "history | tail -n 4\n";
-		out = out + "  511  scp " + FirstFileName() + " drop:/srv/incoming\n";
-		out = out + "  512  <color rgba=\"#E68A2EFF\">shred -u</color> notes/old.txt\n";
-		out = out + "  513  ssh " + host + "-office\n";
-		out = out + "  514  history | tail -n 4\n\n";
-		out = out + prompt;
+		dump = dump + listing + "\n\n";
+		dump = dump + prompt + "whoami\n" + user + "\n\n";
+		dump = dump + prompt + "uptime\n" + " up " + ClockText() + ",  1 user,  load average: 0.14 0.09 0.05\n\n";
+		dump = dump + prompt + "history | tail -n 4\n";
+		dump = dump + "  511  scp " + FirstFileName() + " drop:/srv/incoming\n";
+		dump = dump + "  512  <color rgba=\"#E68A2EFF\">shred -u</color> notes/old.txt\n";
+		dump = dump + "  513  ssh " + host + "-office\n";
+		dump = dump + "  514  history | tail -n 4\n\n";
+		dump = dump + prompt;
 
-		SetText(root, win.Prefix() + "Term", out);
+		SetText(root, win.Prefix() + "Term", dump);
 	}
 
 	//! A heading, as a file name. Mission makers write "Draft, not sent"; a
