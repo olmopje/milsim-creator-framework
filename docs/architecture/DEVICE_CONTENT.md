@@ -165,79 +165,198 @@ conversations already prove works.
 
 ---
 
-## 9. Authoring inside the phone, and what "unread" means
+## 10. Authoring inside the phone, and what "unread" means
 
-Added 2026-09-11, from the project owner, after the phone shell became a real
-handset. Status: **design**. Nothing below is built.
+Proposed 2026-09-10, **built 2026-09-11**. What follows is what the code does,
+not what was hoped for; where the plan and the build differ, the build is
+described and the reason is given.
 
-### 9.1 The Game Master edits the device on the device
+### 10.1 The Game Master edits the device on the device
 
-There is no separate authoring screen. "Edit phone" opens **the phone**, the
-same shell a player sees, in an author mode: the same tiles, the same list, the
-same navigation, plus a few controls per screen — new message, delete, mark
-unread, edit text. APPLY already exists and already goes over MCF's own RPC.
+There is no separate authoring screen. **Edit device** opens *the phone* — the
+same shell a player sees — in author mode: same tiles, same lists, same
+navigation, plus author rows on each screen. `MCF_Intel_ShellMenu.OpenForAuthor`
+is the entry point.
 
-Why this and not the panel we have: the panel is a second screen that edits the
-same object and is named almost the same thing. That is exactly the confusion
-that cost a day on Edit intel versus Edit device (see HANDOVER step 1). One
-screen cannot disagree with itself. On the way, `MCF_Device_EditorMenu` — 19 KB
-of parallel UI — stops being needed.
+Two differences from a player's phone, both deliberate:
 
-The same shell already draws the letter and the notepad, so the day this works
-for a phone it very nearly works for those too, and for the laptop once its
-screen is redrawn.
+- **No lock screen.** A Game Master is not breaking into anything.
+- **Author rows come first.** "+ New item" sits at the top of a list, not at
+  the bottom of a long inbox where nobody finds it.
 
-**The decision that shapes it: object or profile.** A carrier holds either its
-own entries or the id of a shared device profile (`smuggler_phone`). Editing
-the object changes that one handset on that one table; editing the profile
-changes every device in the mission carrying it. Both are wanted. Neither may
-happen by accident, so the author screen has to say which one it has open
-before a single key is typed, and switching between them is a deliberate act —
-that is what the old panel's LOAD NEXT button was groping at.
+An item's fields are rows rather than a form with six boxes: six labelled boxes
+need a screen twice this wide, and this glass is about 250 pixels across.
+Tapping a row opens a full-screen editor for the one field it holds; a yes/no
+row (such as *unread*) flips where it stands.
 
-**The one genuinely new mechanism** is text entry on a 250-pixel-wide glass.
-Everything else is rearranging what exists. Expect it to be its own screen —
-tap a message, get an edit screen with an `SCR_EditBoxComponent` and a done
-button — rather than an edit box inside a scrolling list.
+**Object or profile — the decision that shapes everything.** A carrier holds
+either its own entries or the id of a shared profile (`smuggler_phone`). The
+server upserts **any profile arriving with an id** into `MCF_Device_Library`,
+which means a draft that keeps its id rewrites the shared profile and changes
+every handset in the mission carrying it. That is why `OpenForAuthor` copies the
+source profile and **clears `m_sId` on the draft**:
 
-### 9.2 Read and unread, which does not exist yet
+```c
+m_Draft = MCF_Device_Script.Deserialize(MCF_Device_Script.Serialize(source));
+m_Draft.m_sId = "";   // or the server rewrites the shared library profile
+```
 
-The shell has no notion of read state at all today. It needs one, because
-without it there is nothing for a badge to count and no way for a Game Master
-to say "this message should look new".
+Editing the shared profile on purpose is still wanted and is still not built.
+It needs its own row and its own warning; until then, editing is per object.
 
-Two different facts are being confused whenever this is discussed, and they
-belong in different places:
+### 10.2 Read and unread
 
-1. **Authored-new.** The mission maker says an item starts unread. This is
-   content: it belongs on the item, travels in the wire format, and is the same
-   for everybody. A fifth field on the entry, appended — never inserted, the
-   format is already in saved missions.
-2. **Read by me.** Whether *this player* has opened it. This is not content and
-   must not be replicated as if it were: two players who both pick up the same
-   phone have genuinely different answers, and a phone that marks itself read
-   on the server the moment one player opens it steals the discovery from the
-   other. It belongs per client, keyed by device and item, in
-   `MCF_Core_PersistentStore` — which already survives restarts and already
-   lives outside the engine's save system.
+Two different facts, in two different places:
 
-A badge shows where **authored-new AND not read by me**. So a fresh phone is
-loud, a phone you have been through is quiet, and the player next to you sees
-their own answer.
+1. **Authored-new** — the mission maker says an item starts unread. Content:
+   `m_bNew` on the item, a fifth field appended to the wire format (appended,
+   never inserted — the format is in saved missions), the same for everybody.
+2. **Read by me** — whether *this player* has opened it. Not content, and not
+   replicated: two players who both pick up the same phone have genuinely
+   different answers. `MCF_Device_ReadState` keeps it per client in
+   `MCF_Core_PersistentStore` under the `dev.read.` prefix.
 
-### 9.3 Where the badges go
+A badge shows where **authored-new AND not read by me**.
 
-The HTML preview built on 2026-09-10 draws all three; they are the same red
-pill at three sizes:
+**The key is the object's RplId, not the profile id.** Keying on the profile id
+made three handsets carrying `smuggler_phone` share one read log: opening a
+message on one marked it read on all of them. `Replication.FindItemId(carrier)`
+is unique per object. The trade is deliberate and documented: an RplId is
+session-scoped, so read state does not survive a server restart. Being right
+within a session beats being wrong across them.
 
-- **App tile**: a count, top-right, overlapping the tile by about a quarter.
-  Red, white text, a ring in the screen's own background colour so it reads as
-  raised.
-- **List row**: a dot at the leading edge, in the accent, on the row's vertical
-  centre. No number — the row is one item.
-- **Lock screen**: notification cards, sender and time, never the body. A
-  locked phone that shows the message has given away what breaking in was for.
+Opening an item is what reads it — not hovering, not scrolling past.
 
-The counting is the presenter's job, not the shell's: it already knows which
-items belong to which app, and it is the only thing that should ever have to
-answer "how many".
+### 10.3 Where the badges go
+
+- **App tile**: a count, top right, `PaintBadge`. Hidden at zero, "9+" above
+  nine.
+- **List row**: a dot at the trailing edge in the accent (`0.76 0.39 0.08`). No
+  number; the row is one item.
+- **Lock screen**: up to three notification cards — sender and time, never the
+  body. A locked phone that shows the message has given away what breaking in
+  was for.
+
+Counting is the presenter's job (`UnreadCount`, `UnreadItems`), not the shell's.
+
+---
+
+## 11. One app, one screen
+
+Built 2026-09-11. Until this, every app on the phone opened the same
+heading-date-body reader, and the device read as a menu with eight entry points
+rather than as a phone. Four apps now have a screen of their own. Which reader
+an item opens into is decided in `ShowEntry` by `m_OpenApp.m_eKind`.
+
+### 11.1 The heading separator
+
+Mission makers were already writing `"M. - 02:14"` and `"Outgoing - 0412"` into
+headings before anything read them apart, because that is how a person writes a
+line like that. The shell now reads it: `" - "` splits a heading into **who**
+and **when-or-what-about** (`HeadPart` / `TailPart`).
+
+A heading with no separator is all left half, so **nothing authored before this
+changes how it looks**.
+
+| App | `m_sHeading` | `m_sTimestamp` | `m_sBody` |
+|---|---|---|---|
+| MESSAGES | `sender - time` | date | the conversation (see 11.2) |
+| EMAIL | `sender - subject` | date | the letter |
+| CALLS | `direction - time` | date | `who - how long` |
+| CONTACTS | name | **the number** | a note about them |
+| NOTES / FILES / SETTINGS | title | date | the text |
+
+### 11.2 MESSAGES — a conversation
+
+A sender across the top with their disc beside it, then the body as bubbles.
+
+**The authoring convention is one character.** Every line of the body is a
+bubble; a line starting with `>` is from whoever owns the phone and sits on the
+right, everything else came from the other end and sits on the left. A mission
+maker who writes a conversation gets a conversation; one who writes a paragraph
+gets a paragraph in a single bubble, which is also correct.
+
+`MCF_PhoneBubble.layout` carries **both sides and hides one**. Alignment cannot
+be changed at runtime without slot calls the rest of this device does not use,
+so the row has a Left and a Right and the shell hides the one it does not want.
+Four widgets, and it cannot be got wrong.
+
+Each side **stretches** with a wide margin on the far side rather than hugging
+its text: a bubble that sizes itself to its content cannot wrap, and a message
+that does not wrap runs off the edge of a handset.
+
+### 11.3 EMAIL — a letter
+
+From, date and subject in a card, the body in a reading column under it. The
+difference between this and the chat screen is the whole point of having two: a
+message is a conversation and a mail is a document, and a device where both look
+the same is a device the player cannot read at a glance.
+
+### 11.4 CONTACTS — a list and a card
+
+The list is names against numbers — the number is the second line, and it is the
+number that makes a row read as a contact rather than as a heading with a circle
+next to it. Nothing sits on the right, where a message list puts a time.
+
+The card is the disc at eight times the size, the name, the number, one CALL
+button and the note. **CALL is hidden when no number is saved**: a control that
+cannot do anything is a phone lying about what it knows, which is the one thing
+a piece of evidence must not do. CALL does not ring anybody — it puts the number
+on the dialler, which is the screen the player would have reached typing it
+themselves.
+
+### 11.5 CALLS — a dialler, not a list
+
+Every other app is a list of things somebody wrote down; the phone app is a
+machine you operate. Twelve keys, the last three calls above them, a number
+display that says live whether the number is in the phone book, and a CALL
+button.
+
+The keys are the dialler's own, **not the passcode pad's**: the pad is a door in
+front of the phone and the dialler is a screen inside it, and sharing twelve
+buttons between them meant one was always sitting in the other's geometry.
+
+CALL answers the only question a prop phone can answer: does this handset know
+whose number that is. There is no voice on the other end and there is not going
+to be.
+
+The recents row flips the authored order — the **name** (from the body) is what
+a player scans for, the **direction and time** (from the heading) is what they
+check afterwards.
+
+### 11.6 PHOTOS — a grid
+
+A photograph's thumbnail is its own title. A row reading "Truck at the mill"
+with a coloured disc beside it tells the player strictly less than the picture
+does, and photos are the only app where that is true.
+
+Twelve tiles. A device carrying more says so at the bottom rather than dropping
+them silently. A tile with nothing on it yet shows its heading and is the one
+worth opening, because opening an item is what asks the cache for the picture.
+
+### 11.7 Which apps did not get one
+
+NOTES, FILES, SETTINGS and GENERAL keep the plain reader, and should. They are
+documents and nothing else; giving them a bespoke screen would be decoration.
+
+### 11.8 The list row itself
+
+64 units tall, not 58. The title sits against the top of the row and the preview
+against the bottom, so the gap between them is whatever the row has left over —
+which is how every SMS client on a real handset does it, and why two lines
+crammed into 58 units read as one clump of text.
+
+The list and reader panes used to be pinned inside a `SizeLayoutWidget` with
+`WidthOverride 200` while the glass is more than twice that wide, so rows used
+less than half the screen. **There is no runtime setter for that override** —
+the fix is `AllowWidthOverride 0` plus `HorizontalAlign 3` on the size layout,
+which lets it stretch to the scroll's viewport. Every scroll pane on this device
+now has that shape.
+
+### 11.9 The clock
+
+The status bar, the home screen and the lock screen all read
+`ChimeraWorld.GetTimeAndWeatherManager()` — the mission's own time, not the
+player's. All three are re-read on the one-second status tick. The lock screen's
+clock used to be set once when the screen opened and drifted away from the world
+the longer the phone stayed up.

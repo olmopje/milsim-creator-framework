@@ -90,6 +90,26 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! it still fits the display at 26pt.
 	protected static const int DIAL_MAX_DIGITS = 14;
 
+	//! The bubble row for a message thread.
+	protected static const ResourceName BUBBLE_LAYOUT = "{6A1C4F0B39D3564F}UI/layouts/MCF/MCF_PhoneBubble.layout";
+
+	protected static const string W_CHAT_PANE = "ChatPane";
+	protected static const string W_CHAT_COLUMN = "ChatColumn";
+	protected static const string W_MAIL_PANE = "MailPane";
+	protected static const string W_CONTACT_PANE = "ContactPane";
+	protected static const string W_PHOTO_GRID = "PhotoGrid";
+
+	//! How many photographs the glass holds at once.
+	protected static const int PHOTO_TILES = 12;
+
+	//! What a line of a message body starts with when the phone's owner is the
+	//! one who sent it. One character, and it is the whole chat format.
+	protected static const string OUTGOING_MARK = ">";
+
+	//! What a heading written "who - what" is split on. Mission makers were
+	//! already writing this before anything read it.
+	protected static const string HEAD_SEP = " - ";
+
 	//! Cards on the lock screen. Three fit above the prompt.
 	protected static const int LOCK_NOTES = 3;
 	protected static const string W_LIST_SCROLL = "ListScroll";
@@ -251,6 +271,14 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected ref array<SCR_ButtonTextComponent> m_aDialKeys = {};
 	protected string m_sDialled;
 	protected bool m_bOnDialler;
+
+	protected Widget m_wChatPane;
+	protected Widget m_wChatColumn;
+	protected Widget m_wMailPane;
+	protected Widget m_wContactPane;
+	protected Widget m_wPhotoGrid;
+	protected ref array<SCR_ButtonTextComponent> m_aPhotoTiles = {};
+	protected SCR_ButtonTextComponent m_ContactCall;
 	protected ref MCF_Device_ImageClick m_HomeBarClick;
 	//! Seconds since the home bar was last tapped. Two taps inside
 	//! HOME_DOUBLE_TAP put the phone away.
@@ -497,6 +525,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// Same rule as the pad above: bound while the layout still says it is
 		// visible, then taken down.
 		BindDialler(root);
+		BindPanes(root);
 
 		// THE HOME BAR IS THE ONLY CONTROL THE PHONE NEEDS. One tap steps back
 		// -- entry to list, list to home, and nothing at all once you are home.
@@ -1180,6 +1209,15 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			return;
 		}
 
+		// Photographs are their own thumbnails, so the photo app opens as a
+		// grid rather than as rows. Same exception for the Game Master: the
+		// list is the only place a picture's fields can be edited.
+		if (app.m_eKind == MCF_EIntelApp.PHOTOS && !m_bAuthor)
+		{
+			ShowPhotoGrid(app);
+			return;
+		}
+
 		m_bOnHome = false;
 		m_bOnList = true;
 		m_bOnForm = false;
@@ -1437,7 +1475,20 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		string trailing = entry.m_sTimestamp;
 		bool showAvatar = true;
 
-		if (kind == MCF_EIntelApp.CONTACTS)
+		if (kind == MCF_EIntelApp.MESSAGES)
+		{
+			// The sender, and only the sender. The time that mission makers
+			// write after it ("M. - 02:14") belongs on the conversation, not
+			// on a line that already has the date sitting at its right end.
+			title = HeadPart(title);
+		}
+		else if (kind == MCF_EIntelApp.EMAIL)
+		{
+			// An inbox lists subjects. The sender goes on the card, where
+			// there is a labelled line waiting for it.
+			title = SubjectOf(entry.m_sHeading);
+		}
+		else if (kind == MCF_EIntelApp.CONTACTS)
 		{
 			// A phone book is names AGAINST NUMBERS, and it is the number that
 			// makes a row read as a contact rather than as a heading with a
@@ -1845,6 +1896,34 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		m_bOnHome = false;
 		m_bOnList = false;
+
+		// WHICH READER, BY APP. The plain heading-date-body pane below is the
+		// right answer for a note, a file and a setting -- they are documents
+		// and nothing else. A message is a conversation, a mail is a letter
+		// with a header, and a contact is a card: three screens that exist
+		// because a device where all of them look the same is a device the
+		// player cannot read at a glance.
+		int readerKind;
+		if (m_OpenApp)
+			readerKind = m_OpenApp.m_eKind;
+
+		if (readerKind == MCF_EIntelApp.MESSAGES)
+		{
+			ShowChat(index);
+			return;
+		}
+
+		if (readerKind == MCF_EIntelApp.EMAIL)
+		{
+			ShowMail(index);
+			return;
+		}
+
+		if (readerKind == MCF_EIntelApp.CONTACTS)
+		{
+			ShowContact(index);
+			return;
+		}
 
 		SetScreens(false, false, true);
 
@@ -2275,6 +2354,531 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		DrawPips();
 	}
 
+	// ------------------------------------------------- the per-app detail views
+
+	//! Binds the three detail panes and the photo grid.
+	//!
+	//! Bound while the layout still has them visible, same as the pad and the
+	//! dialler, then taken down by HidePanes.
+	protected void BindPanes(notnull Widget root)
+	{
+		m_wChatPane = root.FindAnyWidget(W_CHAT_PANE);
+		m_wChatColumn = root.FindAnyWidget(W_CHAT_COLUMN);
+		m_wMailPane = root.FindAnyWidget(W_MAIL_PANE);
+		m_wContactPane = root.FindAnyWidget(W_CONTACT_PANE);
+		m_wPhotoGrid = root.FindAnyWidget(W_PHOTO_GRID);
+
+		m_ContactCall = SCR_ButtonTextComponent.GetButtonText("ContactCall", root);
+		if (m_ContactCall)
+			m_ContactCall.m_OnClicked.Insert(OnContactCallClicked);
+
+		m_aPhotoTiles.Clear();
+
+		for (int t = 0; t < PHOTO_TILES; t++)
+		{
+			SCR_ButtonTextComponent tile = SCR_ButtonTextComponent.GetButtonText("PhotoTile" + t.ToString(), root);
+			if (!tile)
+				continue;
+
+			tile.m_OnClicked.Insert(OnPhotoTileClicked);
+			m_aPhotoTiles.Insert(tile);
+		}
+
+		HidePanes();
+	}
+
+	protected void HidePanes()
+	{
+		if (m_wChatPane)
+			m_wChatPane.SetVisible(false);
+
+		if (m_wMailPane)
+			m_wMailPane.SetVisible(false);
+
+		if (m_wContactPane)
+			m_wContactPane.SetVisible(false);
+
+		if (m_wPhotoGrid)
+			m_wPhotoGrid.SetVisible(false);
+	}
+
+	//! The halves of a heading written "who - what".
+	//!
+	//! ONE SEPARATOR, EVERYWHERE, AND IT WAS ALREADY THERE. Mission makers were
+	//! writing "M. - 02:14" and "Outgoing - 0412" into headings long before
+	//! anything read them apart, because that is how a person writes a line like
+	//! that. The shell reads it now: the left half is who, the right half is
+	//! when or what about. A heading with no separator is all left half, which
+	//! is why nothing authored before this changes how it looks.
+	protected string HeadPart(string heading)
+	{
+		int at = heading.IndexOf(HEAD_SEP);
+		if (at < 0)
+			return heading;
+
+		return heading.Substring(0, at);
+	}
+
+	protected string TailPart(string heading)
+	{
+		int at = heading.IndexOf(HEAD_SEP);
+		if (at < 0)
+			return "";
+
+		int from = at + HEAD_SEP.Length();
+		return heading.Substring(from, heading.Length() - from);
+	}
+
+	protected string SubjectOf(string heading)
+	{
+		string tail = TailPart(heading);
+		if (tail.IsEmpty())
+			return heading;
+
+		return tail;
+	}
+
+	protected string SenderOf(string heading)
+	{
+		string head = HeadPart(heading);
+		if (head.IsEmpty())
+			return "(unknown sender)";
+
+		return head;
+	}
+
+	//! The first app of a kind, or null. A profile is not stopped from carrying
+	//! two contact books, but nothing on this device has a use for the second.
+	protected MCF_Device_App FindAppOfKind(int kind)
+	{
+		array<MCF_Device_App> apps = {};
+		m_Content.GetApps(apps);
+
+		foreach (MCF_Device_App candidate : apps)
+		{
+			if (candidate.m_eKind == kind)
+				return candidate;
+		}
+
+		return null;
+	}
+
+	// --------------------------------------------------------------- messages
+
+	//! A message, read as the conversation it is.
+	//!
+	//! A sender across the top with their disc beside it, and the body as
+	//! bubbles underneath. This is the app the whole device is judged on: it is
+	//! the one every player opens first and the one they have seen a thousand
+	//! times on a real handset, so a heading-and-paragraph reader here read as
+	//! a mod menu no matter what the rest of the phone looked like.
+	protected void ShowChat(int index)
+	{
+		MCF_Device_Item entry = m_aVisible[index];
+		m_iOpenEntry = index;
+		StopWaitingForPicture();
+
+		SetScreens(false, false, false);
+
+		if (m_wChatPane)
+			m_wChatPane.SetVisible(true);
+
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string who = SenderOf(entry.m_sHeading);
+		if (who.IsEmpty())
+			who = "Unknown";
+
+		ImageWidget disc = ImageWidget.Cast(root.FindAnyWidget("ChatAvatar"));
+		if (disc)
+			disc.SetColor(Color.FromInt(AvatarColour(who)));
+
+		TextWidget initial = TextWidget.Cast(root.FindAnyWidget("ChatInitial"));
+		if (initial)
+			initial.SetText(Initial(who));
+
+		TextWidget name = TextWidget.Cast(root.FindAnyWidget("ChatName"));
+		if (name)
+			name.SetText(who);
+
+		TextWidget sub = TextWidget.Cast(root.FindAnyWidget("ChatSub"));
+		if (sub)
+			sub.SetText(WhenLine(entry));
+
+		DrawBubbles(entry);
+
+		if (m_wDeviceName)
+			m_wDeviceName.SetVisible(false);
+
+		if (m_ButtonBack)
+			m_ButtonBack.SetText("BACK");
+
+		UpdatePageButtons();
+		UpdateLogButton();
+		SetHint("");
+	}
+
+	//! The time under a sender: whatever the heading said after the separator,
+	//! then the date. Either half may be missing and the line still reads.
+	protected string WhenLine(notnull MCF_Device_Item entry)
+	{
+		string clock = TailPart(entry.m_sHeading);
+		string day = entry.m_sTimestamp;
+
+		if (clock.IsEmpty())
+			return day;
+
+		if (day.IsEmpty())
+			return clock;
+
+		return day + "   " + clock;
+	}
+
+	//! One message becomes a thread.
+	//!
+	//! THE AUTHORING CONVENTION IS ONE CHARACTER. Every line of the body is a
+	//! bubble; a line starting with ">" is from whoever owns the phone and sits
+	//! on the right, everything else came from the other end and sits on the
+	//! left. That is the entire format. A mission maker who writes a
+	//! conversation gets a conversation, and one who writes a paragraph gets a
+	//! paragraph in a single bubble -- which is also correct, and is why every
+	//! message authored before this still reads properly.
+	protected void DrawBubbles(notnull MCF_Device_Item entry)
+	{
+		if (!m_wChatColumn)
+			return;
+
+		ClearChildren(m_wChatColumn);
+
+		// A config file that carried the newline through as two characters
+		// rather than one would otherwise put "\n" in the middle of a bubble.
+		// Harmless when the parser already did the right thing.
+		string said = entry.m_sBody;
+		said.Replace("\\n", "\n");
+
+		array<string> lines = {};
+		said.Split("\n", lines, true);
+
+		foreach (string line : lines)
+		{
+			string trimmed = MCF_Device_Script.Trim(line);
+			if (trimmed.IsEmpty())
+				continue;
+
+			bool mine = trimmed.StartsWith(OUTGOING_MARK);
+
+			if (mine)
+			{
+				trimmed = trimmed.Substring(1, trimmed.Length() - 1);
+				trimmed = MCF_Device_Script.Trim(trimmed);
+			}
+
+			if (trimmed.IsEmpty())
+				continue;
+
+			AddBubble(trimmed, mine);
+		}
+	}
+
+	protected void AddBubble(string said, bool mine)
+	{
+		Widget row = GetGame().GetWorkspace().CreateWidgets(BUBBLE_LAYOUT, m_wChatColumn);
+		if (!row)
+			return;
+
+		Widget left = row.FindAnyWidget("Left");
+		Widget right = row.FindAnyWidget("Right");
+
+		if (left)
+			left.SetVisible(!mine);
+
+		if (right)
+			right.SetVisible(mine);
+
+		RichTextWidget target;
+
+		if (mine)
+			target = RichTextWidget.Cast(row.FindAnyWidget("RightText"));
+		else
+			target = RichTextWidget.Cast(row.FindAnyWidget("LeftText"));
+
+		if (target)
+			target.SetText(said);
+	}
+
+	// ------------------------------------------------------------------- mail
+
+	//! A mail, with the header a mail has.
+	//!
+	//! From, date and subject in a card, then the body in a reading column
+	//! under it. The difference between this and the chat screen is the whole
+	//! point of having two: a message is a conversation and a mail is a
+	//! document, and a device where both look the same is a device where the
+	//! player cannot tell at a glance which one they are holding.
+	protected void ShowMail(int index)
+	{
+		MCF_Device_Item entry = m_aVisible[index];
+		m_iOpenEntry = index;
+		StopWaitingForPicture();
+
+		SetScreens(false, false, false);
+
+		if (m_wMailPane)
+			m_wMailPane.SetVisible(true);
+
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		TextWidget label = TextWidget.Cast(root.FindAnyWidget("MailFromLabel"));
+		if (label)
+			label.SetText("FROM");
+
+		TextWidget from = TextWidget.Cast(root.FindAnyWidget("MailFrom"));
+		if (from)
+			from.SetText(SenderOf(entry.m_sHeading));
+
+		TextWidget when = TextWidget.Cast(root.FindAnyWidget("MailDate"));
+		if (when)
+			when.SetText(entry.m_sTimestamp);
+
+		RichTextWidget subject = RichTextWidget.Cast(root.FindAnyWidget("MailSubject"));
+		if (subject)
+			subject.SetText(SubjectOf(entry.m_sHeading));
+
+		RichTextWidget body = RichTextWidget.Cast(root.FindAnyWidget("MailBody"));
+		if (body)
+			body.SetText(entry.m_sBody);
+
+		if (m_wDeviceName)
+			m_wDeviceName.SetVisible(false);
+
+		if (m_ButtonBack)
+			m_ButtonBack.SetText("BACK");
+
+		UpdatePageButtons();
+		UpdateLogButton();
+		SetHint("");
+	}
+
+	// --------------------------------------------------------------- contacts
+
+	//! One person, on a card.
+	//!
+	//! The disc that was 40 units in the list is most of the top of the screen
+	//! here, because that is the only thing a contact card has to be: a face,
+	//! a name, a number you can act on, and whatever the owner of the phone
+	//! wrote about them.
+	protected void ShowContact(int index)
+	{
+		MCF_Device_Item entry = m_aVisible[index];
+		m_iOpenEntry = index;
+		StopWaitingForPicture();
+
+		SetScreens(false, false, false);
+
+		if (m_wContactPane)
+			m_wContactPane.SetVisible(true);
+
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string who = entry.m_sHeading;
+		if (who.IsEmpty())
+			who = "Unnamed";
+
+		ImageWidget disc = ImageWidget.Cast(root.FindAnyWidget("ContactAvatar"));
+		if (disc)
+			disc.SetColor(Color.FromInt(AvatarColour(who)));
+
+		TextWidget initial = TextWidget.Cast(root.FindAnyWidget("ContactInitial"));
+		if (initial)
+			initial.SetText(Initial(who));
+
+		TextWidget name = TextWidget.Cast(root.FindAnyWidget("ContactName"));
+		if (name)
+			name.SetText(who);
+
+		TextWidget number = TextWidget.Cast(root.FindAnyWidget("ContactNumber"));
+		if (number)
+		{
+			if (entry.m_sTimestamp.IsEmpty())
+				number.SetText("No number saved");
+			else
+				number.SetText(entry.m_sTimestamp);
+		}
+
+		TextWidget noteLabel = TextWidget.Cast(root.FindAnyWidget("ContactNoteLabel"));
+		if (noteLabel)
+		{
+			if (entry.m_sBody.IsEmpty())
+				noteLabel.SetText("");
+			else
+				noteLabel.SetText("NOTE");
+		}
+
+		RichTextWidget note = RichTextWidget.Cast(root.FindAnyWidget("ContactNote"));
+		if (note)
+			note.SetText(entry.m_sBody);
+
+		// A CALL button on a contact with no number saved is a control that
+		// cannot do anything, and a phone that offers it is lying about what it
+		// knows -- which is the one thing a piece of evidence must not do.
+		if (m_ContactCall)
+			m_ContactCall.GetRootWidget().SetVisible(!entry.m_sTimestamp.IsEmpty());
+
+		if (m_wDeviceName)
+			m_wDeviceName.SetVisible(false);
+
+		if (m_ButtonBack)
+			m_ButtonBack.SetText("BACK");
+
+		UpdatePageButtons();
+		UpdateLogButton();
+		SetHint("");
+	}
+
+	//! CALL on a card does not ring anybody: it puts the number on the dialler,
+	//! which is the screen the player would have reached typing it themselves --
+	//! with the name already sitting under it, which is the answer they wanted.
+	protected void OnContactCallClicked(SCR_ButtonTextComponent button)
+	{
+		if (m_iOpenEntry < 0 || m_iOpenEntry >= m_aVisible.Count())
+			return;
+
+		string number = Digits(m_aVisible[m_iOpenEntry].m_sTimestamp);
+		if (number.IsEmpty())
+			return;
+
+		MCF_Device_App calls = FindAppOfKind(MCF_EIntelApp.CALLS);
+		if (!calls)
+			return;
+
+		ShowDialler(calls);
+
+		m_sDialled = number;
+		DrawDialled();
+	}
+
+	// ----------------------------------------------------------------- photos
+
+	//! The photo app, as a grid.
+	//!
+	//! WHY THIS ONE IS NOT A LIST EITHER. A photograph's thumbnail is its own
+	//! title. A row reading "Truck at the mill" with a coloured disc beside it
+	//! tells the player strictly less than the picture does, and photos are the
+	//! only app on this device where that is true.
+	//!
+	//! Twelve tiles is what the glass holds. A device carrying more says so at
+	//! the bottom rather than dropping them silently -- an evidence device that
+	//! hides evidence is worse than one that shows none.
+	protected void ShowPhotoGrid(MCF_Device_App app)
+	{
+		m_bOnHome = false;
+		m_bOnList = true;
+		m_bOnForm = false;
+		m_OpenApp = app;
+		m_iOpenEntry = -1;
+		StopWaitingForPicture();
+
+		SetScreens(false, false, false);
+
+		m_aRowButtons.Clear();
+		m_aAuthorButtons.Clear();
+
+		if (m_wEntryList)
+			ClearChildren(m_wEntryList);
+
+		if (m_wPhotoGrid)
+			m_wPhotoGrid.SetVisible(true);
+
+		m_Content.GetItems(app, m_aVisible);
+
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		for (int i = 0; i < PHOTO_TILES; i++)
+		{
+			SCR_ButtonTextComponent tile;
+			if (i < m_aPhotoTiles.Count())
+				tile = m_aPhotoTiles[i];
+
+			if (!tile)
+				continue;
+
+			bool has = i < m_aVisible.Count();
+			tile.GetRootWidget().SetVisible(has);
+
+			if (!has)
+				continue;
+
+			MCF_Device_Item item = m_aVisible[i];
+
+			ImageWidget shot = ImageWidget.Cast(root.FindAnyWidget("PhotoTileImage" + i.ToString()));
+			TextWidget caption = TextWidget.Cast(root.FindAnyWidget("PhotoTileText" + i.ToString()));
+
+			bool drawn;
+
+			if (shot)
+			{
+				if (!item.m_sImage.IsEmpty())
+					drawn = shot.LoadImageTexture(0, item.m_sImage);
+
+				string key = item.ImageKey();
+
+				if (!drawn && !key.IsEmpty())
+					drawn = MCF_Device_ImageCache.Show(shot, key);
+
+				shot.SetVisible(drawn);
+			}
+
+			// A tile with nothing on it yet is not an empty tile: it is the one
+			// worth opening, because opening an item is what asks for the
+			// picture. Its heading stands in until the fetch lands.
+			if (caption)
+			{
+				caption.SetVisible(!drawn);
+				caption.SetText(item.m_sHeading);
+			}
+		}
+
+		TextWidget hint = TextWidget.Cast(root.FindAnyWidget("PhotoGridHint"));
+		if (hint)
+		{
+			if (m_aVisible.IsEmpty())
+				hint.SetText(app.ResolveEmptyText());
+			else if (m_aVisible.Count() > PHOTO_TILES)
+				hint.SetText((m_aVisible.Count() - PHOTO_TILES).ToString() + " more not shown");
+			else
+				hint.SetText("");
+		}
+
+		if (m_wDeviceName)
+		{
+			m_wDeviceName.SetVisible(true);
+			m_wDeviceName.SetText(app.ResolveLabel());
+		}
+
+		if (m_ButtonBack)
+			m_ButtonBack.SetText("HOME");
+
+		UpdateLogButton();
+		SetHint("");
+	}
+
+	protected void OnPhotoTileClicked(SCR_ButtonTextComponent button)
+	{
+		int index = m_aPhotoTiles.Find(button);
+		if (index < 0)
+			return;
+
+		ShowEntry(index);
+	}
+
 	// ------------------------------------------------------------ the dialler
 
 	//! Binds the dialler's keys.
@@ -2408,7 +3012,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 				name.SetVisible(has);
 
 				if (has)
-					name.SetText(items[i].m_sHeading);
+					name.SetText(RecentWho(items[i]));
 			}
 
 			if (meta)
@@ -2436,21 +3040,30 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! the width of a handset.
 	protected string RecentMeta(notnull MCF_Device_Item item)
 	{
-		string flat = item.m_sBody;
-		flat.Replace("\n", " ");
+		string way = HeadPart(item.m_sHeading);
+		string clock = TailPart(item.m_sHeading);
 
-		if (flat.Length() > 14)
-			flat = flat.Substring(0, 14);
+		if (clock.IsEmpty())
+			return way;
 
-		string stamp = item.m_sTimestamp;
+		return way + "   " + clock;
+	}
 
-		if (flat.IsEmpty())
-			return stamp;
+	//! Who the call was with. A call log entry names the direction in its
+	//! heading and the person in its body ("M. - 4 min 12 s."), which is the
+	//! wrong way round for a dialler: the name is what a player scans for and
+	//! the direction is what they check afterwards.
+	protected string RecentWho(notnull MCF_Device_Item item)
+	{
+		string who = HeadPart(item.m_sBody);
 
-		if (stamp.IsEmpty())
-			return flat;
+		if (who.IsEmpty())
+			who = item.m_sHeading;
 
-		return flat + "   " + stamp;
+		if (who.Length() > 20)
+			who = who.Substring(0, 20);
+
+		return who;
 	}
 
 	//! What has been typed, and who it belongs to if the phone book knows.
@@ -2485,22 +3098,17 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! piece of evidence before it is a convenience.
 	protected string MatchContact(string number)
 	{
-		array<MCF_Device_App> apps = {};
-		m_Content.GetApps(apps);
+		MCF_Device_App book = FindAppOfKind(MCF_EIntelApp.CONTACTS);
+		if (!book)
+			return "";
 
-		foreach (MCF_Device_App candidate : apps)
+		array<ref MCF_Device_Item> people = {};
+		m_Content.GetItems(book, people);
+
+		foreach (MCF_Device_Item person : people)
 		{
-			if (candidate.m_eKind != MCF_EIntelApp.CONTACTS)
-				continue;
-
-			array<ref MCF_Device_Item> people = {};
-			m_Content.GetItems(candidate, people);
-
-			foreach (MCF_Device_Item person : people)
-			{
-				if (Digits(person.m_sTimestamp) == number)
-					return person.m_sHeading;
-			}
+			if (Digits(person.m_sTimestamp) == number)
+				return person.m_sHeading;
 		}
 
 		return "";
@@ -2981,6 +3589,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_wDialler.SetVisible(false);
 
 		m_bOnDialler = false;
+
+		// Same rule for the four detail panes: every screen change takes them
+		// all down, and whichever one is wanted puts itself back up after.
+		HidePanes();
 
 		foreach (TextWidget label : m_aAppLabels)
 		{

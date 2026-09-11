@@ -1148,6 +1148,1234 @@ FrameWidgetClass {
       }
      }
     }
+    FrameWidgetClass "{6A1C4F0B39D35812}" {
+     Name "ChatPane"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35813}" {
+      Anchor 0.0000 0.0000 1.0000 1.0000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     {
+    ImageWidgetClass "{6A1C4F0B39D35801}" {
+     Name "ChatAvatar"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35802}" {
+      Anchor 0.0700 0.1470 0.1640 0.1930
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.35 0.38 0.42 1
+     Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
+     Image ""
+    }
+    TextWidgetClass "{6A1C4F0B39D35803}" {
+     Name "ChatInitial"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35804}" {
+      Anchor 0.0700 0.1560 0.1640 0.1880
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 15
+     "Min Font Size" 15
+     Alignment 0.5 0
+    }
+    TextWidgetClass "{6A1C4F0B39D35805}" {
+     Name "ChatName"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35806}" {
+      Anchor 0.1880 0.1480 0.9300 0.1750
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 15
+     "Min Font Size" 15
+    }
+    TextWidgetClass "{6A1C4F0B39D35807}" {
+     Name "ChatSub"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35808}" {
+      Anchor 0.1880 0.1770 0.9300 0.2000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 10
+     "Min Font Size" 10
+     Color 0.62 0.65 0.69 1
+    }
+    ImageWidgetClass "{6A1C4F0B39D35809}" {
+     Name "ChatRule"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3580A}" {
+      Anchor 0.0400 0.2120 0.9600 0.2130
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 1 1 1 0.10
+    }
+    ScrollLayoutWidgetClass "{6A1C4F0B39D3580B}" {
+     Name "ChatScroll"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3580C}" {
+      Anchor 0.0200 0.2250 0.9800 0.8700
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     components {
+      SCR_GamepadScrollComponent "{6A1C4F0B39D3580D}" {
+      }
+     }
+     style Small
+     {
+      SizeLayoutWidgetClass "{6A1C4F0B39D3580E}" {
+       Name "ChatScrollWidth"
+       Slot AlignableSlot "{6A1C4F0B39D3580F}" {
+        HorizontalAlign 3
+        VerticalAlign 0
+       }
+       AllowWidthOverride 0
+       WidthOverride 200
+       {
+        VerticalLayoutWidgetClass "{6A1C4F0B39D35810}" {
+         Name "ChatColumn"
+         Slot AlignableSlot "{6A1C4F0B39D35811}" {
+          HorizontalAlign 3
+          VerticalAlign 0
+         }
+         {
+         }
+        }
+       }
+      }
+     }
+    }
+     }
+    }
+    FrameWidgetClass "{6A1C4F0B39D35827}" {
+     Name "MailPane"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35828}" {
+      Anchor 0.0000 0.0000 1.0000 1.0000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     {
+    ImageWidgetClass "{6A1C4F0B39D35814}" {
+     Name "MailCard"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35815}" {
+      Anchor 0.0400 0.1430 0.9600 0.3050
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 1 1 1 0.06
+     Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+     Image ""
+    }
+    TextWidgetClass "{6A1C4F0B39D35816}" {
+     Name "MailFromLabel"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35817}" {
+      Anchor 0.0700 0.1520 0.4000 0.1740
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 9
+     "Min Font Size" 9
+     Color 0.50 0.53 0.57 1
+    }
+    TextWidgetClass "{6A1C4F0B39D35818}" {
+     Name "MailFrom"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35819}" {
+      Anchor 0.0700 0.1740 0.9300 0.2050
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 13
+     "Min Font Size" 13
+    }
+    TextWidgetClass "{6A1C4F0B39D3581A}" {
+     Name "MailDate"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3581B}" {
+      Anchor 0.0700 0.2080 0.9300 0.2300
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 10
+     "Min Font Size" 10
+     Color 0.62 0.65 0.69 1
+    }
+    ImageWidgetClass "{6A1C4F0B39D3581C}" {
+     Name "MailRule"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3581D}" {
+      Anchor 0.0700 0.2350 0.9300 0.2360
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 1 1 1 0.10
+    }
+    RichTextWidgetClass "{6A1C4F0B39D3581E}" {
+     Name "MailSubject"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3581F}" {
+      Anchor 0.0700 0.2430 0.9300 0.2980
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping Ancestor
+     Wrap 1
+     "Line Spacing" 20
+     Text ""
+     "Font Size" 15
+     "Min Font Size" 15
+    }
+    ScrollLayoutWidgetClass "{6A1C4F0B39D35820}" {
+     Name "MailScroll"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35821}" {
+      Anchor 0.0450 0.3200 0.9550 0.8700
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     components {
+      SCR_GamepadScrollComponent "{6A1C4F0B39D35822}" {
+      }
+     }
+     style Small
+     {
+      SizeLayoutWidgetClass "{6A1C4F0B39D35823}" {
+       Name "MailScrollWidth"
+       Slot AlignableSlot "{6A1C4F0B39D35824}" {
+        HorizontalAlign 3
+        VerticalAlign 0
+       }
+       AllowWidthOverride 0
+       WidthOverride 200
+       {
+        RichTextWidgetClass "{6A1C4F0B39D35825}" {
+         Name "MailBody"
+         Slot AlignableSlot "{6A1C4F0B39D35826}" {
+          HorizontalAlign 3
+          VerticalAlign 0
+         }
+         Clipping Ancestor
+         Wrap 1
+         Text ""
+         "Font Size" 12
+         "Min Font Size" 12
+         "Line Spacing" 22
+        }
+       }
+      }
+     }
+    }
+     }
+    }
+    FrameWidgetClass "{6A1C4F0B39D3583F}" {
+     Name "ContactPane"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35840}" {
+      Anchor 0.0000 0.0000 1.0000 1.0000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     {
+    ImageWidgetClass "{6A1C4F0B39D35829}" {
+     Name "ContactAvatar"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3582A}" {
+      Anchor 0.3450 0.1650 0.6550 0.3160
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 0.35 0.38 0.42 1
+     Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
+     Image ""
+    }
+    TextWidgetClass "{6A1C4F0B39D3582B}" {
+     Name "ContactInitial"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3582C}" {
+      Anchor 0.3450 0.2150 0.6550 0.2700
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 38
+     "Min Font Size" 38
+     Alignment 0.5 0
+    }
+    TextWidgetClass "{6A1C4F0B39D3582D}" {
+     Name "ContactName"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3582E}" {
+      Anchor 0.0600 0.3300 0.9400 0.3700
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 19
+     "Min Font Size" 19
+     Alignment 0.5 0
+    }
+    TextWidgetClass "{6A1C4F0B39D3582F}" {
+     Name "ContactNumber"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35830}" {
+      Anchor 0.0600 0.3740 0.9400 0.4020
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 12
+     "Min Font Size" 12
+     Alignment 0.5 0
+     Color 0.62 0.65 0.69 1
+    }
+    ButtonWidgetClass "{6A1C4F0B39D35831}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+     Name "ContactCall"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35832}" {
+      Anchor 0.3200 0.4250 0.6800 0.4850
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35833}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 0.16 0.60 0.27 1
+       m_BackgroundHovered 0.22 0.72 0.34 1
+       m_BackgroundClicked 0.30 0.80 0.42 1
+       m_sText "CALL"
+      }
+     }
+    }
+    ImageWidgetClass "{6A1C4F0B39D35834}" {
+     Name "ContactRule"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35835}" {
+      Anchor 0.0900 0.5150 0.9100 0.5160
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Color 1 1 1 0.10
+    }
+    TextWidgetClass "{6A1C4F0B39D35836}" {
+     Name "ContactNoteLabel"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35837}" {
+      Anchor 0.0900 0.5250 0.9100 0.5470
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 9
+     "Min Font Size" 9
+     Color 0.50 0.53 0.57 1
+    }
+    ScrollLayoutWidgetClass "{6A1C4F0B39D35838}" {
+     Name "ContactScroll"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35839}" {
+      Anchor 0.0850 0.5550 0.9150 0.8700
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     components {
+      SCR_GamepadScrollComponent "{6A1C4F0B39D3583A}" {
+      }
+     }
+     style Small
+     {
+      SizeLayoutWidgetClass "{6A1C4F0B39D3583B}" {
+       Name "ContactScrollWidth"
+       Slot AlignableSlot "{6A1C4F0B39D3583C}" {
+        HorizontalAlign 3
+        VerticalAlign 0
+       }
+       AllowWidthOverride 0
+       WidthOverride 200
+       {
+        RichTextWidgetClass "{6A1C4F0B39D3583D}" {
+         Name "ContactNote"
+         Slot AlignableSlot "{6A1C4F0B39D3583E}" {
+          HorizontalAlign 3
+          VerticalAlign 0
+         }
+         Clipping Ancestor
+         Wrap 1
+         Text ""
+         "Font Size" 12
+         "Min Font Size" 12
+         "Line Spacing" 22
+        }
+       }
+      }
+     }
+    }
+     }
+    }
+    FrameWidgetClass "{6A1C4F0B39D358AF}" {
+     Name "PhotoGrid"
+     Slot FrameWidgetSlot "{6A1C4F0B39D358B0}" {
+      Anchor 0.0000 0.0000 1.0000 1.0000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     {
+    ButtonWidgetClass "{6A1C4F0B39D35841}" {
+     Name "PhotoTile0"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35842}" {
+      Anchor 0.0550 0.2400 0.3350 0.3550
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35843}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D35844}" {
+       Name "PhotoTileBox0"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D35845}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D35846}" {
+         Name "PhotoTileImage0"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35847}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D35848}" {
+         Name "PhotoTileText0"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35849}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D3584A}" {
+     Name "PhotoTile1"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3584B}" {
+      Anchor 0.3600 0.2400 0.6400 0.3550
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D3584C}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D3584D}" {
+       Name "PhotoTileBox1"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D3584E}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D3584F}" {
+         Name "PhotoTileImage1"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35850}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D35851}" {
+         Name "PhotoTileText1"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35852}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D35853}" {
+     Name "PhotoTile2"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35854}" {
+      Anchor 0.6650 0.2400 0.9450 0.3550
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35855}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D35856}" {
+       Name "PhotoTileBox2"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D35857}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D35858}" {
+         Name "PhotoTileImage2"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35859}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D3585A}" {
+         Name "PhotoTileText2"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D3585B}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D3585C}" {
+     Name "PhotoTile3"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3585D}" {
+      Anchor 0.0550 0.3680 0.3350 0.4830
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D3585E}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D3585F}" {
+       Name "PhotoTileBox3"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D35860}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D35861}" {
+         Name "PhotoTileImage3"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35862}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D35863}" {
+         Name "PhotoTileText3"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35864}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D35865}" {
+     Name "PhotoTile4"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35866}" {
+      Anchor 0.3600 0.3680 0.6400 0.4830
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35867}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D35868}" {
+       Name "PhotoTileBox4"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D35869}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D3586A}" {
+         Name "PhotoTileImage4"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D3586B}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D3586C}" {
+         Name "PhotoTileText4"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D3586D}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D3586E}" {
+     Name "PhotoTile5"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3586F}" {
+      Anchor 0.6650 0.3680 0.9450 0.4830
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35870}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D35871}" {
+       Name "PhotoTileBox5"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D35872}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D35873}" {
+         Name "PhotoTileImage5"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35874}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D35875}" {
+         Name "PhotoTileText5"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35876}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D35877}" {
+     Name "PhotoTile6"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35878}" {
+      Anchor 0.0550 0.4960 0.3350 0.6110
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35879}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D3587A}" {
+       Name "PhotoTileBox6"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D3587B}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D3587C}" {
+         Name "PhotoTileImage6"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D3587D}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D3587E}" {
+         Name "PhotoTileText6"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D3587F}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D35880}" {
+     Name "PhotoTile7"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35881}" {
+      Anchor 0.3600 0.4960 0.6400 0.6110
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35882}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D35883}" {
+       Name "PhotoTileBox7"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D35884}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D35885}" {
+         Name "PhotoTileImage7"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35886}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D35887}" {
+         Name "PhotoTileText7"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35888}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D35889}" {
+     Name "PhotoTile8"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3588A}" {
+      Anchor 0.6650 0.4960 0.9450 0.6110
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D3588B}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D3588C}" {
+       Name "PhotoTileBox8"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D3588D}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D3588E}" {
+         Name "PhotoTileImage8"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D3588F}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D35890}" {
+         Name "PhotoTileText8"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35891}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D35892}" {
+     Name "PhotoTile9"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35893}" {
+      Anchor 0.0550 0.6240 0.3350 0.7390
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D35894}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D35895}" {
+       Name "PhotoTileBox9"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D35896}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D35897}" {
+         Name "PhotoTileImage9"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D35898}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D35899}" {
+         Name "PhotoTileText9"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D3589A}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D3589B}" {
+     Name "PhotoTile10"
+     Slot FrameWidgetSlot "{6A1C4F0B39D3589C}" {
+      Anchor 0.3600 0.6240 0.6400 0.7390
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D3589D}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D3589E}" {
+       Name "PhotoTileBox10"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D3589F}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D358A0}" {
+         Name "PhotoTileImage10"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D358A1}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D358A2}" {
+         Name "PhotoTileText10"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D358A3}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    ButtonWidgetClass "{6A1C4F0B39D358A4}" {
+     Name "PhotoTile11"
+     Slot FrameWidgetSlot "{6A1C4F0B39D358A5}" {
+      Anchor 0.6650 0.6240 0.9450 0.7390
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Clipping True
+     components {
+      SCR_ButtonTextComponent "{6A1C4F0B39D358A6}" {
+       m_bCanBeToggled 0
+       m_BackgroundDefault 1 1 1 0.07
+       m_BackgroundHovered 1 1 1 0.18
+       m_BackgroundSelected 1 1 1 0.07
+       m_BackgroundSelectedHovered 1 1 1 0.18
+       m_BackgroundClicked 1 1 1 0.26
+       m_sText ""
+      }
+     }
+     style blank
+     {
+      OverlayWidgetClass "{6A1C4F0B39D358A7}" {
+       Name "PhotoTileBox11"
+       Slot ButtonWidgetSlot "{6A1C4F0B39D358A8}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        ImageWidgetClass "{6A1C4F0B39D358A9}" {
+         Name "PhotoTileImage11"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D358AA}" {
+          HorizontalAlign 3
+          VerticalAlign 3
+         }
+         Color 1 1 1 1
+        }
+        TextWidgetClass "{6A1C4F0B39D358AB}" {
+         Name "PhotoTileText11"
+         Slot OverlayWidgetSlot "{6A1C4F0B39D358AC}" {
+          HorizontalAlign 1
+          VerticalAlign 1
+          Padding 6 4 6 4
+         }
+         Text ""
+         "Font Size" 10
+         "Min Font Size" 10
+         Color 0.62 0.65 0.69 1
+        }
+       }
+      }
+     }
+    }
+    TextWidgetClass "{6A1C4F0B39D358AD}" {
+     Name "PhotoGridHint"
+     Slot FrameWidgetSlot "{6A1C4F0B39D358AE}" {
+      Anchor 0.0600 0.7600 0.9400 0.7950
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     Text ""
+     "Font Size" 10
+     "Min Font Size" 10
+     Alignment 0.5 0
+     Color 0.50 0.53 0.57 1
+    }
+     }
+    }
     FrameWidgetClass "{6A1C4F0B39D35700}" {
      Name "Dialler"
      Slot FrameWidgetSlot "{6A1C4F0B39D35701}" {

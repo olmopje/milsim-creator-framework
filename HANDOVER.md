@@ -128,6 +128,13 @@ world and session saves, so a mod update cannot wipe a campaign.
   the pose needs a one-clip animation graph. Build it small — the crash was a
   size problem, not a concept problem. `arms_back` is the clip. Preview in
   `anims/workspaces/player/player_main.aw`.
+- **Phone read state does not survive a server restart.** It is keyed on the
+  object's RplId, which is session-scoped. Deliberate: keying it on the profile
+  id made every handset carrying the same profile share one read log, and being
+  right within a session beats being wrong across them.
+- **Editing a shared device profile on purpose** is not possible. Every edit
+  from inside the phone is per object, because the draft clears its id. Doing
+  it deliberately needs its own row and its own warning.
 - **MAP intel view** exists in the data model and does nothing.
 - **GROUP-assigned tasks** go only to their author until squad membership lands.
 - **Dropped intel objects do not respawn** after a restart. The board record
@@ -269,7 +276,50 @@ Start-Process -FilePath 'C:\Program Files (x86)\Steam\steamapps\common\Arma Refo
   put in Milsim.et is therefore never loaded — check where the components
   actually live before concluding anything from a quiet log.
 
-### 5. The namespace rename, with a fresh head
+### 5. The phone finishing pass — DONE 2026-09-11
+
+The handset is finished. What that took, and what is worth knowing:
+
+**It is drawn, not previewed.** The 3D model behind the UI is gone. Rendering
+it meant measuring where it landed, in a preview whose answer arrives in a
+different unit than the widget it lands in, a frame or three later, sometimes
+never — every fault this screen ever had came from that measurement. A chassis
+PNG and two rectangles from one aspect ratio, recomputed every frame, are
+correct on the first one. The laptop still uses the model; its screen is a quad
+on a mesh and there is a real reason to project it.
+
+**Its own art.** Eight app icons, a signal and a battery glyph, a rounded tile,
+a circle, a wallpaper and the chassis, in
+`addons/MCF_Ops/UI/images/MCF_Phone/`. PNG plus a hand-written `.edds.meta`
+(`PNGResourceClass : TextureColorMap.conf`), then focus the Workbench and the
+watcher builds the `.edds` against our GUID. No import dialog.
+
+**One control.** The home bar. One tap steps back, two taps close, and on a
+locked phone one tap opens the passcode pad. The three grey buttons under the
+screen are gone — they were the last thing on it that said "game menu" out
+loud. The bar must be a `ButtonWidget` above the chassis: an `ImageWidget`
+never receives a click, and a widget underneath the drawn body is covered by
+it. `style blank`, or the button paints a white block.
+
+**Break-in is behind a keypad.** Typing `1337` starts the puzzle. A phone that
+offers a BREAK IN button is a mod; a phone that has a passcode screen is a
+phone.
+
+**Unread, per client.** See DEVICE_CONTENT §10. The one thing to carry in your
+head: read state is keyed on the object's **RplId**, not the profile id, or
+three handsets sharing `smuggler_phone` share one read log.
+
+**Authoring on the device.** Edit device opens the phone itself in author mode.
+The draft has `m_sId` cleared, or the server writes it back into the shared
+library and every handset in the mission changes at once.
+
+**One app, one screen.** Messages is a bubble thread, mail has a header card,
+contacts have a list and a card, calls is a dialler, photos is a grid. Notes,
+files and settings keep the plain reader and should. DEVICE_CONTENT §11 has the
+authoring conventions — in particular that `" - "` in a heading splits it into
+who and when.
+
+### 6. The namespace rename, with a fresh head
 
 `MCF_Devices_` → `MCF_Lock_`, so it stops differing from `MCF_Device_` by one
 letter while meaning something else. And decide what to do about `MCF_AI_` and
@@ -703,3 +753,34 @@ why the photo overlay never showed this and the lock screen did.
   Workbench — because the GUID is baked into the `.xob` too and a clean meta
   beside a stale `.xob` looks exactly like a fix that did not take. With the
   meta clean the rebuild comes out clean; it does not come back.
+
+### A SizeLayoutWidget's width override cannot be set from script
+
+There is no `SetWidthOverride`. A scroll pane wrapped in a `SizeLayoutWidget`
+with `AllowWidthOverride 1` / `WidthOverride 200` is 200 units wide forever, in
+a glass more than twice that — which is what made every list on the phone use
+less than half the screen for weeks.
+
+The fix is in the layout, not in script: `AllowWidthOverride 0` plus
+`HorizontalAlign 3` on the size layout's own slot, so it stretches to the
+scroll's viewport instead of imposing a number.
+
+And the other half of the same lesson, already paid for once: a
+`SizeLayoutWidget` **scales its content**, it does not reserve height. A row
+built inside one came out with letters an inch tall. Row height comes from the
+tallest child plus the overlay's padding, the way every other row here gets one.
+
+### A PowerShell cmdlet that writes by replacing the file can report the new text and change nothing
+
+`Update-MatchInFile` prints a green diff of the result and then fails with
+`Unable to move the replacement file to the file to be replaced` — the preview
+is of what it intended, not of what landed. The file is untouched and a second
+`Select-String` is the only thing that says so.
+
+This is the same trap as `device_commit_files` reporting success on an unchanged
+file, in a different tool. **Read the file back and assert on the new text, in
+the same call that wrote it.** Every patch script in this session ends with a
+readback that raises if the new string is absent; do that.
+
+When the replace-and-move route fails, `[IO.File]::ReadAllText` /
+`WriteAllText` with a `UTF8Encoding($false)` writes in place and works.

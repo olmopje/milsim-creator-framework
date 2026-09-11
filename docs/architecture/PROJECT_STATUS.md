@@ -13,6 +13,74 @@ written. The structure of record is
 
 Supersedes `PHASE0_PROGRESS.md` (kept below for historical environment notes). Last updated after completing the full phased roadmap (ARCHITECTURE.md section 9, Phases 0-14) plus a follow-up session closing several "manual driver" gaps.
 
+## 2026-09-11: one app, one screen — the phone stops being a menu
+
+The handset had a body, a home screen, badges and a break-in, and every app on
+it still opened the same heading-date-body reader. That is the tell: eight
+entry points into one screen is a menu, whatever it is drawn as. Four apps now
+have a screen of their own, and the list they all sit on got the width it
+should have had from the start.
+
+**The width bug, which was in the layout and not the maths.** `ListScroll` and
+`ReadScroll` each wrapped their content in a `SizeLayoutWidget` with
+`AllowWidthOverride 1` / `WidthOverride 200`, in a glass more than twice that
+wide. Rows used less than half the screen and had done for weeks. There is no
+runtime setter for that override — searching the API for one is how the hour
+went — so the fix is in the layout: `AllowWidthOverride 0` and
+`HorizontalAlign 3` on the size layout's own slot, which lets it stretch to the
+scroll's viewport. Every scroll pane on the device now has that shape.
+
+**Row rhythm.** 64 units instead of 58, title against the top of the row and
+preview against the bottom, so the gap between them is what the row has left
+over. Two lines crammed into 58 read as one clump of text; this is what every
+SMS client on a real handset does instead.
+
+**MESSAGES is a conversation.** A sender and their disc across the top, the
+body as bubbles. The authoring convention is one character: each line of the
+body is a bubble and a line starting with `>` is from the phone's owner. A
+mission maker who writes a conversation gets one; one who writes a paragraph
+gets a paragraph in a single bubble, which is also correct, which is why every
+message authored before today still reads properly.
+
+`MCF_PhoneBubble.layout` carries both sides and hides one. Alignment cannot be
+changed at runtime without slot calls nothing else here uses, so the row has a
+Left and a Right. Each side stretches with a wide margin on the far side rather
+than hugging its text: a bubble that sizes to its content cannot wrap, and a
+message that does not wrap runs off the edge of the handset.
+
+**EMAIL is a letter** — from, date and subject in a card over a reading column.
+**CONTACTS is a list and a card** — the number under the name in the list,
+because that is what makes a row read as a contact rather than as a heading
+with a circle beside it; a card with the disc at eight times the size and one
+CALL button, hidden when no number is saved. A control that cannot do anything
+is a phone lying about what it knows.
+
+**CALLS is a dialler.** Every other app is a list of things somebody wrote
+down; the phone app is a machine you operate, and rows reading "Outgoing 14:22"
+were the last screen on the device that still read as a mod menu. Twelve keys
+of its own — not the passcode pad's, because sharing them meant one was always
+sitting in the other's geometry — the last three calls above them, a display
+that says live whether the number is in the phone book, and a CALL button that
+answers the only question a prop phone can: does this handset know whose number
+that is.
+
+**PHOTOS is a grid.** A photograph's thumbnail is its own title, and it is the
+only app where a row tells the player less than the picture does.
+
+**The heading separator was already there.** Mission makers were writing
+`"M. - 02:14"` and `"Outgoing - 0412"` into headings before anything read them
+apart. The shell now splits on `" - "`: left half is who, right half is when or
+what about. A heading without it is all left half, so nothing authored earlier
+changes.
+
+**The clock.** The status bar and home screen already read the mission's own
+`TimeAndWeatherManager`; the lock screen's large clock was set once when the
+screen opened and drifted the longer the phone stayed up. All three are now
+re-read on the one-second status tick.
+
+Notes, files and settings keep the plain reader, and should. They are documents
+and nothing else; a bespoke screen for them would be decoration.
+
 ## 2026-09-10 (evening): the Edit intel / Edit device overlap, closed
 
 Two Game Master screens with similar names were offered on the same objects.

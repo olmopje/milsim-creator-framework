@@ -1,0 +1,90 @@
+// One message in a thread.
+//
+// TWO BUBBLES, ONE HIDDEN. Which side a bubble sits on is decided when the
+// thread is drawn, and an alignment cannot be changed at runtime without
+// reaching for slot calls the rest of this device does not use -- so the row
+// carries both sides and the shell hides the one it does not want. It costs
+// four widgets and it cannot be got wrong.
+//
+// EACH SIDE STRETCHES rather than hugging its text, with a wide margin on the
+// opposite side. A bubble that sizes itself to its content cannot wrap, and a
+// message that does not wrap runs off the edge of a handset -- which is the
+// bug this whole screen exists to fix. The 90 units of empty on the far side
+// are what make it read as left or right.
+OverlayWidgetClass {
+ Name "BubbleRow"
+ Slot LayoutSlot "{6A1C4F0B39D35650}" {
+  Padding 0 0 0 0
+  SizeMode Fill
+ }
+ {
+  OverlayWidgetClass "{6A1C4F0B39D35651}" {
+   Name "Left"
+   Slot OverlayWidgetSlot "{6A1C4F0B39D35652}" {
+    HorizontalAlign 3
+    VerticalAlign 0
+    Padding 10 4 90 4
+   }
+   {
+    ImageWidgetClass "{6A1C4F0B39D35653}" {
+     Name "LeftFill"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35654}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Color 0.20 0.22 0.25 1
+     Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+     Image ""
+    }
+    RichTextWidgetClass "{6A1C4F0B39D35655}" {
+     Name "LeftText"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35656}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+      Padding 12 9 12 9
+     }
+     Clipping Ancestor
+     Wrap 1
+     Text ""
+     "Font Size" 12
+     "Min Font Size" 12
+     "Line Spacing" 20
+    }
+   }
+  }
+  OverlayWidgetClass "{6A1C4F0B39D35657}" {
+   Name "Right"
+   Slot OverlayWidgetSlot "{6A1C4F0B39D35658}" {
+    HorizontalAlign 3
+    VerticalAlign 0
+    Padding 90 4 10 4
+   }
+   {
+    ImageWidgetClass "{6A1C4F0B39D35659}" {
+     Name "RightFill"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D3565A}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+     Color 0.18 0.38 0.58 1
+     Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+     Image ""
+    }
+    RichTextWidgetClass "{6A1C4F0B39D3565B}" {
+     Name "RightText"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D3565C}" {
+      HorizontalAlign 3
+      VerticalAlign 0
+      Padding 12 9 12 9
+     }
+     Clipping Ancestor
+     Wrap 1
+     Text ""
+     "Font Size" 12
+     "Min Font Size" 12
+     "Line Spacing" 20
+    }
+   }
+  }
+ }
+}
