@@ -1,116 +1,77 @@
-//! Makes a multiline edit box behave like a text editor.
+//! Typing into an intel page, and why it is done a line at a time.
 //!
-//! TWO THINGS THE WIDGET DOES NOT DO ON ITS OWN, both traced to the same
-//! fact: `MultilineEditBoxWidget` derives from `TextWidget`, not from
-//! `EditBoxWidget`. The engine's own generated API in
-//! scripts/Core/generated/UI/ says so, and its own SCR_EditBoxComponent
-//! carries a separate field for each with the comment "Why aren't these
-//! derived from a common parent :(".
+//! THE CARET CANNOT BE MOVED. Nothing in the engine's scripted widget API
+//! reports or sets it -- check scripts/Core/generated/UI/, which has one file
+//! per widget class and is the only honest source for this. Everything below
+//! follows from that one missing function, and it was measured rather than
+//! guessed:
 //!
-//! 1. A TextWidget wraps only when it carries the WRAP_TEXT flag. Without it
-//!    a typed line runs off to the right forever.
-//! 2. Return does not put a newline in -- the widget uses it to leave write
-//!    mode instead. The character arrives here as OnChar(w, 13), which is
-//!    measured and not assumed: the log says
-//!    "[MCF] text input: control character 13" once per press.
+//!   [MCF] text input: control character 13         <- Return does arrive
+//!   [MCF] return pressed: had 183 chars, wrote 184, box now reports 184
 //!
-//! WRITING THE NEWLINE BACK IS THE HARD HALF. A box in write mode keeps its
-//! own edit buffer, and a plain SetText during write mode is not reliably
-//! what the box goes on editing. So this leaves write mode, writes the text,
-//! and re-enters -- and keeps its own copy of the last text it saw through
-//! OnChange, so that a GetText which comes back empty mid-edit cannot wipe
-//! what the author typed.
+//! So reading and writing a MultilineEditBoxWidget works perfectly, including
+//! while it is being typed in. What does not work is putting the caret after
+//! the newline that was just written. It stays where it was, so the next
+//! character is typed BEFORE the newline and the line never breaks -- and
+//! ActivateWriteMode(), which does move it, moves it to the start and selects
+//! everything, so the next character wipes the page.
 //!
-//! THE NEW LINE GOES ON THE END. There is no caret API -- nothing in the
-//! scripted class reports or moves it -- so this cannot split a line in the
-//! middle. For composing a page, which is the whole job of these boxes, that
-//! is what a person expects; for editing the middle of one it is not, and the
-//! answer then is a different widget rather than a cleverer handler.
-class MCF_Device_TextInput : ScriptedWidgetEventHandler
+//! A CARET IS ONLY HARMLESS IN AN EMPTY BOX. That is the whole design: the
+//! author types one line at a time in a box that is emptied on every Return,
+//! and the finished lines go onto the page above, where they are drawn as the
+//! player will see them. It reads like writing a letter, which is what it is,
+//! and no part of it depends on a caret.
+class MCF_Device_LineInput : ScriptedWidgetEventHandler
 {
 	protected static const int KEY_RETURN = 13;
 	protected static const int KEY_LINE_FEED = 10;
 
-	//! The last text this box was seen holding. The safety net against a
-	//! GetText that does not see the live edit buffer: appending a newline to
-	//! an empty string would throw away the page.
-	protected string m_sLast;
-
-	override bool OnChange(Widget w, bool finished)
-	{
-		MultilineEditBoxWidget box = MultilineEditBoxWidget.Cast(w);
-		if (box)
-			m_sLast = box.GetText();
-
-		return false;
-	}
+	//! Fired when Return is pressed on the line being typed.
+	ref ScriptInvoker m_OnLine = new ScriptInvoker();
 
 	override bool OnChar(Widget w, int charCode)
 	{
-		// Printable characters are the widget's own business.
-		if (charCode >= 32)
-			return false;
-
-		MultilineEditBoxWidget box = MultilineEditBoxWidget.Cast(w);
-		if (!box)
-			return false;
-
 		if (charCode != KEY_RETURN && charCode != KEY_LINE_FEED)
 			return false;
 
-		string held = box.GetText();
-
-		// If the widget will not tell us what is in it right now, use the last
-		// thing it did tell us. Never append to nothing.
-		if (held.IsEmpty() && !m_sLast.IsEmpty())
-			held = m_sLast;
-
-		string grown = held + "\n";
-
-		box.SetText(grown);
-		m_sLast = grown;
-
-		// Re-entering write mode makes the box take the text it was just
-		// given as the thing it is editing, rather than going on with the
-		// buffer it had before.
-		box.ActivateWriteMode();
-
-		string back = box.GetText();
-		MCF_Core_Log.Warn("return pressed: had " + held.Length().ToString()
-			+ " chars, wrote " + grown.Length().ToString()
-			+ ", box now reports " + back.Length().ToString()
-			+ ", write mode " + box.IsInWriteMode().ToString());
+		m_OnLine.Invoke();
 
 		// Processed, so the widget never sees the Return and cannot use it to
-		// leave write mode -- which is what it was doing with it.
+		// leave write mode -- which is what it does with it otherwise.
 		return true;
 	}
 
-	//! Switches wrapping on and, for a multiline box, hands back a handler the
-	//! caller must keep alive.
+	//! Attaches one to a single-line box and hands it back.
 	//!
 	//! THE CALLER HAS TO HOLD IT. A handler is attached to the widget but
-	//! owned by script; dropped on the floor it is collected and the box goes
-	//! back to swallowing Return some minutes later, which is a bug that looks
+	//! owned by script; dropped on the floor it is collected and Return goes
+	//! back to doing nothing some minutes later, which is a bug that looks
 	//! like a different bug.
-	static MCF_Device_TextInput Attach(Widget found)
+	static MCF_Device_LineInput Attach(Widget found)
 	{
 		if (!found)
 			return null;
 
-		// A MultilineEditBoxWidget IS a TextWidget, so this reaches it -- and
-		// reaches a plain read-only body just as well, which is why this is
-		// the one place wrapping is switched on.
+		MCF_Device_LineInput handler = new MCF_Device_LineInput();
+		found.AddHandler(handler);
+		return handler;
+	}
+}
+
+//! Wrapping, which is the other half of what these widgets do not do alone.
+class MCF_Device_TextInput
+{
+	//! A TextWidget wraps only when it carries the WRAP_TEXT flag -- its own
+	//! doc comment says so -- and without it a long line runs off to the right
+	//! forever. MultilineEditBoxWidget derives from TextWidget, so this
+	//! reaches one of those just as well as a plain body.
+	static void Wrap(Widget found)
+	{
+		if (!found)
+			return;
+
 		TextWidget text = TextWidget.Cast(found);
 		if (text)
 			text.SetTextWrapping(true);
-
-		MultilineEditBoxWidget box = MultilineEditBoxWidget.Cast(found);
-		if (!box)
-			return null;
-
-		MCF_Device_TextInput handler = new MCF_Device_TextInput();
-		found.AddHandler(handler);
-		return handler;
 	}
 }

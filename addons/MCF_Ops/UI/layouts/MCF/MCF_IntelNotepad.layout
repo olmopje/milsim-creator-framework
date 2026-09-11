@@ -747,141 +747,10 @@ FrameWidgetClass {
    "Min Font Size" 13
    Color 0.34 0.31 0.28 1
   }
-  MultilineEditBoxWidgetClass "{6A1C4F0B39D3306C}" {
-   Name "BodyEdit"
+  RichTextWidgetClass "{6A1C4F0B39D3306C}" {
+   Name "AuthorBody"
    Slot FrameWidgetSlot "{6A1C4F0B39D3306D}" {
-    Anchor 0.368 0.196 0.664 0.820
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   "Is Visible" 0
-   Clipping True
-   components {
-    SCR_EventHandlerComponent "{6A1C4F0B39D3306E}" {
-    }
-   }
-   style blank
-   Text ""
-   "Font Size" 14
-   "Min Font Size" 14
-   "Line Spacing" 21
-   Color 0.13 0.12 0.16 1
-  }
-  ButtonWidgetClass "{6A1C4F0B39D3306F}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonType"
-   Slot FrameWidgetSlot "{6A1C4F0B39D33070}" {
-    Anchor 0.150 0.100 0.292 0.140
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   "Is Visible" 0
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D33071}" {
-     m_bCanBeToggled 0
-     m_sText "TYPE"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D33072}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonPage"
-   Slot FrameWidgetSlot "{6A1C4F0B39D33073}" {
-    Anchor 0.150 0.146 0.292 0.186
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   "Is Visible" 0
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D33074}" {
-     m_bCanBeToggled 0
-     m_sText "PAGE"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D33075}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonAddPage"
-   Slot FrameWidgetSlot "{6A1C4F0B39D33076}" {
-    Anchor 0.150 0.206 0.292 0.246
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   "Is Visible" 0
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D33077}" {
-     m_bCanBeToggled 0
-     m_sText "+ PAGE"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D33078}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonDropPage"
-   Slot FrameWidgetSlot "{6A1C4F0B39D33079}" {
-    Anchor 0.150 0.252 0.292 0.292
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   "Is Visible" 0
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D3307A}" {
-     m_bCanBeToggled 0
-     m_sText "- PAGE"
-    }
-   }
-  }
-  ButtonWidgetClass "{6A1C4F0B39D3307B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonSaveIntel"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3307C}" {
-    Anchor 0.150 0.312 0.292 0.352
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   "Is Visible" 0
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D3307D}" {
-     m_bCanBeToggled 0
-     m_sText "SAVE"
-    }
-   }
-  }
-  RichTextWidgetClass "{6A1C4F0B39D3307E}" {
-   Name "AuthorNote"
-   Slot FrameWidgetSlot "{6A1C4F0B39D3307F}" {
-    Anchor 0.150 0.364 0.292 0.470
+    Anchor 0.368 0.196 0.664 0.742
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -894,7 +763,199 @@ FrameWidgetClass {
    "Is Visible" 0
    Clipping Ancestor
    Wrap 1
-   Text "TYPE to write on the page, PAGE to see it as the player will. SAVE writes it to the object."
+   Text ""
+   "Font Size" 14
+   "Min Font Size" 14
+   "Line Spacing" 21
+   Color 0.13 0.12 0.16 1
+  }
+  ImageWidgetClass "{6A1C4F0B39D3306E}" {
+   Name "LineRule"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3306F}" {
+    Anchor 0.368 0.796 0.664 0.797
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   Color 0.55 0.52 0.46 1
+  }
+  EditBoxWidgetClass "{6A1C4F0B39D33070}" {
+   Name "LineEdit"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33071}" {
+    Anchor 0.372 0.750 0.664 0.794
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   Clipping True
+   components {
+    SCR_EventHandlerComponent "{6A1C4F0B39D33072}" {
+    }
+    EditBoxFilterComponent "{6A1C4F0B39D33073}" {
+     m_iCharacterLimit 4000
+    }
+   }
+   style blank
+   Text ""
+   "Font Size" 14
+   "Min Font Size" 14
+   Color 0.13 0.12 0.16 1
+  }
+  ButtonWidgetClass "{6A1C4F0B39D33074}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonType"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33075}" {
+    Anchor 0.150 0.100 0.292 0.140
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D33076}" {
+     m_bCanBeToggled 0
+     m_sText "TYPE"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D33077}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonPage"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33078}" {
+    Anchor 0.150 0.146 0.292 0.186
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D33079}" {
+     m_bCanBeToggled 0
+     m_sText "PAGE"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3307A}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonAddPage"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3307B}" {
+    Anchor 0.150 0.206 0.292 0.246
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3307C}" {
+     m_bCanBeToggled 0
+     m_sText "+ PAGE"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D3307D}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonDropPage"
+   Slot FrameWidgetSlot "{6A1C4F0B39D3307E}" {
+    Anchor 0.150 0.252 0.292 0.292
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D3307F}" {
+     m_bCanBeToggled 0
+     m_sText "- PAGE"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D33080}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonPullLine"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33081}" {
+    Anchor 0.150 0.312 0.292 0.352
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D33082}" {
+     m_bCanBeToggled 0
+     m_sText "UNDO LINE"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D33083}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonSaveIntel"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33084}" {
+    Anchor 0.150 0.372 0.292 0.412
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D33085}" {
+     m_bCanBeToggled 0
+     m_sText "SAVE"
+    }
+   }
+  }
+  RichTextWidgetClass "{6A1C4F0B39D33086}" {
+   Name "AuthorNote"
+   Slot FrameWidgetSlot "{6A1C4F0B39D33087}" {
+    Anchor 0.150 0.424 0.292 0.560
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   Clipping Ancestor
+   Wrap 1
+   Text "TYPE to write. Return finishes a line and starts the next one. PAGE shows it as the player will see it, SAVE writes it to the object."
    "Font Size" 12
    "Min Font Size" 12
    "Line Spacing" 17

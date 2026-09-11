@@ -36,6 +36,9 @@ VISUALS = [
         "heading": (0.345, 0.105, 0.645, 0.150),
         "stamp":   (0.345, 0.152, 0.645, 0.182),
         "body":    (0.340, 0.195, 0.650, 0.830),
+        "page":    (0.340, 0.195, 0.650, 0.752),
+        "rule":    (0.340, 0.806, 0.650, 0.8075),
+        "line":    (0.344, 0.760, 0.650, 0.804),
         "head_size": 22, "head_ink": "0.13 0.12 0.16 1",
         "stamp_size": 14, "stamp_ink": "0.34 0.31 0.28 1",
         "body_size": 15, "body_ink": "0.13 0.12 0.16 1", "body_spacing": 22,
@@ -48,6 +51,9 @@ VISUALS = [
         "heading": (0.372, 0.108, 0.660, 0.152),
         "stamp":   (0.372, 0.154, 0.660, 0.182),
         "body":    (0.368, 0.196, 0.664, 0.820),
+        "page":    (0.368, 0.196, 0.664, 0.742),
+        "rule":    (0.368, 0.796, 0.664, 0.7975),
+        "line":    (0.372, 0.750, 0.664, 0.794),
         "head_size": 20, "head_ink": "0.13 0.12 0.16 1",
         "stamp_size": 13, "stamp_ink": "0.34 0.31 0.28 1",
         "body_size": 14, "body_ink": "0.13 0.12 0.16 1", "body_spacing": 21,
@@ -60,7 +66,8 @@ TOOLS = [
     ("ButtonPage",      "PAGE",    0.146, 0.186),
     ("ButtonAddPage",   "+ PAGE",  0.206, 0.246),
     ("ButtonDropPage",  "- PAGE",  0.252, 0.292),
-    ("ButtonSaveIntel", "SAVE",    0.312, 0.352),
+    ("ButtonPullLine",  "UNDO LINE", 0.312, 0.352),
+    ("ButtonSaveIntel", "SAVE",    0.372, 0.412),
 ]
 TOOL_X = (0.150, 0.292)
 
@@ -124,6 +131,33 @@ def editbox(name, a, g, size, ink, multiline=False, spacing=None):
     return s
 
 
+def page(name, a, g, size, ink, spacing):
+    """The lines already written, drawn the way the player will see them."""
+    s = '  RichTextWidgetClass "{%s}" {\n' % g()
+    s += '   Name "%s"\n' % name
+    s += slot(a, g())
+    s += '   "Is Visible" 0\n'
+    s += "   Clipping Ancestor\n   Wrap 1\n"
+    s += '   Text ""\n'
+    s += '   "Font Size" %d\n' % size
+    s += '   "Min Font Size" %d\n' % size
+    s += '   "Line Spacing" %d\n' % spacing
+    s += "   Color %s\n" % ink
+    s += "  }\n"
+    return s
+
+
+def rule(name, a, g):
+    """The line you are writing on."""
+    s = '  ImageWidgetClass "{%s}" {\n' % g()
+    s += '   Name "%s"\n' % name
+    s += slot(a, g())
+    s += '   "Is Visible" 0\n'
+    s += "   Color 0.55 0.52 0.46 1\n"
+    s += "  }\n"
+    return s
+
+
 def button(name, label, a, g):
     s = '  ButtonWidgetClass "{%s}" : %s {\n' % (g(), BUTTON_BASE)
     s += '   Name "%s"\n' % name
@@ -158,15 +192,24 @@ def block(v):
     s += editbox("NameEdit", v["name"], g, 18, "1 1 1 1")
     s += editbox("HeadingEdit", v["heading"], g, v["head_size"], v["head_ink"])
     s += editbox("StampEdit", v["stamp"], g, v["stamp_size"], v["stamp_ink"])
-    s += editbox("BodyEdit", v["body"], g, v["body_size"], v["body_ink"],
-                 multiline=True, spacing=v["body_spacing"])
+    # THE PAGE, AND THE LINE BEING WRITTEN.
+    #
+    # Not one big edit box, because the caret cannot be moved: see
+    # MCF_Device_LineInput for the measurement. A box is only safe to refill
+    # while it is empty, so the author types one line at a time and the
+    # finished lines are drawn above, as the player will see them.
+    s += page("AuthorBody", v["page"], g, v["body_size"], v["body_ink"],
+              v["body_spacing"])
+    s += rule("LineRule", v["rule"], g)
+    s += editbox("LineEdit", v["line"], g, v["body_size"], v["body_ink"])
 
     for name, label, y0, y1 in TOOLS:
         s += button(name, label, (TOOL_X[0], y0, TOOL_X[1], y1), g)
 
-    s += note("AuthorNote", (TOOL_X[0], 0.364, TOOL_X[1], 0.470), g,
-              "TYPE to write on the page, PAGE to see it as the player will. "
-              "SAVE writes it to the object.")
+    s += note("AuthorNote", (TOOL_X[0], 0.424, TOOL_X[1], 0.560), g,
+              "TYPE to write. Return finishes a line and starts the next one. "
+              "PAGE shows it as the player will see it, SAVE writes it to the "
+              "object.")
     s += END + "\n"
     return s
 
@@ -198,7 +241,7 @@ def apply(v):
     if dupes:
         return v["path"] + "  FAULT duplicate names: " + ", ".join(dupes)
 
-    if "BodyEdit" not in back:
+    if "LineEdit" not in back:
         return v["path"] + "  FAULT: readback"
 
     return "%s  %d widget names, no duplicates" % (v["path"], len(names))
