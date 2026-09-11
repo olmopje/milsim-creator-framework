@@ -1174,3 +1174,59 @@ goes in with its overhaul pass.
 `Widget.AddHandler` attaches it, script owns it, and one nobody holds is
 collected — after which the widget quietly goes back to its old behaviour
 some minutes later.
+
+## A live map on a board, and the four wrong answers on the way there
+
+`MCF_Map_BoardComponent` puts the world's real map on a panel in the world.
+It works. The detail is in `docs/research/map-board-and-drawing.md`; this is
+what a future session needs to not repeat.
+
+**A blank board that is the RIGHT blue is not a broken render target.** The
+map widget's `ClearColor` is `0.173 0.344 0.62` linear, which arrives on
+screen as a pale steel blue. Seeing that colour on the panel proves the whole
+chain -- widget tree, `SetRenderTarget`, the material's `$rendertarget` --
+already works and only the content is missing. Check the colour before
+blaming the plumbing.
+
+**An `RTTextureWidget` on the screen is a hole.** The obvious diagnostic --
+hang the board's widget tree on the workspace and see whether the map draws
+-- cannot answer anything, because the thing in that tree sends its subtree
+to the entity's mesh instead of to the screen. Any such test needs the same
+`MapWidget` with NO render target around it.
+
+**The character camera is innocent.** `OpenMap` switches its render off and
+that really is an optimisation: in Game Master the map and the world are
+visibly drawn at the same time.
+
+**"Open" and "being drawn" are two different things**, and this is the whole
+feature. `m_bIsOpen`, the widget it panned last, the modules, the character
+camera -- bookkeeping, and it belongs to the player. Drawing is three native
+calls on the entity: `EnableVisualisation(true)`, `SetFrame(worldRect)` and
+the layer. They are the last line of `OnMapOpen` and the second-to-last of
+`OnMapClose`, none of them looks at `m_bIsOpen`, and a `MapWidget` draws
+whenever they are set.
+
+**A board that holds the map open breaks M.** There is one `SCR_MapEntity`,
+and while a board holds it open whatever decides what M should do has already
+been told a map is open. Handing it back does not work either: `CloseMap`
+calls `EnableVisualisation(false)` and the board goes blank.
+
+**`SCR_MapEntity` is the singleton; `MapEntity` is not.** The class it
+inherits is a plain `GenericEntity` carrying the entire map. Each board now
+spawns one of its own (`MCF_Map_BoardEntity`), borrows the real map's
+configuration and numbers once during a setup open, and drives its own from
+then on -- so the board's zoom and pan are the board's, replicated between
+everyone looking at it, and nobody's personal map is touched in either
+direction.
+
+**Zoom, pan, layer and grid live on the entity, not on the widget.** A board
+that does not re-state them inherits whatever a player left behind. Re-state
+them; do NOT set the board up again to fix it -- the setup open is itself an
+open map, and a board that cannot tell its own open from a player's will
+prime itself forever, once a second, which also breaks M. The test is
+`GetMapWidget() == m_wMapWidget`.
+
+**Markers are widgets, not map items.** `SCR_MapMarkersUI` is a map UI
+component, and components only update while `IsOpen()`. So markers on a board
+are not a setting -- they are a piece of work, and they conflict with the
+board not holding the map.

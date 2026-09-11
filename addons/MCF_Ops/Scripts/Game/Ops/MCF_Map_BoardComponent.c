@@ -86,6 +86,144 @@ class MCF_Map_BoardComponent : ScriptComponent
 	protected bool m_bPrimed;
 	protected bool m_bPriming;
 
+	//! THE BOARD'S SHARED TRUTH, and it is only this board's. Two numbers:
+	//! how far in it is zoomed, and what it is looking at. Everybody who can
+	//! see the board sees the same two, because they are replicated on the
+	//! board's own entity -- and nobody's personal map is touched by either,
+	//! because the board draws through a map entity of its own.
+	//!
+	//! Boards do not share this. One board, one view, changed by whoever
+	//! walks up to that board.
+	[RplProp(onRplName: "OnViewReplicated")]
+	protected int m_iZoomStep;
+
+	[RplProp(onRplName: "OnViewReplicated")]
+	protected float m_fCentreX;
+
+	[RplProp(onRplName: "OnViewReplicated")]
+	protected float m_fCentreZ;
+
+	//! Until somebody centres it, the board looks at the middle of the world.
+	//! A zero centre is a real coordinate, so it cannot double as "unset".
+	[RplProp(onRplName: "OnViewReplicated")]
+	protected bool m_bCentreSet;
+
+	//! Four doublings is the whole island down to about a quarter of a grid
+	//! square, which is as far in as a board is worth reading.
+	protected static const int MAX_ZOOM_STEP = 4;
+
+	//------------------------------------------------------------------------
+	int GetZoomStep()
+	{
+		return m_iZoomStep;
+	}
+
+	//------------------------------------------------------------------------
+	//! Client side: ask for a change. The server owns the answer, because the
+	//! board is a thing in the world that several people are looking at and
+	//! not a setting in one person's client.
+	void AskZoom(int delta)
+	{
+		Rpc(RpcAsk_Zoom, delta);
+	}
+
+	//------------------------------------------------------------------------
+	void AskCentre(vector world)
+	{
+		Rpc(RpcAsk_Centre, world[0], world[2]);
+	}
+
+	//------------------------------------------------------------------------
+	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+	protected void RpcAsk_Zoom(int delta)
+	{
+		int step = Math.ClampInt(m_iZoomStep + delta, 0, MAX_ZOOM_STEP);
+		if (step == m_iZoomStep)
+			return;
+
+		m_iZoomStep = step;
+
+		// Zooming all the way out is also "show me everything", so it forgets
+		// where it was looking rather than keeping a centre nobody asked for.
+		if (step == 0)
+			m_bCentreSet = false;
+
+		Replication.BumpMe();
+
+		// A listen server is its own client and gets no replication callback
+		// for its own write.
+		OnViewReplicated();
+	}
+
+	//------------------------------------------------------------------------
+	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+	protected void RpcAsk_Centre(float x, float z)
+	{
+		m_fCentreX = x;
+		m_fCentreZ = z;
+		m_bCentreSet = true;
+
+		Replication.BumpMe();
+		OnViewReplicated();
+	}
+
+	//------------------------------------------------------------------------
+	//! Runs on every machine when the board's view changes.
+	protected void OnViewReplicated()
+	{
+		ComputeView();
+	}
+
+	//------------------------------------------------------------------------
+	//! The board's two numbers, turned into the four the map entity wants.
+	//!
+	//! THIS IS SCR_MapEntity'S OWN ARITHMETIC, not an invention. Minimum zoom
+	//! in UpdateZoomBounds is screen height over map size in metres -- the
+	//! whole island fitted to the widget -- and each step doubles it.
+	//! ZoomChange takes a ratio against the widget's fixed layout scale, and
+	//! PosChange is fed exactly what WorldToScreen returns for the point that
+	//! should end up in the middle, which is what CenterMap does.
+	protected void ComputeView()
+	{
+		if (!m_wMapWidget || !m_MapEntity)
+			return;
+
+		float widgetW, widgetH;
+		m_wMapWidget.GetScreenSize(widgetW, widgetH);
+
+		float sizeX = m_MapEntity.GetMapSizeX();
+		float sizeY = m_MapEntity.GetMapSizeY();
+
+		if (widgetW <= 0 || widgetH <= 0 || sizeX <= 0 || sizeY <= 0)
+			return;
+
+		float ppu = (widgetH / sizeY) * Math.Pow(2, m_iZoomStep);
+
+		float basePPU = m_wMapWidget.PixelPerUnit();
+		if (basePPU > 0)
+			m_fZoomLevel = ppu / basePPU;
+
+		float centreX = sizeX * 0.5;
+		float centreZ = sizeY * 0.5;
+
+		if (m_bCentreSet)
+		{
+			centreX = m_fCentreX;
+			centreZ = m_fCentreZ;
+		}
+
+		vector offset = m_MapEntity.Offset();
+
+		m_vPan = Vector((centreX - offset[0]) * ppu, ((sizeY - centreZ) + offset[2]) * ppu, 0);
+
+		float halfW = (widgetW / ppu) * 0.5;
+		float halfH = (widgetH / ppu) * 0.5;
+
+		m_vFrameMin = Vector(centreX - halfW, 0, centreZ - halfH);
+		m_vFrameMax = Vector(centreX + halfW, 0, centreZ + halfH);
+	}
+
+
 	//! THE BOARD'S OWN VIEW, in the four numbers the map entity keeps rather
 	//! than the widget. Read once, off the fitted map, and put back every
 	//! tick -- which is what makes the board independent of whatever a player
@@ -401,7 +539,24 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		m_bPrimed = true;
 
-		MCF_Core_Log.Debug("map board primed at zoom ratio " + m_fZoomLevel.ToString() + ", layer " + m_iLayer.ToString());
+		// THE ARITHMETIC, CHECKED AGAINST THE REAL THING. ComputeView works
+		// the same view out from the board's own two numbers; at zoom step 0
+		// with no centre set that is "the whole island, centred", which is
+		// exactly what ZoomOut and CenterMap just did. If these two lines
+		// disagree, the formula is wrong and everything the board does with
+		// zoom and pan from here is wrong with it.
+		float primedZoom = m_fZoomLevel;
+		vector primedPan = m_vPan;
+
+		ComputeView();
+
+		string check = "map board view | primed zoom " + primedZoom.ToString();
+		check = check + " pan " + primedPan.ToString();
+		check = check + " | computed zoom " + m_fZoomLevel.ToString();
+		check = check + " pan " + m_vPan.ToString();
+		check = check + " | layer " + m_iLayer.ToString();
+
+		MCF_Core_Log.Warn(check);
 
 		// A MAP OF THE BOARD'S OWN, built from the same configuration and
 		// handed the numbers the real map just worked out. From here the board

@@ -26,7 +26,7 @@
 //! draws while a player pans their own map somewhere else, this works and the
 //! board is independent. If it goes blank or follows theirs, it does not, and
 //! MCF_Map_BoardComponent.m_bOwnMapEntity turns it off again.
-[EntityEditorProps(category: "MCF/Ops", description: "A map entity belonging to one MCF map board.", visible: false)]
+[EntityEditorProps(category: "MCF/Ops", description: "A map entity belonging to one MCF map board. Spawned by MCF_Map_BoardComponent, never placed by hand.")]
 class MCF_Map_BoardEntityClass : MapEntityClass
 {
 }

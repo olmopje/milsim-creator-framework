@@ -26,7 +26,7 @@ class MCF_Map_BoardAction : ScriptedUserAction
 
 	override bool GetActionNameScript(out string outName)
 	{
-		outName = "Use map";
+		outName = "Open my map";
 		return true;
 	}
 
@@ -52,5 +52,98 @@ class MCF_Map_BoardAction : ScriptedUserAction
 		MenuManager menus = GetGame().GetMenuManager();
 		if (menus)
 			menus.OpenMenu(ChimeraMenuPreset.MapMenu);
+	}
+}
+
+
+//! Zoom the board in or out, for everybody looking at it.
+//!
+//! THE BOARD IS NOT A SETTING IN ONE PERSON'S CLIENT. Several people stand
+//! at it and they are talking about what they can all see, so the change goes
+//! to the server and comes back to everyone. Nobody's own map moves.
+class MCF_Map_BoardZoomAction : ScriptedUserAction
+{
+	[Attribute(defvalue: "1", uiwidget: UIWidgets.EditBox, desc: "Steps to zoom. 1 is in, -1 is out.", params: "-4 4")]
+	protected int m_iDelta;
+
+	protected MCF_Map_BoardComponent m_Board;
+
+	override void Init(IEntity pOwnerEntity, GenericComponent pManagerComponent)
+	{
+		m_Board = MCF_Map_BoardComponent.Cast(pOwnerEntity.FindComponent(MCF_Map_BoardComponent));
+	}
+
+	override bool HasLocalEffectOnlyScript()
+	{
+		// The action itself is local; what it does is an RPC of its own, which
+		// is the honest way round -- the action system would otherwise run
+		// this on the server with no idea what it means.
+		return true;
+	}
+
+	override bool GetActionNameScript(out string outName)
+	{
+		if (m_iDelta >= 0)
+			outName = "Zoom in";
+		else
+			outName = "Zoom out";
+
+		return true;
+	}
+
+	//! Hidden at the end of its travel rather than greyed. A prompt that can
+	//! do nothing is a prompt that promises something.
+	override bool CanBeShownScript(IEntity user)
+	{
+		if (!m_Board)
+			return false;
+
+		if (m_iDelta > 0)
+			return m_Board.GetZoomStep() < 4;
+
+		return m_Board.GetZoomStep() > 0;
+	}
+
+	override void PerformAction(IEntity pOwnerEntity, IEntity pUserEntity)
+	{
+		if (m_Board)
+			m_Board.AskZoom(m_iDelta);
+	}
+}
+
+//! Put the board's view over where the person standing at it is.
+//!
+//! WHY THIS IS THE PAN. A board on a wall has no cursor, and a set of four
+//! arrow prompts would be a bad imitation of one. "Where I am" is the thing
+//! people actually want a map centred on, and it is one prompt.
+class MCF_Map_BoardCentreAction : ScriptedUserAction
+{
+	protected MCF_Map_BoardComponent m_Board;
+
+	override void Init(IEntity pOwnerEntity, GenericComponent pManagerComponent)
+	{
+		m_Board = MCF_Map_BoardComponent.Cast(pOwnerEntity.FindComponent(MCF_Map_BoardComponent));
+	}
+
+	override bool HasLocalEffectOnlyScript()
+	{
+		return true;
+	}
+
+	override bool GetActionNameScript(out string outName)
+	{
+		outName = "Centre map here";
+		return true;
+	}
+
+	override bool CanBeShownScript(IEntity user)
+	{
+		return m_Board != null;
+	}
+
+	override void PerformAction(IEntity pOwnerEntity, IEntity pUserEntity)
+	{
+		if (m_Board && pUserEntity)
+			m_Board.AskCentre(pUserEntity.GetOrigin());
 	}
 }
