@@ -61,7 +61,12 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//! that mesh for now, so it carries it too, set to visible.
 	int m_iOpacityMapId = 1;
 
+	//! The diagnostic host: the same map widget with no render target around
+	//! it, hung on the screen. Only ever made when m_bDebugOnScreen is set.
+	protected static const ResourceName SCREEN_LAYOUT = "{6A1C4F0B39E11010}UI/layouts/MCF/MCF_MapBoardScreen.layout";
+
 	protected Widget m_wRoot;
+	protected Widget m_wScreenRoot;
 	protected RTTextureWidget m_wRenderTarget;
 	protected SCR_MapEntity m_MapEntity;
 	protected bool m_bRaised;
@@ -104,16 +109,8 @@ class MCF_Map_BoardComponent : ScriptComponent
 			return;
 		}
 
-		// NO PARENT. That is the whole reason this never appears on screen:
-		// CreateWidgets with a null parent leaves the tree outside the
-		// workspace's own hierarchy, and only the render target's recursive
-		// pass ever draws it. Handing it the workspace as a parent puts the
-		// very same tree on the screen, which is what the debug flag is for.
-		Widget parent;
-		if (m_bDebugOnScreen)
-			parent = workspace;
-
-		m_wRoot = workspace.CreateWidgets(m_sLayout, parent);
+		// NO PARENT. That is the whole reason this never appears on screen.
+		m_wRoot = workspace.CreateWidgets(m_sLayout);
 		if (!m_wRoot)
 		{
 			MCF_Core_Log.Warn("map board: the render layout would not load");
@@ -146,6 +143,18 @@ class MCF_Map_BoardComponent : ScriptComponent
 		m_wRenderTarget.SetEnabled(true);
 		m_bRaised = true;
 
+		// The diagnostic host, on the screen, with nothing between the map
+		// widget and the eye. The workspace is a Widget, so it can be a
+		// parent -- and being in its hierarchy is exactly the difference
+		// between a tree that is drawn and one that is only captured.
+		if (m_bDebugOnScreen)
+		{
+			m_wScreenRoot = workspace.CreateWidgets(SCREEN_LAYOUT, workspace);
+
+			if (!m_wScreenRoot)
+				MCF_Core_Log.Warn("map board: the screen debug layout would not load");
+		}
+
 		OpenMapOntoBoard(owner);
 	}
 
@@ -170,7 +179,13 @@ class MCF_Map_BoardComponent : ScriptComponent
 		}
 
 		MapConfiguration config = new MapConfiguration();
-		config.RootWidgetRef = m_wRenderTarget;
+
+		// The diagnostic host wins when it exists, because the whole point of
+		// it is to see what this same map does with no render target in the way.
+		if (m_wScreenRoot)
+			config.RootWidgetRef = m_wScreenRoot;
+		else
+			config.RootWidgetRef = m_wRenderTarget;
 		config.MapEntityMode = EMapEntityMode.MINIMAP;
 		config.Modules = {};
 		config.Components = {};
@@ -276,6 +291,12 @@ class MCF_Map_BoardComponent : ScriptComponent
 		line = line + " | frame " + frameMin.ToString() + " .. " + frameMax.ToString();
 		line = line + " | on screen " + m_bDebugOnScreen.ToString();
 
+		if (m_wScreenRoot)
+		{
+			line = line + " | screen host parented " + (m_wScreenRoot.GetParent() != null).ToString();
+			line = line + ", visible " + m_wScreenRoot.IsVisibleInHierarchy().ToString();
+		}
+
 		MCF_Core_Log.Warn(line);
 	}
 
@@ -311,6 +332,11 @@ class MCF_Map_BoardComponent : ScriptComponent
 			m_wRoot.RemoveFromHierarchy();
 
 		m_wRoot = null;
+
+		if (m_wScreenRoot)
+			m_wScreenRoot.RemoveFromHierarchy();
+
+		m_wScreenRoot = null;
 
 		// MANDATORY, and the engine says so: the render target has to be taken
 		// off the entity's mesh before the widget goes. Leaving it is a
