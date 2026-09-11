@@ -3950,7 +3950,36 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		MCF_Device_Item page = m_aVisible[m_iOpenEntry];
 		SetBoxText(m_wHeadingEdit, page.m_sHeading);
 		SetBoxText(m_wStampEdit, page.m_sTimestamp);
-		SetBoxText(m_wBodyEdit, MCF_Device_Text.Body(page.m_sBody));
+
+		string body = MCF_Device_Text.Body(page.m_sBody);
+		SetBoxText(m_wBodyEdit, body);
+
+		// A programmatic SetText raises no OnChange, so the handler has to be
+		// told what the box now holds or it starts a page behind.
+		if (m_TextInput)
+			m_TextInput.Seed(body);
+	}
+
+	//! What is in the body box, asking the handler first.
+	//!
+	//! THE HANDLER IS RIGHT MORE OFTEN THAN THE WIDGET. It is updated on every
+	//! keystroke; the widget is asked after the focus has moved to whatever
+	//! was clicked, which on the SAVE button is the one moment its answer
+	//! cannot be trusted. The widget still wins when the handler has nothing,
+	//! so a box that was never typed in reads as itself.
+	protected string TypedBody()
+	{
+		string box = BoxText(m_wBodyEdit);
+
+		if (!m_TextInput)
+			return box;
+
+		string tracked = m_TextInput.Text();
+
+		if (tracked.IsEmpty())
+			return box;
+
+		return tracked;
 	}
 
 	//! Takes what was typed and puts it on the draft.
@@ -3981,7 +4010,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// turns a real one into a space, so it goes onto the draft as the two
 		// characters a config carries and MCF_Device_Text.Body unescapes it
 		// again on the way back to the page.
-		page.m_sBody = MCF_Device_Text.Encode(BoxText(m_wBodyEdit));
+		page.m_sBody = MCF_Device_Text.Encode(TypedBody());
 	}
 
 	//! The app the pages of a paper or notepad live in.
@@ -4031,7 +4060,28 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_bPaperTyping = false;
 		ShowPaperAuthor();
 		ShowEntry(m_iOpenEntry);
-		SetHint("This is the page. Nothing is on the object until SAVE.");
+		AutoSave();
+		SetHint("This is the page, as the player will see it.");
+	}
+
+	//! Writes the draft to the object without being asked.
+	//!
+	//! WORK IS NOT LOST BECAUSE A BUTTON WENT UNPRESSED. This runs when the
+	//! author stops typing -- turning a page, switching to the page view,
+	//! adding or removing one, closing the letter -- which is every moment
+	//! the text could otherwise be dropped on the floor. The SAVE button
+	//! stays, because a person wants to be able to say "now", and because it
+	//! is the only thing that reports back that it worked.
+	//!
+	//! NOT PER KEYSTROKE. Each of these is one RPC carrying the whole profile,
+	//! which is fine at the speed a person turns pages and is not fine at the
+	//! speed they type.
+	protected void AutoSave()
+	{
+		if (!m_bAuthor || !m_bPageMode || !m_Draft)
+			return;
+
+		SendDraft();
 	}
 
 	protected void OnAddPageClicked(SCR_ButtonTextComponent button)
@@ -4047,6 +4097,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		app.m_aItems.Insert(page);
 
 		m_Content.GetAllItems(m_aVisible);
+		AutoSave();
 		m_bPaperTyping = true;
 		ShowEntry(m_aVisible.Count() - 1);
 		ShowPaperAuthor();
@@ -4071,6 +4122,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		app.m_aItems.Remove(at);
 		m_Content.GetAllItems(m_aVisible);
+		AutoSave();
 
 		int land = m_iOpenEntry;
 		if (land >= m_aVisible.Count())
@@ -4162,6 +4214,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// text exists until CommitPaperPage runs, so turning a page without it
 		// throws away everything written since the last turn.
 		CommitPaperPage();
+		AutoSave();
 
 		if (m_iOpenEntry > 0)
 			ShowEntry(m_iOpenEntry - 1);
@@ -4170,6 +4223,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected void OnNextClicked(SCR_ButtonTextComponent button)
 	{
 		CommitPaperPage();
+		AutoSave();
 
 		if (m_iOpenEntry >= 0 && m_iOpenEntry < m_aVisible.Count() - 1)
 			ShowEntry(m_iOpenEntry + 1);
@@ -4317,6 +4371,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! Stops the server's reply arriving at a shell that is no longer on screen.
 	override void OnMenuClose()
 	{
+		// Last chance. Closing the letter is the most likely way for a Game
+		// Master to lose a page they thought was theirs.
+		CommitPaperPage();
+		AutoSave();
+
 		CloseHack();
 
 		if (s_Open == this)

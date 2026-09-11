@@ -27,9 +27,27 @@ class MCF_Device_TextInput : ScriptedWidgetEventHandler
 	protected static const int KEY_RETURN = 13;
 	protected static const int KEY_LINE_FEED = 10;
 
-	//! The last text this box was seen holding, so a GetText that does not see
-	//! the live buffer cannot make Return throw the page away.
+	//! The last text this box was seen holding.
+	//!
+	//! THIS IS THE AUTHORITY, not a late GetText. OnChange fires on every
+	//! internal state change -- every character typed and every one deleted --
+	//! so this is current while the box is being written in. Asking the widget
+	//! afterwards asks it once the focus has already gone somewhere else,
+	//! which is exactly the moment its answer stopped being trustworthy.
 	protected string m_sLast;
+
+	//! What was typed. Seeded when the box is filled, kept by OnChange.
+	string Text()
+	{
+		return m_sLast;
+	}
+
+	//! Told what the box was just given, because a programmatic SetText raises
+	//! no OnChange and the tracked copy would start a page behind.
+	void Seed(string value)
+	{
+		m_sLast = value;
+	}
 
 	override bool OnChange(Widget w, bool finished)
 	{
