@@ -45,8 +45,15 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "5", uiwidget: UIWidgets.EditBox, desc: "Over how many metres the map fades out to white before the activation distance. 5 means it starts going at 35 m and is white at 40 m.", params: "0 200")]
 	protected float m_fFadeBand;
 
-	//! How often the board looks at where the viewer is and who holds the map.
+	[Attribute(defvalue: "5", uiwidget: UIWidgets.EditBox, desc: "Seconds between refreshes. The board grabs the map for about a second, draws one picture and gives it straight back -- it never holds the map, because while it does nobody can open theirs.", params: "1 120")]
+	protected float m_fRefreshSeconds;
+
+	//! How often the board looks at where the viewer is and whose turn it is.
 	protected static const int TICK_MS = 250;
+
+	//! How many of those ticks one picture takes. FitBoard runs half a second
+	//! after the open, so this has to be comfortably more than that.
+	protected static const int HOLD_TICKS = 6;
 
 	protected Widget m_wRoot;
 	protected RTTextureWidget m_wRenderTarget;
@@ -64,9 +71,16 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//! somebody else's.
 	protected CanvasWidget m_wMapWidget;
 
-	//! Whether the map is not currently ours. Kept so the log says it once
-	//! rather than four times a second.
-	protected bool m_bLost = true;
+	//! Whether the board is currently holding the map to draw a picture.
+	protected bool m_bHolding;
+
+	//! Ticks spent in whichever of the two states we are in.
+	protected int m_iTicks;
+
+	//! Ticks of drawing still owed for a change that is not the map -- the
+	//! fade. The texture keeps whatever was last drawn into it, so a board
+	//! that is fading has to be redrawn even when it holds no map.
+	protected int m_iPaint;
 
 	//------------------------------------------------------------------------
 	override void OnPostInit(IEntity owner)
@@ -137,7 +151,8 @@ class MCF_Map_BoardComponent : ScriptComponent
 			m_wRenderTarget.ToggleFSR(true);
 		}
 
-		m_wRenderTarget.SetEnabled(true);
+		// Off until there is something to draw. Acquire turns it on.
+		m_wRenderTarget.SetEnabled(false);
 		m_bRaised = true;
 
 		// White until proven near. A board that flashes the whole island for
@@ -149,8 +164,28 @@ class MCF_Map_BoardComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------
-	//! Four times a second: how far away is the viewer, and who holds the map.
+	//! Four times a second: how far away is the viewer, and whose turn it is
+	//! to hold the map.
+	//!
+	//! A BOARD MUST NOT KEEP THE MAP, and that is not politeness, it is the
+	//! only way the rest of the game still works. There is one map, and while
+	//! a board holds it open the player's own M does nothing -- whatever
+	//! reads "is the map open" to decide has already been told yes.
+	//!
+	//! So the board TAKES A PICTURE instead of holding a window. It grabs the
+	//! map for about a second, lets it draw, and gives it straight back; the
+	//! render target keeps the last frame it drew, so the board goes on
+	//! showing that picture until the next refresh. Which is what a map on a
+	//! wall is anyway -- paper does not update at ten frames a second, and
+	//! five seconds is fast enough for markers.
 	protected void Watch()
+	{
+		Decide();
+		Paint();
+	}
+
+	//------------------------------------------------------------------------
+	protected void Decide()
 	{
 		IEntity owner = GetOwner();
 		if (!owner || !m_bRaised)
@@ -164,42 +199,87 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		Whiten(FadeFor(ViewerDistance(owner)));
 
-		// Fully white means there is nothing to see, so there is nothing to
-		// pay for either: the map goes back and the render target drops to a
-		// still frame of white.
+		// Fully white means there is nothing to see and nothing to pay for.
 		bool wanted = m_fWhite < 1;
 
 		bool open = m_MapEntity.IsOpen();
 		bool ours = open && m_MapEntity.GetMapWidget() == m_wMapWidget;
 
-		if (ours && !wanted)
+		if (m_bHolding)
 		{
-			m_MapEntity.CloseMap();
-			m_bLost = true;
-			MCF_Core_Log.Debug("map board: nobody near, handing the map back");
-			return;
-		}
-
-		if (open)
-		{
-			if (!ours && !m_bLost)
+			// Taken off us mid-picture: somebody opened their own map. Their
+			// turn; we go back to waiting and keep whatever we had drawn.
+			if (!ours)
 			{
-				m_bLost = true;
-				MCF_Core_Log.Debug("map board: the map was taken by someone else");
+				m_bHolding = false;
+				m_iTicks = 0;
+				MCF_Core_Log.Debug("map board: the map was taken mid-refresh");
+				return;
 			}
 
+			m_iTicks++;
+
+			if (!wanted || m_iTicks >= HOLD_TICKS)
+				Release();
+
 			return;
 		}
 
+		// ---- resting, showing the last picture
 		if (!wanted)
 			return;
 
-		// Nobody is holding it and somebody is looking at us.
-		if (m_bLost)
-			MCF_Core_Log.Debug("map board: the map is free again, reclaiming it");
+		// Somebody else is reading a map. Never take it off them.
+		if (open)
+			return;
 
-		m_bLost = false;
+		m_iTicks++;
+
+		if (m_iTicks * TICK_MS < m_fRefreshSeconds * 1000)
+			return;
+
+		Acquire(owner);
+	}
+
+	//------------------------------------------------------------------------
+	//! ONE PLACE DECIDES WHETHER THE BOARD IS BEING DRAWN, because the
+	//! texture keeps whatever was put in it last and two callers arguing over
+	//! SetEnabled is how a board ends up frozen on the wrong frame.
+	protected void Paint()
+	{
+		bool draw = m_bHolding || m_iPaint > 0;
+
+		if (m_iPaint > 0)
+			m_iPaint--;
+
+		if (m_wRenderTarget)
+			m_wRenderTarget.SetEnabled(draw);
+	}
+
+	//------------------------------------------------------------------------
+	//! Take the map for one picture.
+	protected void Acquire(IEntity owner)
+	{
+		m_bHolding = true;
+		m_iTicks = 0;
+
 		OpenMapOntoBoard(owner);
+	}
+
+	//------------------------------------------------------------------------
+	//! Give it back, and stop redrawing so the texture keeps the frame.
+	protected void Release()
+	{
+		m_bHolding = false;
+		m_iTicks = 0;
+
+		if (m_MapEntity && m_MapEntity.IsOpen() && m_MapEntity.GetMapWidget() == m_wMapWidget)
+			m_MapEntity.CloseMap();
+
+		// THE PICTURE HAS TO SURVIVE THIS. The tick below stops the render
+		// pass, and the texture the board samples is expected to keep the last
+		// frame drawn into it. If the board goes blue or black instead, that
+		// expectation is wrong and the refresh has to keep a copy another way.
 	}
 
 	//------------------------------------------------------------------------
@@ -274,6 +354,10 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		if (m_wWhiteout)
 			m_wWhiteout.SetOpacity(white);
+
+		// The fade changed, so the picture has to be drawn again even if no
+		// map is held. Three ticks is enough for the change to land.
+		m_iPaint = 3;
 
 		if (!m_wRenderTarget)
 			return;
