@@ -177,7 +177,8 @@ def txt(name, a, ind, size, colour=None, align=None, text="", rich=False,
     return s
 
 
-def editbox(name, a, ind, size=12, limit=4000, spacing=None, colour=None):
+def editbox(name, a, ind, size=12, limit=4000, spacing=None, colour=None,
+            multiline=False):
     """A field you can type in.
 
     `style blank` and our own EditBoxWidgetClass rather than an override of
@@ -186,7 +187,13 @@ def editbox(name, a, ind, size=12, limit=4000, spacing=None, colour=None):
     which cost the handset an evening.
     """
     p = " " * ind
-    s = p + 'EditBoxWidgetClass "%s" {\n' % g()
+    # AN EDIT BOX IS ONE LINE UNLESS IT IS A DIFFERENT WIDGET. There is no
+    # multiline property -- the engine registers `MultilineEditBoxWidgetClass`
+    # as its own class, and a single-line box swallows Return and runs the text
+    # off to the right forever. A filename and a formula bar want exactly that
+    # behaviour; a document body does not.
+    cls = "MultilineEditBoxWidgetClass" if multiline else "EditBoxWidgetClass"
+    s = p + '%s "%s" {\n' % (cls, g())
     s += p + ' Name "%s"\n' % name
     s += slot(a, ind + 1)
     s += p + " Clipping True\n"
@@ -562,7 +569,8 @@ def pane_text(p, ind):
     # nowhere to write it in the first place.
     s += scroll(p + "BodyScroll", (0.080, 0.118, 0.978, 0.930), ind,
                 p + "FileBody", kind="rich", size=12, colour="0.84 0.87 0.89 1")
-    s += editbox(p + "BodyEdit", (0.080, 0.118, 0.978, 0.930), ind, 12, 6000, 19)
+    s += editbox(p + "BodyEdit", (0.080, 0.118, 0.978, 0.930), ind, 12, 6000, 19,
+                 multiline=True)
     s += img(p + "BarFill", (0.016, 0.934, 0.984, 0.980), ind, colour="1 1 1 0.05")
     s += txt(p + "Status", (0.030, 0.940, 0.700, 0.976), ind, 10, colour=FAINT_INK)
     s += flatbtn(p + "FileSave", (0.800, 0.938, 0.972, 0.976), ind, label="SAVE",
@@ -650,7 +658,7 @@ def pane_doc(p, ind):
     s += scroll(p + "BodyScroll", (0.200, 0.290, 0.800, 0.930), ind,
                 p + "FileBody", kind="rich", size=12, colour="0.13 0.14 0.16 1")
     s += editbox(p + "BodyEdit", (0.206, 0.290, 0.794, 0.930), ind, 12, 6000, 20,
-                 colour="0.13 0.14 0.16 1")
+                 colour="0.13 0.14 0.16 1", multiline=True)
     s += flatbtn(p + "FileSave", (0.626, 0.938, 0.798, 0.976), ind, label="SAVE",
                  size=11, bg=ACCENT, bg_hi="0.90 0.54 0.18 1", tex="tile",
                  label_align="centre")

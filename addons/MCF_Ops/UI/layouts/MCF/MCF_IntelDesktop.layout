@@ -8546,7 +8546,7 @@ FrameWidgetClass {
         }
        }
       }
-      EditBoxWidgetClass "{6A1C4F0B39E004A2}" {
+      MultilineEditBoxWidgetClass "{6A1C4F0B39E004A2}" {
        Name "W10BodyEdit"
        Slot FrameWidgetSlot "{6A1C4F0B39E004A3}" {
         Anchor 0.0800 0.1180 0.9780 0.9300
@@ -14255,7 +14255,7 @@ FrameWidgetClass {
         }
        }
       }
-      EditBoxWidgetClass "{6A1C4F0B39E007AD}" {
+      MultilineEditBoxWidgetClass "{6A1C4F0B39E007AD}" {
        Name "W12BodyEdit"
        Slot FrameWidgetSlot "{6A1C4F0B39E007AE}" {
         Anchor 0.2060 0.2900 0.7940 0.9300

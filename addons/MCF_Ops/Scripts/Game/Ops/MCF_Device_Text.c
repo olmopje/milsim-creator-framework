@@ -120,6 +120,23 @@ class MCF_Device_Text
 	//! reader: "signed for nine.\n\nIf anything happens to me". Every place
 	//! that shows a body has to undo that, so it lives here rather than in
 	//! each of the eleven of them.
+	//! The inverse of Body(): a real newline becomes the two characters a
+	//! config carries.
+	//!
+	//! WITHOUT THIS, TYPING RETURN LOSES THE LINE. MCF_Device_Script.Clean()
+	//! turns a real newline into a space -- it has to, the separators are a
+	//! flat string -- so a body typed with newlines would reach the next
+	//! client as one long paragraph. Body() unescapes at display time and this
+	//! escapes at save time, and between them the stored form is always the
+	//! one a mission maker sees in the config.
+	static string Encode(string text)
+	{
+		string kept = text;
+		kept.Replace("\r", "");
+		kept.Replace("\n", "\\n");
+		return kept;
+	}
+
 	static string Body(string text)
 	{
 		// `out` IS A RESERVED WORD -- it is the out-parameter marker, and this

@@ -1297,13 +1297,26 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			m_aLauncherSlots[filled] = win.m_iSlot;
 			app.GetRootWidget().SetVisible(true);
 
+			// SHOWN AGAIN, NOT ONLY FILLED. The loop below hides the icon and
+			// the label of every row this paint did not use, and the first
+			// paint happens before the profile has arrived -- when no window
+			// has an app yet and every row but the terminal counts as unused.
+			// Without these two lines the launcher never gets its icons back,
+			// and Mail, Messages and Contacts read as blank rows for the rest
+			// of the session.
 			ImageWidget icon = ImageWidget.Cast(root.FindAnyWidget("LIcon" + filled.ToString()));
 			if (icon)
+			{
+				icon.SetVisible(true);
 				icon.LoadImageTexture(0, IconFor(win.m_iSlot));
+			}
 
 			TextWidget label = TextWidget.Cast(root.FindAnyWidget("LLabel" + filled.ToString()));
 			if (label)
+			{
+				label.SetVisible(true);
 				label.SetText(TitleOf(win));
+			}
 
 			filled++;
 		}
@@ -2326,7 +2339,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		typed.Replace(",", ";");
 
 		SetText(root, p + "Cell" + win.m_iCellRow.ToString() + "_" + win.m_iCellCol.ToString() + "Text", typed);
-		win.m_Doc.m_sBody = SheetToText(win);
+		win.m_Doc.m_sBody = MCF_Device_Text.Encode(SheetToText(win));
 
 		SetText(root, p + "Status", "Edited. Press SAVE to write it to the device.");
 	}
@@ -2404,13 +2417,13 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 		if (win.m_sPane == PANE_SHEET)
 		{
-			win.m_Doc.m_sBody = SheetToText(win);
+			win.m_Doc.m_sBody = MCF_Device_Text.Encode(SheetToText(win));
 		}
 		else
 		{
 			EditBoxWidget body = EditBoxWidget.Cast(root.FindAnyWidget(p + "BodyEdit"));
 			if (body)
-				win.m_Doc.m_sBody = body.GetText();
+				win.m_Doc.m_sBody = MCF_Device_Text.Encode(body.GetText());
 
 			EditBoxWidget title = EditBoxWidget.Cast(root.FindAnyWidget(p + "TitleEdit"));
 			if (title && win.m_sPane == PANE_DOC)
