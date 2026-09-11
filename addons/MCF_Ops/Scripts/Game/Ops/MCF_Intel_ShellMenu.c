@@ -135,6 +135,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_AUTHOR_BODY = "AuthorBody";
 	protected static const string W_LINE_EDIT = "LineEdit";
 	protected static const string W_LINE_RULE = "LineRule";
+	protected static const string W_PAGE_CATCH = "PageCatch";
 	protected static const string W_BUTTON_PULL_LINE = "ButtonPullLine";
 	protected static const string W_AUTHOR_NOTE = "AuthorNote";
 	protected static const string W_BUTTON_TYPE = "ButtonType";
@@ -395,6 +396,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected Widget m_wAuthorBody;
 	protected Widget m_wLineEdit;
 	protected Widget m_wLineRule;
+	protected Widget m_wPageCatch;
 
 	//! Everything finished, newline-separated, without the line in the box.
 	protected string m_sComposed;
@@ -405,6 +407,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected SCR_ButtonTextComponent m_ButtonAddPage;
 	protected SCR_ButtonTextComponent m_ButtonDropPage;
 	protected SCR_ButtonTextComponent m_ButtonPullLine;
+	protected SCR_ButtonTextComponent m_PageCatch;
 	protected SCR_ButtonTextComponent m_ButtonSaveIntel;
 
 	//! Whether the Game Master is writing on the page or looking at it.
@@ -3862,6 +3865,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wAuthorBody = root.FindAnyWidget(W_AUTHOR_BODY);
 		m_wLineEdit = root.FindAnyWidget(W_LINE_EDIT);
 		m_wLineRule = root.FindAnyWidget(W_LINE_RULE);
+		m_wPageCatch = root.FindAnyWidget(W_PAGE_CATCH);
 		m_wAuthorNote = root.FindAnyWidget(W_AUTHOR_NOTE);
 
 		// The page wraps; a long line must not run off the side of the sheet.
@@ -3877,6 +3881,18 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_ButtonPullLine = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_PULL_LINE, root);
 		if (m_ButtonPullLine)
 			m_ButtonPullLine.m_OnClicked.Insert(OnPullLineClicked);
+
+		m_PageCatch = SCR_ButtonTextComponent.GetButtonText(W_PAGE_CATCH, root);
+		if (m_PageCatch)
+			m_PageCatch.m_OnClicked.Insert(OnPageCatchClicked);
+
+		// Said out loud, because every one of these being found is a thing
+		// that has silently not been found before.
+		MCF_Core_Log.Warn("paper author chrome: line=" + (m_wLineEdit != null).ToString()
+			+ " page=" + (m_wAuthorBody != null).ToString()
+			+ " catch=" + (m_PageCatch != null).ToString()
+			+ " type=" + (m_ButtonType != null).ToString()
+			+ " handler=" + (m_LineInput != null).ToString());
 
 		m_ButtonType = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_TYPE, root);
 		if (m_ButtonType)
@@ -3931,6 +3947,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		ShowIf(m_wAuthorNote, authoring);
 		ShowButtonIf(m_ButtonPullLine, typing);
+		ShowButtonIf(m_PageCatch, typing);
 		ShowButtonIf(m_ButtonType, authoring && !m_bPaperTyping);
 		ShowButtonIf(m_ButtonPageView, authoring && m_bPaperTyping);
 		ShowButtonIf(m_ButtonAddPage, authoring);
@@ -3983,6 +4000,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// replaces the lot.
 		m_sComposed = MCF_Device_Text.Body(page.m_sBody);
 		SetBoxText(m_wLineEdit, "");
+
+		// An empty box on cream paper says nothing about itself. The engine
+		// has a placeholder for exactly this.
+		EditBoxWidget line = EditBoxWidget.Cast(m_wLineEdit);
+		if (line)
+			line.SetPlaceholderText("Type here. Return finishes the line.");
+
 		PaintComposed();
 	}
 
@@ -4011,6 +4035,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// here, because the box was just emptied. That is the whole reason
 		// this is written a line at a time.
 		FocusBox(m_wLineEdit);
+	}
+
+	//! Clicking the page puts the caret back in the line being written.
+	protected void OnPageCatchClicked(SCR_ButtonTextComponent button)
+	{
+		FocusBox(m_wLineEdit);
+		SetHint("Type the line, then Return.");
 	}
 
 	//! UNDO LINE: the last finished line comes back to be fixed.
@@ -4143,6 +4174,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// raises no event when it starts -- vanilla polls IsInWriteMode() and
 		// calls ActivateWriteMode() from its own pencil. This is that pencil.
 		FocusBox(m_wLineEdit);
+
+		EditBoxWidget line = EditBoxWidget.Cast(m_wLineEdit);
+		if (line)
+			MCF_Core_Log.Warn("TYPE pressed: write mode " + line.IsInWriteMode().ToString());
+		else
+			MCF_Core_Log.Warn("TYPE pressed: the line box is not an EditBoxWidget");
+
 		SetHint("Typing. Return finishes a line; PAGE shows the page as the player will see it.");
 	}
 

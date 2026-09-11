@@ -394,10 +394,10 @@ FrameWidgetClass {
    "Line Spacing" 22
    Color 0.13 0.12 0.16 1
   }
-  ImageWidgetClass "{6A1C4F0B39D3204E}" {
-   Name "LineRule"
+  ButtonWidgetClass "{6A1C4F0B39D3204E}" {
+   Name "PageCatch"
    Slot FrameWidgetSlot "{6A1C4F0B39D3204F}" {
-    Anchor 0.340 0.806 0.650 0.807
+    Anchor 0.340 0.195 0.650 0.752
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -408,12 +408,37 @@ FrameWidgetClass {
     OffsetBottom 0
    }
    "Is Visible" 0
-   Color 0.55 0.52 0.46 1
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D32050}" {
+     m_bCanBeToggled 0
+     m_BackgroundDefault 1 1 1 0
+     m_BackgroundHovered 1 1 1 0.06
+     m_BackgroundClicked 1 1 1 0.10
+     m_sText ""
+    }
+   }
+   style blank
   }
-  EditBoxWidgetClass "{6A1C4F0B39D32050}" {
+  ImageWidgetClass "{6A1C4F0B39D32051}" {
+   Name "LineRule"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32052}" {
+    Anchor 0.338 0.756 0.652 0.812
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   Color 0.78 0.75 0.67 1
+  }
+  EditBoxWidgetClass "{6A1C4F0B39D32053}" {
    Name "LineEdit"
-   Slot FrameWidgetSlot "{6A1C4F0B39D32051}" {
-    Anchor 0.344 0.760 0.650 0.804
+   Slot FrameWidgetSlot "{6A1C4F0B39D32054}" {
+    Anchor 0.348 0.762 0.646 0.806
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -426,9 +451,9 @@ FrameWidgetClass {
    "Is Visible" 0
    Clipping True
    components {
-    SCR_EventHandlerComponent "{6A1C4F0B39D32052}" {
+    SCR_EventHandlerComponent "{6A1C4F0B39D32055}" {
     }
-    EditBoxFilterComponent "{6A1C4F0B39D32053}" {
+    EditBoxFilterComponent "{6A1C4F0B39D32056}" {
      m_iCharacterLimit 4000
     }
    }
@@ -438,31 +463,10 @@ FrameWidgetClass {
    "Min Font Size" 15
    Color 0.13 0.12 0.16 1
   }
-  ButtonWidgetClass "{6A1C4F0B39D32054}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonType"
-   Slot FrameWidgetSlot "{6A1C4F0B39D32055}" {
-    Anchor 0.150 0.100 0.292 0.140
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
-   }
-   "Is Visible" 0
-   components {
-    SCR_ButtonTextComponent "{6A1C4F0B39D32056}" {
-     m_bCanBeToggled 0
-     m_sText "TYPE"
-    }
-   }
-  }
   ButtonWidgetClass "{6A1C4F0B39D32057}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonPage"
+   Name "ButtonType"
    Slot FrameWidgetSlot "{6A1C4F0B39D32058}" {
-    Anchor 0.150 0.146 0.292 0.186
+    Anchor 0.150 0.100 0.292 0.140
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -476,14 +480,14 @@ FrameWidgetClass {
    components {
     SCR_ButtonTextComponent "{6A1C4F0B39D32059}" {
      m_bCanBeToggled 0
-     m_sText "PAGE"
+     m_sText "TYPE"
     }
    }
   }
   ButtonWidgetClass "{6A1C4F0B39D3205A}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonAddPage"
+   Name "ButtonPage"
    Slot FrameWidgetSlot "{6A1C4F0B39D3205B}" {
-    Anchor 0.150 0.206 0.292 0.246
+    Anchor 0.150 0.146 0.292 0.186
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -497,14 +501,14 @@ FrameWidgetClass {
    components {
     SCR_ButtonTextComponent "{6A1C4F0B39D3205C}" {
      m_bCanBeToggled 0
-     m_sText "+ PAGE"
+     m_sText "PAGE"
     }
    }
   }
   ButtonWidgetClass "{6A1C4F0B39D3205D}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonDropPage"
+   Name "ButtonAddPage"
    Slot FrameWidgetSlot "{6A1C4F0B39D3205E}" {
-    Anchor 0.150 0.252 0.292 0.292
+    Anchor 0.150 0.206 0.292 0.246
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -518,14 +522,14 @@ FrameWidgetClass {
    components {
     SCR_ButtonTextComponent "{6A1C4F0B39D3205F}" {
      m_bCanBeToggled 0
-     m_sText "- PAGE"
+     m_sText "+ PAGE"
     }
    }
   }
   ButtonWidgetClass "{6A1C4F0B39D32060}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonPullLine"
+   Name "ButtonDropPage"
    Slot FrameWidgetSlot "{6A1C4F0B39D32061}" {
-    Anchor 0.150 0.312 0.292 0.352
+    Anchor 0.150 0.252 0.292 0.292
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -539,14 +543,14 @@ FrameWidgetClass {
    components {
     SCR_ButtonTextComponent "{6A1C4F0B39D32062}" {
      m_bCanBeToggled 0
-     m_sText "UNDO LINE"
+     m_sText "- PAGE"
     }
    }
   }
   ButtonWidgetClass "{6A1C4F0B39D32063}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
-   Name "ButtonSaveIntel"
+   Name "ButtonPullLine"
    Slot FrameWidgetSlot "{6A1C4F0B39D32064}" {
-    Anchor 0.150 0.372 0.292 0.412
+    Anchor 0.150 0.312 0.292 0.352
     PositionX 0
     OffsetLeft 0
     PositionY 0
@@ -560,13 +564,34 @@ FrameWidgetClass {
    components {
     SCR_ButtonTextComponent "{6A1C4F0B39D32065}" {
      m_bCanBeToggled 0
+     m_sText "UNDO LINE"
+    }
+   }
+  }
+  ButtonWidgetClass "{6A1C4F0B39D32066}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonSaveIntel"
+   Slot FrameWidgetSlot "{6A1C4F0B39D32067}" {
+    Anchor 0.150 0.372 0.292 0.412
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+   "Is Visible" 0
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39D32068}" {
+     m_bCanBeToggled 0
      m_sText "SAVE"
     }
    }
   }
-  RichTextWidgetClass "{6A1C4F0B39D32066}" {
+  RichTextWidgetClass "{6A1C4F0B39D32069}" {
    Name "AuthorNote"
-   Slot FrameWidgetSlot "{6A1C4F0B39D32067}" {
+   Slot FrameWidgetSlot "{6A1C4F0B39D3206A}" {
     Anchor 0.150 0.424 0.292 0.560
     PositionX 0
     OffsetLeft 0

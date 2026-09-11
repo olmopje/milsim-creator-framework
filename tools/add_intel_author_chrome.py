@@ -37,8 +37,9 @@ VISUALS = [
         "stamp":   (0.345, 0.152, 0.645, 0.182),
         "body":    (0.340, 0.195, 0.650, 0.830),
         "page":    (0.340, 0.195, 0.650, 0.752),
-        "rule":    (0.340, 0.806, 0.650, 0.8075),
-        "line":    (0.344, 0.760, 0.650, 0.804),
+        "rule":    (0.338, 0.756, 0.652, 0.812),
+        "line":    (0.348, 0.762, 0.646, 0.806),
+        "catch":   (0.340, 0.195, 0.650, 0.752),
         "head_size": 22, "head_ink": "0.13 0.12 0.16 1",
         "stamp_size": 14, "stamp_ink": "0.34 0.31 0.28 1",
         "body_size": 15, "body_ink": "0.13 0.12 0.16 1", "body_spacing": 22,
@@ -52,8 +53,9 @@ VISUALS = [
         "stamp":   (0.372, 0.154, 0.660, 0.182),
         "body":    (0.368, 0.196, 0.664, 0.820),
         "page":    (0.368, 0.196, 0.664, 0.742),
-        "rule":    (0.368, 0.796, 0.664, 0.7975),
-        "line":    (0.372, 0.750, 0.664, 0.794),
+        "rule":    (0.366, 0.746, 0.666, 0.802),
+        "line":    (0.376, 0.752, 0.660, 0.796),
+        "catch":   (0.368, 0.196, 0.664, 0.742),
         "head_size": 20, "head_ink": "0.13 0.12 0.16 1",
         "stamp_size": 13, "stamp_ink": "0.34 0.31 0.28 1",
         "body_size": 14, "body_ink": "0.13 0.12 0.16 1", "body_spacing": 21,
@@ -148,12 +150,43 @@ def page(name, a, g, size, ink, spacing):
 
 
 def rule(name, a, g):
-    """The line you are writing on."""
+    """The box you write in.
+
+    A VISIBLE ONE. It was a hairline first, and a hairline on cream paper is
+    not somewhere a person can see they are meant to type -- which read as
+    "clicking gives no cursor" even when the caret was there.
+    """
     s = '  ImageWidgetClass "{%s}" {\n' % g()
     s += '   Name "%s"\n' % name
     s += slot(a, g())
     s += '   "Is Visible" 0\n'
-    s += "   Color 0.55 0.52 0.46 1\n"
+    s += "   Color 0.78 0.75 0.67 1\n"
+    s += "  }\n"
+    return s
+
+
+def catcher(name, a, g):
+    """A transparent button over the page.
+
+    CLICKING THE PAGE PUTS THE CARET IN THE LINE. Without it the only way in
+    is the TYPE button, because the page above is rich text and a click on it
+    goes nowhere -- and clicking where the words are is what anybody tries
+    first.
+    """
+    s = '  ButtonWidgetClass "{%s}" {\n' % g()
+    s += '   Name "%s"\n' % name
+    s += slot(a, g())
+    s += '   "Is Visible" 0\n'
+    s += "   components {\n"
+    s += '    SCR_ButtonTextComponent "{%s}" {\n' % g()
+    s += "     m_bCanBeToggled 0\n"
+    s += "     m_BackgroundDefault 1 1 1 0\n"
+    s += "     m_BackgroundHovered 1 1 1 0.06\n"
+    s += "     m_BackgroundClicked 1 1 1 0.10\n"
+    s += '     m_sText ""\n'
+    s += "    }\n"
+    s += "   }\n"
+    s += "   style blank\n"
     s += "  }\n"
     return s
 
@@ -200,6 +233,7 @@ def block(v):
     # finished lines are drawn above, as the player will see them.
     s += page("AuthorBody", v["page"], g, v["body_size"], v["body_ink"],
               v["body_spacing"])
+    s += catcher("PageCatch", v["catch"], g)
     s += rule("LineRule", v["rule"], g)
     s += editbox("LineEdit", v["line"], g, v["body_size"], v["body_ink"])
 
