@@ -17,147 +17,86 @@ FrameWidgetClass {
    Color 0 0 0 0.85
   }
 
-  // ---- TEST A: a map in a widget of our own, 640x420, deliberately offset.
-  // If the map draws here and nowhere else, it renders inside its widget and
-  // the whole board idea is on. MapMini.layout already does this at 300x300,
-  // so the odds are good -- this proves it for a widget WE made.
-  FrameWidgetClass "{6A1C4F0B39E10003}" {
-   Name "MapFrame"
-   Slot FrameWidgetSlot "{6A1C4F0B39E10004}" {
-    Anchor 0.055 0.130 0.055 0.130
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
+  // ---- TEST A: the map in a widget of ours, at a position we chose.
+  //
+  // THE SLOTS HERE COPY MapMini.layout EXACTLY and deliberately. The first
+  // attempt used `Anchor` with a size, and every widget came out 0 x 0 -- and
+  // a render target asked for a texture of zero size, which is the flood of
+  // "Out of memory when requested 0, Type: Video" in that log. Vanilla's own
+  // minimap positions a MapWidget with no Anchor at all: position, size, and
+  // the two offsets as the negative of position+size.
+  MapWidgetClass "{0000000060029FBB}" {
+   Name "MapWidget"
+   Slot FrameWidgetSlot "{6A1C4F0B39E10005}" {
+    PositionX 80
+    OffsetLeft 80
+    PositionY 140
+    OffsetTop 140
     SizeX 640
-    OffsetRight 0
+    OffsetRight -720
     SizeY 420
-    OffsetBottom 0
+    OffsetBottom -560
    }
-   {
-    MapWidgetClass "{0000000060029FBB}" {
-     Name "MapWidget"
-     Slot FrameWidgetSlot "{6A1C4F0B39E10005}" {
-      Anchor 0 0 1 1
-      PositionX 0
-      OffsetLeft 0
-      PositionY 0
-      OffsetTop 0
-      SizeX 0
-      OffsetRight 0
-      SizeY 0
-      OffsetBottom 0
-     }
-     Color 1 1 1 1
-     SizeInUnits 1024 1024
-     OffsetPixels 0 0
-     Clear 1
-     ClearColor 0.173 0.344 0.62 1
-    }
-    CanvasWidgetClass "{6A1C4F0B39E10006}" {
-     Name "DrawingWidget"
-     Slot FrameWidgetSlot "{6A1C4F0B39E10007}" {
-      Anchor 0 0 1 1
-      PositionX 0
-      OffsetLeft 0
-      PositionY 0
-      OffsetTop 0
-      SizeX 0
-      OffsetRight 0
-      SizeY 0
-      OffsetBottom 0
-     }
-    }
-    FrameWidgetClass "{6A1C4F0B39E10008}" {
-     Name "DrawingContainer"
-     Slot FrameWidgetSlot "{6A1C4F0B39E10009}" {
-      Anchor 0 0 1 1
-      PositionX 0
-      OffsetLeft 0
-      PositionY 0
-      OffsetTop 0
-      SizeX 0
-      OffsetRight 0
-      SizeY 0
-      OffsetBottom 0
-     }
-     {
-     }
-    }
-   }
+   Color 1 1 1 1
+   SizeInUnits 1024 1024
+   OffsetPixels 0 0
+   Clear 1
+   ClearColor 0.173 0.344 0.62 1
   }
 
   TextWidgetClass "{6A1C4F0B39E1000A}" {
    Name "LabelA"
    Slot FrameWidgetSlot "{6A1C4F0B39E1000B}" {
-    Anchor 0.055 0.095 0.500 0.125
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
+    PositionX 80
+    OffsetLeft 80
+    PositionY 105
+    OffsetTop 105
+    SizeX 640
+    OffsetRight -720
+    SizeY 28
+    OffsetBottom -133
    }
-   Text "A  map in our own widget"
+   Text "A  the map in a widget of ours"
    "Font Size" 16
    "Min Font Size" 16
   }
 
-  // ---- TEST B: the same shape again, this time inside an RTTextureWidget.
-  // Nothing is drawn to the screen from here -- the render target only shows
-  // once a material samples it -- so what this half proves on its own is
-  // narrower: whether the map widget inside it lays out at all. PixelPerUnit
-  // coming back <= 0 is the tell that it does not.
+  // ---- TEST B: the same widget, inside a render target.
+  //
+  // A render target draws no picture until a material samples it, so this
+  // half cannot show terrain. What it reports is whether the map widget
+  // inside one is laid out at all: PixelPerUnit at or below zero means it is
+  // not, and no board can work this way.
   RTTextureWidgetClass "{6A1C4F0B39E1000C}" {
    Name "Probe"
    Slot FrameWidgetSlot "{6A1C4F0B39E1000D}" {
-    Anchor 0.560 0.130 0.560 0.130
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
+    PositionX 800
+    OffsetLeft 800
+    PositionY 140
+    OffsetTop 140
     SizeX 640
-    OffsetRight 0
+    OffsetRight -1440
     SizeY 420
-    OffsetBottom 0
+    OffsetBottom -560
    }
    {
-    FrameWidgetClass "{6A1C4F0B39E1000E}" {
-     Name "ProbeMapFrame"
-     Slot FrameWidgetSlot "{6A1C4F0B39E1000F}" {
-      Anchor 0 0 1 1
+    MapWidgetClass "{0000000060029FBB}" {
+     Name "ProbeMapWidget"
+     Slot FrameWidgetSlot "{6A1C4F0B39E10010}" {
       PositionX 0
       OffsetLeft 0
       PositionY 0
       OffsetTop 0
-      SizeX 0
-      OffsetRight 0
-      SizeY 0
-      OffsetBottom 0
+      SizeX 640
+      OffsetRight -640
+      SizeY 420
+      OffsetBottom -420
      }
-     {
-      MapWidgetClass "{0000000060029FBB}" {
-       Name "ProbeMapWidget"
-       Slot FrameWidgetSlot "{6A1C4F0B39E10010}" {
-        Anchor 0 0 1 1
-        PositionX 0
-        OffsetLeft 0
-        PositionY 0
-        OffsetTop 0
-        SizeX 0
-        OffsetRight 0
-        SizeY 0
-        OffsetBottom 0
-       }
-       Color 1 1 1 1
-       SizeInUnits 1024 1024
-       OffsetPixels 0 0
-       Clear 1
-       ClearColor 0.62 0.344 0.173 1
-      }
-     }
+     Color 1 1 1 1
+     SizeInUnits 1024 1024
+     OffsetPixels 0 0
+     Clear 1
+     ClearColor 0.62 0.344 0.173 1
     }
    }
   }
@@ -165,15 +104,14 @@ FrameWidgetClass {
   TextWidgetClass "{6A1C4F0B39E10011}" {
    Name "LabelB"
    Slot FrameWidgetSlot "{6A1C4F0B39E10012}" {
-    Anchor 0.560 0.095 0.980 0.125
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
+    PositionX 800
+    OffsetLeft 800
+    PositionY 105
+    OffsetTop 105
+    SizeX 640
+    OffsetRight -1440
+    SizeY 28
+    OffsetBottom -133
    }
    Text "B  the same, inside a render target"
    "Font Size" 16
@@ -183,15 +121,14 @@ FrameWidgetClass {
   RichTextWidgetClass "{6A1C4F0B39E10013}" {
    Name "Report"
    Slot FrameWidgetSlot "{6A1C4F0B39E10014}" {
-    Anchor 0.055 0.600 0.980 0.940
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
+    PositionX 80
+    OffsetLeft 80
+    PositionY 600
+    OffsetTop 600
+    SizeX 1360
+    OffsetRight -1440
+    SizeY 380
+    OffsetBottom -980
    }
    Clipping Ancestor
    Wrap 1
@@ -204,15 +141,14 @@ FrameWidgetClass {
   ButtonWidgetClass "{6A1C4F0B39E10015}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
    Name "ButtonClose"
    Slot FrameWidgetSlot "{6A1C4F0B39E10016}" {
-    Anchor 0.860 0.020 0.980 0.070
-    PositionX 0
-    OffsetLeft 0
-    PositionY 0
-    OffsetTop 0
-    SizeX 0
-    OffsetRight 0
-    SizeY 0
-    OffsetBottom 0
+    PositionX 1300
+    OffsetLeft 1300
+    PositionY 30
+    OffsetTop 30
+    SizeX 140
+    OffsetRight -1440
+    SizeY 44
+    OffsetBottom -74
    }
    components {
     SCR_ButtonTextComponent "{6A1C4F0B39E10017}" {
