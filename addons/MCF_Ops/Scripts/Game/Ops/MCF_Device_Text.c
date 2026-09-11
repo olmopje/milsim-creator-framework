@@ -272,6 +272,52 @@ class MCF_Device_Text
 		return path.Substring(0, folder.Length() + 1) == folder + PATH_SEP;
 	}
 
+	//! A filename's extension, lowercased, or "" if it has none.
+	static string ExtOf(string path)
+	{
+		string name = LeafOf(path);
+		int found = -1;
+		int n = name.Length();
+
+		for (int i = 0; i < n; i++)
+		{
+			if (name.Substring(i, 1) == ".")
+				found = i;
+		}
+
+		if (found < 0 || found == n - 1)
+			return "";
+
+		int from = found + 1;
+		string ext = name.Substring(from, n - from);
+		ext.ToLower();
+		return ext;
+	}
+
+	//! Which window a file opens in.
+	//!
+	//! THE EXTENSION IS THE WHOLE RULE -- it is how a real machine decides and
+	//! how a mission maker would expect it to. Name a file ledger.xlsx and it
+	//! opens in a grid; nothing else about an item says what kind of thing it
+	//! is, and nothing else should have to.
+	//!
+	//! The numbers are window slots in MCF_Desktop_ShellMenu's table. They are
+	//! not persisted anywhere, so unlike MCF_EIntelApp they are safe to move.
+	static int EditorSlot(string path)
+	{
+		string ext = ExtOf(path);
+
+		if (ext == "xls" || ext == "xlsx" || ext == "csv" || ext == "tsv")
+			return 11;
+
+		if (ext == "doc" || ext == "docx" || ext == "rtf" || ext == "pdf" || ext == "odt")
+			return 12;
+
+		// Everything else is text, including no extension at all. A file whose
+		// kind is unknown is still a file somebody typed.
+		return 10;
+	}
+
 	static string Pad2(int value)
 	{
 		if (value < 10)

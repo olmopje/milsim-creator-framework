@@ -330,7 +330,7 @@ def scroll(name, a, ind, inner, kind="vertical", size=12, colour=None):
 # One window per app kind. Five of them share the list-and-reader shape, which
 # is the whole argument for generating this file.
 WINDOWS = [
-    ("Files",    "files",    "list",     780, 470),
+    ("Files",    "files",    "files",    880, 520),
     ("Mail",     "mail",     "mail",     870, 545),
     ("Messages", "messages", "chat",     750, 505),
     ("Contacts", "contacts", "contacts", 690, 465),
@@ -340,6 +340,13 @@ WINDOWS = [
     ("Settings", "settings", "list",     660, 440),
     ("Calls",    "phone",    "list",     660, 440),
     ("Archive",  "doc",      "list",     660, 440),
+
+    # The editors. They are not apps on the device -- nothing in a device
+    # profile mentions them -- they are what a file opens into, chosen by its
+    # extension, and they take one item rather than a list.
+    ("Text editor", "notes",    "text",  760, 520),
+    ("Spreadsheet", "doc",      "sheet", 900, 560),
+    ("Document",    "doc",      "doc",   780, 580),
 ]
 
 BAR_H = 0.072          # title bar, as a share of the window
@@ -466,8 +473,110 @@ def pane_term(p, ind):
     return s
 
 
+# --------------------------------------------------------- the file manager
+def pane_files(p, ind):
+    """A tree on the left, the folder's contents on the right.
+
+    NOT the list-and-reader every other app uses. A file manager's left half is
+    where you are, not what is in it, and its right half is a table of files --
+    which is why the first build read as a message list with folders on top of
+    it. Opening a file here does not fill a reading pane; it opens the file in
+    the editor its extension calls for, the way a machine does.
+    """
+    s = pane_head(p, ind)
+    s += txt(p + "Where", (0.022, 0.100, 0.690, 0.150), ind, 11, colour=DIM_INK)
+    s += scroll(p + "TreeScroll", (0.016, 0.158, 0.300, 0.980), ind, p + "TreeList")
+    s += img(p + "Split", (0.308, 0.112, 0.3095, 0.980), ind, colour=LINE)
+    s += txt(p + "ColName", (0.330, 0.112, 0.700, 0.152), ind, 9, colour=FAINT_INK,
+             text="NAME")
+    s += txt(p + "ColWhen", (0.740, 0.112, 0.972, 0.152), ind, 9, colour=FAINT_INK,
+             align="Right", text="MODIFIED")
+    s += img(p + "ColRule", (0.318, 0.156, 0.982, 0.1575), ind, colour=LINE)
+    s += scroll(p + "FileScroll", (0.318, 0.162, 0.982, 0.980), ind, p + "FileList")
+    s += txt(p + "Hint", (0.330, 0.400, 0.972, 0.460), ind, 12, colour=FAINT_INK,
+             align="Center")
+    return s
+
+
+# ------------------------------------------------------------- the text editor
+def pane_text(p, ind):
+    """A plain-text editor: a dark field, a numbered gutter, one column of
+    monospaced-looking text. It is the cheapest of the three to draw and the
+    one a player will open most, because most of what is worth finding on a
+    seized machine was typed into a text file."""
+    s = pane_head(p, ind)
+    s += img(p + "Glass", (0.016, 0.112, 0.984, 0.980), ind, colour=TERM_BG)
+    s += txt(p + "Gutter", (0.022, 0.122, 0.062, 0.972), ind, 11,
+             colour=FAINT_INK, align="Right", rich=True, spacing=20)
+    s += img(p + "GutterRule", (0.070, 0.112, 0.0712, 0.980), ind, colour=LINE)
+    s += scroll(p + "BodyScroll", (0.080, 0.118, 0.978, 0.972), ind,
+                p + "Body", kind="rich", size=12, colour="0.84 0.87 0.89 1")
+    return s
+
+
+# ------------------------------------------------------------- the spreadsheet
+def pane_sheet(p, ind):
+    """A grid. The body is read as comma-separated lines -- the first line is
+    the header row -- which is a convention a mission maker can type into a
+    config without learning anything, and is what a spreadsheet is."""
+    s = pane_head(p, ind)
+    s += img(p + "Paper", (0.016, 0.112, 0.984, 0.980), ind, colour="0.93 0.94 0.95 1")
+
+    COLS = 6
+    ROWS = 13
+    x0, gutter, cw = 0.016, 0.046, 0.153
+    y0, hh, rh = 0.112, 0.042, 0.0585
+
+    # the header strip and the row-number strip, in the grey a spreadsheet uses
+    s += img(p + "HeadFill", (x0, y0, 0.984, y0 + hh), ind, colour="0.80 0.82 0.84 1")
+    s += img(p + "SideFill", (x0, y0, x0 + gutter, 0.980), ind, colour="0.80 0.82 0.84 1")
+
+    letters = ["A", "B", "C", "D", "E", "F"]
+    for c in range(COLS):
+        cx = x0 + gutter + c * cw
+        s += txt(p + "Col%d" % c, (cx, y0 + 0.006, cx + cw, y0 + hh - 0.004), ind, 10,
+                 colour="0.26 0.28 0.31 1", align="Center", text=letters[c])
+        s += img(p + "VRule%d" % c, (cx, y0, cx + 0.0012, 0.980), ind,
+                 colour="0.72 0.74 0.76 1")
+
+    for r in range(ROWS):
+        ry = y0 + hh + r * rh
+        s += txt(p + "Row%d" % r, (x0, ry + 0.010, x0 + gutter - 0.006, ry + rh - 0.006),
+                 ind, 9, colour="0.26 0.28 0.31 1", align="Right", text=str(r + 1))
+        s += img(p + "HRule%d" % r, (x0, ry, 0.984, ry + 0.0012), ind,
+                 colour="0.72 0.74 0.76 1")
+
+        for c in range(COLS):
+            cx = x0 + gutter + c * cw
+            s += txt(p + "Cell%d_%d" % (r, c),
+                     (cx + 0.008, ry + 0.010, cx + cw - 0.006, ry + rh - 0.006),
+                     ind, 10, colour="0.13 0.15 0.17 1")
+
+    return s
+
+
+# ---------------------------------------------------------- the document viewer
+def pane_doc(p, ind):
+    """A page on a desk. White, inset, with its title set larger than its body
+    -- which is all that separates a word processor from a text editor to look
+    at, and it is enough for a player to know which one they are holding."""
+    s = pane_head(p, ind)
+    s += img(p + "Desk", (0.016, 0.112, 0.984, 0.980), ind, colour="0.11 0.12 0.14 1")
+    s += img(p + "Page", (0.170, 0.128, 0.830, 0.980), ind, colour="0.97 0.97 0.96 1")
+    s += txt(p + "Title", (0.206, 0.160, 0.794, 0.216), ind, 17,
+             colour="0.10 0.11 0.13 1", rich=True, wrap=True, spacing=22)
+    s += img(p + "Rule", (0.206, 0.226, 0.794, 0.2275), ind, colour="0.72 0.72 0.70 1")
+    s += txt(p + "Stamp", (0.206, 0.236, 0.794, 0.272), ind, 10,
+             colour="0.42 0.43 0.44 1")
+    s += scroll(p + "BodyScroll", (0.200, 0.290, 0.800, 0.962), ind,
+                p + "Body", kind="rich", size=12, colour="0.13 0.14 0.16 1")
+    return s
+
+
 PANES = {"list": pane_list, "mail": pane_mail, "chat": pane_chat,
-         "contacts": pane_contacts, "photos": pane_photos, "term": pane_term}
+         "contacts": pane_contacts, "photos": pane_photos, "term": pane_term,
+         "files": pane_files, "text": pane_text, "sheet": pane_sheet,
+         "doc": pane_doc}
 
 
 def window(i, label, icon, kind, ind):

@@ -35,7 +35,11 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	//! How many window frames the layout carries. One per app kind plus the
 	//! terminal; a device with two contact books gets one contacts window,
 	//! which is correct.
-	protected static const int WINDOWS = 10;
+	protected static const int WINDOWS = 13;
+
+	//! How many of those are apps the device has, rather than editors a file
+	//! opens into. The launcher and the pins only ever offer these.
+	protected static const int APP_WINDOWS = 10;
 
 	//! The panel's share of the desktop's height, matching the layout.
 	protected static const float PANEL_SHARE = 0.0560;
@@ -61,6 +65,19 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	protected static const string PANE_CONTACTS = "contacts";
 	protected static const string PANE_PHOTOS = "photos";
 	protected static const string PANE_TERM = "term";
+	protected static const string PANE_FILES = "files";
+	protected static const string PANE_TEXT = "text";
+	protected static const string PANE_SHEET = "sheet";
+	protected static const string PANE_DOC = "doc";
+
+	//! The grid the spreadsheet draws, matching the layout.
+	protected static const int SHEET_COLS = 6;
+	protected static const int SHEET_ROWS = 13;
+
+	protected static const ResourceName DESKTOP_ROW_LAYOUT = "{6A1C4F0B39D3566F}UI/layouts/MCF/MCF_DesktopRow.layout";
+	protected static const ResourceName DOC_ICON = "{6A1C4F0B39D3550C}UI/images/MCF_Desktop/icon_doc.edds";
+	protected static const ResourceName SHEET_ICON = "{6A1C4F0B39D35509}UI/images/MCF_Desktop/icon_settings.edds";
+	protected static const ResourceName PHOTO_ICON = "{6A1C4F0B39D35506}UI/images/MCF_Desktop/icon_photos.edds";
 
 	// -------------------------------------------------------------- the state
 
@@ -520,7 +537,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		m_aWindows.Clear();
 		m_aDragHandlers.Clear();
 
-		AddWindow(root, 0, "Files", MCF_EIntelApp.FILES, PANE_LIST, 0.542, 0.522);
+		AddWindow(root, 0, "Files", MCF_EIntelApp.FILES, PANE_FILES, 0.611, 0.578);
 		AddWindow(root, 1, "Mail", MCF_EIntelApp.EMAIL, PANE_MAIL, 0.604, 0.606);
 		AddWindow(root, 2, "Messages", MCF_EIntelApp.MESSAGES, PANE_CHAT, 0.521, 0.561);
 		AddWindow(root, 3, "Contacts", MCF_EIntelApp.CONTACTS, PANE_CONTACTS, 0.479, 0.517);
@@ -530,6 +547,12 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		AddWindow(root, 7, "Settings", MCF_EIntelApp.SETTINGS, PANE_LIST, 0.458, 0.489);
 		AddWindow(root, 8, "Calls", MCF_EIntelApp.CALLS, PANE_LIST, 0.458, 0.489);
 		AddWindow(root, 9, "Archive", MCF_EIntelApp.GENERAL, PANE_LIST, 0.458, 0.489);
+
+		// The editors. Kind -1, because nothing in a device profile mentions
+		// them: they are what a file opens into, not something the device has.
+		AddWindow(root, 10, "Text editor", -1, PANE_TEXT, 0.528, 0.578);
+		AddWindow(root, 11, "Spreadsheet", -1, PANE_SHEET, 0.625, 0.622);
+		AddWindow(root, 12, "Document", -1, PANE_DOC, 0.542, 0.644);
 	}
 
 	protected void AddWindow(notnull Widget root, int slot, string title, int kind, string pane, float wantW, float wantH)
@@ -869,6 +892,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 	// ================================================================ the panel
 
+	//! The taskbar has ten buttons and the device has thirteen windows, but
+	//! three of them are editors and nobody has ten apps open at once.
 	protected void BindPanel(notnull Widget root)
 	{
 		m_Kick = SCR_ButtonTextComponent.GetButtonText("Kick", root);
@@ -889,7 +914,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 		m_aTasks.Clear();
 		m_aTaskSlots.Clear();
-		for (int t = 0; t < WINDOWS; t++)
+		for (int t = 0; t < APP_WINDOWS; t++)
 		{
 			SCR_ButtonTextComponent task = SCR_ButtonTextComponent.GetButtonText("Task" + t.ToString(), root);
 			m_aTasks.Insert(task);
@@ -1132,7 +1157,23 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			return;
 		}
 
-		OpenFolder("", "readme.txt");
+		// A document on the desktop opens in its editor, the way it does on a
+		// machine -- not in the file manager with the file highlighted.
+		MCF_Desktop_Window files = WindowAt(0);
+		if (!files || !files.m_App)
+			return;
+
+		array<ref MCF_Device_Item> all = {};
+		m_Content.GetItems(files.m_App, all);
+
+		foreach (MCF_Device_Item item : all)
+		{
+			if (MCF_Device_Text.LeafOf(item.m_sHeading) == "readme.txt")
+			{
+				OpenDocument(item);
+				return;
+			}
+		}
 	}
 
 	//! Everything that belongs to a logged-in session.
@@ -1221,6 +1262,12 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		{
 			if (filled >= m_aLauncherApps.Count())
 				break;
+
+			// An editor is not an application on this device; it is where a
+			// file goes when you open it. Offering "Spreadsheet" in a launcher
+			// with nothing to put in it is a menu entry that opens a blank.
+			if (win.m_iSlot >= APP_WINDOWS)
+				continue;
 
 			if (win.m_eKind >= 0 && !win.m_App)
 				continue;
@@ -1396,6 +1443,18 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (win.m_App)
 			return win.m_App.ResolveLabel();
 
+		if (win.m_Doc)
+			return MCF_Device_Text.LeafOf(win.m_Doc.m_sHeading);
+
+		if (win.m_sPane == PANE_TEXT)
+			return "Text editor";
+
+		if (win.m_sPane == PANE_SHEET)
+			return "Spreadsheet";
+
+		if (win.m_sPane == PANE_DOC)
+			return "Document";
+
 		return "Terminal";
 	}
 
@@ -1438,6 +1497,18 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (win.m_sPane == PANE_TERM)
 		{
 			FillTerminal(win);
+			return;
+		}
+
+		if (win.m_sPane == PANE_FILES)
+		{
+			FillFiles(win);
+			return;
+		}
+
+		if (win.m_sPane == PANE_TEXT || win.m_sPane == PANE_SHEET || win.m_sPane == PANE_DOC)
+		{
+			FillEditor(win);
 			return;
 		}
 
@@ -2087,6 +2158,378 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		return "archive.tar";
 	}
 
+	// ====================================================== the file manager
+
+	//! The tree on the left, and the folder's contents on the right.
+	//!
+	//! A FILE MANAGER'S TWO HALVES ARE NOT A LIST AND A READER. The left half
+	//! is where you are -- every folder on the device, indented -- and the
+	//! right half is what is in the folder you picked. The first build put the
+	//! folders on top of the files in one column and a reading pane beside it,
+	//! which is a message app with a breadcrumb, not a file manager.
+	protected void FillFiles(notnull MCF_Desktop_Window win)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (!workspace)
+			return;
+
+		string p = win.Prefix();
+
+		array<ref MCF_Device_Item> all = {};
+		if (win.m_App)
+			m_Content.GetItems(win.m_App, all);
+
+		// ---- every folder on the device, in order, so the tree can be drawn
+		win.m_aFolders.Clear();
+		win.m_aFolders.Insert("");
+
+		foreach (MCF_Device_Item item : all)
+		{
+			string folder = item.m_sHeading;
+
+			if (!MCF_Device_Text.IsFolderMark(folder))
+				folder = MCF_Device_Text.FolderOf(folder);
+			else
+				folder = folder.Substring(0, folder.Length() - 1);
+
+			if (folder.IsEmpty())
+				continue;
+
+			// Every folder along the way, not just the last one: a file at
+			// a/b/c.txt proves that both a and a/b exist.
+			string walk;
+			array<string> parts = {};
+			folder.Split(MCF_Device_Text.PATH_SEP, parts, true);
+
+			foreach (string part : parts)
+			{
+				walk = MCF_Device_Text.Join(walk, part);
+
+				if (win.m_aFolders.Find(walk) < 0)
+					win.m_aFolders.Insert(walk);
+			}
+		}
+
+		SortPaths(win.m_aFolders);
+
+		// ---- the files in the folder that is open
+		win.m_aVisible.Clear();
+
+		foreach (MCF_Device_Item candidate : all)
+		{
+			if (MCF_Device_Text.IsFolderMark(candidate.m_sHeading))
+				continue;
+
+			if (MCF_Device_Text.FolderOf(candidate.m_sHeading) == win.m_sPath)
+				win.m_aVisible.Insert(candidate);
+		}
+
+		// ---- draw the tree
+		win.m_aTree.Clear();
+		Widget tree = root.FindAnyWidget(p + "TreeList");
+
+		if (tree)
+		{
+			ClearChildren(tree);
+
+			foreach (string path : win.m_aFolders)
+			{
+				Widget node = workspace.CreateWidgets(DESKTOP_ROW_LAYOUT, tree);
+				if (!node)
+					continue;
+
+				SCR_ButtonTextComponent button = SCR_ButtonTextComponent.FindButtonTextComponent(node);
+				if (!button)
+					continue;
+
+				button.m_OnClicked.Insert(OnTreeClicked);
+				win.m_aTree.Insert(button);
+				button.SetToggled(path == win.m_sPath, false, false);
+
+				string name = "This device";
+				if (!path.IsEmpty())
+					name = MCF_Device_Text.LeafOf(path);
+
+				FillDeskRow(node, name, "", FOLDER_ICON, Depth(path));
+			}
+		}
+
+		// ---- and the files
+		win.m_aRows.Clear();
+		Widget list = root.FindAnyWidget(p + "FileList");
+
+		if (list)
+		{
+			ClearChildren(list);
+
+			foreach (MCF_Device_Item file : win.m_aVisible)
+			{
+				Widget row = workspace.CreateWidgets(DESKTOP_ROW_LAYOUT, list);
+				if (!row)
+					continue;
+
+				SCR_ButtonTextComponent button = SCR_ButtonTextComponent.FindButtonTextComponent(row);
+				if (!button)
+					continue;
+
+				button.m_OnClicked.Insert(OnFileClicked);
+				win.m_aRows.Insert(button);
+				button.SetToggled(false, false, false);
+
+				FillDeskRow(row, MCF_Device_Text.LeafOf(file.m_sHeading),
+					file.m_sTimestamp, IconForFile(file.m_sHeading), 0);
+			}
+		}
+
+		ShowWhere(win);
+
+		string empty = "This folder is empty.";
+		if (!win.m_aVisible.IsEmpty())
+			empty = "";
+
+		SetText(root, p + "Hint", empty);
+	}
+
+	//! How deep a path sits, for the tree's indent.
+	protected int Depth(string path)
+	{
+		if (path.IsEmpty())
+			return 0;
+
+		array<string> parts = {};
+		path.Split(MCF_Device_Text.PATH_SEP, parts, true);
+		return parts.Count();
+	}
+
+	//! Alphabetical, so a tree does not reshuffle itself between two openings
+	//! of the same device. An insertion sort: these lists are a handful long.
+	protected void SortPaths(notnull array<string> paths)
+	{
+		for (int i = 1; i < paths.Count(); i++)
+		{
+			string held = paths[i];
+			int j = i - 1;
+
+			while (j >= 0 && paths[j] > held)
+			{
+				paths[j + 1] = paths[j];
+				j--;
+			}
+
+			paths[j + 1] = held;
+		}
+	}
+
+	protected void FillDeskRow(notnull Widget row, string name, string right, ResourceName icon, int depth)
+	{
+		TextWidget label = TextWidget.Cast(row.FindAnyWidget("Label"));
+		TextWidget trailing = TextWidget.Cast(row.FindAnyWidget("Right"));
+		ImageWidget art = ImageWidget.Cast(row.FindAnyWidget("Icon"));
+
+		int indent = depth * 14;
+
+		if (art)
+		{
+			art.SetVisible(true);
+			art.LoadImageTexture(0, icon);
+			AlignableSlot.SetPadding(art, 10 + indent, 0, 0, 0);
+		}
+
+		if (label)
+		{
+			label.SetText(name);
+			AlignableSlot.SetPadding(label, 36 + indent, 0, 110, 0);
+		}
+
+		if (trailing)
+			trailing.SetText(right);
+	}
+
+	//! Which icon a name deserves. A file manager where everything is the same
+	//! grey page tells the player nothing they could not read anyway.
+	protected ResourceName IconForFile(string path)
+	{
+		string ext = MCF_Device_Text.ExtOf(path);
+
+		if (ext == "xls" || ext == "xlsx" || ext == "csv")
+			return SHEET_ICON;
+
+		if (ext == "jpg" || ext == "jpeg" || ext == "png")
+			return PHOTO_ICON;
+
+		return DOC_ICON;
+	}
+
+	protected void OnTreeClicked(SCR_ButtonTextComponent button)
+	{
+		MCF_Desktop_Window win = WindowAt(0);
+		if (!win)
+			return;
+
+		int index = win.m_aTree.Find(button);
+		if (index < 0 || index >= win.m_aFolders.Count())
+			return;
+
+		FocusWindow(0);
+		win.m_sPath = win.m_aFolders[index];
+		FillFiles(win);
+	}
+
+	protected void OnFileClicked(SCR_ButtonTextComponent button)
+	{
+		MCF_Desktop_Window win = WindowAt(0);
+		if (!win)
+			return;
+
+		int index = win.m_aRows.Find(button);
+		if (index < 0 || index >= win.m_aVisible.Count())
+			return;
+
+		// Remembered, so that Rename and Delete on the right-click menu have
+		// something to act on -- a file manager's selection IS its context.
+		win.m_iOpenEntry = index;
+
+		foreach (SCR_ButtonTextComponent row : win.m_aRows)
+		{
+			row.SetToggled(row == button, false, false);
+		}
+
+		OpenDocument(win.m_aVisible[index]);
+	}
+
+	// =========================================================== the editors
+
+	//! Opens a file in the editor its extension calls for.
+	//!
+	//! THE EXTENSION IS THE WHOLE RULE, which is how a real machine decides and
+	//! how a mission maker would expect it to. Nothing else about an item says
+	//! what kind of thing it is, and nothing else should have to: name a file
+	//! ledger.xlsx and it opens in a grid.
+	protected void OpenDocument(MCF_Device_Item item)
+	{
+		if (!item)
+			return;
+
+		int slot = MCF_Device_Text.EditorSlot(item.m_sHeading);
+
+		MCF_Desktop_Window win = WindowAt(slot);
+		if (!win)
+			return;
+
+		win.m_Doc = item;
+
+		if (!OpenWindow(slot))
+			return;
+
+		FillWindow(win);
+
+		if (m_Content.MarkRead(item))
+		{
+			PaintPins();
+			DrawLockNotes();
+		}
+	}
+
+	//! The editors take one item, not an app, so their title is the file.
+	protected void FillEditor(notnull MCF_Desktop_Window win)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string p = win.Prefix();
+
+		if (!win.m_Doc)
+		{
+			SetText(root, p + "Head", TitleOf(win));
+			return;
+		}
+
+		string name = MCF_Device_Text.LeafOf(win.m_Doc.m_sHeading);
+		SetText(root, p + "Head", name);
+
+		TextWidget bar = TextWidget.Cast(root.FindAnyWidget(p + "Title"));
+		if (bar)
+			bar.SetText(name);
+
+		string body = MCF_Device_Text.Body(win.m_Doc.m_sBody);
+
+		if (win.m_sPane == PANE_SHEET)
+		{
+			FillSheet(win, body);
+			return;
+		}
+
+		if (win.m_sPane == PANE_DOC)
+		{
+			SetText(root, p + "Stamp", win.m_Doc.m_sTimestamp);
+			SetText(root, p + "Body", body);
+			return;
+		}
+
+		// The plain editor. The gutter is one widget carrying every number,
+		// which lines up with the body for free as long as both use the same
+		// line spacing -- and costs one widget instead of forty.
+		array<string> lines = {};
+		body.Split("\n", lines, false);
+
+		string numbers;
+		int count = lines.Count();
+		if (count < 1)
+			count = 1;
+
+		for (int i = 1; i <= count; i++)
+		{
+			if (i > 1)
+				numbers = numbers + "\n";
+
+			numbers = numbers + i.ToString();
+		}
+
+		SetText(root, p + "Gutter", numbers);
+		SetText(root, p + "Body", body);
+	}
+
+	//! A comma-separated body, in a grid.
+	//!
+	//! FIRST LINE IS THE HEADER, and it is written into the row that would
+	//! otherwise be row 1 -- which is exactly where a person putting a table
+	//! into a spreadsheet puts it. A mission maker types
+	//! "Crate,Weight,Signed" and gets a spreadsheet; nothing new to learn.
+	protected void FillSheet(notnull MCF_Desktop_Window win, string body)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		string p = win.Prefix();
+
+		array<string> lines = {};
+		body.Split("\n", lines, true);
+
+		for (int r = 0; r < SHEET_ROWS; r++)
+		{
+			array<string> cells = {};
+
+			if (r < lines.Count())
+				lines[r].Split(",", cells, false);
+
+			for (int c = 0; c < SHEET_COLS; c++)
+			{
+				string value;
+
+				if (c < cells.Count())
+					value = MCF_Device_Script.Trim(cells[c]);
+
+				SetText(root, p + "Cell" + r.ToString() + "_" + c.ToString(), value);
+			}
+		}
+	}
+
 	// ========================================================== the file tree
 
 	//! What the file manager is looking at, and everything above it.
@@ -2160,20 +2603,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			return;
 
 		// OpenWindow fills it at whatever path it already had; re-fill now that
-		// the path is set, and land on the file the caller asked for.
+		// the path is set.
 		FillWindow(win);
-
-		if (select.IsEmpty())
-			return;
-
-		for (int i = 0; i < win.m_aVisible.Count(); i++)
-		{
-			if (MCF_Device_Text.LeafOf(win.m_aVisible[i].m_sHeading) == select)
-			{
-				ShowEntry(win, i);
-				return;
-			}
-		}
 	}
 
 	protected void EnterFolder(notnull MCF_Desktop_Window win, string name)
@@ -2204,11 +2635,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (!win.m_sPath.IsEmpty())
 			where = "/" + win.m_sPath;
 
-		int count = win.m_aVisible.Count() + win.m_aFolders.Count();
-		if (!win.m_sPath.IsEmpty())
-			count--;
-
-		SetText(root, win.Prefix() + "Where", where + "      " + count.ToString() + " items");
+		SetText(root, win.Prefix() + "Where", where + "      " + win.m_aVisible.Count().ToString() + " items");
 	}
 
 	//! A folder, drawn in the same row the files use.

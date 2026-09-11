@@ -68,9 +68,16 @@ class MCF_Desktop_Window
 	//! file you can then find in the window.
 	string m_sPath;
 
-	//! The folder rows drawn above the files, newest state first: ".." when
-	//! there is somewhere to go back to, then each child folder by name.
+	//! Every folder on the device, in order, for the tree on the left.
 	ref array<string> m_aFolders = {};
+
+	//! The tree's own buttons. Separate from m_aRows because the tree and the
+	//! file list are two scroll panes, not one list with folders on top.
+	ref array<SCR_ButtonTextComponent> m_aTree = {};
+
+	//! An editor window shows ONE file rather than an app's list, so this is
+	//! what it is showing. Null for every window that is an app.
+	MCF_Device_Item m_Doc;
 
 	ref array<ref MCF_Device_Item> m_aVisible = {};
 	ref array<SCR_ButtonTextComponent> m_aRows = {};

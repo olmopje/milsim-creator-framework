@@ -1,0 +1,98 @@
+// One line in a file manager: an icon, a name, and something small on the
+// right. NOT the handset's row -- that one is built around a 40-unit face and
+// carries two lines of text, which is right for a message and wrong for a file.
+//
+// The height is declared by "Sizer", for the same reason it is in the other
+// row: the icon is allowed to be absent and a hidden widget contributes
+// nothing to a layout.
+ButtonWidgetClass {
+ Name "Button"
+ Slot LayoutSlot "{6A1C4F0B39D35670}" {
+  Padding 0 0 0 0
+  SizeMode Fill
+ }
+ Clipping True
+ components {
+  SCR_ButtonTextComponent "{6A1C4F0B39D35671}" {
+   m_bCanBeToggled 1
+   m_BackgroundDefault 1 1 1 0
+   m_BackgroundHovered 1 1 1 0.08
+   m_BackgroundSelected 0.53824 0.12597 0.00719 0.55
+   m_BackgroundSelectedHovered 0.71057 0.20490 0.02721 0.60
+   m_BackgroundClicked 1 1 1 0.16
+   m_sText ""
+  }
+ }
+ style blank
+ {
+  OverlayWidgetClass "{6A1C4F0B39D35672}" {
+   Name "Overlay"
+   Slot ButtonWidgetSlot "{6A1C4F0B39D35673}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+    Padding 0 6 0 6
+   }
+   {
+    ImageWidgetClass "{6A1C4F0B39D35674}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35675}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+    }
+    ImageWidgetClass "{6A1C4F0B39D35676}" {
+     Name "Sizer"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35677}" {
+      HorizontalAlign 0
+      VerticalAlign 1
+     }
+     Size 1 20
+     Color 1 1 1 0
+    }
+    ImageWidgetClass "{6A1C4F0B39D35678}" {
+     Name "Icon"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35679}" {
+      HorizontalAlign 0
+      VerticalAlign 1
+      Padding 10 0 0 0
+     }
+     Size 18 18
+     Color 1 1 1 1
+    }
+    TextWidgetClass "{6A1C4F0B39D3567A}" {
+     Name "Label"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D3567B}" {
+      HorizontalAlign 0
+      VerticalAlign 1
+      Padding 36 0 110 0
+     }
+     Text ""
+     "Font Size" 12
+     "Min Font Size" 12
+    }
+    TextWidgetClass "{6A1C4F0B39D3567C}" {
+     Name "Right"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D3567D}" {
+      HorizontalAlign 2
+      VerticalAlign 1
+      Padding 0 0 12 0
+     }
+     Text ""
+     "Font Size" 10
+     "Min Font Size" 10
+     Color 0.31855 0.35469 0.40645 1
+    }
+    ImageWidgetClass "{6A1C4F0B39D3567E}" {
+     Name "Divider"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D3567F}" {
+      HorizontalAlign 3
+      VerticalAlign 2
+      Padding 10 0 0 -6
+     }
+     Size 0 1
+     Color 1 1 1 0.06
+    }
+   }
+  }
+ }
+}
