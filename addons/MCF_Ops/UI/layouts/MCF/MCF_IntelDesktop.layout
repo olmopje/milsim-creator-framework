@@ -14,7 +14,7 @@ FrameWidgetClass {
     SizeY 0
     OffsetBottom 0
    }
-   Color 0 0 0 0.90
+   Color 0.00000 0.00000 0.00000 0.90000
   }
   FrameWidgetClass "{6A1C4F0B39E0064E}" {
    Name "Screen"
@@ -43,7 +43,7 @@ FrameWidgetClass {
      SizeY 0
      OffsetBottom 0
     }
-    Color 1 1 1 1
+    Color 1.00000 1.00000 1.00000 1.00000
     Texture "{6A1C4F0B39D35524}UI/images/MCF_Desktop/wallpaper_desktop.edds"
     Image ""
    }
@@ -64,11 +64,11 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39E00005}" {
       m_bCanBeToggled 0
-      m_BackgroundDefault 1 1 1 0
-      m_BackgroundHovered 1 1 1 0.09
-      m_BackgroundSelected 0.76 0.39 0.08 1
-      m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-      m_BackgroundClicked 1 1 1 0.22
+      m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+      m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+      m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+      m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+      m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
       m_sText ""
      }
     }
@@ -98,7 +98,7 @@ FrameWidgetClass {
      SizeY 0
      OffsetBottom 0
     }
-    Color 1 1 1 1
+    Color 1.00000 1.00000 1.00000 1.00000
     Texture "{6A1C4F0B39D35502}UI/images/MCF_Desktop/icon_folder.edds"
     Image ""
    }
@@ -118,7 +118,7 @@ FrameWidgetClass {
     Text "Home"
     "Font Size" 11
     "Min Font Size" 11
-    "Text Horizontal Align" 1
+    "Horizontal Alignment" Center
    }
    ButtonWidgetClass "{6A1C4F0B39E0000C}" {
     Name "DeskDocs"
@@ -137,11 +137,11 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39E0000E}" {
       m_bCanBeToggled 0
-      m_BackgroundDefault 1 1 1 0
-      m_BackgroundHovered 1 1 1 0.09
-      m_BackgroundSelected 0.76 0.39 0.08 1
-      m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-      m_BackgroundClicked 1 1 1 0.22
+      m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+      m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+      m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+      m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+      m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
       m_sText ""
      }
     }
@@ -171,7 +171,7 @@ FrameWidgetClass {
      SizeY 0
      OffsetBottom 0
     }
-    Color 1 1 1 1
+    Color 1.00000 1.00000 1.00000 1.00000
     Texture "{6A1C4F0B39D35502}UI/images/MCF_Desktop/icon_folder.edds"
     Image ""
    }
@@ -191,7 +191,7 @@ FrameWidgetClass {
     Text "Documents"
     "Font Size" 11
     "Min Font Size" 11
-    "Text Horizontal Align" 1
+    "Horizontal Alignment" Center
    }
    ButtonWidgetClass "{6A1C4F0B39E00015}" {
     Name "DeskFile"
@@ -210,11 +210,11 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39E00017}" {
       m_bCanBeToggled 0
-      m_BackgroundDefault 1 1 1 0
-      m_BackgroundHovered 1 1 1 0.09
-      m_BackgroundSelected 0.76 0.39 0.08 1
-      m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-      m_BackgroundClicked 1 1 1 0.22
+      m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+      m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+      m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+      m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+      m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
       m_sText ""
      }
     }
@@ -244,7 +244,7 @@ FrameWidgetClass {
      SizeY 0
      OffsetBottom 0
     }
-    Color 1 1 1 1
+    Color 1.00000 1.00000 1.00000 1.00000
     Texture "{6A1C4F0B39D3550C}UI/images/MCF_Desktop/icon_doc.edds"
     Image ""
    }
@@ -264,7 +264,7 @@ FrameWidgetClass {
     Text "readme.txt"
     "Font Size" 11
     "Min Font Size" 11
-    "Text Horizontal Align" 1
+    "Horizontal Alignment" Center
    }
    FrameWidgetClass "{6A1C4F0B39E00082}" {
     Name "W0"
@@ -294,7 +294,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -342,7 +342,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E00024}" {
        Name "W0Add"
@@ -361,11 +361,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00026}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -418,11 +418,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0002F}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -475,11 +475,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00038}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -532,11 +532,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00041}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -626,7 +626,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       RichTextWidgetClass "{6A1C4F0B39E00051}" {
        Name "W0ReadHeading"
@@ -664,7 +664,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 11
        "Min Font Size" 11
-       Color 0.60 0.63 0.67 1
+       Color 0.31855 0.35469 0.40645 1.00000
       }
       ScrollLayoutWidgetClass "{6A1C4F0B39E00055}" {
        Name "W0ReadScroll"
@@ -727,8 +727,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 12
        "Min Font Size" 12
-       Color 0.43 0.46 0.50 1
-       "Text Horizontal Align" 1
+       Color 0.15487 0.17887 0.21404 1.00000
+       "Horizontal Alignment" Center
       }
      }
     }
@@ -745,7 +745,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -766,11 +766,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00064}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -800,7 +800,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35501}UI/images/MCF_Desktop/icon_files.edds"
      Image ""
     }
@@ -838,11 +838,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0006D}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -886,11 +886,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00074}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -934,11 +934,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0007B}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -978,7 +978,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -1010,7 +1010,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -1058,7 +1058,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E0008A}" {
        Name "W1Add"
@@ -1077,11 +1077,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0008C}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -1134,11 +1134,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00095}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -1191,11 +1191,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0009E}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -1248,11 +1248,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E000A7}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -1342,7 +1342,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ImageWidgetClass "{6A1C4F0B39E000B7}" {
        Name "W1Card"
@@ -1357,7 +1357,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.05
+       Color 1.00000 1.00000 1.00000 0.05000
        Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
        Image ""
       }
@@ -1377,7 +1377,7 @@ FrameWidgetClass {
        Text "FROM"
        "Font Size" 9
        "Min Font Size" 9
-       Color 0.43 0.46 0.50 1
+       Color 0.15487 0.17887 0.21404 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E000BB}" {
        Name "W1From"
@@ -1412,7 +1412,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
+       Color 0.31855 0.35469 0.40645 1.00000
       }
       ImageWidgetClass "{6A1C4F0B39E000BF}" {
        Name "W1CardRule"
@@ -1427,7 +1427,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       RichTextWidgetClass "{6A1C4F0B39E000C1}" {
        Name "W1Subject"
@@ -1509,7 +1509,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -1530,11 +1530,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E000D0}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -1564,7 +1564,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35503}UI/images/MCF_Desktop/icon_mail.edds"
      Image ""
     }
@@ -1602,11 +1602,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E000D9}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -1650,11 +1650,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E000E0}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -1698,11 +1698,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E000E7}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -1742,7 +1742,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -1774,7 +1774,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -1822,7 +1822,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E000F6}" {
        Name "W2Add"
@@ -1841,11 +1841,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E000F8}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -1898,11 +1898,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00101}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -1955,11 +1955,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0010A}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -2012,11 +2012,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00113}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -2106,7 +2106,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ImageWidgetClass "{6A1C4F0B39E00123}" {
        Name "W2Avatar"
@@ -2121,7 +2121,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 0.35 0.38 0.42 1
+       Color 0.10048 0.11928 0.14732 1.00000
        Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
        Image ""
       }
@@ -2141,7 +2141,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 14
        "Min Font Size" 14
-       "Text Horizontal Align" 1
+       "Horizontal Alignment" Center
       }
       TextWidgetClass "{6A1C4F0B39E00127}" {
        Name "W2Who"
@@ -2176,7 +2176,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
+       Color 0.31855 0.35469 0.40645 1.00000
       }
       ImageWidgetClass "{6A1C4F0B39E0012B}" {
        Name "W2ChatRule"
@@ -2191,7 +2191,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ScrollLayoutWidgetClass "{6A1C4F0B39E0012D}" {
        Name "W2ThreadScroll"
@@ -2249,7 +2249,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -2270,11 +2270,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0013A}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -2304,7 +2304,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35504}UI/images/MCF_Desktop/icon_messages.edds"
      Image ""
     }
@@ -2342,11 +2342,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00143}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -2390,11 +2390,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0014A}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -2438,11 +2438,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00151}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -2482,7 +2482,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -2514,7 +2514,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -2562,7 +2562,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E00160}" {
        Name "W3Add"
@@ -2581,11 +2581,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00162}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -2638,11 +2638,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0016B}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -2695,11 +2695,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00174}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -2752,11 +2752,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0017D}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -2846,7 +2846,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ImageWidgetClass "{6A1C4F0B39E0018D}" {
        Name "W3Big"
@@ -2861,7 +2861,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 0.35 0.38 0.42 1
+       Color 0.10048 0.11928 0.14732 1.00000
        Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
        Image ""
       }
@@ -2881,7 +2881,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 30
        "Min Font Size" 30
-       "Text Horizontal Align" 1
+       "Horizontal Alignment" Center
       }
       TextWidgetClass "{6A1C4F0B39E00191}" {
        Name "W3Name"
@@ -2899,7 +2899,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 18
        "Min Font Size" 18
-       "Text Horizontal Align" 1
+       "Horizontal Alignment" Center
       }
       TextWidgetClass "{6A1C4F0B39E00193}" {
        Name "W3Number"
@@ -2917,8 +2917,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 12
        "Min Font Size" 12
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E00195}" {
        Name "W3Call"
@@ -2937,11 +2937,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00197}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 0.16 0.60 0.27 1
-         m_BackgroundHovered 0.22 0.72 0.34 1
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 0.02198 0.31855 0.05925 1.00000
+         m_BackgroundHovered 0.03968 0.47700 0.09463 1.00000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -2991,7 +2991,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       TextWidgetClass "{6A1C4F0B39E001A0}" {
        Name "W3NoteLabel"
@@ -3009,7 +3009,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 9
        "Min Font Size" 9
-       Color 0.43 0.46 0.50 1
+       Color 0.15487 0.17887 0.21404 1.00000
       }
       ScrollLayoutWidgetClass "{6A1C4F0B39E001A2}" {
        Name "W3NoteScroll"
@@ -3051,7 +3051,7 @@ FrameWidgetClass {
            "Font Size" 12
            "Min Font Size" 12
            "Line Spacing" 21
-           Color 0.60 0.63 0.67 1
+           Color 0.31855 0.35469 0.40645 1.00000
           }
          }
         }
@@ -3072,7 +3072,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -3093,11 +3093,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E001AF}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -3127,7 +3127,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35505}UI/images/MCF_Desktop/icon_contacts.edds"
      Image ""
     }
@@ -3165,11 +3165,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E001B8}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -3213,11 +3213,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E001BF}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -3261,11 +3261,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E001C6}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -3305,7 +3305,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -3337,7 +3337,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -3385,7 +3385,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E001D5}" {
        Name "W4Add"
@@ -3404,11 +3404,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E001D7}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3461,11 +3461,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E001E0}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3518,11 +3518,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E001E9}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3575,11 +3575,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E001F2}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3632,11 +3632,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E001FB}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3666,7 +3666,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E00200}" {
        Name "W4Cap0"
@@ -3684,8 +3684,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E00202}" {
        Name "W4Tile1"
@@ -3704,11 +3704,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00204}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3738,7 +3738,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E00209}" {
        Name "W4Cap1"
@@ -3756,8 +3756,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E0020B}" {
        Name "W4Tile2"
@@ -3776,11 +3776,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0020D}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3810,7 +3810,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E00212}" {
        Name "W4Cap2"
@@ -3828,8 +3828,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E00214}" {
        Name "W4Tile3"
@@ -3848,11 +3848,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00216}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3882,7 +3882,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E0021B}" {
        Name "W4Cap3"
@@ -3900,8 +3900,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E0021D}" {
        Name "W4Tile4"
@@ -3920,11 +3920,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0021F}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -3954,7 +3954,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E00224}" {
        Name "W4Cap4"
@@ -3972,8 +3972,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E00226}" {
        Name "W4Tile5"
@@ -3992,11 +3992,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00228}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4026,7 +4026,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E0022D}" {
        Name "W4Cap5"
@@ -4044,8 +4044,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E0022F}" {
        Name "W4Tile6"
@@ -4064,11 +4064,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00231}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4098,7 +4098,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E00236}" {
        Name "W4Cap6"
@@ -4116,8 +4116,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E00238}" {
        Name "W4Tile7"
@@ -4136,11 +4136,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0023A}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4170,7 +4170,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E0023F}" {
        Name "W4Cap7"
@@ -4188,8 +4188,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E00241}" {
        Name "W4Tile8"
@@ -4208,11 +4208,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00243}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4242,7 +4242,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E00248}" {
        Name "W4Cap8"
@@ -4260,8 +4260,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E0024A}" {
        Name "W4Tile9"
@@ -4280,11 +4280,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0024C}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4314,7 +4314,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E00251}" {
        Name "W4Cap9"
@@ -4332,8 +4332,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E00253}" {
        Name "W4Tile10"
@@ -4352,11 +4352,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00255}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4386,7 +4386,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E0025A}" {
        Name "W4Cap10"
@@ -4404,8 +4404,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       ButtonWidgetClass "{6A1C4F0B39E0025C}" {
        Name "W4Tile11"
@@ -4424,11 +4424,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0025E}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4458,7 +4458,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 1
+       Color 1.00000 1.00000 1.00000 1.00000
       }
       TextWidgetClass "{6A1C4F0B39E00263}" {
        Name "W4Cap11"
@@ -4476,8 +4476,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 10
        "Min Font Size" 10
-       Color 0.60 0.63 0.67 1
-       "Text Horizontal Align" 1
+       Color 0.31855 0.35469 0.40645 1.00000
+       "Horizontal Alignment" Center
       }
       TextWidgetClass "{6A1C4F0B39E00265}" {
        Name "W4GridHint"
@@ -4495,8 +4495,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 12
        "Min Font Size" 12
-       Color 0.43 0.46 0.50 1
-       "Text Horizontal Align" 1
+       Color 0.15487 0.17887 0.21404 1.00000
+       "Horizontal Alignment" Center
       }
      }
     }
@@ -4513,7 +4513,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -4534,11 +4534,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0026D}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -4568,7 +4568,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35506}UI/images/MCF_Desktop/icon_photos.edds"
      Image ""
     }
@@ -4606,11 +4606,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00276}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -4654,11 +4654,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0027D}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -4702,11 +4702,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00284}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -4746,7 +4746,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -4778,7 +4778,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -4826,7 +4826,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E00293}" {
        Name "W5Add"
@@ -4845,11 +4845,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00295}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4902,11 +4902,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0029E}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -4959,11 +4959,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E002A7}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -5016,11 +5016,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E002B0}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -5110,7 +5110,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       RichTextWidgetClass "{6A1C4F0B39E002C0}" {
        Name "W5ReadHeading"
@@ -5148,7 +5148,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 11
        "Min Font Size" 11
-       Color 0.60 0.63 0.67 1
+       Color 0.31855 0.35469 0.40645 1.00000
       }
       ScrollLayoutWidgetClass "{6A1C4F0B39E002C4}" {
        Name "W5ReadScroll"
@@ -5211,8 +5211,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 12
        "Min Font Size" 12
-       Color 0.43 0.46 0.50 1
-       "Text Horizontal Align" 1
+       Color 0.15487 0.17887 0.21404 1.00000
+       "Horizontal Alignment" Center
       }
      }
     }
@@ -5229,7 +5229,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -5250,11 +5250,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E002D3}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -5284,7 +5284,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35507}UI/images/MCF_Desktop/icon_notes.edds"
      Image ""
     }
@@ -5322,11 +5322,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E002DC}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -5370,11 +5370,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E002E3}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -5418,11 +5418,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E002EA}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -5462,7 +5462,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -5494,7 +5494,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -5542,7 +5542,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E002F9}" {
        Name "W6Add"
@@ -5561,11 +5561,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E002FB}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -5618,11 +5618,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00304}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -5675,11 +5675,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0030D}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -5732,11 +5732,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00316}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -5785,7 +5785,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 0.075 0.086 0.098 1
+       Color 0.00657 0.00799 0.00972 1.00000
       }
       ScrollLayoutWidgetClass "{6A1C4F0B39E0031F}" {
        Name "W6TermScroll"
@@ -5827,7 +5827,7 @@ FrameWidgetClass {
            "Font Size" 11
            "Min Font Size" 11
            "Line Spacing" 20
-           Color 0.81 0.84 0.86 1
+           Color 0.62092 0.67386 0.71057 1.00000
           }
          }
         }
@@ -5848,7 +5848,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -5869,11 +5869,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0032C}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -5903,7 +5903,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35508}UI/images/MCF_Desktop/icon_terminal.edds"
      Image ""
     }
@@ -5941,11 +5941,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00335}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -5989,11 +5989,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0033C}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -6037,11 +6037,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00343}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -6081,7 +6081,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -6113,7 +6113,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -6161,7 +6161,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E00352}" {
        Name "W7Add"
@@ -6180,11 +6180,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00354}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -6237,11 +6237,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0035D}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -6294,11 +6294,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00366}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -6351,11 +6351,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0036F}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -6445,7 +6445,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       RichTextWidgetClass "{6A1C4F0B39E0037F}" {
        Name "W7ReadHeading"
@@ -6483,7 +6483,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 11
        "Min Font Size" 11
-       Color 0.60 0.63 0.67 1
+       Color 0.31855 0.35469 0.40645 1.00000
       }
       ScrollLayoutWidgetClass "{6A1C4F0B39E00383}" {
        Name "W7ReadScroll"
@@ -6546,8 +6546,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 12
        "Min Font Size" 12
-       Color 0.43 0.46 0.50 1
-       "Text Horizontal Align" 1
+       Color 0.15487 0.17887 0.21404 1.00000
+       "Horizontal Alignment" Center
       }
      }
     }
@@ -6564,7 +6564,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -6585,11 +6585,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00392}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -6619,7 +6619,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35509}UI/images/MCF_Desktop/icon_settings.edds"
      Image ""
     }
@@ -6657,11 +6657,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0039B}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -6705,11 +6705,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E003A2}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -6753,11 +6753,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E003A9}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -6797,7 +6797,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -6829,7 +6829,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -6877,7 +6877,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E003B8}" {
        Name "W8Add"
@@ -6896,11 +6896,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E003BA}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -6953,11 +6953,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E003C3}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -7010,11 +7010,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E003CC}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -7067,11 +7067,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E003D5}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -7161,7 +7161,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       RichTextWidgetClass "{6A1C4F0B39E003E5}" {
        Name "W8ReadHeading"
@@ -7199,7 +7199,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 11
        "Min Font Size" 11
-       Color 0.60 0.63 0.67 1
+       Color 0.31855 0.35469 0.40645 1.00000
       }
       ScrollLayoutWidgetClass "{6A1C4F0B39E003E9}" {
        Name "W8ReadScroll"
@@ -7262,8 +7262,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 12
        "Min Font Size" 12
-       Color 0.43 0.46 0.50 1
-       "Text Horizontal Align" 1
+       Color 0.15487 0.17887 0.21404 1.00000
+       "Horizontal Alignment" Center
       }
      }
     }
@@ -7280,7 +7280,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -7301,11 +7301,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E003F8}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -7335,7 +7335,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550A}UI/images/MCF_Desktop/icon_phone.edds"
      Image ""
     }
@@ -7373,11 +7373,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00401}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -7421,11 +7421,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00408}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -7469,11 +7469,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0040F}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -7513,7 +7513,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -7545,7 +7545,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.157 0.176 0.196 1
+     Color 0.02125 0.02611 0.03187 1.00000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -7593,7 +7593,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       ButtonWidgetClass "{6A1C4F0B39E0041E}" {
        Name "W9Add"
@@ -7612,11 +7612,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00420}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -7669,11 +7669,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00429}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -7726,11 +7726,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E00432}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -7783,11 +7783,11 @@ FrameWidgetClass {
        components {
         SCR_ButtonTextComponent "{6A1C4F0B39E0043B}" {
          m_bCanBeToggled 0
-         m_BackgroundDefault 1 1 1 0.07
-         m_BackgroundHovered 1 1 1 0.18
-         m_BackgroundSelected 0.76 0.39 0.08 1
-         m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-         m_BackgroundClicked 1 1 1 0.22
+         m_BackgroundDefault 1.00000 1.00000 1.00000 0.07000
+         m_BackgroundHovered 1.00000 1.00000 1.00000 0.18000
+         m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+         m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
          m_sText ""
         }
        }
@@ -7877,7 +7877,7 @@ FrameWidgetClass {
         SizeY 0
         OffsetBottom 0
        }
-       Color 1 1 1 0.09
+       Color 1.00000 1.00000 1.00000 0.09000
       }
       RichTextWidgetClass "{6A1C4F0B39E0044B}" {
        Name "W9ReadHeading"
@@ -7915,7 +7915,7 @@ FrameWidgetClass {
        Text ""
        "Font Size" 11
        "Min Font Size" 11
-       Color 0.60 0.63 0.67 1
+       Color 0.31855 0.35469 0.40645 1.00000
       }
       ScrollLayoutWidgetClass "{6A1C4F0B39E0044F}" {
        Name "W9ReadScroll"
@@ -7978,8 +7978,8 @@ FrameWidgetClass {
        Text ""
        "Font Size" 12
        "Min Font Size" 12
-       Color 0.43 0.46 0.50 1
-       "Text Horizontal Align" 1
+       Color 0.15487 0.17887 0.21404 1.00000
+       "Horizontal Alignment" Center
       }
      }
     }
@@ -7996,7 +7996,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35522}UI/images/MCF_Desktop/bar_titlebar.edds"
      Image ""
     }
@@ -8017,11 +8017,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0045E}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.06
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8051,7 +8051,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550C}UI/images/MCF_Desktop/icon_doc.edds"
      Image ""
     }
@@ -8089,11 +8089,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00467}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8137,11 +8137,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0046E}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8185,11 +8185,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00475}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 0.77 0.28 0.23 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 0.55422 0.06372 0.04323 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8229,7 +8229,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     }
    }
@@ -8260,7 +8260,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35521}UI/images/MCF_Desktop/bar_panel.edds"
      Image ""
     }
@@ -8281,11 +8281,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00482}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.10
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.10000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8337,7 +8337,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     ButtonWidgetClass "{6A1C4F0B39E0048B}" {
      Name "Pin0"
@@ -8356,11 +8356,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0048D}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.12
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.12000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8400,7 +8400,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
      Image ""
      "Is Visible" 0
@@ -8422,7 +8422,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 9
      "Min Font Size" 9
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E00496}" {
      Name "Pin1"
@@ -8441,11 +8441,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00498}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.12
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.12000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8485,7 +8485,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
      Image ""
      "Is Visible" 0
@@ -8507,7 +8507,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 9
      "Min Font Size" 9
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E004A1}" {
      Name "Pin2"
@@ -8526,11 +8526,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E004A3}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.12
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.12000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8570,7 +8570,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
      Image ""
      "Is Visible" 0
@@ -8592,7 +8592,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 9
      "Min Font Size" 9
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E004AC}" {
      Name "Pin3"
@@ -8611,11 +8611,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E004AE}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.12
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.12000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8655,7 +8655,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
      Image ""
      "Is Visible" 0
@@ -8677,7 +8677,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 9
      "Min Font Size" 9
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E004B7}" {
      Name "Pin4"
@@ -8696,11 +8696,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E004B9}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.12
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.12000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8740,7 +8740,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
      Image ""
      "Is Visible" 0
@@ -8762,7 +8762,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 9
      "Min Font Size" 9
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E004C2}" {
      Name "Pin5"
@@ -8781,11 +8781,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E004C4}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.12
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.12000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8825,7 +8825,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
      Image ""
      "Is Visible" 0
@@ -8847,7 +8847,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 9
      "Min Font Size" 9
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     ImageWidgetClass "{6A1C4F0B39E004CD}" {
      Name "PinRule"
@@ -8862,7 +8862,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     ButtonWidgetClass "{6A1C4F0B39E004CF}" {
      Name "Task0"
@@ -8881,11 +8881,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E004D1}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -8946,7 +8946,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E004DC}" {
@@ -8966,11 +8966,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E004DE}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9031,7 +9031,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E004E9}" {
@@ -9051,11 +9051,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E004EB}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9116,7 +9116,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E004F6}" {
@@ -9136,11 +9136,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E004F8}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9201,7 +9201,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E00503}" {
@@ -9221,11 +9221,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00505}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9286,7 +9286,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E00510}" {
@@ -9306,11 +9306,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00512}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9371,7 +9371,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E0051D}" {
@@ -9391,11 +9391,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0051F}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9456,7 +9456,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E0052A}" {
@@ -9476,11 +9476,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0052C}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9541,7 +9541,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E00537}" {
@@ -9561,11 +9561,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00539}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9626,7 +9626,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ButtonWidgetClass "{6A1C4F0B39E00544}" {
@@ -9646,11 +9646,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00546}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.06
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.06000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9711,7 +9711,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      "Is Visible" 0
     }
     ImageWidgetClass "{6A1C4F0B39E00551}" {
@@ -9727,7 +9727,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     ImageWidgetClass "{6A1C4F0B39E00553}" {
      Name "TrayNet"
@@ -9742,7 +9742,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.81 0.84 0.86 1
+     Color 0.62092 0.67386 0.71057 1.00000
      Texture "{6A1C4F0B39D3550E}UI/images/MCF_Desktop/glyph_network.edds"
      Image ""
     }
@@ -9759,7 +9759,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.81 0.84 0.86 1
+     Color 0.62092 0.67386 0.71057 1.00000
      Texture "{6A1C4F0B39D3550F}UI/images/MCF_Desktop/glyph_volume.edds"
      Image ""
     }
@@ -9776,7 +9776,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.81 0.84 0.86 1
+     Color 0.62092 0.67386 0.71057 1.00000
      Texture "{6A1C4F0B39D35510}UI/images/MCF_Desktop/glyph_battery.edds"
      Image ""
     }
@@ -9796,7 +9796,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 10
      "Min Font Size" 10
-     Color 0.60 0.63 0.67 1
+     Color 0.31855 0.35469 0.40645 1.00000
     }
     TextWidgetClass "{6A1C4F0B39E0055B}" {
      Name "TrayClock"
@@ -9814,7 +9814,7 @@ FrameWidgetClass {
      Text "00:00"
      "Font Size" 13
      "Min Font Size" 13
-     "Text Horizontal Align" 2
+     "Horizontal Alignment" Right
     }
     TextWidgetClass "{6A1C4F0B39E0055D}" {
      Name "TrayDate"
@@ -9832,8 +9832,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 10
      "Min Font Size" 10
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 2
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Right
     }
     }
    }
@@ -9865,7 +9865,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.137 0.157 0.176 0.98
+     Color 0.01675 0.02125 0.02611 0.98000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -9882,7 +9882,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.07
+     Color 1.00000 1.00000 1.00000 0.07000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -9899,7 +9899,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.55 0.58 0.62 1
+     Color 0.26327 0.29570 0.34239 1.00000
      Texture "{6A1C4F0B39D35512}UI/images/MCF_Desktop/glyph_search.edds"
      Image ""
     }
@@ -9919,7 +9919,7 @@ FrameWidgetClass {
      Text "Applications"
      "Font Size" 12
      "Min Font Size" 12
-     Color 0.43 0.46 0.50 1
+     Color 0.15487 0.17887 0.21404 1.00000
     }
     ImageWidgetClass "{6A1C4F0B39E00569}" {
      Name "LRule"
@@ -9934,7 +9934,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     ButtonWidgetClass "{6A1C4F0B39E0056B}" {
      Name "LApp0"
@@ -9953,11 +9953,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0056D}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -9987,7 +9987,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10007,8 +10007,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E00574}" {
      Name "LApp1"
@@ -10027,11 +10027,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00576}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10061,7 +10061,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10081,8 +10081,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E0057D}" {
      Name "LApp2"
@@ -10101,11 +10101,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0057F}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10135,7 +10135,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10155,8 +10155,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E00586}" {
      Name "LApp3"
@@ -10175,11 +10175,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00588}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10209,7 +10209,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10229,8 +10229,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E0058F}" {
      Name "LApp4"
@@ -10249,11 +10249,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00591}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10283,7 +10283,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10303,8 +10303,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E00598}" {
      Name "LApp5"
@@ -10323,11 +10323,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0059A}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10357,7 +10357,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10377,8 +10377,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E005A1}" {
      Name "LApp6"
@@ -10397,11 +10397,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E005A3}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10431,7 +10431,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10451,8 +10451,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E005AA}" {
      Name "LApp7"
@@ -10471,11 +10471,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E005AC}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10505,7 +10505,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10525,8 +10525,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E005B3}" {
      Name "LApp8"
@@ -10545,11 +10545,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E005B5}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10579,7 +10579,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10599,8 +10599,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E005BC}" {
      Name "LApp9"
@@ -10619,11 +10619,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E005BE}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10653,7 +10653,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10673,8 +10673,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E005C5}" {
      Name "LApp10"
@@ -10693,11 +10693,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E005C7}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10727,7 +10727,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10747,8 +10747,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ButtonWidgetClass "{6A1C4F0B39E005CE}" {
      Name "LApp11"
@@ -10767,11 +10767,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E005D0}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0
-       m_BackgroundHovered 1 1 1 0.09
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.09000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10801,7 +10801,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
      Image ""
     }
@@ -10821,8 +10821,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ImageWidgetClass "{6A1C4F0B39E005D7}" {
      Name "LFootRule"
@@ -10837,7 +10837,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
     }
     ImageWidgetClass "{6A1C4F0B39E005D9}" {
      Name "LFace"
@@ -10852,7 +10852,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
      Image ""
     }
@@ -10872,7 +10872,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 12
      "Min Font Size" 12
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     TextWidgetClass "{6A1C4F0B39E005DD}" {
      Name "LUser"
@@ -10908,11 +10908,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E005E1}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.05
-       m_BackgroundHovered 1 1 1 0.14
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.05000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.14000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -10979,11 +10979,11 @@ FrameWidgetClass {
     components {
      SCR_ButtonTextComponent "{6A1C4F0B39E005EE}" {
       m_bCanBeToggled 0
-      m_BackgroundDefault 1 1 1 0
-      m_BackgroundHovered 1 1 1 0
-      m_BackgroundSelected 0.76 0.39 0.08 1
-      m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-      m_BackgroundClicked 1 1 1 0.22
+      m_BackgroundDefault 1.00000 1.00000 1.00000 0.00000
+      m_BackgroundHovered 1.00000 1.00000 1.00000 0.00000
+      m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+      m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+      m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
       m_sText ""
      }
     }
@@ -11027,7 +11027,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.04 0.05 0.06 0.80
+     Color 0.00310 0.00394 0.00490 0.80000
     }
     TextWidgetClass "{6A1C4F0B39E005F3}" {
      Name "LockClock"
@@ -11045,7 +11045,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 62
      "Min Font Size" 62
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     TextWidgetClass "{6A1C4F0B39E005F5}" {
      Name "LockDate"
@@ -11063,8 +11063,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 13
      "Min Font Size" 13
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ImageWidgetClass "{6A1C4F0B39E005F7}" {
      Name "Note0Card"
@@ -11079,7 +11079,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.16 0.18 0.20 0.90
+     Color 0.02198 0.02721 0.03310 0.90000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
      "Is Visible" 0
@@ -11097,7 +11097,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35504}UI/images/MCF_Desktop/icon_messages.edds"
      Image ""
      "Is Visible" 0
@@ -11137,7 +11137,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 10
      "Min Font Size" 10
-     Color 0.43 0.46 0.50 1
+     Color 0.15487 0.17887 0.21404 1.00000
     }
     TextWidgetClass "{6A1C4F0B39E005FF}" {
      Name "Note0When"
@@ -11156,8 +11156,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 10
      "Min Font Size" 10
-     Color 0.43 0.46 0.50 1
-     "Text Horizontal Align" 2
+     Color 0.15487 0.17887 0.21404 1.00000
+     "Horizontal Alignment" Right
     }
     ImageWidgetClass "{6A1C4F0B39E00601}" {
      Name "Note1Card"
@@ -11172,7 +11172,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.16 0.18 0.20 0.90
+     Color 0.02198 0.02721 0.03310 0.90000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
      "Is Visible" 0
@@ -11190,7 +11190,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35504}UI/images/MCF_Desktop/icon_messages.edds"
      Image ""
      "Is Visible" 0
@@ -11230,7 +11230,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 10
      "Min Font Size" 10
-     Color 0.43 0.46 0.50 1
+     Color 0.15487 0.17887 0.21404 1.00000
     }
     TextWidgetClass "{6A1C4F0B39E00609}" {
      Name "Note1When"
@@ -11249,8 +11249,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 10
      "Min Font Size" 10
-     Color 0.43 0.46 0.50 1
-     "Text Horizontal Align" 2
+     Color 0.15487 0.17887 0.21404 1.00000
+     "Horizontal Alignment" Right
     }
     ImageWidgetClass "{6A1C4F0B39E0060B}" {
      Name "Note2Card"
@@ -11265,7 +11265,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.16 0.18 0.20 0.90
+     Color 0.02198 0.02721 0.03310 0.90000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
      "Is Visible" 0
@@ -11283,7 +11283,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 1
+     Color 1.00000 1.00000 1.00000 1.00000
      Texture "{6A1C4F0B39D35504}UI/images/MCF_Desktop/icon_messages.edds"
      Image ""
      "Is Visible" 0
@@ -11323,7 +11323,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 10
      "Min Font Size" 10
-     Color 0.43 0.46 0.50 1
+     Color 0.15487 0.17887 0.21404 1.00000
     }
     TextWidgetClass "{6A1C4F0B39E00613}" {
      Name "Note2When"
@@ -11342,8 +11342,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 10
      "Min Font Size" 10
-     Color 0.43 0.46 0.50 1
-     "Text Horizontal Align" 2
+     Color 0.15487 0.17887 0.21404 1.00000
+     "Horizontal Alignment" Right
     }
     ImageWidgetClass "{6A1C4F0B39E00615}" {
      Name "LockFace"
@@ -11358,7 +11358,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.76 0.39 0.08 1
+     Color 0.53824 0.12597 0.00719 1.00000
      Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
      Image ""
     }
@@ -11378,7 +11378,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 34
      "Min Font Size" 34
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     TextWidgetClass "{6A1C4F0B39E00619}" {
      Name "LockUser"
@@ -11396,7 +11396,7 @@ FrameWidgetClass {
      Text ""
      "Font Size" 18
      "Min Font Size" 18
-     "Text Horizontal Align" 1
+     "Horizontal Alignment" Center
     }
     TextWidgetClass "{6A1C4F0B39E0061B}" {
      Name "LockHost"
@@ -11414,8 +11414,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.60 0.63 0.67 1
-     "Text Horizontal Align" 1
+     Color 0.31855 0.35469 0.40645 1.00000
+     "Horizontal Alignment" Center
     }
     ImageWidgetClass "{6A1C4F0B39E0061D}" {
      Name "LockFieldBack"
@@ -11430,7 +11430,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.09
+     Color 1.00000 1.00000 1.00000 0.09000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -11475,11 +11475,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00624}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 0.76 0.39 0.08 1
-       m_BackgroundHovered 0.90 0.54 0.18 1
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundHovered 0.78741 0.25295 0.02721 1.00000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -11532,8 +11532,8 @@ FrameWidgetClass {
      Text ""
      "Font Size" 11
      "Min Font Size" 11
-     Color 0.43 0.46 0.50 1
-     "Text Horizontal Align" 1
+     Color 0.15487 0.17887 0.21404 1.00000
+     "Horizontal Alignment" Center
     }
     }
    }
@@ -11565,7 +11565,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 0.03 0.04 0.05 0.92
+     Color 0.00232 0.00310 0.00394 0.92000
     }
     TextWidgetClass "{6A1C4F0B39E00631}" {
      Name "EditorTitle"
@@ -11597,7 +11597,7 @@ FrameWidgetClass {
       SizeY 0
       OffsetBottom 0
      }
-     Color 1 1 1 0.06
+     Color 1.00000 1.00000 1.00000 0.06000
      Texture "{6A1C4F0B39D3551F}UI/images/MCF_Desktop/tile_window.edds"
      Image ""
     }
@@ -11643,11 +11643,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E0063A}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.10
-       m_BackgroundHovered 1 1 1 0.22
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.10000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.22000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }
@@ -11701,11 +11701,11 @@ FrameWidgetClass {
      components {
       SCR_ButtonTextComponent "{6A1C4F0B39E00643}" {
        m_bCanBeToggled 0
-       m_BackgroundDefault 1 1 1 0.10
-       m_BackgroundHovered 1 1 1 0.22
-       m_BackgroundSelected 0.76 0.39 0.08 1
-       m_BackgroundSelectedHovered 0.76 0.39 0.08 1
-       m_BackgroundClicked 1 1 1 0.22
+       m_BackgroundDefault 1.00000 1.00000 1.00000 0.10000
+       m_BackgroundHovered 1.00000 1.00000 1.00000 0.22000
+       m_BackgroundSelected 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundSelectedHovered 0.53824 0.12597 0.00719 1.00000
+       m_BackgroundClicked 1.00000 1.00000 1.00000 0.22000
        m_sText ""
       }
      }

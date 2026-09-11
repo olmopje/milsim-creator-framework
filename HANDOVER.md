@@ -785,18 +785,52 @@ readback that raises if the new string is absent; do that.
 When the replace-and-move route fails, `[IO.File]::ReadAllText` /
 `WriteAllText` with a `UTF8Encoding($false)` writes in place and works.
 
-### `Alignment` on a TextWidget is accepted and ignored
+### Centring text: the property is `"Horizontal Alignment"` and its value is a word
 
-The property that centres text is `"Text Horizontal Align"` -- 0 left, 1 centre,
-2 right. `Alignment 0.5 0` parses, survives validation, and does nothing, so
-every centred label on the desktop's first build came out hard left: a 62pt
-clock in the top-left corner over the desktop icons, and a lock screen whose
-name, host and message all started at the same arbitrary x.
+```
+"Horizontal Alignment" Center      // Left | Center | Right
+"Vertical Alignment" Center        // Top  | Center | Bottom
+```
 
-It went unnoticed on the handset because `Alignment 0.5 0` is on the app-tile
-labels there, and those boxes are narrow enough that left and centre look the
-same. `MCF_PlanningBoard.layout` has always used the right one.
+Two wrong guesses came first and both cost a build:
 
+- **`Alignment 0.5 0`** is a *FrameWidgetSlot* property -- the pivot -- and the
+  engine ignores it outright whenever a slot's min and max anchors differ,
+  which is every stretched box in this project. The handset's app-tile labels
+  carry it and have never been centred; the boxes are narrow enough that nobody
+  could tell.
+- **`"Text Horizontal Align"`** does not exist. The string appears nowhere in
+  the engine binary. An unknown key in a layout is dropped in silence, so it
+  validates, loads, and does nothing. `MCF_PlanningBoard` had carried it for
+  months.
+
+At runtime there is no `SetTextAlign`. Alignment is a widget flag:
+`w.SetFlags(WidgetFlags.CENTER)` / `ClearFlags`, with `RALIGN` for right and
+`VCENTER` for vertical. There is no `HCENTER`.
+
+And the related rule, straight out of the engine's own warning string
+(*"Position/Size works only when min and max anchor is the same in given
+direction"*): a FrameWidgetSlot whose anchors differ **does** stretch the widget
+across the span, and `PositionX/SizeX/Alignment` are ignored in that direction.
+So a text that looks left-aligned in a wide box is not a narrow box -- it is a
+full-width box with no alignment flag.
+
+### A layout's `Color` is linear, not sRGB
+
+Write the values a designer works in and every flat fill comes out pale. The
+desktop's window bodies were authored as #282D32 and rendered mid-grey; the
+accent as #C26314 and rendered a washed tangerine. Convert before writing:
+
+```
+c <= 0.04045 ?  c / 12.92  :  ((c + 0.055) / 1.055) ^ 2.4
+```
+
+Alpha is not a colour and passes through. **Textures are not affected** -- the
+importer handles their colour space -- which is why the panel gradient and the
+wallpaper always looked right while everything drawn as a tinted white tile did
+not. `tools/generate_desktop_layout.py` converts in `col()`; the handset's
+layouts are still written in sRGB and are mildly pale where they use a flat
+fill, which is cosmetic and not worth disturbing a screen that is signed off.
 ### A button's fill must be a child called `Background`
 
 `SCR_ButtonTextComponent` tints the widget named `Background` inside its own
