@@ -263,16 +263,67 @@ Two things the first run got wrong, both mine and both worth remembering:
   `SCR_MapCursorModule.InitWidgets` throws once per frame looking for widgets
   a board has no reason to own.
 
-### What is still not proven
+### PROVEN: the map drives a widget inside a render target
 
-B's numbers are the widget's own defaults -- zoom 1, `PixelPerUnit` 0.625 --
-because only one map exists and it bound to A. So B proves a map widget *lays
-out* inside a render target, not that the map *renders* into one.
+Stage two. Two hosts, each holding a widget called `MapWidget`; `OpenMap` does
+`FindAnyWidget` for that name on whatever root it is given, so handing it one
+host or the other is the entire difference. Verbatim:
 
-Stage two of the probe answers that: two hosts, each containing a widget
-called `MapWidget`, and `OpenMap` handed one or the other. If B's numbers then
-move off their defaults the way A's did, the map is driving a widget inside a
-render target, and a board on a wall is one material away.
+```
+opened into A (PlainHost)
+A: 640 x 420, PixelPerUnit 0.15625, zoom 2.13333
+B: 640 x 420, PixelPerUnit 0.625,   zoom 1        <- B untouched, layout default
+
+B pressed
+opened into B (Probe)
+A: 640 x 420, PixelPerUnit 0.15625, zoom 2.13333
+B: 640 x 420, PixelPerUnit 0.15625, zoom 1        <- B moved
+```
+
+**B's `PixelPerUnit` went from 0.625 to 0.15625 at the moment the map was
+opened into it, and 0.15625 is exactly what the map gives the widget it is
+bound to.** 0.625 is the arithmetic of the layout alone — 640 pixels over the
+declared `SizeInUnits` of 1024. 0.15625 is the map's own: it calls
+`SetSizeInUnits(terrain size in metres)` on its widget and sets the zoom, and
+pixels-per-metre falls out of that.
+
+So `SCR_MapEntity` reached inside an `RTTextureWidget`, took the map widget it
+found there, and drove it. **A render target can hold the game's own map.**
+
+Repeated twice in the same run, with the same numbers.
+
+### The one thing left
+
+That the pixels land in the render target's *texture*. The map is
+demonstrably driving a widget inside one; whether what it draws is captured
+needs `RTTextureWidget.SetRenderTarget(entity)` and a material sampling
+`$rendertarget` on a board in the world. That is material authoring, not
+script, and it is the last unknown in the chain.
+
+Everything before it is now measured rather than hoped for:
+
+| question | answer |
+| --- | --- |
+| map in a widget we choose, at a size we choose | yes |
+| map with no modules and no components | yes, and that is what a board wants |
+| character camera can be given straight back | yes |
+| a map widget inside a render target lays out | yes |
+| the map drives that widget | yes |
+| the render target's texture receives the pixels | **not yet tested** |
+
+### What the probe cost to get right
+
+Two mistakes, both mine, both worth not repeating:
+
+- **`Anchor` plus a size gives 0 x 0.** Copy `MapMini.layout`: no `Anchor`,
+  position and size, offsets as the negative of position+size. A render target
+  sized zero then asks for a texture sized zero, and the log fills with
+  `Out of memory when requested 0, Type: Video` — an error that reads like a
+  graphics fault and is a layout fault.
+- **The gadget map config brings the whole component set**, and
+  `SCR_MapCursorModule.InitWidgets` throws once per frame looking for widgets
+  a board has no reason to own. Build the configuration by hand: the four
+  defaults named in `SCR_MapConstants`, no modules, no components.
 
 ## What is available, and is arguably better
 
