@@ -62,6 +62,16 @@ class MCF_Desktop_Window
 
 	int m_iOpenEntry = -1;
 
+	//! Which folder the file manager is showing. "" is the root, which is also
+	//! the desktop -- on a real machine those are the same folder, and making
+	//! them the same here is what lets a right-click on the wallpaper create a
+	//! file you can then find in the window.
+	string m_sPath;
+
+	//! The folder rows drawn above the files, newest state first: ".." when
+	//! there is somewhere to go back to, then each child folder by name.
+	ref array<string> m_aFolders = {};
+
 	ref array<ref MCF_Device_Item> m_aVisible = {};
 	ref array<SCR_ButtonTextComponent> m_aRows = {};
 
@@ -116,6 +126,36 @@ class MCF_Desktop_Drag : ScriptedWidgetEventHandler
 			return false;
 
 		m_Menu.EndDrag();
+		return false;
+	}
+}
+
+//! A right-click, which is the only input on this device that is not a click.
+//!
+//! Enfusion reports the button as an int on the same OnMouseButtonDown every
+//! other press comes through, so this is the whole mechanism: button 1 is the
+//! right one, and the menu is opened wherever the cursor was.
+class MCF_Desktop_Menu : ScriptedWidgetEventHandler
+{
+	protected MCF_Desktop_ShellMenu m_Menu;
+
+	void MCF_Desktop_Menu(MCF_Desktop_ShellMenu menu)
+	{
+		m_Menu = menu;
+	}
+
+	override bool OnMouseButtonDown(Widget w, int x, int y, int button)
+	{
+		if (!m_Menu)
+			return false;
+
+		if (button == 1)
+		{
+			m_Menu.OpenContextMenu();
+			return true;
+		}
+
+		m_Menu.CloseContextMenu();
 		return false;
 	}
 }

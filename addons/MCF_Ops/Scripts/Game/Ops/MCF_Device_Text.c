@@ -170,6 +170,108 @@ class MCF_Device_Text
 		return text.Substring(0, limit);
 	}
 
+	//! A file's folder, and its name.
+	//!
+	//! A FILE'S PATH IS ITS HEADING. There is no folder tree in the data model
+	//! and there does not need to be one: a heading of "Documents/ledger.xlsx"
+	//! already says everything a file manager has to know, it travels in the
+	//! wire format that exists, it survives in the config a mission maker
+	//! edits by hand, and a device that has never heard of folders reads it as
+	//! a filename with a slash in it. The same argument as the " - " in a
+	//! message heading, applied to the one app that needs somewhere to be.
+	//!
+	//! A heading that ENDS in a slash is a folder with nothing in it, which is
+	//! the only kind of folder that cannot be implied by the files inside it.
+	static const string PATH_SEP = "/";
+
+	static string FolderOf(string path)
+	{
+		int at = LastSep(path);
+		if (at < 0)
+			return "";
+
+		return path.Substring(0, at);
+	}
+
+	static string LeafOf(string path)
+	{
+		string trimmed = path;
+		if (IsFolderMark(trimmed))
+			trimmed = trimmed.Substring(0, trimmed.Length() - 1);
+
+		int at = LastSep(trimmed);
+		if (at < 0)
+			return trimmed;
+
+		int from = at + 1;
+		return trimmed.Substring(from, trimmed.Length() - from);
+	}
+
+	static bool IsFolderMark(string path)
+	{
+		if (path.IsEmpty())
+			return false;
+
+		return path.Substring(path.Length() - 1, 1) == PATH_SEP;
+	}
+
+	//! Where the last separator is. Enforce has no LastIndexOf, so this walks.
+	static int LastSep(string path)
+	{
+		int found = -1;
+		int n = path.Length();
+
+		for (int i = 0; i < n; i++)
+		{
+			if (path.Substring(i, 1) == PATH_SEP)
+				found = i;
+		}
+
+		return found;
+	}
+
+	static string Join(string folder, string name)
+	{
+		if (folder.IsEmpty())
+			return name;
+
+		return folder + PATH_SEP + name;
+	}
+
+	//! The first segment of what is left of a path once a folder is stripped
+	//! off the front. "Documents/scans/a.jpg" under "Documents" is "scans".
+	static string NextSegment(string path, string folder)
+	{
+		string rest = path;
+
+		if (!folder.IsEmpty())
+		{
+			int skip = folder.Length() + 1;
+			if (path.Length() <= skip)
+				return "";
+
+			rest = path.Substring(skip, path.Length() - skip);
+		}
+
+		int at = rest.IndexOf(PATH_SEP);
+		if (at < 0)
+			return "";
+
+		return rest.Substring(0, at);
+	}
+
+	//! Whether a path sits inside a folder at any depth.
+	static bool Under(string path, string folder)
+	{
+		if (folder.IsEmpty())
+			return true;
+
+		if (path.Length() <= folder.Length())
+			return false;
+
+		return path.Substring(0, folder.Length() + 1) == folder + PATH_SEP;
+	}
+
 	static string Pad2(int value)
 	{
 		if (value < 10)

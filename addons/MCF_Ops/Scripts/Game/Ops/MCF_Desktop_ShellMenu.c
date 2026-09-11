@@ -23,6 +23,10 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	protected static const ResourceName BUBBLE_LAYOUT = "{6A1C4F0B39D3564F}UI/layouts/MCF/MCF_PhoneBubble.layout";
 	protected static const ResourceName HACK_LAYOUT = "{6A1C4F0B39D30000}UI/layouts/MCF/MCF_DeviceHack.layout";
 
+	//! A folder's own icon, for the one row in a file list that is not a
+	//! document.
+	protected static const ResourceName FOLDER_ICON = "{6A1C4F0B39D35502}UI/images/MCF_Desktop/icon_folder.edds";
+
 	//! A laptop screen. Not 16:9: every machine this is meant to look like is
 	//! 16:10, and the difference is visible.
 	protected static const float SCREEN_ASPECT = 1.60;
@@ -78,6 +82,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	protected Widget m_wLockScreen;
 	protected Widget m_wEditor;
 	protected Widget m_wDragCatch;
+	protected Widget m_wCtxMenu;
+	protected ref MCF_Desktop_Menu m_DeskMenuHandler;
 
 	protected float m_fScreenW;
 	protected float m_fScreenH;
@@ -219,6 +225,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		BindLock(root);
 		BindEditor(root);
 		BindDragCatch(root);
+		BindContextMenu(root);
 
 		// The panel and the overlays sit above every window whatever a window's
 		// Z order becomes. A taskbar a window can be dragged on top of is not a
@@ -906,13 +913,12 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		m_aDeskSlots.Clear();
 
 		array<string> deskNames = {"DeskHome", "DeskDocs", "DeskFile"};
-		array<int> deskTargets = {0, 0, 5};
 
 		for (int d = 0; d < deskNames.Count(); d++)
 		{
 			SCR_ButtonTextComponent icon = SCR_ButtonTextComponent.GetButtonText(deskNames[d], root);
 			m_aDeskIcons.Insert(icon);
-			m_aDeskSlots.Insert(deskTargets[d]);
+			m_aDeskSlots.Insert(d);
 
 			if (icon)
 				icon.m_OnClicked.Insert(OnDeskIconClicked);
@@ -1103,13 +1109,30 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		FocusWindow(slot);
 	}
 
+	//! The three shortcuts on the wallpaper, and each lands somewhere of its
+	//! own. They all opened the same flat list before, because before there was
+	//! no such thing as a place.
 	protected void OnDeskIconClicked(SCR_ButtonTextComponent button)
 	{
 		int index = m_aDeskIcons.Find(button);
-		if (index < 0 || index >= m_aDeskSlots.Count())
+		if (index < 0)
 			return;
 
-		OpenWindow(m_aDeskSlots[index]);
+		CloseContextMenu();
+
+		if (index == 0)
+		{
+			OpenFolder("", "");
+			return;
+		}
+
+		if (index == 1)
+		{
+			OpenFolder("Documents", "");
+			return;
+		}
+
+		OpenFolder("", "readme.txt");
 	}
 
 	//! Everything that belongs to a logged-in session.
@@ -1418,12 +1441,20 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			return;
 		}
 
+		win.m_aFolders.Clear();
 		win.m_aVisible.Clear();
 
-		if (win.m_App)
+		if (win.m_eKind == MCF_EIntelApp.FILES)
+		{
+			ListFolder(win);
+		}
+		else if (win.m_App)
+		{
 			m_Content.GetItems(win.m_App, win.m_aVisible);
+		}
 
 		PaintRows(win, -1);
+		ShowWhere(win);
 
 		if (win.m_aVisible.IsEmpty())
 		{
@@ -1457,6 +1488,25 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		WorkspaceWidget workspace = GetGame().GetWorkspace();
 		if (!workspace)
 			return;
+
+		// FOLDERS FIRST, then files. The row index a click reports is an index
+		// into this combined list, which is why OnRowClicked subtracts the
+		// folder count before it goes looking for an item.
+		foreach (string folder : win.m_aFolders)
+		{
+			Widget crumb = workspace.CreateWidgets(ROW_LAYOUT, list);
+			if (!crumb)
+				continue;
+
+			SCR_ButtonTextComponent stepper = SCR_ButtonTextComponent.FindButtonTextComponent(crumb);
+			if (!stepper)
+				continue;
+
+			stepper.m_OnClicked.Insert(OnRowClicked);
+			win.m_aRows.Insert(stepper);
+			stepper.SetToggled(false, false, false);
+			FillFolderRow(crumb, folder);
+		}
 
 		for (int i = 0; i < win.m_aVisible.Count(); i++)
 		{
@@ -1511,7 +1561,13 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			second = entry.m_sTimestamp;
 			trailing = "";
 		}
-		else if (kind == MCF_EIntelApp.SETTINGS || kind == MCF_EIntelApp.FILES || kind == MCF_EIntelApp.NOTES)
+		else if (kind == MCF_EIntelApp.FILES)
+		{
+			// The heading is the whole path; a row in a folder shows the name.
+			title = MCF_Device_Text.LeafOf(entry.m_sHeading);
+			showAvatar = false;
+		}
+		else if (kind == MCF_EIntelApp.SETTINGS || kind == MCF_EIntelApp.NOTES)
 		{
 			showAvatar = false;
 		}
@@ -1591,7 +1647,15 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 				continue;
 
 			FocusWindow(win.m_iSlot);
-			ShowEntry(win, index);
+
+			// The first rows are folders, and opening one is going into it.
+			if (index < win.m_aFolders.Count())
+			{
+				EnterFolder(win, win.m_aFolders[index]);
+				return;
+			}
+
+			ShowEntry(win, index - win.m_aFolders.Count());
 			return;
 		}
 	}
@@ -1668,7 +1732,12 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			return;
 
 		string p = win.Prefix();
-		SetText(root, p + "ReadHeading", entry.m_sHeading);
+
+		string shown = entry.m_sHeading;
+		if (win.m_eKind == MCF_EIntelApp.FILES)
+			shown = MCF_Device_Text.LeafOf(shown);
+
+		SetText(root, p + "ReadHeading", shown);
 		SetText(root, p + "ReadStamp", entry.m_sTimestamp);
 		SetText(root, p + "ReadBody", MCF_Device_Text.Body(entry.m_sBody));
 		SetText(root, p + "Hint", "");
@@ -2018,6 +2087,327 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		return "archive.tar";
 	}
 
+	// ========================================================== the file tree
+
+	//! What the file manager is looking at, and everything above it.
+	//!
+	//! FOLDERS ARE NOT IN THE DATA MODEL. A file's path is its heading -- see
+	//! MCF_Device_Text.FolderOf -- so the tree is derived here, every time, out
+	//! of the paths the app happens to hold. Nothing is stored twice and there
+	//! is no second structure to keep in step with the first.
+	protected void ListFolder(notnull MCF_Desktop_Window win)
+	{
+		win.m_aFolders.Clear();
+		win.m_aVisible.Clear();
+
+		array<ref MCF_Device_Item> all = {};
+		if (win.m_App)
+			m_Content.GetItems(win.m_App, all);
+
+		// Somewhere to go back to, always first, the way every file manager
+		// ever written puts it.
+		if (!win.m_sPath.IsEmpty())
+			win.m_aFolders.Insert("..");
+
+		foreach (MCF_Device_Item item : all)
+		{
+			string path = item.m_sHeading;
+
+			if (!MCF_Device_Text.Under(path, win.m_sPath))
+				continue;
+
+			// A child folder announces itself by having something deeper than
+			// this level, or by being an empty-folder mark sitting right here.
+			string deeper = MCF_Device_Text.NextSegment(path, win.m_sPath);
+
+			if (!deeper.IsEmpty())
+			{
+				if (win.m_aFolders.Find(deeper) < 0)
+					win.m_aFolders.Insert(deeper);
+
+				continue;
+			}
+
+			if (MCF_Device_Text.IsFolderMark(path))
+			{
+				string leaf = MCF_Device_Text.LeafOf(path);
+
+				if (!leaf.IsEmpty() && win.m_aFolders.Find(leaf) < 0)
+					win.m_aFolders.Insert(leaf);
+
+				continue;
+			}
+
+			if (MCF_Device_Text.FolderOf(path) == win.m_sPath)
+				win.m_aVisible.Insert(item);
+		}
+	}
+
+	//! Opens the file manager at a folder.
+	//!
+	//! The desktop shortcuts all used to land in the same place, because there
+	//! was no such thing as a place: Home and Documents were the same flat list
+	//! twice. They are a location now, and so is the desktop itself.
+	protected void OpenFolder(string path, string select)
+	{
+		MCF_Desktop_Window win = WindowAt(0);
+		if (!win)
+			return;
+
+		win.m_sPath = path;
+
+		if (!OpenWindow(0))
+			return;
+
+		// OpenWindow fills it at whatever path it already had; re-fill now that
+		// the path is set, and land on the file the caller asked for.
+		FillWindow(win);
+
+		if (select.IsEmpty())
+			return;
+
+		for (int i = 0; i < win.m_aVisible.Count(); i++)
+		{
+			if (MCF_Device_Text.LeafOf(win.m_aVisible[i].m_sHeading) == select)
+			{
+				ShowEntry(win, i);
+				return;
+			}
+		}
+	}
+
+	protected void EnterFolder(notnull MCF_Desktop_Window win, string name)
+	{
+		if (name == "..")
+			win.m_sPath = MCF_Device_Text.FolderOf(win.m_sPath);
+		else
+			win.m_sPath = MCF_Device_Text.Join(win.m_sPath, name);
+
+		FillWindow(win);
+	}
+
+	//! The location line above the list. A file manager that does not say where
+	//! it is is a list of names.
+	protected void ShowWhere(notnull MCF_Desktop_Window win)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		if (win.m_eKind != MCF_EIntelApp.FILES)
+		{
+			SetText(root, win.Prefix() + "Where", "");
+			return;
+		}
+
+		string where = "/";
+		if (!win.m_sPath.IsEmpty())
+			where = "/" + win.m_sPath;
+
+		int count = win.m_aVisible.Count() + win.m_aFolders.Count();
+		if (!win.m_sPath.IsEmpty())
+			count--;
+
+		SetText(root, win.Prefix() + "Where", where + "      " + count.ToString() + " items");
+	}
+
+	//! A folder, drawn in the same row the files use.
+	protected void FillFolderRow(notnull Widget row, string name)
+	{
+		TextWidget line1 = TextWidget.Cast(row.FindAnyWidget("Line1"));
+		RichTextWidget line2 = RichTextWidget.Cast(row.FindAnyWidget("Line2"));
+		TextWidget right = TextWidget.Cast(row.FindAnyWidget("Right"));
+		ImageWidget avatar = ImageWidget.Cast(row.FindAnyWidget("Avatar"));
+		TextWidget avatarText = TextWidget.Cast(row.FindAnyWidget("AvatarText"));
+		Widget dot = row.FindAnyWidget("Unread");
+
+		if (line1)
+			line1.SetText(name);
+
+		if (line2)
+		{
+			// A folder has no preview line, and the row keeps its height from
+			// Sizer either way.
+			line2.SetVisible(false);
+			line2.SetText("");
+		}
+
+		if (right)
+			right.SetText("");
+
+		// The disc carries the folder's own icon rather than a letter: it is
+		// the one row in this list that is not a document, and a player should
+		// be able to see that without reading it.
+		if (avatar)
+		{
+			avatar.SetVisible(true);
+			avatar.SetColor(Color.FromInt(0xFFFFFFFF));
+			avatar.LoadImageTexture(0, FOLDER_ICON);
+		}
+
+		if (avatarText)
+			avatarText.SetVisible(false);
+
+		if (dot)
+			dot.SetVisible(false);
+	}
+
+	// ====================================================== the context menu
+
+	//! What a right-click on the wallpaper offers.
+	//!
+	//! IT ACTS ON THE FOLDER IN FRONT. If a file manager window is open, a new
+	//! file lands in whatever folder that window is showing; otherwise it lands
+	//! on the desktop, which is the root folder -- on a real machine those are
+	//! the same place, and making them the same here is what lets a Game Master
+	//! right-click the wallpaper, make a file, and then find it in the window.
+	void OpenContextMenu()
+	{
+		if (!m_bAuthor || !m_wCtxMenu)
+			return;
+
+		float mx, my;
+		if (!MousePoint(mx, my))
+			return;
+
+		// The pointer is in workspace units and the menu's slot is relative to
+		// the desktop, so the desktop's own corner comes off first.
+		float left = mx - (GetGame().GetWorkspace().GetWidth() - m_fScreenW) * 0.5;
+		float top = my - (GetGame().GetWorkspace().GetHeight() - m_fScreenH) * 0.5;
+
+		float w = m_fScreenW * 0.150;
+		float h = m_fScreenH * 0.190;
+
+		if (left + w > m_fScreenW)
+			left = m_fScreenW - w;
+
+		if (top + h > m_fScreenH * (1 - PANEL_SHARE))
+			top = m_fScreenH * (1 - PANEL_SHARE) - h;
+
+		if (left < 0)
+			left = 0;
+
+		if (top < 0)
+			top = 0;
+
+		FrameSlot.SetAnchor(m_wCtxMenu, 0, 0);
+		FrameSlot.SetSize(m_wCtxMenu, w, h);
+		FrameSlot.SetPos(m_wCtxMenu, left, top);
+
+		m_wCtxMenu.SetZOrder(7000);
+		m_wCtxMenu.SetVisible(true);
+	}
+
+	void CloseContextMenu()
+	{
+		if (m_wCtxMenu)
+			m_wCtxMenu.SetVisible(false);
+	}
+
+	//! The folder a new thing goes into.
+	protected string TargetFolder()
+	{
+		MCF_Desktop_Window win = WindowAt(0);
+
+		if (win && win.m_bOpen && !win.m_bMin)
+			return win.m_sPath;
+
+		return "";
+	}
+
+	protected void OnCtxNewFile(SCR_ButtonTextComponent button)
+	{
+		CloseContextMenu();
+		MakeFileItem(false);
+	}
+
+	protected void OnCtxNewFolder(SCR_ButtonTextComponent button)
+	{
+		CloseContextMenu();
+		MakeFileItem(true);
+	}
+
+	//! Creates a file or a folder in the front file manager's folder.
+	//!
+	//! A FOLDER IS A HEADING THAT ENDS IN A SLASH and nothing else. It exists
+	//! so that an empty folder can exist at all; the moment a file is put in
+	//! one, the folder is implied by that file's own path and the mark is
+	//! redundant but harmless.
+	protected void MakeFileItem(bool folder)
+	{
+		MCF_Desktop_Window win = WindowAt(0);
+		if (!win)
+			return;
+
+		MCF_Device_App app = DraftApp(win);
+		if (!app)
+			return;
+
+		string where = TargetFolder();
+		string name = "new_file.txt";
+
+		if (folder)
+			name = "New folder";
+
+		MCF_Device_Item item = new MCF_Device_Item();
+		item.m_sHeading = MCF_Device_Text.Join(where, name);
+
+		if (folder)
+			item.m_sHeading = item.m_sHeading + MCF_Device_Text.PATH_SEP;
+		else
+			item.m_sBody = "";
+
+		app.m_aItems.Insert(item);
+		win.m_App = app;
+		win.m_sPath = where;
+
+		OpenWindow(0);
+		FillWindow(win);
+
+		// Straight into the name, because "new_file.txt" is not a name anybody
+		// wants and the only reason to make one is to call it something.
+		ShowEditor(win, "path", "Name", item.m_sHeading, item);
+	}
+
+	protected void OnCtxRename(SCR_ButtonTextComponent button)
+	{
+		CloseContextMenu();
+
+		MCF_Desktop_Window win = WindowAt(0);
+		if (!win || win.m_iOpenEntry < 0 || win.m_iOpenEntry >= win.m_aVisible.Count())
+			return;
+
+		MCF_Device_Item item = win.m_aVisible[win.m_iOpenEntry];
+		ShowEditor(win, "path", "Name", item.m_sHeading, item);
+	}
+
+	protected void OnCtxDelete(SCR_ButtonTextComponent button)
+	{
+		CloseContextMenu();
+
+		MCF_Desktop_Window win = WindowAt(0);
+		if (!win || win.m_iOpenEntry < 0 || win.m_iOpenEntry >= win.m_aVisible.Count())
+			return;
+
+		MCF_Device_App app = DraftApp(win);
+		if (!app)
+			return;
+
+		MCF_Device_Item doomed = win.m_aVisible[win.m_iOpenEntry];
+
+		for (int i = 0; i < app.m_aItems.Count(); i++)
+		{
+			if (app.m_aItems[i].m_sHeading == doomed.m_sHeading)
+			{
+				app.m_aItems.Remove(i);
+				break;
+			}
+		}
+
+		win.m_App = app;
+		FillWindow(win);
+	}
+
 	// ============================================================== the author
 
 	//! The Game Master's row, above each list.
@@ -2273,6 +2663,23 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 		string value = m_EditorField.GetText();
 
+		if (m_sEditKind == "path")
+		{
+			// A rename that keeps the folder: the Game Master typed a name, not
+			// a path, unless they deliberately typed one.
+			m_EditItem.m_sHeading = value;
+			OnEditorCancel(null);
+
+			MCF_Desktop_Window renamed = WindowAt(m_iEditSlot);
+			if (renamed)
+			{
+				renamed.m_App = DraftApp(renamed);
+				FillWindow(renamed);
+			}
+
+			return;
+		}
+
 		if (m_sEditKind == "heading")
 			m_EditItem.m_sHeading = value;
 		else if (m_sEditKind == "stamp")
@@ -2339,6 +2746,38 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		m_CatchHandler = new MCF_Desktop_Catch(this);
 		m_wDragCatch.AddHandler(m_CatchHandler);
 		m_wDragCatch.SetVisible(false);
+	}
+
+	protected void BindContextMenu(notnull Widget root)
+	{
+		m_wCtxMenu = root.FindAnyWidget("CtxMenu");
+		if (m_wCtxMenu)
+			m_wCtxMenu.SetVisible(false);
+
+		// The wallpaper cannot take a click -- an ImageWidget never does -- so
+		// a transparent button sits over it, behind every window and the panel.
+		Widget desk = root.FindAnyWidget("DeskClick");
+		if (desk)
+		{
+			m_DeskMenuHandler = new MCF_Desktop_Menu(this);
+			desk.AddHandler(m_DeskMenuHandler);
+		}
+
+		SCR_ButtonTextComponent newFile = SCR_ButtonTextComponent.GetButtonText("CtxItem0", root);
+		if (newFile)
+			newFile.m_OnClicked.Insert(OnCtxNewFile);
+
+		SCR_ButtonTextComponent newFolder = SCR_ButtonTextComponent.GetButtonText("CtxItem1", root);
+		if (newFolder)
+			newFolder.m_OnClicked.Insert(OnCtxNewFolder);
+
+		SCR_ButtonTextComponent rename = SCR_ButtonTextComponent.GetButtonText("CtxItem2", root);
+		if (rename)
+			rename.m_OnClicked.Insert(OnCtxRename);
+
+		SCR_ButtonTextComponent drop = SCR_ButtonTextComponent.GetButtonText("CtxItem3", root);
+		if (drop)
+			drop.m_OnClicked.Insert(OnCtxDelete);
 	}
 
 	protected bool IsDeviceLocked()

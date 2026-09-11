@@ -373,7 +373,10 @@ def pane_head(p, ind, title=""):
 
 def pane_list(p, ind):
     s = pane_head(p, ind)
-    s += scroll(p + "ListScroll", (0.018, 0.112, 0.392, 0.980), ind, p + "EntryList")
+    # The location line. Empty for every app but the file manager, which is the
+    # only one of the five sharing this pane that has anywhere to be.
+    s += txt(p + "Where", (0.022, 0.100, 0.690, 0.150), ind, 11, colour=DIM_INK)
+    s += scroll(p + "ListScroll", (0.018, 0.158, 0.392, 0.980), ind, p + "EntryList")
     s += img(p + "Split", (0.400, 0.112, 0.4015, 0.980), ind, colour=LINE)
     s += txt(p + "ReadHeading", (0.415, 0.120, 0.980, 0.186), ind, 15,
              rich=True, wrap=True, spacing=20)
@@ -584,6 +587,30 @@ def launcher(ind):
                  visible=False)
 
 
+# ============================================================= context menu
+def ctxmenu(ind):
+    """What a right-click offers a Game Master.
+
+    Placed at the cursor by the shell, so its slot is a point anchor and its
+    size is set from script -- the same construction a window uses, and for the
+    same reason: a thing that appears where the mouse is has no fixed anchor.
+    """
+    b = img("CtxBack", (0.0, 0.0, 1.0, 1.0), ind + 1,
+            colour="0.137 0.157 0.176 0.98", tex="tile")
+    rows = [("CtxItem0", "add", "New file"),
+            ("CtxItem1", "folder", "New folder"),
+            ("CtxItem2", "edit", "Rename"),
+            ("CtxItem3", "delete", "Delete")]
+
+    for i, (name, icon, label) in enumerate(rows):
+        y0 = 0.035 + i * 0.240
+        b += flatbtn(name, (0.030, y0, 0.970, y0 + 0.215), ind + 1,
+                     icon=icon, icon_px=16, pad_l=10, label=label, text_l=34,
+                     size=12, bg="1 1 1 0", bg_hi="1 1 1 0.12")
+
+    return frame("CtxMenu", (0.0, 0.0, 0.0, 0.0), ind, b, visible=False)
+
+
 # ================================================================ lock screen
 def lockscreen(ind):
     b = img("LockDim", (0.0, 0.0, 1.0, 1.0), ind + 1, colour="0.04 0.05 0.06 0.80")
@@ -666,6 +693,7 @@ def editor(ind):
 
 # ================================================================== assemble
 screen = img("Wallpaper", (0.0, 0.0, 1.0, 1.0), 3, colour="1 1 1 1", tex="wall")
+screen += flatbtn("DeskClick", (0.0, 0.0, 1.0, 1.0), 3, bg="1 1 1 0", bg_hi="1 1 1 0")
 
 DESK = [("DeskHome", "folder", "Home"),
         ("DeskDocs", "folder", "Documents"),
@@ -694,6 +722,7 @@ screen += launcher(3)
 # the duration of the drag.
 screen += flatbtn("DragCatch", (0.0, 0.0, 1.0, 1.0), 3,
                   bg="1 1 1 0", bg_hi="1 1 1 0")
+screen += ctxmenu(3)
 screen += lockscreen(3)
 screen += editor(3)
 
