@@ -1,0 +1,8 @@
+// The border around a map board. Plain, dark, unremarkable on purpose: the
+// map is the thing being looked at and a frame that competes with it is a
+// frame doing the wrong job.
+MatPBRBasic {
+ Color 0.14 0.14 0.15 1
+ RoughnessScale 0.6
+ MetalnessScale 0.1
+}

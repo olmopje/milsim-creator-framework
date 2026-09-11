@@ -1,0 +1,19 @@
+// The face of a map board: whatever the render target is showing.
+//
+// `$rendertarget` IS THE ENGINE'S OWN REFERENCE, not a filename. The material
+// system resolves it against whichever RTTextureWidget most recently called
+// SetRenderTarget(entity) on this object -- see MCF_Map_BoardComponent, and
+// the engine's own comment on RTTextureWidget.SetRenderTarget which says it
+// in as many words.
+//
+// EMISSIVE, AND FULLY SO. A map on a wall in an unlit command post has to
+// stay readable, and this surface is showing a screen's worth of pixels
+// rather than reflecting a room. Roughness is high and metalness nil so the
+// panel does not catch highlights across the middle of the terrain.
+MatPBRBasic {
+ Color 1 1 1 1
+ RoughnessScale 1
+ MetalnessScale 0
+ Emissive 1 1 1 1
+ BCRMap "$rendertarget"
+}

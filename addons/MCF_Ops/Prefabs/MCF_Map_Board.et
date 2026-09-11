@@ -1,16 +1,18 @@
 // A board in the world with the game's own map on it.
 //
-// THE MESH IS VANILLA'S RANGE TABLE, on purpose and for now. Its material
-// already samples $rendertarget -- it is what the ballistic table draws its
-// pages onto -- so this proves the picture lands without a line of material
-// authoring. Frames of our own (a paper map on a table, a whiteboard, a
-// beamer board) each need their own mesh and their own material, and that is
-// the next piece of work rather than this one.
+// THE MESH IS A FLAT PANEL WITH A FRAME AROUND IT -- the laptop lid, copied
+// and given two materials of its own: the screen face sampling $rendertarget,
+// and a plain dark border. Borrowing the geometry rather than authoring a
+// quad is what makes a wall map possible today instead of after a modelling
+// session, and the shape is already right: flat, rectangular, a thin surround.
+//
+// SCALE IT. A Game Master resizes this like any other object, which is how it
+// goes from something on a table to something covering a wall.
 GenericEntity {
  ID "6A1C4F0B39E12001"
  components {
   MeshObject "{6A1C4F0B39E12002}" {
-   Object "{35054A71A764B615}Assets/Items/Misc/BallisticTable/RangeTable_01.xob"
+   Object "{6A1C4F0B39E13000}Assets/Props/Intel/MapBoard/MapBoard.xob"
   }
   RigidBody "{6A1C4F0B39E12003}" {
    Enabled 1

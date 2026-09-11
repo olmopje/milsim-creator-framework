@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{6A1C4F0B39E13011}Assets/Props/Intel/MapBoard/Data/MapBoard_Frame.emat"
+ Configurations {
+  EMATResourceClass PC {
+  }
+  EMATResourceClass XBOX_ONE : PC {
+  }
+  EMATResourceClass XBOX_SERIES : PC {
+  }
+  EMATResourceClass PS4 : PC {
+  }
+  EMATResourceClass PS5 : PC {
+  }
+  EMATResourceClass HEADLESS : PC {
+  }
+ }
+}
