@@ -364,7 +364,57 @@ transparent full-screen catcher takes the release.
 Verified: `Module: Game`, 5778 files, 11341 classes, no errors. Not yet verified
 in a live session with a second client.
 
-### 7. The namespace rename, with a fresh head
+### 7. The visual IS the editor — the pattern, started 2026-09-11
+
+**This is how every new intel view gets authored from now on.** A Game Master
+who rewrites a letter should be looking at the letter, with the writing
+switched on. Not at a form with three fields that claims to be one.
+
+The phone and the laptop already worked this way. The handwritten letter
+(PAPER) and the field notebook (NOTEPAD) do now too, and the shape is meant to
+be copied:
+
+1. **The player's layout carries both halves.** Each read-only widget has an
+   edit box in exactly the same box, shipped `"Is Visible" 0`. One of the pair
+   is shown. An edit box that is always there lets a player rewrite the
+   evidence they were sent to find.
+2. **A tool column, not a toolbar.** It sits on the dim area beside the sheet,
+   which is empty in both layouts, so it never fights the player's own row of
+   buttons at the bottom.
+3. **`tools/add_intel_author_chrome.py` writes that chrome**, one entry per
+   visual with that visual's own anchors, and refuses to write a layout
+   containing a duplicate widget name. Re-running it replaces the block rather
+   than stacking a second one.
+4. **The right-click action routes by view.** `MCF_Intel_EditContextAction`
+   opens the visual where there is one and falls back to
+   `MCF_Intel_EditorMenu` where there is not. DOCUMENT and MAP still use the
+   form and should keep using it until each has a visual of its own — losing
+   the only editor a view has is worse than an ugly one.
+5. **Saving is the route that already exists.** The shell's `SendDraft()`
+   sends the profile over `MCF_RequestWriteDeviceProfile`; the server writes
+   it onto the object with `SetProfileFromServer` and the override wins over
+   the prefab's own `m_aEntries`. No new server code was needed and none
+   should be for the next view either.
+
+Two things that are easy to get wrong and were:
+
+- **Commit before anything moves.** The edit boxes are the only place typed
+  text exists until `CommitPaperPage()` runs, so turning a page, adding one or
+  saving without it throws away everything typed since the last turn.
+- **A typed newline does not survive on its own.** `MCF_Device_Script.Clean()`
+  turns a real newline into a space, so a body goes onto the draft through
+  `MCF_Device_Text.Encode()` and comes back through `Body()`.
+
+Still on the form: DOCUMENT and MAP. The obvious next one is DOCUMENT, which
+already has a visual in the viewer and needs only the author half.
+
+### Parked: the laptop desktop
+
+Basically functional at the user's call on 2026-09-11 — it opens, drags,
+stacks, browses folders, edits and saves files — and wants an overhaul pass
+before it is finished. Not blocking anything.
+
+### 8. The namespace rename, with a fresh head
 
 `MCF_Devices_` → `MCF_Lock_`, so it stops differing from `MCF_Device_` by one
 letter while meaning something else. And decide what to do about `MCF_AI_` and

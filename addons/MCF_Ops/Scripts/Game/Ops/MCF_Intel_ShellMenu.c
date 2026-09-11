@@ -127,6 +127,19 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_READ_HEADING = "ReadHeading";
 	protected static const string W_READ_TIMESTAMP = "ReadTimestamp";
 	protected static const string W_BUTTON_BACK = "ButtonBack";
+	// The Game Master's half of a paper or notepad: an edit box in the same
+	// box as each read-only widget, and a tool column beside the sheet.
+	protected static const string W_NAME_EDIT = "NameEdit";
+	protected static const string W_HEADING_EDIT = "HeadingEdit";
+	protected static const string W_STAMP_EDIT = "StampEdit";
+	protected static const string W_BODY_EDIT = "BodyEdit";
+	protected static const string W_AUTHOR_NOTE = "AuthorNote";
+	protected static const string W_BUTTON_TYPE = "ButtonType";
+	protected static const string W_BUTTON_PAGE = "ButtonPage";
+	protected static const string W_BUTTON_ADD_PAGE = "ButtonAddPage";
+	protected static const string W_BUTTON_DROP_PAGE = "ButtonDropPage";
+	protected static const string W_BUTTON_SAVE_INTEL = "ButtonSaveIntel";
+
 	protected static const string W_BUTTON_PREV = "ButtonPrev";
 	protected static const string W_BUTTON_NEXT = "ButtonNext";
 	protected static const string W_PAGE_NUMBER = "PageNumber";
@@ -372,6 +385,21 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected TextWidget m_wClockDate;
 	protected SCR_ButtonTextComponent m_ButtonBack;
 	protected SCR_ButtonTextComponent m_ButtonLog;
+	protected Widget m_wNameEdit;
+	protected Widget m_wHeadingEdit;
+	protected Widget m_wStampEdit;
+	protected Widget m_wBodyEdit;
+	protected Widget m_wAuthorNote;
+
+	protected SCR_ButtonTextComponent m_ButtonType;
+	protected SCR_ButtonTextComponent m_ButtonPageView;
+	protected SCR_ButtonTextComponent m_ButtonAddPage;
+	protected SCR_ButtonTextComponent m_ButtonDropPage;
+	protected SCR_ButtonTextComponent m_ButtonSaveIntel;
+
+	//! Whether the Game Master is writing on the page or looking at it.
+	protected bool m_bPaperTyping;
+
 	protected SCR_ButtonTextComponent m_ButtonPrev;
 	protected SCR_ButtonTextComponent m_ButtonNext;
 	protected TextWidget m_wPageNumber;
@@ -651,6 +679,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_ButtonClose = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_CLOSE, root);
 		if (m_ButtonClose)
 			m_ButtonClose.m_OnClicked.Insert(OnCloseClicked);
+
+		BindPaperAuthor(root);
 
 		m_aAppButtons.Clear();
 		m_aAppLabels.Clear();
@@ -1975,6 +2005,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		UpdatePageButtons();
 		UpdateLogButton();
+
+		// After UpdateLogButton, which shows the LOG button unconditionally --
+		// a Game Master writing the page has nothing to file at the board.
+		FillPaperAuthor();
+		ShowPaperAuthor();
 	}
 
 	//! The photograph on an item, if it has one and if this machine has it.
@@ -3791,14 +3826,336 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			SetHint("Not at the board.");
 	}
 
+	// ================================ authoring on the page itself
+
+	//! Binds the Game Master's half of a paper or notepad visual.
+	//!
+	//! THE EDITOR IS THE THING ITSELF. A Game Master rewriting a letter should
+	//! be looking at the letter. The old form -- MCF_Intel_EditorMenu, a list
+	//! and three fields -- still exists for the views that have no visual yet
+	//! (DOCUMENT, MAP) and is not what these two open any more.
+	protected void BindPaperAuthor(notnull Widget root)
+	{
+		m_wNameEdit = root.FindAnyWidget(W_NAME_EDIT);
+		m_wHeadingEdit = root.FindAnyWidget(W_HEADING_EDIT);
+		m_wStampEdit = root.FindAnyWidget(W_STAMP_EDIT);
+		m_wBodyEdit = root.FindAnyWidget(W_BODY_EDIT);
+		m_wAuthorNote = root.FindAnyWidget(W_AUTHOR_NOTE);
+
+		m_ButtonType = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_TYPE, root);
+		if (m_ButtonType)
+			m_ButtonType.m_OnClicked.Insert(OnTypeClicked);
+
+		m_ButtonPageView = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_PAGE, root);
+		if (m_ButtonPageView)
+			m_ButtonPageView.m_OnClicked.Insert(OnPageViewClicked);
+
+		m_ButtonAddPage = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_ADD_PAGE, root);
+		if (m_ButtonAddPage)
+			m_ButtonAddPage.m_OnClicked.Insert(OnAddPageClicked);
+
+		m_ButtonDropPage = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_DROP_PAGE, root);
+		if (m_ButtonDropPage)
+			m_ButtonDropPage.m_OnClicked.Insert(OnDropPageClicked);
+
+		m_ButtonSaveIntel = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_SAVE_INTEL, root);
+		if (m_ButtonSaveIntel)
+			m_ButtonSaveIntel.m_OnClicked.Insert(OnSaveIntelClicked);
+	}
+
+	//! Which half of the page is showing.
+	//!
+	//! A PLAYER READS AND A GAME MASTER WRITES, and the same box holds both --
+	//! the read-only widget and an edit box in exactly the same place, one of
+	//! them shown. An edit box always there would let a player rewrite the
+	//! evidence they were sent to find.
+	protected void ShowPaperAuthor()
+	{
+		bool authoring = m_bAuthor && m_bPageMode;
+		bool typing = authoring && m_bPaperTyping;
+
+		ShowIf(m_wNameEdit, typing);
+		ShowIf(m_wHeadingEdit, typing);
+		ShowIf(m_wStampEdit, typing);
+		ShowIf(m_wBodyEdit, typing);
+
+		if (m_wDeviceName)
+			m_wDeviceName.SetVisible(!typing);
+
+		if (m_wReadHeading)
+			m_wReadHeading.SetVisible(!typing);
+
+		if (m_wReadTimestamp)
+			m_wReadTimestamp.SetVisible(!typing);
+
+		if (m_wReadScroll)
+			m_wReadScroll.SetVisible(!typing);
+
+		ShowIf(m_wAuthorNote, authoring);
+		ShowButtonIf(m_ButtonType, authoring && !m_bPaperTyping);
+		ShowButtonIf(m_ButtonPageView, authoring && m_bPaperTyping);
+		ShowButtonIf(m_ButtonAddPage, authoring);
+		ShowButtonIf(m_ButtonDropPage, authoring && m_aVisible.Count() > 1);
+		ShowButtonIf(m_ButtonSaveIntel, authoring);
+
+		// LOG is the player's verb -- it files what they read onto the
+		// planning board. A Game Master writing the page has nothing to file.
+		if (authoring && m_ButtonLog)
+			m_ButtonLog.GetRootWidget().SetVisible(false);
+	}
+
+	protected void ShowIf(Widget found, bool visible)
+	{
+		if (found)
+			found.SetVisible(visible);
+	}
+
+	protected void ShowButtonIf(SCR_ButtonTextComponent button, bool visible)
+	{
+		if (button)
+			button.GetRootWidget().SetVisible(visible);
+	}
+
+	//! Fills the Game Master's boxes with the page that is open.
+	protected void FillPaperAuthor()
+	{
+		if (!m_bAuthor || !m_bPageMode)
+			return;
+
+		SetBoxText(m_wNameEdit, m_Content.DeviceName());
+
+		if (m_iOpenEntry < 0 || m_iOpenEntry >= m_aVisible.Count())
+		{
+			SetBoxText(m_wHeadingEdit, "");
+			SetBoxText(m_wStampEdit, "");
+			SetBoxText(m_wBodyEdit, "");
+			return;
+		}
+
+		MCF_Device_Item page = m_aVisible[m_iOpenEntry];
+		SetBoxText(m_wHeadingEdit, page.m_sHeading);
+		SetBoxText(m_wStampEdit, page.m_sTimestamp);
+		SetBoxText(m_wBodyEdit, MCF_Device_Text.Body(page.m_sBody));
+	}
+
+	//! Takes what was typed and puts it on the draft.
+	//!
+	//! CALLED BEFORE ANYTHING MOVES -- turning a page, adding one, saving. The
+	//! boxes are the only place the new text exists until this runs, so a page
+	//! turn without it loses everything typed since the last one.
+	protected void CommitPaperPage()
+	{
+		if (!m_bAuthor || !m_bPageMode || !m_bPaperTyping)
+			return;
+
+		if (m_Draft)
+		{
+			string named = MCF_Device_Script.Trim(BoxText(m_wNameEdit));
+			if (!named.IsEmpty())
+				m_Draft.m_sDeviceName = named;
+		}
+
+		if (m_iOpenEntry < 0 || m_iOpenEntry >= m_aVisible.Count())
+			return;
+
+		MCF_Device_Item page = m_aVisible[m_iOpenEntry];
+		page.m_sHeading = BoxText(m_wHeadingEdit);
+		page.m_sTimestamp = BoxText(m_wStampEdit);
+
+		// A typed newline has to survive being stored: MCF_Device_Script.Clean
+		// turns a real one into a space, so it goes onto the draft as the two
+		// characters a config carries and MCF_Device_Text.Body unescapes it
+		// again on the way back to the page.
+		page.m_sBody = MCF_Device_Text.Encode(BoxText(m_wBodyEdit));
+	}
+
+	//! The app the pages of a paper or notepad live in.
+	//!
+	//! One app, because a letter has no apps -- the shell is in page mode
+	//! precisely because there is nothing to index. A draft that arrived with
+	//! none gets one rather than refusing to take a page.
+	protected MCF_Device_App PaperApp()
+	{
+		if (!m_Draft)
+			return null;
+
+		if (!m_Draft.m_aApps)
+			m_Draft.m_aApps = {};
+
+		if (m_Draft.m_aApps.IsEmpty())
+		{
+			MCF_Device_App fresh = new MCF_Device_App();
+			fresh.m_eKind = MCF_EIntelApp.GENERAL;
+			fresh.m_aItems = {};
+			m_Draft.m_aApps.Insert(fresh);
+		}
+
+		MCF_Device_App app = m_Draft.m_aApps[0];
+		if (!app.m_aItems)
+			app.m_aItems = {};
+
+		return app;
+	}
+
+	protected void OnTypeClicked(SCR_ButtonTextComponent button)
+	{
+		m_bPaperTyping = true;
+		FillPaperAuthor();
+		ShowPaperAuthor();
+
+		// An edit box takes keystrokes only in write mode, and the engine
+		// raises no event when it starts -- vanilla polls IsInWriteMode() and
+		// calls ActivateWriteMode() from its own pencil. This is that pencil.
+		FocusBox(m_wBodyEdit);
+		SetHint("Typing. PAGE shows it as the player will see it.");
+	}
+
+	protected void OnPageViewClicked(SCR_ButtonTextComponent button)
+	{
+		CommitPaperPage();
+		m_bPaperTyping = false;
+		ShowPaperAuthor();
+		ShowEntry(m_iOpenEntry);
+		SetHint("This is the page. Nothing is on the object until SAVE.");
+	}
+
+	protected void OnAddPageClicked(SCR_ButtonTextComponent button)
+	{
+		CommitPaperPage();
+
+		MCF_Device_App app = PaperApp();
+		if (!app)
+			return;
+
+		MCF_Device_Item page = new MCF_Device_Item();
+		page.m_sHeading = "New page";
+		app.m_aItems.Insert(page);
+
+		m_Content.GetAllItems(m_aVisible);
+		m_bPaperTyping = true;
+		ShowEntry(m_aVisible.Count() - 1);
+		ShowPaperAuthor();
+		FillPaperAuthor();
+		FocusBox(m_wHeadingEdit);
+		SetHint("A page was added. SAVE writes it to the object.");
+	}
+
+	protected void OnDropPageClicked(SCR_ButtonTextComponent button)
+	{
+		if (m_aVisible.Count() < 2 || m_iOpenEntry < 0)
+			return;
+
+		MCF_Device_App app = PaperApp();
+		if (!app)
+			return;
+
+		MCF_Device_Item page = m_aVisible[m_iOpenEntry];
+		int at = app.m_aItems.Find(page);
+		if (at < 0)
+			return;
+
+		app.m_aItems.Remove(at);
+		m_Content.GetAllItems(m_aVisible);
+
+		int land = m_iOpenEntry;
+		if (land >= m_aVisible.Count())
+			land = m_aVisible.Count() - 1;
+
+		ShowEntry(land);
+		ShowPaperAuthor();
+		FillPaperAuthor();
+		SetHint("A page was removed. SAVE writes it to the object.");
+	}
+
+	protected void OnSaveIntelClicked(SCR_ButtonTextComponent button)
+	{
+		CommitPaperPage();
+		SendDraft();
+
+		if (m_wDeviceName)
+			m_wDeviceName.SetText(m_Content.DeviceName());
+
+		ShowEntry(m_iOpenEntry);
+		ShowPaperAuthor();
+	}
+
+	// ------------------------------------------- reading and writing a field
+
+	//! MULTILINE IS A DIFFERENT CLASS, NOT A FLAG.
+	//!
+	//! MultilineEditBoxWidget and EditBoxWidget do not share a parent -- the
+	//! engine's own SCR_EditBoxComponent carries one field for each and
+	//! apologises for it in a comment -- so a cast to one returns null for the
+	//! other and the box silently fills with nothing and saves nothing.
+	protected string BoxText(Widget found)
+	{
+		if (!found)
+			return "";
+
+		EditBoxWidget one = EditBoxWidget.Cast(found);
+		if (one)
+			return one.GetText();
+
+		MultilineEditBoxWidget many = MultilineEditBoxWidget.Cast(found);
+		if (many)
+			return many.GetText();
+
+		return "";
+	}
+
+	protected void SetBoxText(Widget found, string value)
+	{
+		if (!found)
+			return;
+
+		EditBoxWidget one = EditBoxWidget.Cast(found);
+		if (one)
+		{
+			one.SetText(value);
+			return;
+		}
+
+		MultilineEditBoxWidget many = MultilineEditBoxWidget.Cast(found);
+		if (many)
+			many.SetText(value);
+	}
+
+	protected void FocusBox(Widget found)
+	{
+		if (!found)
+			return;
+
+		WorkspaceWidget workspace = GetGame().GetWorkspace();
+		if (workspace)
+			workspace.SetFocusedWidget(found);
+
+		EditBoxWidget one = EditBoxWidget.Cast(found);
+		if (one)
+		{
+			one.ActivateWriteMode();
+			return;
+		}
+
+		MultilineEditBoxWidget many = MultilineEditBoxWidget.Cast(found);
+		if (many)
+			many.ActivateWriteMode();
+	}
+
 	protected void OnPrevClicked(SCR_ButtonTextComponent button)
 	{
+		// COMMITTED BEFORE THE PAGE MOVES. The boxes are the only place typed
+		// text exists until CommitPaperPage runs, so turning a page without it
+		// throws away everything written since the last turn.
+		CommitPaperPage();
+
 		if (m_iOpenEntry > 0)
 			ShowEntry(m_iOpenEntry - 1);
 	}
 
 	protected void OnNextClicked(SCR_ButtonTextComponent button)
 	{
+		CommitPaperPage();
+
 		if (m_iOpenEntry >= 0 && m_iOpenEntry < m_aVisible.Count() - 1)
 			ShowEntry(m_iOpenEntry + 1);
 	}

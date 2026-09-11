@@ -56,7 +56,7 @@ class MCF_Intel_EditContextAction : SCR_SelectedEntitiesContextAction
 			if (!carrier)
 				continue;
 
-			MCF_Intel_EditorMenu.OpenFor(carrier, selected);
+			OpenEditorFor(carrier, selected);
 			return;
 		}
 
@@ -64,7 +64,34 @@ class MCF_Intel_EditContextAction : SCR_SelectedEntitiesContextAction
 		// cursor, which is how a right-click on an unselected object arrives.
 		MCF_Intel_CarrierComponent hovered = GetCarrier(hoveredEntity);
 		if (hovered)
-			MCF_Intel_EditorMenu.OpenFor(hovered, hoveredEntity);
+			OpenEditorFor(hovered, hoveredEntity);
+	}
+
+	//! THE VISUAL IS THE EDITOR, WHERE THERE IS ONE.
+	//!
+	//! A Game Master rewriting a letter should be looking at the letter, with
+	//! the writing switched on -- the same way editing a phone opens the
+	//! phone. This is the pattern every new intel view should follow: give it
+	//! a visual, then give that visual an author half.
+	//!
+	//! The old form stays for the views that have none yet. DOCUMENT and MAP
+	//! fall through to it, and should keep falling through until each has a
+	//! visual of its own rather than losing the only editor it has.
+	protected void OpenEditorFor(notnull MCF_Intel_CarrierComponent carrier, SCR_EditableEntityComponent editable)
+	{
+		MCF_EIntelView view = carrier.GetView();
+
+		if (view == MCF_EIntelView.PAPER || view == MCF_EIntelView.NOTEPAD)
+		{
+			if (MCF_Intel_ShellMenu.OpenForAuthor(carrier, editable))
+				return;
+
+			// The skin refused to open. Falling through to the form is better
+			// than a right-click that does nothing.
+			MCF_Core_Log.Warn("the visual editor would not open -- falling back to the form");
+		}
+
+		MCF_Intel_EditorMenu.OpenFor(carrier, editable);
 	}
 
 	protected MCF_Intel_CarrierComponent GetCarrier(SCR_EditableEntityComponent editable)
