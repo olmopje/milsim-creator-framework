@@ -65,6 +65,24 @@ class MCF_Device_Item
 	[Attribute(defvalue: "", uiwidget: UIWidgets.EditBox, desc: "URL of a BASE64 TEXT copy of a picture. Not a .jpg -- see MCF_Device_ImageCache. Each player fetches it themselves.")]
 	string m_sImageUrl;
 
+	//! Whether this item should read as NEW to a player who has not opened it.
+	//!
+	//! This is content, not state: the mission maker says a message is fresh,
+	//! and every player gets the same answer. Whether a given player has
+	//! actually read it is a different fact and lives per client -- see
+	//! MCF_Device_ReadState. A badge is the two of them together.
+	[Attribute(defvalue: "0", uiwidget: UIWidgets.CheckBox, desc: "Show this as new until the player opens it.")]
+	bool m_bNew;
+
+	//! What the read log files this item under.
+	//!
+	//! Heading and stamp rather than an index: an item that moves in the list
+	//! is the same item, and one whose text is rewritten is fairly a new one.
+	string ReadKey()
+	{
+		return m_sHeading + "|" + m_sTimestamp;
+	}
+
 	//! What the fetched copy is filed under. Two items naming the same picture
 	//! should share one file rather than fetching it twice.
 	string ImageKey()

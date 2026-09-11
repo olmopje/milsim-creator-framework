@@ -164,6 +164,101 @@ class MCF_Device_Presenter
 		return outItems.Count();
 	}
 
+	//! The newest unread items on the device, newest first as authored, with
+	//! the app each one came from.
+	//!
+	//! For the lock screen, which shows who wrote and when and never what --
+	//! a locked phone that prints the message has given away the reason for
+	//! breaking into it.
+	int UnreadItems(int max, notnull out array<MCF_Device_Item> outItems, notnull out array<int> outKinds)
+	{
+		outItems.Clear();
+		outKinds.Clear();
+
+		if (!m_Profile || !m_Profile.m_aApps)
+			return 0;
+
+		foreach (MCF_Device_App app : m_Profile.m_aApps)
+		{
+			if (!app || !app.m_aItems)
+				continue;
+
+			foreach (MCF_Device_Item item : app.m_aItems)
+			{
+				if (!IsUnread(item))
+					continue;
+
+				outItems.Insert(item);
+				outKinds.Insert(app.m_eKind);
+
+				if (outItems.Count() >= max)
+					return outItems.Count();
+			}
+		}
+
+		return outItems.Count();
+	}
+
+	// ------------------------------------------------------- authoring
+
+	//! The profile this presenter is drawing. The author mode edits a COPY of
+	//! it and hands the copy back through SetProfile, so the screen shows the
+	//! draft while the object still carries the original.
+	MCF_Device_Profile GetProfile()
+	{
+		return m_Profile;
+	}
+
+	void SetProfile(MCF_Device_Profile profile)
+	{
+		m_Profile = profile;
+	}
+
+	// ------------------------------------------------------------- unread
+
+	//! Whether this item should draw as new for the player looking at it.
+	//!
+	//! Two facts, and both have to be true: the mission maker marked it new,
+	//! and this player has not opened it. Either one alone is not a badge --
+	//! the first would never go away, the second would light up every item on
+	//! every device the player has not been through.
+	bool IsUnread(MCF_Device_Item item)
+	{
+		if (!item || !item.m_bNew)
+			return false;
+
+		return !MCF_Device_ReadState.IsRead(MCF_Device_ReadState.DeviceKey(m_Carrier), item.ReadKey());
+	}
+
+	//! \return True if this changed something, so the caller can redraw.
+	bool MarkRead(MCF_Device_Item item)
+	{
+		if (!item || !item.m_bNew)
+			return false;
+
+		return MCF_Device_ReadState.MarkRead(MCF_Device_ReadState.DeviceKey(m_Carrier), item.ReadKey());
+	}
+
+	//! How many unread items are filed under one app. The number on the badge.
+	//!
+	//! Counting lives here rather than in the shell because the shell would
+	//! have to ask this class for the items anyway, and because the laptop
+	//! will want the same number without knowing how a phone draws it.
+	int UnreadCount(MCF_Device_App app)
+	{
+		if (!app || !app.m_aItems)
+			return 0;
+
+		int count;
+		foreach (MCF_Device_Item item : app.m_aItems)
+		{
+			if (IsUnread(item))
+				count++;
+		}
+
+		return count;
+	}
+
 	// ------------------------------------------------------------ internals
 
 	//! A profile made out of the entries on the object itself.
@@ -221,6 +316,7 @@ class MCF_Device_Presenter
 				item.m_sHeading = entry.m_sHeading;
 				item.m_sTimestamp = entry.m_sTimestamp;
 				item.m_sBody = entry.m_sBody;
+				item.m_bNew = entry.m_bNew;
 				app.m_aItems.Insert(item);
 			}
 

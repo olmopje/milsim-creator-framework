@@ -42,7 +42,7 @@ class MCF_Device_EditContextAction : SCR_SelectedEntitiesContextAction
 			if (!device)
 				continue;
 
-			MCF_Device_EditorMenu.OpenFor(device, selected);
+			MCF_Intel_ShellMenu.OpenForAuthor(device, selected);
 			return;
 		}
 
@@ -50,7 +50,7 @@ class MCF_Device_EditContextAction : SCR_SelectedEntitiesContextAction
 		// cursor, which is how a right-click on an unselected object arrives.
 		MCF_Intel_CarrierComponent hovered = GetDevice(hoveredEntity);
 		if (hovered)
-			MCF_Device_EditorMenu.OpenFor(hovered, hoveredEntity);
+			MCF_Intel_ShellMenu.OpenForAuthor(hovered, hoveredEntity);
 	}
 
 	//! Only things that draw as a device.

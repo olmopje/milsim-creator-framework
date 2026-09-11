@@ -1,0 +1,149 @@
+// One row on a phone: a disc with an initial, a bright line, a dim line under
+// it, a small stamp on the right, and a hairline that starts where the text
+// does.
+//
+// NO SizeLayoutWidget, AND THAT IS THE POINT. A SizeLayout does not reserve a
+// height -- it SCALES whatever is inside it to the size it is given, so a row
+// built that way came out with letters an inch tall. The row's height here
+// comes the way every other row in this project gets one: from its tallest
+// child plus the overlay's own padding. 40 for the disc, 12 above and below,
+// which is the 64 a phone list actually uses.
+//
+// WHY THE ROW IS THIS TALL AND THE TEXT THIS FAR APART. A message list is
+// read at a glance, down the left edge, and two lines crammed into 58 units
+// read as one clump of text rather than a sender and what they said. The
+// title sits against the top of the row and the preview against the bottom,
+// so the gap between them is whatever the row has left over -- which is how
+// every SMS client on a real handset does it.
+//
+// Everything is placed with OverlayWidgetSlot alignment rather than free
+// coordinates, so nothing can be positioned into a padding field by mistake.
+ButtonWidgetClass {
+ Name "Button"
+ Slot LayoutSlot "{6A1C4F0B39D35601}" {
+  Padding 0 0 0 0
+  SizeMode Fill
+ }
+ Clipping True
+ components {
+  SCR_ButtonTextComponent "{6A1C4F0B39D35602}" {
+   m_bCanBeToggled 0
+   m_BackgroundDefault 1 1 1 0
+   m_BackgroundHovered 1 1 1 0.10
+   m_BackgroundSelected 1 1 1 0.14
+   m_BackgroundSelectedHovered 1 1 1 0.18
+   m_BackgroundClicked 1 1 1 0.22
+   m_sText ""
+  }
+ }
+ style blank
+ {
+  OverlayWidgetClass "{6A1C4F0B39D35603}" {
+   Name "Overlay"
+   Slot ButtonWidgetSlot "{6A1C4F0B39D35604}" {
+    HorizontalAlign 3
+    VerticalAlign 3
+    Padding 0 12 0 12
+   }
+   {
+    ImageWidgetClass "{6A1C4F0B39D35605}" {
+     Name "Background"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35606}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+     }
+    }
+    OverlayWidgetClass "{6A1C4F0B39D35607}" {
+     Name "AvatarBox"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35608}" {
+      HorizontalAlign 0
+      VerticalAlign 1
+      Padding 14 0 0 0
+     }
+     Size 40 40
+     {
+      ImageWidgetClass "{6A1C4F0B39D35609}" {
+       Name "Avatar"
+       Slot OverlayWidgetSlot "{6A1C4F0B39D3560A}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       Color 0.35 0.38 0.42 1
+       Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
+       Image ""
+      }
+      TextWidgetClass "{6A1C4F0B39D3560B}" {
+       Name "AvatarText"
+       Slot OverlayWidgetSlot "{6A1C4F0B39D3560C}" {
+        HorizontalAlign 1
+        VerticalAlign 1
+       }
+       Text ""
+       "Font Size" 16
+       "Min Font Size" 16
+      }
+     }
+    }
+    TextWidgetClass "{6A1C4F0B39D3560D}" {
+     Name "Line1"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D3560E}" {
+      HorizontalAlign 0
+      VerticalAlign 0
+      Padding 68 2 62 0
+     }
+     Text ""
+     "Font Size" 14
+     "Min Font Size" 14
+    }
+    RichTextWidgetClass "{6A1C4F0B39D3560F}" {
+     Name "Line2"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35610}" {
+      HorizontalAlign 0
+      VerticalAlign 2
+      Padding 68 0 26 2
+     }
+     Clipping Ancestor
+     Text ""
+     "Font Size" 11
+     "Min Font Size" 11
+     Color 0.63 0.66 0.70 1
+    }
+    TextWidgetClass "{6A1C4F0B39D35611}" {
+     Name "Right"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35612}" {
+      HorizontalAlign 2
+      VerticalAlign 0
+      Padding 0 3 14 0
+     }
+     Text ""
+     "Font Size" 10
+     "Min Font Size" 10
+     Color 0.60 0.63 0.67 1
+    }
+    ImageWidgetClass "{6A1C4F0B39D35613}" {
+     Name "Unread"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35614}" {
+      HorizontalAlign 2
+      VerticalAlign 2
+      Padding 0 0 16 4
+     }
+     Size 9 9
+     Color 0.76 0.39 0.08 1
+     Texture "{6A1C4F0B39D3520B}UI/images/MCF_Phone/circle.edds"
+     Image ""
+     "Is Visible" 0
+    }
+    ImageWidgetClass "{6A1C4F0B39D35615}" {
+     Name "Divider"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35616}" {
+      HorizontalAlign 3
+      VerticalAlign 2
+      Padding 68 0 0 -11
+     }
+     Size 0 1
+     Color 1 1 1 0.10
+    }
+   }
+  }
+ }
+}

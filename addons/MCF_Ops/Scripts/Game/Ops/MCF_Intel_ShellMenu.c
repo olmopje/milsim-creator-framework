@@ -29,6 +29,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! and on a phone it drew straight out past the side of the handset.
 	protected static const ResourceName ROW_LAYOUT = "{6A1C4F0B39D34500}UI/layouts/MCF/MCF_IntelRow.layout";
 
+	//! The phone's own row: a disc, two lines and a small right-hand note.
+	protected static const ResourceName PHONE_ROW_LAYOUT = "{6A1C4F0B39D35600}UI/layouts/MCF/MCF_PhoneRow.layout";
+
 	//! The break-in panel, drawn inside the device's own glass. One layout
 	//! serves every skin, and it is created on demand rather than shipped
 	//! inside each device layout -- see StartHack below.
@@ -39,6 +42,9 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_STATUS_RIGHT = "StatusRight";
 	protected static const string W_TILE = "Tile";
 	protected static const string W_ICON = "Icon";
+	protected static const string W_BADGE = "Badge";
+	protected static const string W_BADGE_TEXT = "BadgeText";
+	protected static const string W_UNREAD_DOT = "Unread";
 
 	//! The base game's own icon atlas. White masks, tinted by the widget.
 	protected static const ResourceName ICON_SET = "{2EFEA2AF1F38E7F0}UI/Textures/Icons/icons_wrapperUI-64.imageset";
@@ -48,6 +54,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_CHASSIS = "Chassis";
 	protected static const string W_HOME_BAR = "HomeTap";
 	protected static const string W_KEYPAD = "Keypad";
+	protected static const string W_EDITOR = "EditorPane";
+	protected static const string W_EDITOR_TITLE = "EditorTitle";
+	protected static const string W_EDITOR_FIELD = "EditorField";
+	protected static const string W_EDITOR_SAVE = "EditorSave";
+	protected static const string W_EDITOR_CANCEL = "EditorCancel";
 	protected static const string W_KEYPAD_TITLE = "KeypadTitle";
 	protected static const string W_PIP_PREFIX = "Pip";
 	protected static const string W_KEY_DELETE = "KeyDel";
@@ -57,6 +68,30 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! is the puzzle.
 	protected static const string BREAK_IN_CODE = "1337";
 	protected static const int CODE_LENGTH = 4;
+
+	// The dialler's own widgets. They are NOT the passcode pad's: the pad is a
+	// door in front of the phone and the dialler is a screen inside it, and a
+	// single set of twelve keys shared between the two meant one of them was
+	// always sitting in the other one's geometry.
+	protected static const string W_DIALLER = "Dialler";
+	protected static const string W_DIAL_NUMBER = "DialNumber";
+	protected static const string W_DIAL_SUB = "DialSub";
+	protected static const string W_DIAL_KEY_PREFIX = "DialKey";
+	protected static const string W_DIAL_CALL = "DialCall";
+	protected static const string W_DIAL_DELETE = "DialDel";
+	protected static const string W_DIAL_RECENT_LABEL = "DialRecentLabel";
+
+	//! How many calls fit above the keys. Three is what the screen has room for
+	//! once the keypad has what it needs, and a call log is read newest-first
+	//! anyway -- the rest of it is in the app, not on the dialler.
+	protected static const int DIAL_RECENTS = 3;
+
+	//! Long enough for any number a mission would write down, short enough that
+	//! it still fits the display at 26pt.
+	protected static const int DIAL_MAX_DIGITS = 14;
+
+	//! Cards on the lock screen. Three fit above the prompt.
+	protected static const int LOCK_NOTES = 3;
 	protected static const string W_LIST_SCROLL = "ListScroll";
 	protected static const string W_ENTRY_LIST = "EntryList";
 	protected static const string W_READ_SCROLL = "ReadScroll";
@@ -174,11 +209,48 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected Widget m_wChassis;
 	protected Widget m_wHomeBar;
 	protected Widget m_wKeypad;
+	protected Widget m_wEditor;
+	protected TextWidget m_wEditorTitle;
+	protected EditBoxWidget m_EditorField;
+	protected SCR_ButtonTextComponent m_EditorSave;
+	protected SCR_ButtonTextComponent m_EditorCancel;
 	protected TextWidget m_wKeypadTitle;
 	protected ref array<Widget> m_aPips = {};
 	protected ref array<SCR_ButtonTextComponent> m_aKeys = {};
 	protected string m_sCode;
+
+	// ------------------------------------------------------------ authoring
+
+	//! True when a Game Master opened this screen to CHANGE the device rather
+	//! than to read it. Same shell, same tiles, same navigation -- the editing
+	//! is a few extra rows and one extra pane, not a second screen with a
+	//! similar name. See docs/architecture/DEVICE_CONTENT.md section 9.
+	protected bool m_bAuthor;
+
+	//! The object being edited, as the wire names it.
+	protected SCR_EditableEntityComponent m_Editable;
+
+	//! A copy of the device's profile. The screen draws this while the object
+	//! still carries the original, so a Game Master who changes their mind can
+	//! simply close the phone.
+	protected ref MCF_Device_Profile m_Draft;
+
+	//! What the editor pane is currently editing, and where to put it back.
+	protected string m_sEditKind;
+	protected MCF_Device_Item m_EditItem;
+	protected MCF_Device_Item m_FormItem;
+	protected bool m_bOnForm;
+
+	protected static SCR_EditableEntityComponent s_PendingEditable;
+	protected static bool s_bPendingAuthor;
 	protected bool m_bOnKeypad;
+
+	protected Widget m_wDialler;
+	protected TextWidget m_wDialNumber;
+	protected TextWidget m_wDialSub;
+	protected ref array<SCR_ButtonTextComponent> m_aDialKeys = {};
+	protected string m_sDialled;
+	protected bool m_bOnDialler;
 	protected ref MCF_Device_ImageClick m_HomeBarClick;
 	//! Seconds since the home bar was last tapped. Two taps inside
 	//! HOME_DOUBLE_TAP put the phone away.
@@ -210,6 +282,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const float PICTURE_GIVE_UP_SECONDS = 30.0;
 	protected ref array<ref MCF_Device_Item> m_aVisible = {};
 	protected ref array<SCR_ButtonTextComponent> m_aRowButtons = {};
+	protected ref array<SCR_ButtonTextComponent> m_aAuthorButtons = {};
+	protected ref array<string> m_aAuthorKinds = {};
 
 	protected Widget m_wListScroll;
 	protected Widget m_wReadScroll;
@@ -299,6 +373,27 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! Opens the skin this object's view calls for.
 	//! \return True if a skin took it; false means the caller should fall back
 	//! to the plain viewer, which is what DOCUMENT, DEVICE and MAP still use.
+	//! Opens the device the way a Game Master edits it: the phone itself, with
+	//! the authoring rows switched on.
+	//!
+	//! WHY NOT A SEPARATE PANEL. There was one, and it was the second screen
+	//! that edited the same object under a name one word different from the
+	//! first. That confusion cost a day (HANDOVER step 1) and the fix was to
+	//! delete the overlap, not to document it. A Game Master who edits the
+	//! phone should be looking at the phone.
+	static bool OpenForAuthor(notnull MCF_Intel_CarrierComponent carrier, SCR_EditableEntityComponent editable)
+	{
+		s_PendingEditable = editable;
+		s_bPendingAuthor = true;
+
+		if (OpenFor(carrier))
+			return true;
+
+		s_PendingEditable = null;
+		s_bPendingAuthor = false;
+		return false;
+	}
+
 	static bool OpenFor(notnull MCF_Intel_CarrierComponent carrier)
 	{
 		MCF_EIntelView view = carrier.GetView();
@@ -356,6 +451,20 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// while the pad is visible in the layout, because GetButtonText does
 		// not walk into a subtree the layout marks hidden.
 		m_wKeypad = root.FindAnyWidget(W_KEYPAD);
+		m_wEditor = root.FindAnyWidget(W_EDITOR);
+		m_wEditorTitle = TextWidget.Cast(root.FindAnyWidget(W_EDITOR_TITLE));
+		m_EditorField = EditBoxWidget.Cast(root.FindAnyWidget(W_EDITOR_FIELD));
+
+		m_EditorSave = SCR_ButtonTextComponent.GetButtonText(W_EDITOR_SAVE, root);
+		if (m_EditorSave)
+			m_EditorSave.m_OnClicked.Insert(OnEditorSave);
+
+		m_EditorCancel = SCR_ButtonTextComponent.GetButtonText(W_EDITOR_CANCEL, root);
+		if (m_EditorCancel)
+			m_EditorCancel.m_OnClicked.Insert(OnEditorCancel);
+
+		if (m_wEditor)
+			m_wEditor.SetVisible(false);
 		m_wKeypadTitle = TextWidget.Cast(root.FindAnyWidget(W_KEYPAD_TITLE));
 
 		m_aKeys.Clear();
@@ -384,6 +493,10 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 		if (m_wKeypad)
 			m_wKeypad.SetVisible(false);
+
+		// Same rule as the pad above: bound while the layout still says it is
+		// visible, then taken down.
+		BindDialler(root);
 
 		// THE HOME BAR IS THE ONLY CONTROL THE PHONE NEEDS. One tap steps back
 		// -- entry to list, list to home, and nothing at all once you are home.
@@ -529,6 +642,49 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_Content.Bind(m_Carrier);
 		PrefetchPictures();
 
+		// AUTHOR MODE, taken from the static handover and cleared at once so a
+		// later read-only open cannot inherit it.
+		m_bAuthor = s_bPendingAuthor;
+		m_Editable = s_PendingEditable;
+		s_bPendingAuthor = false;
+		s_PendingEditable = null;
+
+		if (m_bAuthor)
+		{
+			// A copy, through the same serialiser the wire uses -- so what the
+			// Game Master edits is exactly what can be sent, and the object
+			// keeps what it has until SAVE.
+			MCF_Device_Profile source = m_Content.GetProfile();
+			if (source)
+			{
+				m_Draft = MCF_Device_Script.Deserialize(MCF_Device_Script.Serialize(source));
+
+				if (m_Draft)
+				{
+					// THE DRAFT LOSES THE SHARED ID, AND THIS IS THE WHOLE
+					// REASON EVERY PHONE USED TO CHANGE AT ONCE. The server
+					// files any profile that arrives with an id back into the
+					// library under that id -- which is what makes a profile
+					// reusable, and which meant editing one handset rewrote
+					// `smuggler_phone` itself and with it every other phone
+					// reading that profile.
+					//
+					// A Game Master editing one device is editing THAT device.
+					// Without an id the server writes the profile onto the
+					// object and touches nothing else. Editing the shared
+					// profile on purpose is a different act and deserves its
+					// own row and its own warning -- see DEVICE_CONTENT.md.
+					m_Draft.m_sId = "";
+					m_Content.SetProfile(m_Draft);
+				}
+				else
+				{
+					MCF_Core_Log.Warn("device draft could not be built -- author mode would edit the shared profile, so it stays read-only");
+					m_bAuthor = false;
+				}
+			}
+		}
+
 		if (m_wDeviceName)
 			m_wDeviceName.SetText(m_Content.DeviceName());
 
@@ -554,7 +710,12 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			// Checked here rather than in the read action so that there is one
 			// prompt in the world and the refusal happens where the player can
 			// see what it is and do something about it.
-			if (IsDeviceLocked())
+			//
+			// A GAME MASTER DOES NOT HAVE TO BREAK INTO HIS OWN PROP. In author
+			// mode the lock is content being edited, not an obstacle -- so the
+			// phone opens on its home screen and the lock screen is simply one
+			// of the things that can be looked at from there.
+			if (IsDeviceLocked() && !m_bAuthor)
 				ShowLock();
 			else
 				ShowHome();
@@ -789,6 +950,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	{
 		m_bOnHome = true;
 		m_bOnList = false;
+		m_bOnForm = false;
 		m_OpenApp = null;
 		m_iOpenEntry = -1;
 		StopWaitingForPicture();
@@ -816,11 +978,14 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 					button.SetText("");
 				else
 					button.SetText(MCF_Device_Names.GlyphFor(kind));
+
+				PaintBadge(button, m_Content.UnreadCount(m_aApps[i]));
 			}
 			else
 			{
 				button.SetText("");
 				SetTileIcon(button, "");
+				PaintBadge(button, 0);
 			}
 
 			if (i >= m_aAppLabels.Count() || !m_aAppLabels[i])
@@ -879,6 +1044,62 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		return drawn;
 	}
 
+	//! The red pill on a tile, and the number in it.
+	//!
+	//! Hidden at zero rather than drawn empty: a badge that is always there
+	//! stops meaning anything. Above nine it says 9+, because the pill is
+	//! nineteen pixels across and a phone has never shown you 47.
+	//! Re-reads the dots on the rows that are already on screen.
+	//!
+	//! Called when something has just been read, so the list behind the entry
+	//! is already correct when the player steps back to it -- rebuilding the
+	//! list instead would lose the scroll position, which on a phone is the
+	//! difference between "I was here" and "where was I".
+	protected void RefreshRowDots()
+	{
+		foreach (int i, SCR_ButtonTextComponent rowButton : m_aRowButtons)
+		{
+			if (!rowButton || i >= m_aVisible.Count())
+				continue;
+
+			Widget row = rowButton.GetRootWidget();
+			if (!row)
+				continue;
+
+			Widget dot = row.FindAnyWidget(W_UNREAD_DOT);
+			if (dot)
+				dot.SetVisible(m_Content.IsUnread(m_aVisible[i]));
+		}
+	}
+
+	protected void PaintBadge(notnull SCR_ButtonTextComponent button, int count)
+	{
+		Widget tileRoot = button.GetRootWidget();
+		if (!tileRoot)
+			return;
+
+		Widget badge = tileRoot.FindAnyWidget(W_BADGE);
+		TextWidget badgeText = TextWidget.Cast(tileRoot.FindAnyWidget(W_BADGE_TEXT));
+
+		bool show = count > 0;
+
+		if (badge)
+			badge.SetVisible(show);
+
+		if (!badgeText)
+			return;
+
+		badgeText.SetVisible(show);
+
+		if (!show)
+			return;
+
+		if (count > 9)
+			badgeText.SetText("9+");
+		else
+			badgeText.SetText(count.ToString());
+	}
+
 	protected void PaintTile(notnull SCR_ButtonTextComponent button, int colour)
 	{
 		Widget tileRoot = button.GetRootWidget();
@@ -924,6 +1145,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 				dockButton.SetText("");
 			else
 				dockButton.SetText(MCF_Device_Names.GlyphFor(kind));
+
+			PaintBadge(dockButton, m_Content.UnreadCount(m_aApps[i]));
 		}
 	}
 
@@ -948,8 +1171,18 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			return;
 		}
 
+		// The call log is not a list on a phone -- it is the dialler, with what
+		// was last rung sitting above the keys. A Game Master editing this app
+		// still gets the list: you cannot edit a row you cannot see.
+		if (app.m_eKind == MCF_EIntelApp.CALLS && !m_bAuthor)
+		{
+			ShowDialler(app);
+			return;
+		}
+
 		m_bOnHome = false;
 		m_bOnList = true;
+		m_bOnForm = false;
 		m_OpenApp = app;
 		m_iOpenEntry = -1;
 		StopWaitingForPicture();
@@ -957,6 +1190,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		SetScreens(false, true, false);
 
 		m_aRowButtons.Clear();
+		m_aAuthorButtons.Clear();
 
 		if (m_wEntryList)
 			ClearChildren(m_wEntryList);
@@ -964,6 +1198,19 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// Ask what is in there, then draw it. The presenter decides whether an
 		// empty app has anything to say for itself; this only puts rows on the
 		// screen.
+		// AUTHORING ROWS FIRST. A Game Master reads this list top-down looking
+		// for what they can change; a "new item" row at the bottom of a long
+		// inbox is a row nobody finds.
+		m_aAuthorKinds.Clear();
+
+		if (m_bAuthor)
+		{
+			if (app.m_eKind == MCF_EIntelApp.SETTINGS)
+				AddAuthorRow("Device name:  " + m_Content.DeviceName(), "device");
+
+			AddAuthorRow("+  New item", "new");
+		}
+
 		m_Content.GetItems(app, m_aVisible);
 
 		foreach (MCF_Device_Item entry : m_aVisible)
@@ -985,7 +1232,464 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			SetHint(m_aVisible.Count().ToString() + " item(s)");
 	}
 
+	// --------------------------------------------------------- the editor pane
+
+	//! Opens the one-field editor over the phone.
+	//!
+	//! \param kind What is being edited, so SAVE knows where to put it back.
+	//! \param item The item being edited, or null when it is the device itself.
+	protected void ShowEditor(string kind, string title, string value, MCF_Device_Item item)
+	{
+		m_sEditKind = kind;
+		m_EditItem = item;
+
+		if (m_wEditorTitle)
+			m_wEditorTitle.SetText(title);
+
+		if (m_EditorField)
+			m_EditorField.SetText(value);
+
+		if (m_wEditor)
+			m_wEditor.SetVisible(true);
+
+		// Put the cursor in the field. A Game Master who has to click the box
+		// before typing will click the phone behind it half the time.
+		if (m_EditorField)
+		{
+			GetGame().GetWorkspace().SetFocusedWidget(m_EditorField);
+		}
+	}
+
+	protected void HideEditor()
+	{
+		m_sEditKind = "";
+		m_EditItem = null;
+
+		if (m_wEditor)
+			m_wEditor.SetVisible(false);
+	}
+
+	protected void OnEditorCancel(SCR_ButtonTextComponent button)
+	{
+		HideEditor();
+	}
+
+	//! Writes the typed value into the draft and sends the whole draft.
+	//!
+	//! ONE EDIT, ONE SEND. The old panel collected changes and pushed them all
+	//! on APPLY, which meant a Game Master could lose ten minutes of typing by
+	//! closing the wrong window. A field at a time costs one small RPC and
+	//! cannot lose anything.
+	protected void OnEditorSave(SCR_ButtonTextComponent button)
+	{
+		if (!m_EditorField || !m_Draft)
+		{
+			HideEditor();
+			return;
+		}
+
+		string typed = MCF_Device_Script.Trim(m_EditorField.GetText());
+		bool intelSide;
+
+		if (m_sEditKind == "device")
+			m_Draft.m_sDeviceName = typed;
+		else if (m_sEditKind == "verb")
+			intelSide = true;
+		else if (m_sEditKind == "heading" && m_EditItem)
+			m_EditItem.m_sHeading = typed;
+		else if (m_sEditKind == "stamp" && m_EditItem)
+			m_EditItem.m_sTimestamp = typed;
+		else if (m_sEditKind == "body" && m_EditItem)
+			m_EditItem.m_sBody = typed;
+		else if (m_sEditKind == "image" && m_EditItem)
+			m_EditItem.m_sImage = typed;
+		else if (m_sEditKind == "url" && m_EditItem)
+			m_EditItem.m_sImageUrl = typed;
+
+		MCF_Device_Item edited = m_EditItem;
+		HideEditor();
+
+		// The prompt verb is not part of the device profile: it is the word the
+		// world action says, and it lives on the carrier with the object's own
+		// intel. So it goes over the intel route instead -- two payloads,
+		// because they are genuinely two pieces of state.
+		if (intelSide)
+			SendVerb(typed);
+		else
+			SendDraft();
+
+		// Redraw whatever is behind the pane, so the change is visible where it
+		// was made rather than only after a trip to the home screen.
+		if (m_bOnForm && edited)
+			ShowItemForm(edited);
+		else if (m_bOnForm)
+			ShowDeviceForm();
+		else if (m_bOnList && m_OpenApp)
+			ShowList(m_OpenApp);
+		else
+			ShowHome();
+	}
+
+	//! The word the world action uses ("Search", "Read"), over the intel route.
+	protected void SendVerb(string verb)
+	{
+		if (!m_Carrier)
+			return;
+
+		SCR_PlayerController controller = SCR_PlayerController.Cast(GetGame().GetPlayerController());
+		if (!controller || !m_Editable)
+		{
+			SetHint("Cannot reach the server.");
+			return;
+		}
+
+		RplId targetId = Replication.FindItemId(m_Editable);
+		if (targetId == RplId.Invalid())
+			return;
+
+		// The intel payload is device name, view, verb, then the pages -- the
+		// same shape MCF_Intel_EditorMenu sends. Only the verb changes here, so
+		// everything else is read back off the carrier untouched.
+		array<MCF_Intel_Entry> entries = {};
+		m_Carrier.GetEntries(entries);
+
+		string payload = m_Carrier.GetDeviceName() + "<<f>>" + m_Carrier.GetView().ToString() + "<<f>>" + verb;
+
+		foreach (MCF_Intel_Entry entry : entries)
+		{
+			payload = payload + "<<e>>" + entry.m_sHeading + "<<f>>" + entry.m_sTimestamp + "<<f>>" + entry.m_sBody + "<<f>>" + entry.m_eApp.ToString();
+		}
+
+		controller.MCF_RequestEditIntelObject(targetId, payload);
+		SetHint("Saved.");
+	}
+
+	//! Sends the draft to the server, which writes it onto the object and
+	//! replicates it to everyone -- the same route the old editor used.
+	protected void SendDraft()
+	{
+		if (!m_Draft)
+			return;
+
+		SCR_PlayerController controller = SCR_PlayerController.Cast(GetGame().GetPlayerController());
+		if (!controller || !m_Editable)
+		{
+			SetHint("Cannot reach the server.");
+			return;
+		}
+
+		RplId targetId = Replication.FindItemId(m_Editable);
+		if (targetId == RplId.Invalid())
+		{
+			SetHint("That object is not replicated and cannot be edited.");
+			return;
+		}
+
+		controller.MCF_RequestWriteDeviceProfile(targetId, MCF_Device_Script.Serialize(m_Draft));
+		SetHint("Saved.");
+	}
+
 	protected void AddRow(notnull MCF_Device_Item entry)
+	{
+		if (!m_wEntryList)
+			return;
+
+		Widget row = GetGame().GetWorkspace().CreateWidgets(PHONE_ROW_LAYOUT, m_wEntryList);
+		if (!row)
+			return;
+
+		SCR_ButtonTextComponent rowButton = SCR_ButtonTextComponent.FindButtonTextComponent(row);
+		if (!rowButton)
+			return;
+
+		rowButton.m_OnClicked.Insert(OnRowClicked);
+		m_aRowButtons.Insert(rowButton);
+
+		FillRow(row, entry);
+	}
+
+	//! What one row says, in the terms of the app it is sitting in.
+	//!
+	//! THIS IS WHERE THE APPS STOP LOOKING ALIKE. The widgets are the same four
+	//! -- a disc, a bright line, a dim line, something small on the right --
+	//! but an inbox fills them with sender, preview and time; a phone book
+	//! fills them with a name and nothing else; a call log puts the direction
+	//! where the preview would be. Four apps out of one row, and none of them
+	//! needs a layout of its own.
+	protected void FillRow(notnull Widget row, notnull MCF_Device_Item entry)
+	{
+		int kind;
+		if (m_OpenApp)
+			kind = m_OpenApp.m_eKind;
+
+		TextWidget line1 = TextWidget.Cast(row.FindAnyWidget("Line1"));
+		RichTextWidget line2 = RichTextWidget.Cast(row.FindAnyWidget("Line2"));
+		TextWidget right = TextWidget.Cast(row.FindAnyWidget("Right"));
+		ImageWidget avatar = ImageWidget.Cast(row.FindAnyWidget("Avatar"));
+		TextWidget avatarText = TextWidget.Cast(row.FindAnyWidget("AvatarText"));
+		Widget dot = row.FindAnyWidget(W_UNREAD_DOT);
+
+		string title = entry.m_sHeading;
+		if (title.IsEmpty())
+			title = "(no subject)";
+
+		string second = entry.m_sBody;
+		string trailing = entry.m_sTimestamp;
+		bool showAvatar = true;
+
+		if (kind == MCF_EIntelApp.CONTACTS)
+		{
+			// A phone book is names AGAINST NUMBERS, and it is the number that
+			// makes a row read as a contact rather than as a heading with a
+			// circle next to it. What is written under a contact is a note to
+			// whoever owned the phone and belongs on the card; nothing sits on
+			// the right, where a message list would put a time.
+			second = entry.m_sTimestamp;
+			trailing = "";
+		}
+		else if (kind == MCF_EIntelApp.SETTINGS || kind == MCF_EIntelApp.FILES)
+		{
+			// Settings and files are not people.
+			showAvatar = false;
+		}
+		else if (kind == MCF_EIntelApp.NOTES)
+		{
+			showAvatar = false;
+		}
+
+		if (line1)
+			line1.SetText(title);
+
+		if (line2)
+		{
+			line2.SetVisible(!second.IsEmpty());
+			line2.SetText(Preview(second));
+		}
+
+		if (right)
+			right.SetText(trailing);
+
+		if (avatar)
+		{
+			avatar.SetVisible(showAvatar);
+
+			if (showAvatar)
+				avatar.SetColor(Color.FromInt(AvatarColour(title)));
+		}
+
+		if (avatarText)
+		{
+			avatarText.SetVisible(showAvatar);
+
+			if (showAvatar)
+				avatarText.SetText(Initial(title));
+		}
+
+		// Without an avatar the disc's column would sit empty. The text and the
+		// rule move left together: a rule that stops short of text it is not
+		// separating reads as a mistake.
+		//
+		// AlignableSlot padding, not FrameSlot: everything in this row is
+		// placed by alignment, and mixing the two is how a widget ends up at
+		// coordinates its parent does not use.
+		if (!showAvatar)
+		{
+			if (line1)
+				AlignableSlot.SetPadding(line1, 14, 1, 70, 0);
+
+			if (line2)
+				AlignableSlot.SetPadding(line2, 14, 0, 40, 1);
+
+			Widget divider = row.FindAnyWidget("Divider");
+			if (divider)
+				AlignableSlot.SetPadding(divider, 14, 0, 0, -9);
+		}
+
+		if (dot)
+			dot.SetVisible(m_Content.IsUnread(entry));
+	}
+
+	//! One line of the body, short enough to sit under a sender.
+	protected string Preview(string body)
+	{
+		string flat = body;
+		flat.Replace("\n", " ");
+
+		if (flat.Length() > 52)
+			return flat.Substring(0, 52) + "...";
+
+		return flat;
+	}
+
+	//! The letter on the disc. Digits and punctuation get a dot rather than a
+	//! number, because "0" as a face reads as an error.
+	protected string Initial(string name)
+	{
+		if (name.IsEmpty())
+			return "?";
+
+		string first = name.Get(0);
+		int code = first.ToAscii();
+
+		// ToUpper MUTATES AND RETURNS AN INT -- see the Enfusion lessons. Call
+		// it for its effect and hand back the string itself.
+		if (code >= 97 && code <= 122)
+		{
+			first.ToUpper();
+			return first;
+		}
+
+		if (code >= 65 && code <= 90)
+			return first;
+
+		return "-";
+	}
+
+	//! A colour that belongs to the name, so the same sender is the same disc
+	//! every time -- which is most of what makes a list of people scannable.
+	protected int AvatarColour(string name)
+	{
+		int seed = 11;
+		int count = name.Length();
+		for (int i = 0; i < count; i++)
+		{
+			seed = (seed * 31 + name.Get(i).ToAscii()) % 9973;
+		}
+
+		int index = seed % 6;
+
+		if (index == 0)
+			return 0xFF8C4A3C;
+
+		if (index == 1)
+			return 0xFF3E6E52;
+
+		if (index == 2)
+			return 0xFF3A5A78;
+
+		if (index == 3)
+			return 0xFF6A5A8C;
+
+		if (index == 4)
+			return 0xFF8A6A2E;
+
+		return 0xFF4C5560;
+	}
+
+	protected void OnRowClicked(SCR_ButtonTextComponent button)
+	{
+		int index = m_aRowButtons.Find(button);
+		if (index < 0)
+			return;
+
+		// In author mode a row is a thing to change, not a thing to read.
+		if (m_bAuthor)
+		{
+			ShowItemForm(m_aVisible[index]);
+			return;
+		}
+
+		ShowEntry(index);
+	}
+
+	// ---------------------------------------------------------- author forms
+
+	//! Everything about one item, as a list of rows on the phone itself.
+	//!
+	//! WHY ROWS AND NOT A FORM WITH SIX BOXES. Six labelled boxes need a screen
+	//! twice this wide; this glass is 250 pixels across. A list of
+	//! "label — value" rows is a form that fits, reads top to bottom, and uses
+	//! the same row widget everything else on the phone already uses. Tapping a
+	//! row opens the one field it holds; a yes/no row flips where it stands.
+	protected void ShowItemForm(MCF_Device_Item item)
+	{
+		if (!item)
+			return;
+
+		m_FormItem = item;
+		m_bOnForm = true;
+		m_bOnList = false;
+
+		SetScreens(false, true, false);
+
+		m_aRowButtons.Clear();
+		m_aAuthorButtons.Clear();
+		m_aAuthorKinds.Clear();
+
+		if (m_wEntryList)
+			ClearChildren(m_wEntryList);
+
+		if (m_wDeviceName)
+			m_wDeviceName.SetText("Edit item");
+
+		AddAuthorRow("Heading:  " + Shown(item.m_sHeading), "f.heading");
+		AddAuthorRow("Timestamp:  " + Shown(item.m_sTimestamp), "f.stamp");
+		AddAuthorRow("Message:  " + Shown(item.m_sBody), "f.body");
+		AddAuthorRow("Shows as new:  " + YesNo(item.m_bNew), "f.new");
+		AddAuthorRow("Picture (addon):  " + Shown(item.m_sImage), "f.image");
+		AddAuthorRow("Picture (url):  " + Shown(item.m_sImageUrl), "f.url");
+		AddAuthorRow("Delete this item", "f.delete");
+		AddAuthorRow("< Back to the list", "f.back");
+
+		SetHint("Editing this device only.");
+	}
+
+	//! The device's own settings, same shape.
+	protected void ShowDeviceForm()
+	{
+		m_bOnForm = true;
+		m_bOnList = false;
+		m_FormItem = null;
+
+		SetScreens(false, true, false);
+
+		m_aRowButtons.Clear();
+		m_aAuthorButtons.Clear();
+		m_aAuthorKinds.Clear();
+
+		if (m_wEntryList)
+			ClearChildren(m_wEntryList);
+
+		if (m_wDeviceName)
+			m_wDeviceName.SetText("Device");
+
+		AddAuthorRow("Name:  " + Shown(m_Content.DeviceName()), "d.name");
+		AddAuthorRow("Prompt verb:  " + Shown(CarrierVerb()), "d.verb");
+		AddAuthorRow("< Back", "f.back");
+
+		SetHint("Editing this device only.");
+	}
+
+	protected string Shown(string value)
+	{
+		if (value.IsEmpty())
+			return "(empty)";
+
+		if (value.Length() > 28)
+			return value.Substring(0, 28) + "...";
+
+		return value;
+	}
+
+	protected string YesNo(bool value)
+	{
+		if (value)
+			return "YES";
+
+		return "NO";
+	}
+
+	protected string CarrierVerb()
+	{
+		if (m_Carrier)
+			return m_Carrier.GetActionVerb();
+
+		return "";
+	}
+
+	//! A row that does something to the device rather than showing what is on
+	//! it. Only ever added in author mode.
+	protected void AddAuthorRow(string label, string kind)
 	{
 		if (!m_wEntryList)
 			return;
@@ -998,17 +1702,132 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (!rowButton)
 			return;
 
-		rowButton.SetText(entry.DescribeRow());
-		rowButton.m_OnClicked.Insert(OnRowClicked);
-		m_aRowButtons.Insert(rowButton);
+		rowButton.SetText(label);
+		rowButton.m_OnClicked.Insert(OnAuthorRowClicked);
+		m_aAuthorButtons.Insert(rowButton);
+		m_aAuthorKinds.Insert(kind);
 	}
 
-	protected void OnRowClicked(SCR_ButtonTextComponent button)
+	protected void OnAuthorRowClicked(SCR_ButtonTextComponent button)
 	{
-		int index = m_aRowButtons.Find(button);
-		if (index >= 0)
-			ShowEntry(index);
+		int index = m_aAuthorButtons.Find(button);
+		if (index < 0 || index >= m_aAuthorKinds.Count())
+			return;
+
+		string kind = m_aAuthorKinds[index];
+
+		// ---- the list's own rows
+		if (kind == "device")
+		{
+			ShowDeviceForm();
+			return;
+		}
+
+		if (kind == "new" && m_OpenApp)
+		{
+			MCF_Device_Item fresh = new MCF_Device_Item();
+			fresh.m_sHeading = "New item";
+			fresh.m_bNew = true;
+
+			if (!m_OpenApp.m_aItems)
+				m_OpenApp.m_aItems = {};
+
+			m_OpenApp.m_aItems.Insert(fresh);
+			SendDraft();
+			ShowItemForm(fresh);
+			return;
+		}
+
+		// ---- the device form
+		if (kind == "d.name")
+		{
+			ShowEditor("device", "Device name", m_Content.DeviceName(), null);
+			return;
+		}
+
+		if (kind == "d.verb")
+		{
+			ShowEditor("verb", "Prompt verb", CarrierVerb(), null);
+			return;
+		}
+
+		// ---- one item's form
+		if (kind == "f.back")
+		{
+			m_bOnForm = false;
+			m_FormItem = null;
+
+			if (m_OpenApp)
+				ShowList(m_OpenApp);
+			else
+				ShowHome();
+
+			return;
+		}
+
+		if (!m_FormItem)
+			return;
+
+		if (kind == "f.heading")
+		{
+			ShowEditor("heading", "Heading", m_FormItem.m_sHeading, m_FormItem);
+			return;
+		}
+
+		if (kind == "f.stamp")
+		{
+			ShowEditor("stamp", "Timestamp", m_FormItem.m_sTimestamp, m_FormItem);
+			return;
+		}
+
+		if (kind == "f.body")
+		{
+			ShowEditor("body", "Message", m_FormItem.m_sBody, m_FormItem);
+			return;
+		}
+
+		if (kind == "f.image")
+		{
+			ShowEditor("image", "Picture, addon resource", m_FormItem.m_sImage, m_FormItem);
+			return;
+		}
+
+		if (kind == "f.url")
+		{
+			ShowEditor("url", "Picture, base64 url", m_FormItem.m_sImageUrl, m_FormItem);
+			return;
+		}
+
+		// A yes/no flips where it stands rather than opening anything: there is
+		// nothing to type and a keyboard for two states is a screen too many.
+		if (kind == "f.new")
+		{
+			m_FormItem.m_bNew = !m_FormItem.m_bNew;
+			SendDraft();
+			ShowItemForm(m_FormItem);
+			return;
+		}
+
+		if (kind == "f.delete")
+		{
+			if (m_OpenApp && m_OpenApp.m_aItems)
+			{
+				int at = m_OpenApp.m_aItems.Find(m_FormItem);
+				if (at >= 0)
+					m_OpenApp.m_aItems.Remove(at);
+			}
+
+			m_FormItem = null;
+			m_bOnForm = false;
+			SendDraft();
+
+			if (m_OpenApp)
+				ShowList(m_OpenApp);
+
+			return;
+		}
 	}
+
 
 	// ---------------------------------------------------------- one entry
 
@@ -1016,6 +1835,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	{
 		if (index < 0 || index >= m_aVisible.Count())
 			return;
+
+		// Opening it is what reads it. Not hovering, not scrolling past -- and
+		// only on this machine: see MCF_Device_ReadState for why the server is
+		// deliberately not told.
+		if (m_Content.MarkRead(m_aVisible[index]))
+			RefreshRowDots();
+
 
 		m_bOnHome = false;
 		m_bOnList = false;
@@ -1449,6 +2275,310 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		DrawPips();
 	}
 
+	// ------------------------------------------------------------ the dialler
+
+	//! Binds the dialler's keys.
+	//!
+	//! Called while the layout still has the pane marked visible, for the same
+	//! reason the passcode pad is: GetButtonText does not walk into a subtree
+	//! the layout has hidden, and twelve keys bound to nothing is a screen that
+	//! looks right and does not work.
+	protected void BindDialler(notnull Widget root)
+	{
+		m_wDialler = root.FindAnyWidget(W_DIALLER);
+		m_wDialNumber = TextWidget.Cast(root.FindAnyWidget(W_DIAL_NUMBER));
+		m_wDialSub = TextWidget.Cast(root.FindAnyWidget(W_DIAL_SUB));
+
+		m_aDialKeys.Clear();
+
+		// INDEX IS THE DIGIT. The same trick the passcode pad uses: the handler
+		// asks the array where the button sits rather than reading its caption,
+		// so a key's face and a key's value cannot drift apart.
+		for (int k = 0; k < 10; k++)
+		{
+			SCR_ButtonTextComponent digit = SCR_ButtonTextComponent.GetButtonText(W_DIAL_KEY_PREFIX + k.ToString(), root);
+			if (!digit)
+				continue;
+
+			digit.m_OnClicked.Insert(OnDialKeyClicked);
+			m_aDialKeys.Insert(digit);
+		}
+
+		// Ten and eleven, in that order: star then hash, which is where a
+		// handset puts them.
+		SCR_ButtonTextComponent star = SCR_ButtonTextComponent.GetButtonText("DialKeyStar", root);
+		if (star)
+		{
+			star.m_OnClicked.Insert(OnDialKeyClicked);
+			m_aDialKeys.Insert(star);
+		}
+
+		SCR_ButtonTextComponent hash = SCR_ButtonTextComponent.GetButtonText("DialKeyHash", root);
+		if (hash)
+		{
+			hash.m_OnClicked.Insert(OnDialKeyClicked);
+			m_aDialKeys.Insert(hash);
+		}
+
+		SCR_ButtonTextComponent wipe = SCR_ButtonTextComponent.GetButtonText(W_DIAL_DELETE, root);
+		if (wipe)
+			wipe.m_OnClicked.Insert(OnDialDeleteClicked);
+
+		SCR_ButtonTextComponent call = SCR_ButtonTextComponent.GetButtonText(W_DIAL_CALL, root);
+		if (call)
+			call.m_OnClicked.Insert(OnDialCallClicked);
+
+		if (m_wDialler)
+			m_wDialler.SetVisible(false);
+	}
+
+	//! The call app, as a phone actually presents it.
+	//!
+	//! WHY THIS APP IS NOT A LIST. Every other app on this device is a list of
+	//! things somebody wrote down; the phone app is a machine you operate.
+	//! Opening it onto rows reading "Outgoing 14:22" was the last screen on the
+	//! handset that still read as a mod menu. The keys are what a player expects
+	//! to see, and the last three calls are what they expect above them.
+	protected void ShowDialler(MCF_Device_App app)
+	{
+		m_bOnHome = false;
+		m_bOnList = false;
+		m_bOnForm = false;
+		m_OpenApp = app;
+		m_iOpenEntry = -1;
+		StopWaitingForPicture();
+
+		// No list, no reader, no home. SetScreens takes the dialler down along
+		// with everything else, so the flag and the pane both go back up after.
+		SetScreens(false, false, false);
+
+		m_aRowButtons.Clear();
+		m_aAuthorButtons.Clear();
+
+		if (m_wEntryList)
+			ClearChildren(m_wEntryList);
+
+		if (m_wDialler)
+			m_wDialler.SetVisible(true);
+
+		m_bOnDialler = true;
+
+		if (m_wDeviceName)
+		{
+			m_wDeviceName.SetVisible(true);
+			m_wDeviceName.SetText(app.ResolveLabel());
+		}
+
+		if (m_ButtonBack)
+			m_ButtonBack.SetText("HOME");
+
+		UpdateLogButton();
+
+		m_sDialled = "";
+		DrawDialled();
+		DrawRecents(app);
+
+		SetHint("");
+	}
+
+	//! The last few calls, newest first: who, and when. Rows with nothing to
+	//! say are hidden rather than left blank -- three empty rules across the
+	//! top of a dialler read as a screen that failed to load, and the label
+	//! goes with them when there is no log at all.
+	protected void DrawRecents(MCF_Device_App app)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		array<ref MCF_Device_Item> items = {};
+		if (app)
+			m_Content.GetItems(app, items);
+
+		for (int i = 0; i < DIAL_RECENTS; i++)
+		{
+			TextWidget name = TextWidget.Cast(root.FindAnyWidget("DialRecentName" + i.ToString()));
+			TextWidget meta = TextWidget.Cast(root.FindAnyWidget("DialRecentMeta" + i.ToString()));
+			Widget rule = root.FindAnyWidget("DialRecentLine" + i.ToString());
+
+			bool has = i < items.Count();
+
+			if (name)
+			{
+				name.SetVisible(has);
+
+				if (has)
+					name.SetText(items[i].m_sHeading);
+			}
+
+			if (meta)
+			{
+				meta.SetVisible(has);
+
+				if (has)
+					meta.SetText(RecentMeta(items[i]));
+			}
+
+			if (rule)
+				rule.SetVisible(has);
+		}
+
+		Widget label = root.FindAnyWidget(W_DIAL_RECENT_LABEL);
+		if (label)
+			label.SetVisible(!items.IsEmpty());
+	}
+
+	//! The right-hand half of a call row.
+	//!
+	//! A log that only says 14:22 is a clock. What makes it a call log is which
+	//! way the call went, which is whatever the mission maker wrote in the body
+	//! -- "Outgoing", "Missed", "12 min". Kept short: this sits in a third of
+	//! the width of a handset.
+	protected string RecentMeta(notnull MCF_Device_Item item)
+	{
+		string flat = item.m_sBody;
+		flat.Replace("\n", " ");
+
+		if (flat.Length() > 14)
+			flat = flat.Substring(0, 14);
+
+		string stamp = item.m_sTimestamp;
+
+		if (flat.IsEmpty())
+			return stamp;
+
+		if (stamp.IsEmpty())
+			return flat;
+
+		return flat + "   " + stamp;
+	}
+
+	//! What has been typed, and who it belongs to if the phone book knows.
+	protected void DrawDialled()
+	{
+		if (m_wDialNumber)
+			m_wDialNumber.SetText(m_sDialled);
+
+		if (!m_wDialSub)
+			return;
+
+		if (m_sDialled.IsEmpty())
+		{
+			m_wDialSub.SetText("Enter a number");
+			return;
+		}
+
+		string match = MatchContact(m_sDialled);
+
+		if (match.IsEmpty())
+			m_wDialSub.SetText("Not in contacts");
+		else
+			m_wDialSub.SetText(match);
+	}
+
+	//! The phone book, read the way a dialler reads it: a number that has a
+	//! name gets the name.
+	//!
+	//! EXACT MATCH ONLY, and on digits alone so that a contact written as
+	//! "555 0148" still answers to 5550148. A half-typed number that guesses at
+	//! a contact is a phone lying about who is being rung, and this device is a
+	//! piece of evidence before it is a convenience.
+	protected string MatchContact(string number)
+	{
+		array<MCF_Device_App> apps = {};
+		m_Content.GetApps(apps);
+
+		foreach (MCF_Device_App candidate : apps)
+		{
+			if (candidate.m_eKind != MCF_EIntelApp.CONTACTS)
+				continue;
+
+			array<ref MCF_Device_Item> people = {};
+			m_Content.GetItems(candidate, people);
+
+			foreach (MCF_Device_Item person : people)
+			{
+				if (Digits(person.m_sTimestamp) == number)
+					return person.m_sHeading;
+			}
+		}
+
+		return "";
+	}
+
+	//! Everything in a written number that a keypad could have produced.
+	protected string Digits(string text)
+	{
+		string kept;
+		int n = text.Length();
+
+		for (int i = 0; i < n; i++)
+		{
+			string ch = text.Substring(i, 1);
+
+			if (ch == "0" || ch == "1" || ch == "2" || ch == "3" || ch == "4" || ch == "5" || ch == "6" || ch == "7" || ch == "8" || ch == "9")
+				kept = kept + ch;
+		}
+
+		return kept;
+	}
+
+	protected void OnDialKeyClicked(SCR_ButtonTextComponent button)
+	{
+		if (!m_bOnDialler || !button)
+			return;
+
+		if (m_sDialled.Length() >= DIAL_MAX_DIGITS)
+			return;
+
+		int slot = m_aDialKeys.Find(button);
+		if (slot < 0)
+			return;
+
+		if (slot < 10)
+			m_sDialled = m_sDialled + slot.ToString();
+		else if (slot == 10)
+			m_sDialled = m_sDialled + "*";
+		else
+			m_sDialled = m_sDialled + "#";
+
+		DrawDialled();
+	}
+
+	protected void OnDialDeleteClicked(SCR_ButtonTextComponent button)
+	{
+		if (!m_bOnDialler || m_sDialled.IsEmpty())
+			return;
+
+		m_sDialled = m_sDialled.Substring(0, m_sDialled.Length() - 1);
+		DrawDialled();
+	}
+
+	//! CALL does not place one, and is not going to.
+	//!
+	//! There is no voice on the other end of a prop phone. What the button is
+	//! for is answering the question the player actually has when they find a
+	//! number on a scrap of paper: does this phone know whose it is. A name is
+	//! the answer; anything else rings out.
+	protected void OnDialCallClicked(SCR_ButtonTextComponent button)
+	{
+		if (!m_bOnDialler)
+			return;
+
+		if (m_sDialled.IsEmpty())
+		{
+			SetHint("No number.");
+			return;
+		}
+
+		string match = MatchContact(m_sDialled);
+
+		if (match.IsEmpty())
+			SetHint("Calling " + m_sDialled + "  -  no answer.");
+		else
+			SetHint("Calling " + match + "  -  no answer.");
+	}
+
 	protected void ShowLock()
 	{
 		m_bOnLock = true;
@@ -1494,6 +2624,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_UnlockButton && lock)
 			m_UnlockButton.SetText(lock.GetBreakInVerb());
 
+		DrawLockNotes();
 		SetHint("Touch the bar to unlock.");
 	}
 
@@ -1505,6 +2636,77 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! The player is not shopping for a padlock; they are deciding whether to
 	//! spend the next minute on this phone while the patrol comes back. So the
 	//! line names the work: how hard, and roughly how long.
+	//! Notification cards on the lock screen: who wrote, and when.
+	//!
+	//! NEVER THE BODY. A locked phone that prints the message has handed over
+	//! the reason to break into it -- the card is the hook, the break-in is the
+	//! price, and putting the text on the lock screen turns the puzzle into a
+	//! tax on something the player already has.
+	protected void DrawLockNotes()
+	{
+		array<MCF_Device_Item> items = {};
+		array<int> kinds = {};
+
+		if (m_Content)
+			m_Content.UnreadItems(LOCK_NOTES, items, kinds);
+
+		for (int i = 0; i < LOCK_NOTES; i++)
+		{
+			bool used = i < items.Count();
+
+			Widget card = FindLockNote(i, "Card");
+			Widget icon = FindLockNote(i, "Icon");
+			TextWidget title = TextWidget.Cast(FindLockNote(i, "Title"));
+			TextWidget stamp = TextWidget.Cast(FindLockNote(i, "Stamp"));
+
+			if (card)
+				card.SetVisible(used);
+
+			if (title)
+				title.SetVisible(used);
+
+			if (stamp)
+				stamp.SetVisible(used);
+
+			if (!used)
+			{
+				if (icon)
+					icon.SetVisible(false);
+
+				continue;
+			}
+
+			MCF_Device_Item item = items[i];
+
+			if (title)
+				title.SetText(item.m_sHeading);
+
+			if (stamp)
+				stamp.SetText(item.m_sTimestamp);
+
+			ImageWidget picture = ImageWidget.Cast(icon);
+			if (!picture)
+				continue;
+
+			string sprite = MCF_Device_Names.IconFor(kinds[i]);
+			bool drawn;
+
+			if (!sprite.IsEmpty())
+				drawn = picture.LoadImageTexture(0, sprite);
+
+			picture.SetVisible(drawn);
+		}
+	}
+
+	protected Widget FindLockNote(int index, string part)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return null;
+
+		return root.FindAnyWidget("Note" + index.ToString() + part);
+	}
+
 	protected string DescribeLock(int difficulty)
 	{
 		if (difficulty <= 0)
@@ -1772,6 +2974,14 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_bOnKeypad = false;
 		}
 
+		// The dialler is an app screen like any other, so every other screen
+		// takes it down. ShowDialler calls here first and puts it back after,
+		// which is why this is unconditional rather than guarded like the pad.
+		if (m_wDialler)
+			m_wDialler.SetVisible(false);
+
+		m_bOnDialler = false;
+
 		foreach (TextWidget label : m_aAppLabels)
 		{
 			if (label)
@@ -1866,6 +3076,16 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		if (m_bOnHome)
 		{
 			Close();
+			return;
+		}
+
+		// BEFORE the list branch and before the m_OpenApp fallback below. The
+		// dialler keeps m_OpenApp set, so falling through to ShowList would
+		// route straight back into ShowDialler and the phone would never leave
+		// the call app.
+		if (m_bOnDialler)
+		{
+			ShowHome();
 			return;
 		}
 
@@ -2018,6 +3238,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 
 			if (m_bOnHome)
 				ShowClock(true);
+
+			// The lock screen's clock is the biggest thing on this device and
+			// the one a player reads against the sky. Set once when the screen
+			// opened, it drifted away from the mission's own time the longer
+			// the phone stayed up; it is re-read here with everything else.
+			if (m_bOnLock && m_wLockTitle)
+				m_wLockTitle.SetText(ClockText());
 		}
 
 		if (m_bFitted || m_iFitFrame > FIT_GIVE_UP_FRAME)

@@ -205,7 +205,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39D3530D}" {
      Name "DeviceName"
      Slot FrameWidgetSlot "{6A1C4F0B39D3530E}" {
-      Anchor 0.0600 0.1680 0.9400 0.2100
+      Anchor 0.0600 0.1500 0.9400 0.2050
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -216,8 +216,8 @@ FrameWidgetClass {
       OffsetBottom 0
      }
      Text ""
-     "Font Size" 20
-     "Min Font Size" 20
+     "Font Size" 22
+     "Min Font Size" 22
     }
     ButtonWidgetClass "{6A1C4F0B39D3530F}" : "{6A1C4F0B39D35100}UI/layouts/MCF/MCF_IntelAppTile.layout" {
      Name "App0"
@@ -787,7 +787,7 @@ FrameWidgetClass {
     ScrollLayoutWidgetClass "{6A1C4F0B39D35037}" {
      Name "ListScroll"
      Slot FrameWidgetSlot "{6A1C4F0B39D35038}" {
-      Anchor 0.0500 0.2000 0.9500 0.8400
+      Anchor 0.0100 0.2250 0.9900 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -806,10 +806,10 @@ FrameWidgetClass {
       SizeLayoutWidgetClass "{6A1C4F0B39D3503A}" {
        Name "ListWidth"
        Slot AlignableSlot "{6A1C4F0B39D3503B}" {
-        HorizontalAlign 0
+        HorizontalAlign 3
         VerticalAlign 0
        }
-       AllowWidthOverride 1
+       AllowWidthOverride 0
        WidthOverride 200
        {
         VerticalLayoutWidgetClass "{6A1C4F0B39D3503C}" {
@@ -828,7 +828,7 @@ FrameWidgetClass {
     ScrollLayoutWidgetClass "{6A1C4F0B39D35046}" {
      Name "ReadScroll"
      Slot FrameWidgetSlot "{6A1C4F0B39D35047}" {
-      Anchor 0.0500 0.2050 0.9500 0.8400
+      Anchor 0.0450 0.2050 0.9550 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -847,10 +847,10 @@ FrameWidgetClass {
       SizeLayoutWidgetClass "{6A1C4F0B39D35049}" {
        Name "ReadWidth"
        Slot AlignableSlot "{6A1C4F0B39D3504A}" {
-        HorizontalAlign 0
+        HorizontalAlign 3
         VerticalAlign 0
        }
-       AllowWidthOverride 1
+       AllowWidthOverride 0
        WidthOverride 200
        {
         VerticalLayoutWidgetClass "{6A1C4F0B39D3504B}" {
@@ -1018,6 +1018,644 @@ FrameWidgetClass {
      "Font Size" 11
      "Min Font Size" 11
     }
+    FrameWidgetClass "{6A1C4F0B39D35500}" {
+     Name "EditorPane"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35501}" {
+      Anchor 0.0000 0.0000 1.0000 1.0000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     {
+      ImageWidgetClass "{6A1C4F0B39D35502}" {
+       Name "EditorDim"
+       Slot FrameWidgetSlot "{6A1C4F0B39D35503}" {
+        Anchor 0.0000 0.0000 1.0000 1.0000
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       Color 0.043 0.043 0.051 1
+      }
+      TextWidgetClass "{6A1C4F0B39D35504}" {
+       Name "EditorTitle"
+       Slot FrameWidgetSlot "{6A1C4F0B39D35505}" {
+        Anchor 0.0600 0.1200 0.9400 0.1800
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       Text ""
+       "Font Size" 16
+       "Min Font Size" 16
+      }
+      ImageWidgetClass "{6A1C4F0B39D35540}" {
+       Name "EditorFieldBack"
+       Slot FrameWidgetSlot "{6A1C4F0B39D35541}" {
+        Anchor 0.0600 0.2100 0.9400 0.5600
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       Color 1 1 1 0.06
+       Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+       Image ""
+      }
+      EditBoxWidgetClass "{6A1C4F0B39D35542}" {
+       Name "EditorField"
+       Slot FrameWidgetSlot "{6A1C4F0B39D35543}" {
+        Anchor 0.0900 0.2300 0.9100 0.5400
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       Clipping True
+       components {
+        EditBoxFilterComponent "{6A1C4F0B39D35544}" {
+         m_iCharacterLimit 1000
+        }
+       }
+       style blank
+       Text ""
+       "Font Size" 14
+       "Min Font Size" 14
+       "Line Spacing" 19
+      }
+      ButtonWidgetClass "{6A1C4F0B39D35509}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
+       Name "EditorSave"
+       Slot FrameWidgetSlot "{6A1C4F0B39D3550A}" {
+        Anchor 0.0600 0.6100 0.4700 0.6750
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       components {
+        SCR_ButtonTextComponent "{6A1C4F0B39D3550B}" {
+         m_bCanBeToggled 0
+         m_sText "SAVE"
+        }
+       }
+      }
+      ButtonWidgetClass "{6A1C4F0B39D3550C}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
+       Name "EditorCancel"
+       Slot FrameWidgetSlot "{6A1C4F0B39D3550D}" {
+        Anchor 0.5300 0.6100 0.9400 0.6750
+        PositionX 0
+        OffsetLeft 0
+        PositionY 0
+        OffsetTop 0
+        SizeX 0
+        OffsetRight 0
+        SizeY 0
+        OffsetBottom 0
+       }
+       components {
+        SCR_ButtonTextComponent "{6A1C4F0B39D3550E}" {
+         m_bCanBeToggled 0
+         m_sText "CANCEL"
+        }
+       }
+      }
+     }
+    }
+    FrameWidgetClass "{6A1C4F0B39D35700}" {
+     Name "Dialler"
+     Slot FrameWidgetSlot "{6A1C4F0B39D35701}" {
+      Anchor 0.0000 0.0000 1.0000 1.0000
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 0
+      OffsetRight 0
+      SizeY 0
+      OffsetBottom 0
+     }
+     {
+     TextWidgetClass "{6A1C4F0B39D35702}" {
+      Name "DialRecentLabel"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35703}" {
+       Anchor 0.0900 0.2080 0.9100 0.2450
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text "RECENT"
+      "Font Size" 10
+      "Min Font Size" 10
+      Color 0.55 0.58 0.62 1
+     }
+     TextWidgetClass "{6A1C4F0B39D35704}" {
+      Name "DialRecentName0"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35705}" {
+       Anchor 0.0900 0.2500 0.6000 0.3020
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+     }
+     TextWidgetClass "{6A1C4F0B39D35706}" {
+      Name "DialRecentMeta0"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35707}" {
+       Anchor 0.5800 0.2500 0.9100 0.3020
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 10
+      "Min Font Size" 10
+      Alignment 1 0
+      Color 0.60 0.63 0.67 1
+     }
+     ImageWidgetClass "{6A1C4F0B39D35708}" {
+      Name "DialRecentLine0"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35709}" {
+       Anchor 0.0900 0.3025 0.9100 0.3035
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.08
+     }
+     TextWidgetClass "{6A1C4F0B39D3570A}" {
+      Name "DialRecentName1"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3570B}" {
+       Anchor 0.0900 0.3060 0.6000 0.3580
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+     }
+     TextWidgetClass "{6A1C4F0B39D3570C}" {
+      Name "DialRecentMeta1"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3570D}" {
+       Anchor 0.5800 0.3060 0.9100 0.3580
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 10
+      "Min Font Size" 10
+      Alignment 1 0
+      Color 0.60 0.63 0.67 1
+     }
+     ImageWidgetClass "{6A1C4F0B39D3570E}" {
+      Name "DialRecentLine1"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3570F}" {
+       Anchor 0.0900 0.3585 0.9100 0.3595
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.08
+     }
+     TextWidgetClass "{6A1C4F0B39D35710}" {
+      Name "DialRecentName2"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35711}" {
+       Anchor 0.0900 0.3620 0.6000 0.4140
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+     }
+     TextWidgetClass "{6A1C4F0B39D35712}" {
+      Name "DialRecentMeta2"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35713}" {
+       Anchor 0.5800 0.3620 0.9100 0.4140
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 10
+      "Min Font Size" 10
+      Alignment 1 0
+      Color 0.60 0.63 0.67 1
+     }
+     ImageWidgetClass "{6A1C4F0B39D35714}" {
+      Name "DialRecentLine2"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35715}" {
+       Anchor 0.0900 0.4145 0.9100 0.4155
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.08
+     }
+     TextWidgetClass "{6A1C4F0B39D35716}" {
+      Name "DialNumber"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35717}" {
+       Anchor 0.0700 0.4300 0.9300 0.5000
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 26
+      "Min Font Size" 26
+      Alignment 0.5 0
+     }
+     TextWidgetClass "{6A1C4F0B39D35718}" {
+      Name "DialSub"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35719}" {
+       Anchor 0.0700 0.4980 0.9300 0.5320
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 10
+      "Min Font Size" 10
+      Alignment 0.5 0
+      Color 0.60 0.63 0.67 1
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35720}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey1"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35721}" {
+       Anchor 0.2000 0.5400 0.3700 0.6180
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35722}" {
+        m_bCanBeToggled 0
+        m_sText "1"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35723}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey2"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35724}" {
+       Anchor 0.4150 0.5400 0.5850 0.6180
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35725}" {
+        m_bCanBeToggled 0
+        m_sText "2"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35726}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey3"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35727}" {
+       Anchor 0.6300 0.5400 0.8000 0.6180
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35728}" {
+        m_bCanBeToggled 0
+        m_sText "3"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35729}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey4"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3572A}" {
+       Anchor 0.2000 0.6250 0.3700 0.7030
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D3572B}" {
+        m_bCanBeToggled 0
+        m_sText "4"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3572C}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey5"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3572D}" {
+       Anchor 0.4150 0.6250 0.5850 0.7030
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D3572E}" {
+        m_bCanBeToggled 0
+        m_sText "5"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3572F}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey6"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35730}" {
+       Anchor 0.6300 0.6250 0.8000 0.7030
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35731}" {
+        m_bCanBeToggled 0
+        m_sText "6"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35732}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey7"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35733}" {
+       Anchor 0.2000 0.7100 0.3700 0.7880
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35734}" {
+        m_bCanBeToggled 0
+        m_sText "7"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35735}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey8"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35736}" {
+       Anchor 0.4150 0.7100 0.5850 0.7880
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35737}" {
+        m_bCanBeToggled 0
+        m_sText "8"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35738}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey9"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35739}" {
+       Anchor 0.6300 0.7100 0.8000 0.7880
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D3573A}" {
+        m_bCanBeToggled 0
+        m_sText "9"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3573B}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKeyStar"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3573C}" {
+       Anchor 0.2000 0.7950 0.3700 0.8730
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D3573D}" {
+        m_bCanBeToggled 0
+        m_sText "*"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D3573E}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKey0"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3573F}" {
+       Anchor 0.4150 0.7950 0.5850 0.8730
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35740}" {
+        m_bCanBeToggled 0
+        m_sText "0"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35741}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialKeyHash"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35742}" {
+       Anchor 0.6300 0.7950 0.8000 0.8730
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35743}" {
+        m_bCanBeToggled 0
+        m_sText "#"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35744}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialCall"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35745}" {
+       Anchor 0.4150 0.8830 0.5850 0.9610
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35746}" {
+        m_bCanBeToggled 0
+        m_BackgroundDefault 0.16 0.60 0.27 1
+        m_BackgroundHovered 0.22 0.72 0.34 1
+        m_BackgroundClicked 0.30 0.80 0.42 1
+        m_sText "CALL"
+       }
+      }
+     }
+     ButtonWidgetClass "{6A1C4F0B39D35747}" : "{6A1C4F0B39D35130}UI/layouts/MCF/MCF_PhoneKey.layout" {
+      Name "DialDel"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35748}" {
+       Anchor 0.6300 0.8830 0.8000 0.9610
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      components {
+       SCR_ButtonTextComponent "{6A1C4F0B39D35749}" {
+        m_bCanBeToggled 0
+        m_BackgroundDefault 1 1 1 0.05
+        m_sText "DEL"
+       }
+      }
+     }
+     }
+    }
     FrameWidgetClass "{6A1C4F0B39D35400}" {
      Name "Keypad"
      Slot FrameWidgetSlot "{6A1C4F0B39D35401}" {
@@ -1032,7 +1670,7 @@ FrameWidgetClass {
       OffsetBottom 0
      }
      {
-     TextWidgetClass "{6A1C4F0B39D35401}" {
+     TextWidgetClass "{6A1C4F0B39D3547F}" {
       Name "KeypadTitle"
       Slot FrameWidgetSlot "{6A1C4F0B39D35402}" {
        Anchor 0.0600 0.1500 0.9400 0.2000
@@ -1404,6 +2042,219 @@ FrameWidgetClass {
        "Min Font Size" 12
        Color 0.60 0.62 0.62 1
       }
+     ImageWidgetClass "{6A1C4F0B39D35521}" {
+      Name "Note0Card"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35522}" {
+       Anchor 0.0700 0.3600 0.9300 0.4480
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.11
+      Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+      Image ""
+      "Is Visible" 0
+     }
+     ImageWidgetClass "{6A1C4F0B39D35523}" {
+      Name "Note0Icon"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35524}" {
+       Anchor 0.1050 0.3800 0.1750 0.4280
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.95
+      Image ""
+      "Is Visible" 0
+     }
+     TextWidgetClass "{6A1C4F0B39D35525}" {
+      Name "Note0Title"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35526}" {
+       Anchor 0.2000 0.3780 0.7600 0.4080
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Is Visible" 0
+     }
+     TextWidgetClass "{6A1C4F0B39D35527}" {
+      Name "Note0Stamp"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35528}" {
+       Anchor 0.2000 0.4100 0.9000 0.4380
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 10
+      "Min Font Size" 10
+      "Is Visible" 0
+     }
+     ImageWidgetClass "{6A1C4F0B39D35529}" {
+      Name "Note1Card"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3552A}" {
+       Anchor 0.0700 0.4650 0.9300 0.5530
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.11
+      Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+      Image ""
+      "Is Visible" 0
+     }
+     ImageWidgetClass "{6A1C4F0B39D3552B}" {
+      Name "Note1Icon"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3552C}" {
+       Anchor 0.1050 0.4850 0.1750 0.5330
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.95
+      Image ""
+      "Is Visible" 0
+     }
+     TextWidgetClass "{6A1C4F0B39D3552D}" {
+      Name "Note1Title"
+      Slot FrameWidgetSlot "{6A1C4F0B39D3552E}" {
+       Anchor 0.2000 0.4830 0.7600 0.5130
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Is Visible" 0
+     }
+     TextWidgetClass "{6A1C4F0B39D3552F}" {
+      Name "Note1Stamp"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35530}" {
+       Anchor 0.2000 0.5150 0.9000 0.5430
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 10
+      "Min Font Size" 10
+      "Is Visible" 0
+     }
+     ImageWidgetClass "{6A1C4F0B39D35531}" {
+      Name "Note2Card"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35532}" {
+       Anchor 0.0700 0.5700 0.9300 0.6580
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.11
+      Texture "{6A1C4F0B39D3520A}UI/images/MCF_Phone/tile_rounded.edds"
+      Image ""
+      "Is Visible" 0
+     }
+     ImageWidgetClass "{6A1C4F0B39D35533}" {
+      Name "Note2Icon"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35534}" {
+       Anchor 0.1050 0.5900 0.1750 0.6380
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Color 1 1 1 0.95
+      Image ""
+      "Is Visible" 0
+     }
+     TextWidgetClass "{6A1C4F0B39D35535}" {
+      Name "Note2Title"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35536}" {
+       Anchor 0.2000 0.5880 0.7600 0.6180
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 12
+      "Min Font Size" 12
+      "Is Visible" 0
+     }
+     TextWidgetClass "{6A1C4F0B39D35537}" {
+      Name "Note2Stamp"
+      Slot FrameWidgetSlot "{6A1C4F0B39D35538}" {
+       Anchor 0.2000 0.6200 0.9000 0.6480
+       PositionX 0
+       OffsetLeft 0
+       PositionY 0
+       OffsetTop 0
+       SizeX 0
+       OffsetRight 0
+       SizeY 0
+       OffsetBottom 0
+      }
+      Text ""
+      "Font Size" 10
+      "Min Font Size" 10
+      "Is Visible" 0
+     }
       ButtonWidgetClass "{6A1C4F0B39D35098}" : "{6A1C4F0B39D35120}UI/layouts/MCF/MCF_PhoneButton.layout" {
        Name "ButtonUnlock"
        Slot FrameWidgetSlot "{6A1C4F0B39D35099}" {

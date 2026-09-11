@@ -304,6 +304,16 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 	//! One string rather than parallel arrays because an RPC with three
 	//! same-length arrays is three chances for them to arrive out of step, and
 	//! because the number of pages is itself editable.
+	//! A bool on the wire. "1" or "0" and nothing cleverer: ToString on a
+	//! bool is not something this format should have to trust.
+	protected string Flag(bool value)
+	{
+		if (value)
+			return "1";
+
+		return "0";
+	}
+
 	string SerializeContent()
 	{
 		array<MCF_Intel_Entry> entries = {};
@@ -317,7 +327,7 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 			// existed still parses -- see the fallback in
 			// ApplySerializedContent. Adding a field anywhere but the end
 			// would silently shift every field after it.
-			result = result + ENTRY_SEP + Clean(entry.m_sHeading) + FIELD_SEP + Clean(entry.m_sTimestamp) + FIELD_SEP + Clean(entry.m_sBody) + FIELD_SEP + entry.m_eApp.ToString();
+			result = result + ENTRY_SEP + Clean(entry.m_sHeading) + FIELD_SEP + Clean(entry.m_sTimestamp) + FIELD_SEP + Clean(entry.m_sBody) + FIELD_SEP + entry.m_eApp.ToString() + FIELD_SEP + Flag(entry.m_bNew);
 		}
 
 		return result;
@@ -367,6 +377,11 @@ class MCF_Intel_CarrierComponent : ScriptComponent
 			// right answer for it: no particular section.
 			if (fields.Count() > 3)
 				entry.m_eApp = fields[3].ToInt();
+
+			// Appended after the app, so content written before unread existed
+			// reads back as read -- which is what it always was.
+			if (fields.Count() > 4)
+				entry.m_bNew = fields[4].ToInt() != 0;
 
 			m_aEntries.Insert(entry);
 		}

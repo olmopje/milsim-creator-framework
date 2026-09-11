@@ -83,7 +83,8 @@ class MCF_Device_Script
 				+ Clean(item.m_sTimestamp) + SEP_FIELD
 				+ Clean(item.m_sBody) + SEP_FIELD
 				+ Clean(item.m_sImage) + SEP_FIELD
-				+ Clean(item.m_sImageUrl);
+				+ Clean(item.m_sImageUrl) + SEP_FIELD
+				+ Flag(item.m_bNew);
 		}
 
 		return result;
@@ -179,6 +180,9 @@ class MCF_Device_Script
 			if (fields.Count() > 4)
 				item.m_sImageUrl = fields[4];
 
+			if (fields.Count() > 5)
+				item.m_bNew = fields[5].ToInt() != 0;
+
 			app.m_aItems.Insert(item);
 		}
 
@@ -191,6 +195,14 @@ class MCF_Device_Script
 	//! and an unescaper is a second place the format can be wrong. A mission
 	//! maker who types "<<f>>" into a message loses five characters they did
 	//! not mean to type; the alternative is losing the message.
+	protected static string Flag(bool value)
+	{
+		if (value)
+			return "1";
+
+		return "0";
+	}
+
 	protected static string Clean(string value)
 	{
 		string result = value;

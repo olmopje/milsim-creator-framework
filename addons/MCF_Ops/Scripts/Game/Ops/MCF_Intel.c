@@ -97,6 +97,9 @@ class MCF_Intel_Entry
 	[Attribute(defvalue: "0", uiwidget: UIWidgets.ComboBox, enums: ParamEnumArray.FromEnum(MCF_EIntelApp), desc: "Which section of the device this belongs to. Ignored by the plain viewer; the devices module uses it to decide which icon it sits behind.")]
 	MCF_EIntelApp m_eApp;
 
+	[Attribute(defvalue: "0", uiwidget: UIWidgets.CheckBox, desc: "Show this as new until the player opens it.")]
+	bool m_bNew;
+
 	//! One line for the list on the left.
 	string DescribeShort()
 	{
