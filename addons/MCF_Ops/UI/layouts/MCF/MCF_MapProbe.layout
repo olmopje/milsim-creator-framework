@@ -17,17 +17,20 @@ FrameWidgetClass {
    Color 0 0 0 0.85
   }
 
-  // ---- TEST A: the map in a widget of ours, at a position we chose.
+  // ---- TWO HOSTS, EACH WITH ITS OWN "MapWidget".
   //
-  // THE SLOTS HERE COPY MapMini.layout EXACTLY and deliberately. The first
-  // attempt used `Anchor` with a size, and every widget came out 0 x 0 -- and
-  // a render target asked for a texture of zero size, which is the flood of
-  // "Out of memory when requested 0, Type: Video" in that log. Vanilla's own
-  // minimap positions a MapWidget with no Anchor at all: position, size, and
-  // the two offsets as the negative of position+size.
-  MapWidgetClass "{0000000060029FBB}" {
-   Name "MapWidget"
-   Slot FrameWidgetSlot "{6A1C4F0B39E10005}" {
+  // OpenMap does FindAnyWidget("MapWidget") on whatever root it is given, so
+  // handing it one host or the other decides which of these the map binds to.
+  // That is the whole of stage two: the same map, once in a plain widget and
+  // once inside a render target, and the numbers say which one it drove.
+  //
+  // The slots copy MapMini.layout exactly -- no Anchor, position and size,
+  // offsets as the negative of position+size. Anchor plus a size gives 0 x 0,
+  // and a render target sized zero asks for a texture sized zero, which is a
+  // wall of "Out of memory when requested 0, Type: Video".
+  FrameWidgetClass "{6A1C4F0B39E10003}" {
+   Name "PlainHost"
+   Slot FrameWidgetSlot "{6A1C4F0B39E10004}" {
     PositionX 80
     OffsetLeft 80
     PositionY 140
@@ -37,11 +40,26 @@ FrameWidgetClass {
     SizeY 420
     OffsetBottom -560
    }
-   Color 1 1 1 1
-   SizeInUnits 1024 1024
-   OffsetPixels 0 0
-   Clear 1
-   ClearColor 0.173 0.344 0.62 1
+   {
+    MapWidgetClass "{0000000060029FBB}" {
+     Name "MapWidget"
+     Slot FrameWidgetSlot "{6A1C4F0B39E10005}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 640
+      OffsetRight -640
+      SizeY 420
+      OffsetBottom -420
+     }
+     Color 1 1 1 1
+     SizeInUnits 1024 1024
+     OffsetPixels 0 0
+     Clear 1
+     ClearColor 0.173 0.344 0.62 1
+    }
+   }
   }
 
   TextWidgetClass "{6A1C4F0B39E1000A}" {
@@ -56,17 +74,11 @@ FrameWidgetClass {
     SizeY 28
     OffsetBottom -133
    }
-   Text "A  the map in a widget of ours"
+   Text "A  plain widget"
    "Font Size" 16
    "Min Font Size" 16
   }
 
-  // ---- TEST B: the same widget, inside a render target.
-  //
-  // A render target draws no picture until a material samples it, so this
-  // half cannot show terrain. What it reports is whether the map widget
-  // inside one is laid out at all: PixelPerUnit at or below zero means it is
-  // not, and no board can work this way.
   RTTextureWidgetClass "{6A1C4F0B39E1000C}" {
    Name "Probe"
    Slot FrameWidgetSlot "{6A1C4F0B39E1000D}" {
@@ -81,7 +93,7 @@ FrameWidgetClass {
    }
    {
     MapWidgetClass "{0000000060029FBB}" {
-     Name "ProbeMapWidget"
+     Name "MapWidget"
      Slot FrameWidgetSlot "{6A1C4F0B39E10010}" {
       PositionX 0
       OffsetLeft 0
@@ -113,7 +125,7 @@ FrameWidgetClass {
     SizeY 28
     OffsetBottom -133
    }
-   Text "B  the same, inside a render target"
+   Text "B  inside a render target"
    "Font Size" 16
    "Min Font Size" 16
   }
@@ -123,11 +135,11 @@ FrameWidgetClass {
    Slot FrameWidgetSlot "{6A1C4F0B39E10014}" {
     PositionX 80
     OffsetLeft 80
-    PositionY 600
-    OffsetTop 600
+    PositionY 620
+    OffsetTop 620
     SizeX 1360
     OffsetRight -1440
-    SizeY 380
+    SizeY 360
     OffsetBottom -980
    }
    Clipping Ancestor
@@ -136,6 +148,46 @@ FrameWidgetClass {
    "Font Size" 14
    "Min Font Size" 14
    "Line Spacing" 20
+  }
+
+  ButtonWidgetClass "{6A1C4F0B39E10018}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonPlain"
+   Slot FrameWidgetSlot "{6A1C4F0B39E10019}" {
+    PositionX 80
+    OffsetLeft 80
+    PositionY 570
+    OffsetTop 570
+    SizeX 300
+    OffsetRight -380
+    SizeY 44
+    OffsetBottom -614
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39E1001A}" {
+     m_bCanBeToggled 0
+     m_sText "OPEN INTO A"
+    }
+   }
+  }
+
+  ButtonWidgetClass "{6A1C4F0B39E1001B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
+   Name "ButtonProbe"
+   Slot FrameWidgetSlot "{6A1C4F0B39E1001C}" {
+    PositionX 800
+    OffsetLeft 800
+    PositionY 570
+    OffsetTop 570
+    SizeX 300
+    OffsetRight -1100
+    SizeY 44
+    OffsetBottom -614
+   }
+   components {
+    SCR_ButtonTextComponent "{6A1C4F0B39E1001D}" {
+     m_bCanBeToggled 0
+     m_sText "OPEN INTO B"
+    }
+   }
   }
 
   ButtonWidgetClass "{6A1C4F0B39E10015}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {

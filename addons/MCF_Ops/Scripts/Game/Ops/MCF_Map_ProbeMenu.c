@@ -26,6 +26,7 @@
 class MCF_Map_ProbeMenu : ChimeraMenuBase
 {
 	protected SCR_MapEntity m_MapEntity;
+	protected string m_sOpenIn = "nothing";
 	protected RichTextWidget m_wReport;
 	protected ref array<string> m_aLines = {};
 
@@ -44,6 +45,14 @@ class MCF_Map_ProbeMenu : ChimeraMenuBase
 		if (close)
 			close.m_OnClicked.Insert(OnCloseClicked);
 
+		SCR_ButtonTextComponent plainButton = SCR_ButtonTextComponent.GetButtonText("ButtonPlain", root);
+		if (plainButton)
+			plainButton.m_OnClicked.Insert(OnPlainClicked);
+
+		SCR_ButtonTextComponent probeButton = SCR_ButtonTextComponent.GetButtonText("ButtonProbe", root);
+		if (probeButton)
+			probeButton.m_OnClicked.Insert(OnProbeClicked);
+
 		m_MapEntity = SCR_MapEntity.GetMapInstance();
 		if (!m_MapEntity)
 		{
@@ -51,34 +60,66 @@ class MCF_Map_ProbeMenu : ChimeraMenuBase
 			return;
 		}
 
-		// ---- the sizes BEFORE anything is opened, because zero here is the
-		// whole of the last run's failure and it is worth catching early.
-		CanvasWidget plain = CanvasWidget.Cast(root.FindAnyWidget("MapWidget"));
-		CanvasWidget inRT = CanvasWidget.Cast(root.FindAnyWidget("ProbeMapWidget"));
+		Say("stage one already answered: the map draws in a widget of ours, and a map widget inside a render target lays out with a real PixelPerUnit.");
+		Say("stage two asks the one thing left: does the MAP bind to the widget inside the render target, or only to the plain one.");
+		Say("");
+		Say("OPEN INTO A puts the map in the left box. OPEN INTO B hands OpenMap the render target's subtree instead -- if the numbers for B then move off their defaults the way A's do, the map is driving a widget inside a render target and a board on a wall is only a material away.");
 
-		SaySize("A before open", plain);
-		SaySize("B before open", inRT);
+		OpenInto("A", "PlainHost");
+	}
 
-		MapConfiguration config = BuildConfig(root);
+	//------------------------------------------------------------------------
+	protected void OnPlainClicked(SCR_ButtonTextComponent button)
+	{
+		OpenInto("A", "PlainHost");
+	}
+
+	protected void OnProbeClicked(SCR_ButtonTextComponent button)
+	{
+		OpenInto("B", "Probe");
+	}
+
+	//------------------------------------------------------------------------
+	//! Opens the map into one host or the other.
+	//!
+	//! BOTH HOSTS CONTAIN A WIDGET CALLED "MapWidget". OpenMap does
+	//! FindAnyWidget for that name on whatever root it is handed, so handing
+	//! it one host or the other is the entire difference -- same map, same
+	//! config, one of two widgets.
+	protected void OpenInto(string label, string hostName)
+	{
+		Widget root = GetRootWidget();
+		if (!root || !m_MapEntity)
+			return;
+
+		Widget host = root.FindAnyWidget(hostName);
+		if (!host)
+		{
+			Say("no host called " + hostName);
+			return;
+		}
+
+		if (m_MapEntity.IsOpen())
+			m_MapEntity.CloseMap();
+
+		MapConfiguration config = BuildConfig(host);
 		if (!config)
 			return;
 
+		m_sOpenIn = label;
 		m_MapEntity.OpenMap(config);
-		Say("OpenMap called with our own root and a config carrying no modules and no components");
+		Say("");
+		Say("opened into " + label + " (" + hostName + ")");
 
-		// ---- and give the character its camera back
-		//
-		// OpenMap switches it off; CloseMap switches it on. Nothing says the
-		// map needs it off, so: on, and we see whether the map minds.
+		// OpenMap switches the character camera off; CloseMap switches it on.
+		// Nothing says the map needs it off, so: on.
 		PlayerController controller = GetGame().GetPlayerController();
 		if (controller)
-		{
 			controller.SetCharacterCameraRenderActive(true);
-			Say("character camera switched back on");
-		}
 
 		// The map stalls a frame waiting for its widget to lay out, so asking
 		// now would only ever read the fallback.
+		GetGame().GetCallqueue().Remove(Measure);
 		GetGame().GetCallqueue().CallLater(Measure, 800, false);
 	}
 
@@ -135,8 +176,16 @@ class MCF_Map_ProbeMenu : ChimeraMenuBase
 		if (!root)
 			return;
 
-		SaySize("A after open", CanvasWidget.Cast(root.FindAnyWidget("MapWidget")));
-		SaySize("B after open", CanvasWidget.Cast(root.FindAnyWidget("ProbeMapWidget")));
+		Widget plainHost = root.FindAnyWidget("PlainHost");
+		Widget probeHost = root.FindAnyWidget("Probe");
+
+		if (plainHost)
+			SaySize("A", CanvasWidget.Cast(plainHost.FindAnyWidget("MapWidget")));
+
+		if (probeHost)
+			SaySize("B", CanvasWidget.Cast(probeHost.FindAnyWidget("MapWidget")));
+
+		Say("the map was opened into " + m_sOpenIn + " -- whichever of the two moved off zoom 1 is the one it bound to");
 
 		if (m_MapEntity)
 		{

@@ -222,6 +222,58 @@ look at the board.
 
 Half an hour, and it decides the shape of the feature.
 
+## MEASURED: the map goes in a widget of ours, and a render target holds one
+
+Run on 2026-09-11 with `MCF_Map_ProbeMenu`. Verbatim:
+
+```
+A before open: 0 x 0, PixelPerUnit 0, zoom 1
+B before open: 0 x 0, PixelPerUnit 0, zoom 1
+config built: 6 layer(s), props 1, descriptor defaults 1, descriptor visibility 1
+OpenMap called with our own root and a config carrying no modules and no components
+character camera switched back on
+A after open: 640 x 420, PixelPerUnit 0.15625, zoom 2.13333
+B after open: 640 x 420, PixelPerUnit 0.625, zoom 1
+map reports open: true, zoom 1
+visible world frame <0, 0, 3676> .. <640, 0, 4096>
+```
+
+Terrain appeared in the left box. So, settled:
+
+1. **The map draws inside a widget we made**, at a position and size we chose.
+   Not full screen, not somewhere else. A board is possible.
+2. **A map widget inside an `RTTextureWidget` lays out** — 640 x 420 with a
+   real `PixelPerUnit` of 0.625, not the `<= 0` that would have meant no
+   layout at all and no board this way.
+3. **The character camera can be given straight back.** `OpenMap` switches it
+   off, the probe switches it on in the next line, and the map carries on. The
+   line that looked fatal is simply removable.
+4. **A map with no modules and no components works.** Which is what a board
+   wants anyway -- no cursor, no tool menu, no ruler -- and it steps around
+   `SetupMapConfig` handing back and mutating the shared `m_ActiveMapCfg`.
+
+Two things the first run got wrong, both mine and both worth remembering:
+
+- **`Anchor` plus a size gives 0 x 0.** Copy `MapMini.layout`: no `Anchor`,
+  position and size, offsets as the negative of position+size. A render target
+  sized zero then asks for a texture sized zero, which fills the log with
+  `Out of memory when requested 0, Type: Video` -- an error that reads like a
+  graphics problem and is a layout problem.
+- **The gadget map config brings the whole component set**, and
+  `SCR_MapCursorModule.InitWidgets` throws once per frame looking for widgets
+  a board has no reason to own.
+
+### What is still not proven
+
+B's numbers are the widget's own defaults -- zoom 1, `PixelPerUnit` 0.625 --
+because only one map exists and it bound to A. So B proves a map widget *lays
+out* inside a render target, not that the map *renders* into one.
+
+Stage two of the probe answers that: two hosts, each containing a widget
+called `MapWidget`, and `OpenMap` handed one or the other. If B's numbers then
+move off their defaults the way A's did, the map is driving a widget inside a
+render target, and a board on a wall is one material away.
+
 ## What is available, and is arguably better
 
 Build the board out of the two things that are proven, and own the data:
