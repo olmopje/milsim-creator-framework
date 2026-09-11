@@ -53,6 +53,16 @@ class MCF_Map_ProbeMenu : ChimeraMenuBase
 		if (probeButton)
 			probeButton.m_OnClicked.Insert(OnProbeClicked);
 
+		// EVERY PRESS LANDED ON A. Four times, in one run, and the B handler
+		// never spoke -- so either the widget was not found or the click never
+		// reached it, and guessing which costs another launch.
+		Say("buttons found: A " + (plainButton != null).ToString()
+			+ ", B " + (probeButton != null).ToString()
+			+ ", close " + (close != null).ToString());
+
+		Widget rawProbe = root.FindAnyWidget("ButtonProbe");
+		Say("the B widget itself: " + (rawProbe != null).ToString());
+
 		m_MapEntity = SCR_MapEntity.GetMapInstance();
 		if (!m_MapEntity)
 		{
@@ -71,11 +81,13 @@ class MCF_Map_ProbeMenu : ChimeraMenuBase
 	//------------------------------------------------------------------------
 	protected void OnPlainClicked(SCR_ButtonTextComponent button)
 	{
+		Say("A pressed");
 		OpenInto("A", "PlainHost");
 	}
 
 	protected void OnProbeClicked(SCR_ButtonTextComponent button)
 	{
+		Say("B pressed");
 		OpenInto("B", "Probe");
 	}
 

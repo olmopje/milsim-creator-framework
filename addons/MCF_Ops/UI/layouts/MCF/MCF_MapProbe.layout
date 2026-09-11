@@ -173,12 +173,12 @@ FrameWidgetClass {
   ButtonWidgetClass "{6A1C4F0B39E1001B}" : "{6A1C4F0B39D2B000}UI/layouts/MCF/MCF_PlanningBoard_TaskEntry.layout" {
    Name "ButtonProbe"
    Slot FrameWidgetSlot "{6A1C4F0B39E1001C}" {
-    PositionX 800
-    OffsetLeft 800
+    PositionX 400
+    OffsetLeft 400
     PositionY 570
     OffsetTop 570
     SizeX 300
-    OffsetRight -1100
+    OffsetRight -700
     SizeY 44
     OffsetBottom -614
    }
