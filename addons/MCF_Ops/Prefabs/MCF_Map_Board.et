@@ -1,10 +1,9 @@
 // A board in the world with the game's own map on it.
 //
-// THE MESH IS A FLAT PANEL WITH A FRAME AROUND IT -- the laptop lid, copied
-// and given two materials of its own: the screen face sampling $rendertarget,
-// and a plain dark border. Borrowing the geometry rather than authoring a
-// quad is what makes a wall map possible today instead of after a modelling
-// session, and the shape is already right: flat, rectangular, a thin surround.
+// THE MESH IS ITS OWN: a flat panel in a thin frame, built by
+// tools/make_map_board.py, one metre wide and 10:7. Two material slots --
+// MapBoard_Surface samples $rendertarget and is the map, MapBoard_Frame is
+// the border -- and a UBX_ box collider so the thing can be stood in front of.
 //
 // SCALE IT. A Game Master resizes this like any other object, which is how it
 // goes from something on a table to something covering a wall.
@@ -14,6 +13,8 @@ GenericEntity {
   MeshObject "{6A1C4F0B39E12002}" {
    Object "{6A1C4F0B39E13000}Assets/Props/Intel/MapBoard/MapBoard.xob"
   }
+  RplComponent "{6A1C4F0B39E12007}" {
+  }
   RigidBody "{6A1C4F0B39E12003}" {
    Enabled 1
    LinearDamping 0.5
@@ -21,6 +22,7 @@ GenericEntity {
    ModelGeometry 1
   }
   MCF_Map_BoardComponent "{6A1C4F0B39E12004}" {
+   m_bDebugOnScreen 1
   }
   SCR_EditableEntityComponent "{6A1C4F0B39E12005}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_EntityType OBJECT

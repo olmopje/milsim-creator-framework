@@ -40,6 +40,23 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "0.5", uiwidget: UIWidgets.EditBox, desc: "Render scale, 0.1 to 1. Below 1 the board is drawn smaller and upscaled, which is most of the rest of what it costs.", params: "0.1 1")]
 	protected float m_fResolutionScale;
 
+	//! DIAGNOSTIC, AND IT ANSWERS ONE QUESTION. The board draws its clear
+	//! colour and nothing else, which proves the render target works and
+	//! leaves exactly one suspect: whether the map's terrain is drawn into
+	//! the widget it was given, or into the screen. Put the same widget tree
+	//! ON the screen and look:
+	//!
+	//!   map appears on screen  -> it renders to the screen pass and a render
+	//!                             target can never catch it; the board has
+	//!                             to be fed some other way.
+	//!   still only blue        -> the map is not drawing at all and the
+	//!                             fault is in the configuration we build.
+	//!
+	//! Off for a real board -- a 1024 x 700 panel over the corner of the
+	//! screen is not something anybody wants twice.
+	[Attribute(defvalue: "0", uiwidget: UIWidgets.CheckBox, desc: "Debug only: also hang the board's widget tree on the screen, to see whether the map draws there.")]
+	protected bool m_bDebugOnScreen;
+
 	//! The ballistic table carries this and its material reads it. Ours uses
 	//! that mesh for now, so it carries it too, set to visible.
 	int m_iOpacityMapId = 1;
@@ -87,8 +104,16 @@ class MCF_Map_BoardComponent : ScriptComponent
 			return;
 		}
 
-		// NO PARENT. That is the whole reason this never appears on screen.
-		m_wRoot = workspace.CreateWidgets(m_sLayout);
+		// NO PARENT. That is the whole reason this never appears on screen:
+		// CreateWidgets with a null parent leaves the tree outside the
+		// workspace's own hierarchy, and only the render target's recursive
+		// pass ever draws it. Handing it the workspace as a parent puts the
+		// very same tree on the screen, which is what the debug flag is for.
+		Widget parent;
+		if (m_bDebugOnScreen)
+			parent = workspace;
+
+		m_wRoot = workspace.CreateWidgets(m_sLayout, parent);
 		if (!m_wRoot)
 		{
 			MCF_Core_Log.Warn("map board: the render layout would not load");
@@ -202,6 +227,56 @@ class MCF_Map_BoardComponent : ScriptComponent
 		m_MapEntity.ZoomOut();
 
 		MCF_Core_Log.Debug("map board fitted at zoom " + m_MapEntity.GetCurrentZoom().ToString());
+
+		GetGame().GetCallqueue().CallLater(DumpBoard, 1500, false);
+	}
+
+	//------------------------------------------------------------------------
+	//! Every number the board's picture depends on, in one line.
+	//!
+	//! The board shows its clear colour and nothing else, so the render target
+	//! demonstrably works and the map demonstrably does not draw into it. This
+	//! prints the things that could still be wrong before the pixels: whether
+	//! the widget has a size at all, where the engine thinks it is on the
+	//! screen, what zoom it settled on, and which patch of world it has been
+	//! told to draw. A visible frame that is off the island, or a zero size,
+	//! is a bug we can fix; correct numbers with a blank board mean the map
+	//! is not rendered in this pass and the feature needs another route.
+	protected void DumpBoard()
+	{
+		if (!m_MapEntity)
+			return;
+
+		// NOT "map": the compiler reserves it for the container type, and the
+		// error it gives is about a variable name rather than a type.
+		CanvasWidget mapWidget = m_MapEntity.GetMapWidget();
+		if (!mapWidget)
+		{
+			MCF_Core_Log.Warn("map board: the map entity holds no map widget");
+			return;
+		}
+
+		float sizeX, sizeY, posX, posY;
+		mapWidget.GetScreenSize(sizeX, sizeY);
+		mapWidget.GetScreenPos(posX, posY);
+
+		vector frameMin, frameMax;
+		m_MapEntity.GetMapVisibleFrame(frameMin, frameMax);
+
+		// One + chain of this length is "Formula too complex" to the Enforce
+		// compiler, so it is built in pieces.
+		string line = "map board dump | open " + m_MapEntity.IsOpen().ToString();
+		line = line + " | widget " + sizeX.ToString() + " x " + sizeY.ToString();
+		line = line + " at " + posX.ToString() + "," + posY.ToString();
+		line = line + " | ppu " + mapWidget.PixelPerUnit().ToString();
+		line = line + " | zoom " + m_MapEntity.GetCurrentZoom().ToString();
+		line = line + " (min " + m_MapEntity.GetMinZoom().ToString();
+		line = line + ", max " + m_MapEntity.GetMaxZoom().ToString() + ")";
+		line = line + " | world " + m_MapEntity.GetMapSizeX().ToString() + " m";
+		line = line + " | frame " + frameMin.ToString() + " .. " + frameMax.ToString();
+		line = line + " | on screen " + m_bDebugOnScreen.ToString();
+
+		MCF_Core_Log.Warn(line);
 	}
 
 	//------------------------------------------------------------------------
@@ -224,6 +299,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 		{
 			callqueue.Remove(Raise);
 			callqueue.Remove(FitBoard);
+			callqueue.Remove(DumpBoard);
 		}
 
 		if (m_MapEntity && m_MapEntity.IsOpen())
