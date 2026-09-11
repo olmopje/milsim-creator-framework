@@ -52,6 +52,13 @@ modded enum ChimeraMenuPreset
 	//! device profile, which is the part worth sharing.
 	MCF_IntelDesktop,
 
+	//! A probe, not a feature. Answers whether the game's own map can be put
+	//! in a widget we choose and whether a render target can hold one --
+	//! everything about the map board rests on it, and it cannot be answered
+	//! by reading. DELETE THIS, its menu class and its layout once the answer
+	//! is written down.
+	MCF_MapProbe,
+
 	//! Talking to somebody: what they say, and what you may say back.
 	//! Opened by the talk action on the person themselves.
 	MCF_Dialogue,
