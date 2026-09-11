@@ -68,8 +68,7 @@ TOOLS = [
     ("ButtonPage",      "PAGE",    0.146, 0.186),
     ("ButtonAddPage",   "+ PAGE",  0.206, 0.246),
     ("ButtonDropPage",  "- PAGE",  0.252, 0.292),
-    ("ButtonPullLine",  "UNDO LINE", 0.312, 0.352),
-    ("ButtonSaveIntel", "SAVE",    0.372, 0.412),
+    ("ButtonSaveIntel", "SAVE",    0.312, 0.352),
 ]
 TOOL_X = (0.150, 0.292)
 
@@ -225,25 +224,19 @@ def block(v):
     s += editbox("NameEdit", v["name"], g, 18, "1 1 1 1")
     s += editbox("HeadingEdit", v["heading"], g, v["head_size"], v["head_ink"])
     s += editbox("StampEdit", v["stamp"], g, v["stamp_size"], v["stamp_ink"])
-    # THE PAGE, AND THE LINE BEING WRITTEN.
-    #
-    # Not one big edit box, because the caret cannot be moved: see
-    # MCF_Device_LineInput for the measurement. A box is only safe to refill
-    # while it is empty, so the author types one line at a time and the
-    # finished lines are drawn above, as the player will see them.
-    s += page("AuthorBody", v["page"], g, v["body_size"], v["body_ink"],
-              v["body_spacing"])
-    s += catcher("PageCatch", v["catch"], g)
-    s += rule("LineRule", v["rule"], g)
-    s += editbox("LineEdit", v["line"], g, v["body_size"], v["body_ink"])
+    # ONE BOX, THE WHOLE PAGE IN IT. A line-at-a-time input was tried and
+    # rejected: an author wants to edit the text, not feed it in. What that
+    # costs is in MCF_Device_TextInput -- the widget selects everything when
+    # it is made to pick up text written from outside.
+    s += editbox("BodyEdit", v["body"], g, v["body_size"], v["body_ink"],
+                 multiline=True, spacing=v["body_spacing"])
 
     for name, label, y0, y1 in TOOLS:
         s += button(name, label, (TOOL_X[0], y0, TOOL_X[1], y1), g)
 
-    s += note("AuthorNote", (TOOL_X[0], 0.424, TOOL_X[1], 0.560), g,
-              "TYPE to write. Return finishes a line and starts the next one. "
-              "PAGE shows it as the player will see it, SAVE writes it to the "
-              "object.")
+    s += note("AuthorNote", (TOOL_X[0], 0.364, TOOL_X[1], 0.500), g,
+              "TYPE to write on the page, PAGE to see it as the player will. "
+              "SAVE writes it to the object.")
     s += END + "\n"
     return s
 
@@ -275,7 +268,7 @@ def apply(v):
     if dupes:
         return v["path"] + "  FAULT duplicate names: " + ", ".join(dupes)
 
-    if "LineEdit" not in back:
+    if "BodyEdit" not in back:
         return v["path"] + "  FAULT: readback"
 
     return "%s  %d widget names, no duplicates" % (v["path"], len(names))

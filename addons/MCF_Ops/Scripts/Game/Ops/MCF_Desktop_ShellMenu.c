@@ -127,6 +127,11 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	protected bool m_bLauncherOpen;
 	protected ref array<SCR_ButtonTextComponent> m_aPins = {};
 	protected ref array<int> m_aPinSlots = {};
+	//! The Return-and-wrap handlers, one per editor body. HELD, NOT DROPPED:
+	//! a handler is attached to the widget but owned by script, and one
+	//! nobody keeps is collected -- after which Return quietly stops working.
+	protected ref array<ref MCF_Device_TextInput> m_aTextInputs = {};
+
 	protected ref array<SCR_ButtonTextComponent> m_aTasks = {};
 	protected ref array<int> m_aTaskSlots = {};
 	protected ref array<SCR_ButtonTextComponent> m_aLauncherApps = {};
@@ -548,6 +553,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	{
 		m_aWindows.Clear();
 		m_aDragHandlers.Clear();
+		m_aTextInputs.Clear();
 
 		AddWindow(root, 0, "Files", MCF_EIntelApp.FILES, PANE_FILES, 0.611, 0.578);
 		AddWindow(root, 1, "Mail", MCF_EIntelApp.EMAIL, PANE_MAIL, 0.604, 0.606);
@@ -2582,7 +2588,9 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		// these boxes still does nothing -- the laptop is parked, and the
 		// line-at-a-time input the paper visuals now use has to be ported
 		// here before it does. See MCF_Device_LineInput.
-		MCF_Device_TextInput.Wrap(root.FindAnyWidget(p + "BodyEdit"));
+		MCF_Device_TextInput typing = MCF_Device_TextInput.Attach(root.FindAnyWidget(p + "BodyEdit"));
+		if (typing)
+			m_aTextInputs.Insert(typing);
 
 		SCR_ButtonTextComponent page = SCR_ButtonTextComponent.GetButtonText(p + "Preview", root);
 		if (page)

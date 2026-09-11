@@ -132,11 +132,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected static const string W_NAME_EDIT = "NameEdit";
 	protected static const string W_HEADING_EDIT = "HeadingEdit";
 	protected static const string W_STAMP_EDIT = "StampEdit";
-	protected static const string W_AUTHOR_BODY = "AuthorBody";
-	protected static const string W_LINE_EDIT = "LineEdit";
-	protected static const string W_LINE_RULE = "LineRule";
-	protected static const string W_PAGE_CATCH = "PageCatch";
-	protected static const string W_BUTTON_PULL_LINE = "ButtonPullLine";
+	protected static const string W_BODY_EDIT = "BodyEdit";
 	protected static const string W_AUTHOR_NOTE = "AuthorNote";
 	protected static const string W_BUTTON_TYPE = "ButtonType";
 	protected static const string W_BUTTON_PAGE = "ButtonPage";
@@ -392,22 +388,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	protected Widget m_wNameEdit;
 	protected Widget m_wHeadingEdit;
 	protected Widget m_wStampEdit;
-	//! The lines already written, and the one being written.
-	protected Widget m_wAuthorBody;
-	protected Widget m_wLineEdit;
-	protected Widget m_wLineRule;
-	protected Widget m_wPageCatch;
-
-	//! Everything finished, newline-separated, without the line in the box.
-	protected string m_sComposed;
+	protected Widget m_wBodyEdit;
 	protected Widget m_wAuthorNote;
 
 	protected SCR_ButtonTextComponent m_ButtonType;
 	protected SCR_ButtonTextComponent m_ButtonPageView;
 	protected SCR_ButtonTextComponent m_ButtonAddPage;
 	protected SCR_ButtonTextComponent m_ButtonDropPage;
-	protected SCR_ButtonTextComponent m_ButtonPullLine;
-	protected SCR_ButtonTextComponent m_PageCatch;
 	protected SCR_ButtonTextComponent m_ButtonSaveIntel;
 
 	//! Whether the Game Master is writing on the page or looking at it.
@@ -417,11 +404,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 	//! to the widget but owned by script, and one nobody keeps is collected --
 	//! after which the box goes back to swallowing Return, minutes later, as
 	//! what looks like a different bug.
-	//! The Return handler on the line box. HELD, NOT DROPPED: a handler is
-	//! attached to the widget but owned by script, and one nobody keeps is
-	//! collected -- after which Return quietly stops working, minutes later,
-	//! as what looks like a different bug.
-	protected ref MCF_Device_LineInput m_LineInput;
+	//! The Return-and-wrap handler on the body box. HELD, NOT DROPPED: a
+	//! handler is attached to the widget but owned by script, and one nobody
+	//! keeps is collected -- after which Return quietly stops working,
+	//! minutes later, as what looks like a different bug.
+	protected ref MCF_Device_TextInput m_TextInput;
 
 	protected SCR_ButtonTextComponent m_ButtonPrev;
 	protected SCR_ButtonTextComponent m_ButtonNext;
@@ -3862,37 +3849,13 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		m_wNameEdit = root.FindAnyWidget(W_NAME_EDIT);
 		m_wHeadingEdit = root.FindAnyWidget(W_HEADING_EDIT);
 		m_wStampEdit = root.FindAnyWidget(W_STAMP_EDIT);
-		m_wAuthorBody = root.FindAnyWidget(W_AUTHOR_BODY);
-		m_wLineEdit = root.FindAnyWidget(W_LINE_EDIT);
-		m_wLineRule = root.FindAnyWidget(W_LINE_RULE);
-		m_wPageCatch = root.FindAnyWidget(W_PAGE_CATCH);
+		m_wBodyEdit = root.FindAnyWidget(W_BODY_EDIT);
 		m_wAuthorNote = root.FindAnyWidget(W_AUTHOR_NOTE);
 
-		// The page wraps; a long line must not run off the side of the sheet.
-		MCF_Device_TextInput.Wrap(m_wAuthorBody);
-
-		// Return finishes the line. The widget does nothing with it on its
-		// own -- see MCF_Device_LineInput for the measurement and for why the
-		// page is written a line at a time rather than in one big box.
-		m_LineInput = MCF_Device_LineInput.Attach(m_wLineEdit);
-		if (m_LineInput)
-			m_LineInput.m_OnLine.Insert(OnLineFinished);
-
-		m_ButtonPullLine = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_PULL_LINE, root);
-		if (m_ButtonPullLine)
-			m_ButtonPullLine.m_OnClicked.Insert(OnPullLineClicked);
-
-		m_PageCatch = SCR_ButtonTextComponent.GetButtonText(W_PAGE_CATCH, root);
-		if (m_PageCatch)
-			m_PageCatch.m_OnClicked.Insert(OnPageCatchClicked);
-
-		// Said out loud, because every one of these being found is a thing
-		// that has silently not been found before.
-		MCF_Core_Log.Warn("paper author chrome: line=" + (m_wLineEdit != null).ToString()
-			+ " page=" + (m_wAuthorBody != null).ToString()
-			+ " catch=" + (m_PageCatch != null).ToString()
-			+ " type=" + (m_ButtonType != null).ToString()
-			+ " handler=" + (m_LineInput != null).ToString());
+		// Return, and wrapping. Neither happens on its own -- see
+		// MCF_Device_TextInput for the measurements and for what the engine
+		// does not offer.
+		m_TextInput = MCF_Device_TextInput.Attach(m_wBodyEdit);
 
 		m_ButtonType = SCR_ButtonTextComponent.GetButtonText(W_BUTTON_TYPE, root);
 		if (m_ButtonType)
@@ -3929,9 +3892,7 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		ShowIf(m_wNameEdit, typing);
 		ShowIf(m_wHeadingEdit, typing);
 		ShowIf(m_wStampEdit, typing);
-		ShowIf(m_wAuthorBody, typing);
-		ShowIf(m_wLineEdit, typing);
-		ShowIf(m_wLineRule, typing);
+		ShowIf(m_wBodyEdit, typing);
 
 		if (m_wDeviceName)
 			m_wDeviceName.SetVisible(!typing);
@@ -3946,8 +3907,6 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			m_wReadScroll.SetVisible(!typing);
 
 		ShowIf(m_wAuthorNote, authoring);
-		ShowButtonIf(m_ButtonPullLine, typing);
-		ShowButtonIf(m_PageCatch, typing);
 		ShowButtonIf(m_ButtonType, authoring && !m_bPaperTyping);
 		ShowButtonIf(m_ButtonPageView, authoring && m_bPaperTyping);
 		ShowButtonIf(m_ButtonAddPage, authoring);
@@ -3984,112 +3943,14 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		{
 			SetBoxText(m_wHeadingEdit, "");
 			SetBoxText(m_wStampEdit, "");
-			SetBoxText(m_wLineEdit, "");
-			m_sComposed = "";
-			PaintComposed();
+			SetBoxText(m_wBodyEdit, "");
 			return;
 		}
 
 		MCF_Device_Item page = m_aVisible[m_iOpenEntry];
 		SetBoxText(m_wHeadingEdit, page.m_sHeading);
 		SetBoxText(m_wStampEdit, page.m_sTimestamp);
-
-		// EVERYTHING FINISHED GOES ON THE PAGE, and the box starts empty. A
-		// box is only safe to refill while it is empty -- refilling one that
-		// has text in it selects all of it, and the next character typed
-		// replaces the lot.
-		m_sComposed = MCF_Device_Text.Body(page.m_sBody);
-		SetBoxText(m_wLineEdit, "");
-
-		// An empty box on cream paper says nothing about itself. The engine
-		// has a placeholder for exactly this.
-		EditBoxWidget line = EditBoxWidget.Cast(m_wLineEdit);
-		if (line)
-			line.SetPlaceholderText("Type here. Return finishes the line.");
-
-		PaintComposed();
-	}
-
-	//! Draws the lines written so far, with the one being typed under them.
-	protected void PaintComposed()
-	{
-		TextWidget page = TextWidget.Cast(m_wAuthorBody);
-		if (page)
-			page.SetText(m_sComposed);
-	}
-
-	//! Return: the line is finished, the next one starts empty.
-	protected void OnLineFinished()
-	{
-		string line = BoxText(m_wLineEdit);
-
-		if (m_sComposed.IsEmpty())
-			m_sComposed = line;
-		else
-			m_sComposed = m_sComposed + "\n" + line;
-
-		SetBoxText(m_wLineEdit, "");
-		PaintComposed();
-
-		// Write mode selects everything in the box it is given -- harmless
-		// here, because the box was just emptied. That is the whole reason
-		// this is written a line at a time.
-		FocusBox(m_wLineEdit);
-	}
-
-	//! Clicking the page puts the caret back in the line being written.
-	protected void OnPageCatchClicked(SCR_ButtonTextComponent button)
-	{
-		FocusBox(m_wLineEdit);
-		SetHint("Type the line, then Return.");
-	}
-
-	//! UNDO LINE: the last finished line comes back to be fixed.
-	protected void OnPullLineClicked(SCR_ButtonTextComponent button)
-	{
-		if (m_sComposed.IsEmpty())
-			return;
-
-		// Whatever is half-typed goes first, so nothing is silently lost.
-		string held = BoxText(m_wLineEdit);
-		if (!held.IsEmpty())
-		{
-			m_sComposed = m_sComposed + "\n" + held;
-			held = "";
-		}
-
-		int cut = LastBreak(m_sComposed);
-
-		if (cut < 0)
-		{
-			SetBoxText(m_wLineEdit, m_sComposed);
-			m_sComposed = "";
-		}
-		else
-		{
-			int from = cut + 1;
-			SetBoxText(m_wLineEdit, m_sComposed.Substring(from, m_sComposed.Length() - from));
-			m_sComposed = m_sComposed.Substring(0, cut);
-		}
-
-		PaintComposed();
-		FocusBox(m_wLineEdit);
-	}
-
-	//! The last newline in a string, or -1. Written out because Enforce has no
-	//! LastIndexOf.
-	protected int LastBreak(string value)
-	{
-		int found = -1;
-		int n = value.Length();
-
-		for (int i = 0; i < n; i++)
-		{
-			if (value.Substring(i, 1) == "\n")
-				found = i;
-		}
-
-		return found;
+		SetBoxText(m_wBodyEdit, MCF_Device_Text.Body(page.m_sBody));
 	}
 
 	//! Takes what was typed and puts it on the draft.
@@ -4116,24 +3977,11 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		page.m_sHeading = BoxText(m_wHeadingEdit);
 		page.m_sTimestamp = BoxText(m_wStampEdit);
 
-		// The finished lines plus the one still in the box, which has not had
-		// its Return yet and would otherwise be lost.
-		string whole = m_sComposed;
-		string tail = BoxText(m_wLineEdit);
-
-		if (!tail.IsEmpty())
-		{
-			if (whole.IsEmpty())
-				whole = tail;
-			else
-				whole = whole + "\n" + tail;
-		}
-
 		// A typed newline has to survive being stored: MCF_Device_Script.Clean
 		// turns a real one into a space, so it goes onto the draft as the two
 		// characters a config carries and MCF_Device_Text.Body unescapes it
 		// again on the way back to the page.
-		page.m_sBody = MCF_Device_Text.Encode(whole);
+		page.m_sBody = MCF_Device_Text.Encode(BoxText(m_wBodyEdit));
 	}
 
 	//! The app the pages of a paper or notepad live in.
@@ -4173,15 +4021,8 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 		// An edit box takes keystrokes only in write mode, and the engine
 		// raises no event when it starts -- vanilla polls IsInWriteMode() and
 		// calls ActivateWriteMode() from its own pencil. This is that pencil.
-		FocusBox(m_wLineEdit);
-
-		EditBoxWidget line = EditBoxWidget.Cast(m_wLineEdit);
-		if (line)
-			MCF_Core_Log.Warn("TYPE pressed: write mode " + line.IsInWriteMode().ToString());
-		else
-			MCF_Core_Log.Warn("TYPE pressed: the line box is not an EditBoxWidget");
-
-		SetHint("Typing. Return finishes a line; PAGE shows the page as the player will see it.");
+		FocusBox(m_wBodyEdit);
+		SetHint("Typing. PAGE shows it as the player will see it.");
 	}
 
 	protected void OnPageViewClicked(SCR_ButtonTextComponent button)
