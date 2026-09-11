@@ -50,6 +50,13 @@ modded class SCR_PlayerController
 	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
 	void MCF_RpcDo_DeviceChallenge(RplId deviceId, int seed, int difficulty)
 	{
+		// The desktop is asked first and the handset second. Exactly one device
+		// screen is ever open, so the order is a formality -- but a challenge
+		// that lands nowhere leaves the player staring at a lock screen that
+		// never answers, which is why both are asked at all.
+		if (MCF_Desktop_ShellMenu.ShowChallenge(deviceId, seed, difficulty))
+			return;
+
 		if (MCF_Intel_ShellMenu.ShowChallenge(deviceId, seed, difficulty))
 			return;
 

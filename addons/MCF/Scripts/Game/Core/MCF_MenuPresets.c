@@ -40,7 +40,17 @@ modded enum ChimeraMenuPreset
 	//! The fourth skin, and the reason the geometry stopped being a set of
 	//! constants: a laptop is landscape. Same menu class as the three above,
 	//! same data, a wider screen and an app grid five across instead of three.
+	//!
+	//! SUPERSEDED BY MCF_IntelDesktop below and kept only so that a saved
+	//! mission referring to it still resolves. Nothing opens it any more.
 	MCF_IntelLaptop,
+
+	//! The laptop as a desktop: a panel at the bottom, an application
+	//! launcher, and windows that drag and stack. Its own menu class, because
+	//! a screen where ten things are open at once has nothing in common with
+	//! one that shows a single app at a time -- what the two share is the
+	//! device profile, which is the part worth sharing.
+	MCF_IntelDesktop,
 
 	//! Talking to somebody: what they say, and what you may say back.
 	//! Opened by the talk action on the person themselves.

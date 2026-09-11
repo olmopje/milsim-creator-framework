@@ -432,7 +432,26 @@ class MCF_Intel_ShellMenu : ChimeraMenuBase
 			case MCF_EIntelView.PAPER:   preset = ChimeraMenuPreset.MCF_IntelPaper; break;
 			case MCF_EIntelView.NOTEPAD: preset = ChimeraMenuPreset.MCF_IntelNotepad; break;
 			case MCF_EIntelView.PHONE:   preset = ChimeraMenuPreset.MCF_IntelDevice; break;
-			case MCF_EIntelView.LAPTOP:  preset = ChimeraMenuPreset.MCF_IntelLaptop; break;
+		}
+
+		// THE LAPTOP IS NOT A SKIN ON THIS MENU ANY MORE. It is a desktop: a
+		// panel, a launcher and windows that drag and stack, none of which
+		// this class has a concept of. It keeps its own menu and its own
+		// layout, and shares the part that was always the point -- the device
+		// profile. Routed from here rather than from the caller so that there
+		// is still exactly one place that answers "what opens this object".
+		if (view == MCF_EIntelView.LAPTOP)
+		{
+			if (s_bPendingAuthor)
+			{
+				MCF_Intel_CarrierComponent held = carrier;
+				SCR_EditableEntityComponent editable = s_PendingEditable;
+				s_PendingEditable = null;
+				s_bPendingAuthor = false;
+				return MCF_Desktop_ShellMenu.OpenForAuthor(held, editable);
+			}
+
+			return MCF_Desktop_ShellMenu.OpenFor(carrier);
 		}
 
 		if (preset < 0)
