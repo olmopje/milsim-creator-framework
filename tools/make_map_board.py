@@ -12,9 +12,14 @@ MapBoard_Frame.emat. Rename one here and the board loses its map.
 
 ONE METRE WIDE AND 10:7, which is roughly a wall map's proportion and, more to
 the point, a number a Game Master can reason about when scaling: at scale 3
-the board is three metres across. The render texture is square, so the map is
-drawn square and the panel shows it at the board's own aspect -- the component
-sizes the widget to match, rather than the map being stretched to fit.
+the board is three metres across.
+
+THE FACE'S ASPECT IS A NUMBER SOMEWHERE ELSE. The face is a plane with the
+default 0..1 unwrap, so the render texture is stretched over it and nothing
+crops. Its size is (WIDTH - 2*FRAME) x (HEIGHT - 2*FRAME) = 0.95 x 0.65 m,
+1.4615 : 1, and MCF_MapBoardRender.layout is 1024 x 700 to match. Move WIDTH,
+HEIGHT or FRAME here and that layout has to move too, or the map arrives
+squashed.
 
 Run it with the Blender the other MCF models were made in:
   "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe" --background --python tools/make_map_board.py

@@ -7,10 +7,19 @@
 // surface, and the shape here is copied from its
 // UI/layouts/Gadgets/BallisticTable/BallisticTableRenderTarget.layout.
 //
-// SQUARE AND 1024. The map is measured into the widget's own unit space, so
-// the texture's aspect is the board's aspect. Square keeps north up and the
-// scale even in both directions; the frame it is cropped into is the mesh's
-// business, not this file's.
+// 1024 x 700, AND THAT IS THE MESH'S NUMBER, NOT A ROUND ONE. The board's
+// face is a plane with a default 0..1 unwrap, so the texture is STRETCHED
+// across it -- it is not cropped, and nothing about the frame saves a square
+// picture from a rectangular face. The face is (1.00 - 2 x 0.025) wide by
+// (0.70 - 2 x 0.025) tall = 0.95 x 0.65 m, which is 1.4615 : 1, and
+// 1024 / 1.4615 = 700. Texture aspect equals face aspect equals no
+// distortion. Change WIDTH, HEIGHT or FRAME in tools/make_map_board.py and
+// this number has to move with them.
+//
+// THE SEA IS THE LETTERBOX. Zoomed all the way out the map fits its height,
+// so a square island leaves a margin left and right -- and ClearColor below
+// is the map's own sea blue, so that margin reads as water on a wide sheet
+// rather than as black bars on a broken screen.
 //
 // The slots deliberately carry no Anchor. Anchor plus a size gives 0 x 0, and
 // a render target sized zero asks the driver for a texture sized zero -- which
@@ -21,8 +30,8 @@ FrameWidgetClass {
  Slot FrameWidgetSlot "{6A1C4F0B39E11001}" {
   SizeX 1024
   OffsetRight -1024
-  SizeY 1024
-  OffsetBottom -1024
+  SizeY 700
+  OffsetBottom -700
  }
  {
   RTTextureWidgetClass "{6A1C4F0B39E11002}" {
@@ -34,8 +43,8 @@ FrameWidgetClass {
     OffsetTop 0
     SizeX 1024
     OffsetRight -1024
-    SizeY 1024
-    OffsetBottom -1024
+    SizeY 700
+    OffsetBottom -700
    }
    {
     MapWidgetClass "{0000000060029FBB}" {
@@ -47,11 +56,11 @@ FrameWidgetClass {
       OffsetTop 0
       SizeX 1024
       OffsetRight -1024
-      SizeY 1024
-      OffsetBottom -1024
+      SizeY 700
+      OffsetBottom -700
      }
      Color 1 1 1 1
-     SizeInUnits 1024 1024
+     SizeInUnits 1024 700
      OffsetPixels 0 0
      Clear 1
      ClearColor 0.173 0.344 0.62 1

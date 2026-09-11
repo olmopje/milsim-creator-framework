@@ -173,7 +173,35 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (controller)
 			controller.SetCharacterCameraRenderActive(true);
 
+		// Not now: SCR_MapEntity counts down FRAME_DELAY frames after an open
+		// before it will accept a zoom or a pan, and says so in the log if you
+		// ask early. Half a second is a long time in frames and nothing at all
+		// to a board that takes a second to come up anyway.
+		GetGame().GetCallqueue().CallLater(FitBoard, 500, false);
+
 		MCF_Core_Log.Debug("map board raised with " + config.LayerCount.ToString() + " layer(s)");
+	}
+
+	//------------------------------------------------------------------------
+	//! The whole world on the board, once the map will listen.
+	//!
+	//! A BOARD IS NOT A MAP A PLAYER IS DRIVING. It opens at whatever zoom the
+	//! map happened to be left at, which for a thing hanging on a wall is the
+	//! wrong answer every time -- you walk up to a wall map to see where
+	//! everything is, not to read one grid square.
+	//!
+	//! ZoomOut() is vanilla's own: minimum zoom and then CenterMap(). Minimum
+	//! zoom is computed in UpdateZoomBounds as screen height over map size in
+	//! metres, so it is exactly "the whole island, fitted to the height" --
+	//! which is why the widget's spare width shows the map's sea colour.
+	protected void FitBoard()
+	{
+		if (!m_MapEntity || !m_MapEntity.IsOpen())
+			return;
+
+		m_MapEntity.ZoomOut();
+
+		MCF_Core_Log.Debug("map board fitted at zoom " + m_MapEntity.GetCurrentZoom().ToString());
 	}
 
 	//------------------------------------------------------------------------
@@ -189,6 +217,15 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//------------------------------------------------------------------------
 	override void OnDelete(IEntity owner)
 	{
+		// Both of this component's timers point at a method on an object that
+		// is about to stop existing.
+		ScriptCallQueue callqueue = GetGame().GetCallqueue();
+		if (callqueue)
+		{
+			callqueue.Remove(Raise);
+			callqueue.Remove(FitBoard);
+		}
+
 		if (m_MapEntity && m_MapEntity.IsOpen())
 			m_MapEntity.CloseMap();
 
