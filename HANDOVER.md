@@ -1230,3 +1230,56 @@ prime itself forever, once a second, which also breaks M. The test is
 component, and components only update while `IsOpen()`. So markers on a board
 are not a setting -- they are a piece of work, and they conflict with the
 board not holding the map.
+
+### Where the map board was parked, 2026-09-11
+
+It works, and it is not finished. "Basis maar niet goed" is the user's own
+verdict and it is the right one.
+
+**Settled, do not re-litigate:**
+
+- The render target, the material and the mesh are all fine. A board showing
+  the map is proof of the whole chain.
+- A board must NOT hold the map open. One map exists; holding it breaks M.
+- A board must NOT set itself up again to recover -- it cannot tell its own
+  setup open from a player's without `GetMapWidget() == m_wMapWidget`, and
+  without that test it primes forever, once a second.
+- A second `MapEntity` does not give an independent view. Measured: it
+  writes into the same native state and `InitializeLayers` on it destroys the
+  real map's layers, which shows up as the PLAYER'S map losing its terrain.
+
+**The arrangement that stands:** the board drives the shared entity, re-states
+its own four numbers (`EnableVisualisation`, layer, `ZoomChange`,
+`PosChange`, `SetFrame`) four times a second, and touches nothing at all
+while `IsOpen()`. Its view is two replicated numbers on its own component --
+zoom step and centre -- so everyone at that board sees the same thing and no
+personal map is affected.
+
+**The pan formula, now measured rather than guessed.** `PosChange` takes the
+map's TOP-LEFT CORNER in the widget, not the screen position of the point
+being centred. The setup open logs both:
+
+```
+primed zoom 0.683594 pan <162, 0, 0> | computed zoom 0.683594 pan <350, 350, 0>
+```
+
+Widget 1024 x 700, island 4096 m, fitted zoom 0.170898 px/m, so the island
+draws 700 x 700 and centred sits (1024 - 700) / 2 = 162 from the left and 0
+from the top. So `pan = half the widget - the centred point in map pixels`.
+The zoom ratio was right from the start; only the pan was wrong. Fixed, but
+NOT yet seen in game -- that is the first thing to check tomorrow, and the
+log line is still there to check it with.
+
+**Still open, roughly in the order they matter:**
+
+1. Confirm the corrected pan: zoom in and centre should now land where they
+   say. Then decide whether the log line stays.
+2. The board follows a player's map for the seconds it is open. Unavoidable
+   with one entity; possibly worth hiding behind the white fade instead of
+   showing their view.
+3. Markers are `SCR_MapMarkersUI`, a map UI component, and components only
+   update while `IsOpen()`. Markers on a board are a piece of work, not a
+   setting, and they pull against the board not holding the map.
+4. More frames: paper map on a table, whiteboard, beamer board.
+5. Freeform drawing on the in-game map, then channel permissions.
+6. Unique maps with their own stored information -- a found enemy map.

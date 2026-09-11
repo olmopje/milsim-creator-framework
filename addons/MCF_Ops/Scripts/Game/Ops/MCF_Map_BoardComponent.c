@@ -227,7 +227,20 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		vector offset = m_MapEntity.Offset();
 
-		m_vPan = Vector((centreX - offset[0]) * ppu, ((sizeY - centreZ) + offset[2]) * ppu, 0);
+		// PAN IS THE MAP'S TOP-LEFT CORNER IN THE WIDGET, not the screen
+		// position of the point being centred -- which is what the first
+		// version assumed, and the reason the setup open logged
+		// "primed pan <162, 0, 0>" against a computed <350, 350, 0>.
+		//
+		// The measurement makes it plain. Widget 1024 x 700, island 4096 m,
+		// fitted zoom 0.170898 px/m, so the island draws 700 x 700: centred
+		// it sits (1024 - 700) / 2 = 162 from the left and 0 from the top,
+		// which is exactly what ZoomOut and CenterMap produced. So the pan is
+		// half the widget MINUS where the centred point falls in map pixels.
+		float pixelX = (centreX - offset[0]) * ppu;
+		float pixelY = ((sizeY - centreZ) + offset[2]) * ppu;
+
+		m_vPan = Vector(widgetW * 0.5 - pixelX, widgetH * 0.5 - pixelY, 0);
 
 		float halfW = (widgetW / ppu) * 0.5;
 		float halfH = (widgetH / ppu) * 0.5;
