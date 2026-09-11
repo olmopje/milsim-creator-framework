@@ -62,6 +62,9 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the map's grid on the board. The grid belongs to the map entity rather than to this board, so two boards that disagree about it will take turns winning.")]
 	protected bool m_bShowGrid;
 
+	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Give this board a map entity of its own, so its view is independent of every player's map. Off falls back to driving the shared map entity, which works but is always in somebody's way.")]
+	protected bool m_bOwnMapEntity;
+
 	//! How often the board looks at where the viewer is and whether it still
 	//! has to say "keep drawing".
 	protected static const int TICK_MS = 250;
@@ -90,6 +93,15 @@ class MCF_Map_BoardComponent : ScriptComponent
 	protected float m_fZoomLevel;
 	protected vector m_vPan;
 	protected int m_iLayer = -1;
+
+	//! The board's own map, when it has one. Everything below draws through
+	//! this instead of the shared entity the moment it exists.
+	protected MCF_Map_BoardEntity m_OwnMap;
+
+	//! Kept from the setup open so the board's own map can be built from the
+	//! same configuration the real one used.
+	protected ref SCR_MapLayersBase m_LayersConfig;
+	protected ref SCR_MapPropsBase m_PropsConfig;
 
 	//! The world rectangle the board draws, read off the map after it was
 	//! zoomed out to fit the island.
@@ -225,7 +237,11 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// what made the board prime itself over and over, once a second,
 		// forever -- and an open map four times a second is also exactly what
 		// stops M from working.
-		if (m_MapEntity.IsOpen())
+		// A BOARD WITH ITS OWN MAP HAS NOTHING TO WAIT FOR. It writes to its
+		// own entity, so a player reading theirs is not in the way and the
+		// board does not have to stop -- which is the entire point of giving
+		// it one, and also the test of whether it worked.
+		if (m_MapEntity.IsOpen() && !m_OwnMap)
 		{
 			if (m_MapEntity.GetMapWidget() != m_wMapWidget)
 				m_bVisualising = false;
@@ -233,6 +249,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 			return;
 		}
 
+		// The setup open is ours and has to be left alone to finish.
 		if (m_bPriming)
 			return;
 
@@ -248,12 +265,25 @@ class MCF_Map_BoardComponent : ScriptComponent
 		{
 			// Nobody near. Stop drawing the world for a board nobody can see,
 			// but only if we are the one who asked for it.
-			if (m_bVisualising)
-			{
-				m_MapEntity.EnableVisualisation(false);
-				m_bVisualising = false;
-			}
+			if (!m_bVisualising)
+				return;
 
+			m_bVisualising = false;
+
+			if (m_OwnMap)
+				m_OwnMap.Hide();
+			else if (!m_MapEntity.IsOpen())
+				m_MapEntity.EnableVisualisation(false);
+
+			return;
+		}
+
+		// The board's own map, when it has one: same four numbers, written to
+		// an entity nobody else reads.
+		if (m_OwnMap)
+		{
+			m_OwnMap.ShowView(m_fZoomLevel, m_vPan, m_vFrameMin, m_vFrameMax, m_bShowGrid);
+			m_bVisualising = true;
 			return;
 		}
 
@@ -302,8 +332,11 @@ class MCF_Map_BoardComponent : ScriptComponent
 		config.Components = {};
 		config.OtherComponents = 0;
 
-		config.LayerConfig = SCR_MapLayersBase.Cast(LoadConfig(SCR_MapConstants.CFG_LAYERS_DEFAULT));
-		config.MapPropsConfig = SCR_MapPropsBase.Cast(LoadConfig(SCR_MapConstants.CFG_PROPS_DEFAULT));
+		m_LayersConfig = SCR_MapLayersBase.Cast(LoadConfig(SCR_MapConstants.CFG_LAYERS_DEFAULT));
+		m_PropsConfig = SCR_MapPropsBase.Cast(LoadConfig(SCR_MapConstants.CFG_PROPS_DEFAULT));
+
+		config.LayerConfig = m_LayersConfig;
+		config.MapPropsConfig = m_PropsConfig;
 		config.DescriptorDefsConfig = SCR_MapDescriptorDefaults.Cast(LoadConfig(SCR_MapConstants.CFG_DESCTYPES_DEFAULT));
 		config.DescriptorVisibilityConfig = SCR_MapDescriptorVisibilityBase.Cast(LoadConfig(SCR_MapConstants.CFG_DESCVIEW_DEFAULT));
 
@@ -369,6 +402,26 @@ class MCF_Map_BoardComponent : ScriptComponent
 		m_bPrimed = true;
 
 		MCF_Core_Log.Debug("map board primed at zoom ratio " + m_fZoomLevel.ToString() + ", layer " + m_iLayer.ToString());
+
+		// A MAP OF THE BOARD'S OWN, built from the same configuration and
+		// handed the numbers the real map just worked out. From here the board
+		// never writes to the shared entity again.
+		if (!m_bOwnMapEntity)
+			return;
+
+		IEntity owner = GetOwner();
+		if (!owner)
+			return;
+
+		m_OwnMap = MCF_Map_BoardEntity.Spawn(owner);
+
+		if (!m_OwnMap)
+		{
+			MCF_Core_Log.Warn("map board: could not spawn a map entity of its own -- falling back to the shared one");
+			return;
+		}
+
+		m_OwnMap.Setup(m_LayersConfig, m_PropsConfig, m_iLayer);
 	}
 
 	//------------------------------------------------------------------------
@@ -485,6 +538,13 @@ class MCF_Map_BoardComponent : ScriptComponent
 			callqueue.Remove(Raise);
 			callqueue.Remove(Watch);
 			callqueue.Remove(FinishPriming);
+		}
+
+		if (m_OwnMap)
+		{
+			m_OwnMap.Hide();
+			SCR_EntityHelper.DeleteEntityAndChildren(m_OwnMap);
+			m_OwnMap = null;
 		}
 
 		if (m_MapEntity)
