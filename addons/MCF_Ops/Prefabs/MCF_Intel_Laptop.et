@@ -42,7 +42,7 @@ GenericEntity : "{C95E11C60810F432}Prefabs/Items/Core/Item_Base.et" {
    m_eView LAPTOP
    m_sActionVerb "Use"
    m_sPreviewPrefab "{6A1C4F0B39D2D090}Prefabs/MCF_Intel_Laptop_Preview.et"
-   m_sProfileId ""
+   m_sProfileId "field_laptop"
    m_aEntries {
     MCF_Intel_Entry "{6A1C4F0B39D2D034}" {
      m_sHeading "Consignment manifest"

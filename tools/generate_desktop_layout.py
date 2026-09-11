@@ -77,6 +77,35 @@ DIM_INK   = "0.60 0.63 0.67 1"
 FAINT_INK = "0.43 0.46 0.50 1"
 TERM_BG   = "0.075 0.086 0.098 1"
 
+def col(value):
+    """sRGB in, linear out.
+
+    A widget's `Color` in a .layout is a LINEAR triple. Writing the sRGB floats
+    a designer works in makes everything come out pale: the window bodies were
+    authored as #282D32 and rendered mid-grey, and the accent as #C26314 and
+    rendered a washed tangerine. Alpha is not a colour and passes through.
+
+    Textures are not affected -- the importer handles their colour space -- so
+    an image tinted `1 1 1 1` was always right and is why the panel and the
+    wallpaper looked correct while every flat fill did not.
+    """
+    parts = value.split()
+    out = []
+
+    for i, raw in enumerate(parts):
+        c = float(raw)
+
+        if i < 3:
+            if c <= 0.04045:
+                c = c / 12.92
+            else:
+                c = ((c + 0.055) / 1.055) ** 2.4
+
+        out.append("%.5f" % c)
+
+    return " ".join(out)
+
+
 _n = [0]
 
 
@@ -104,7 +133,7 @@ def img(name, a, ind, colour=None, tex=None, visible=True):
     s += p + ' Name "%s"\n' % name
     s += slot(a, ind + 1)
     if colour:
-        s += p + " Color %s\n" % colour
+        s += p + " Color %s\n" % col(colour)
     if tex:
         s += p + ' Texture "%s"\n' % ART[tex]
         s += p + ' Image ""\n'
@@ -133,13 +162,17 @@ def txt(name, a, ind, size, colour=None, align=None, text="", rich=False,
     if spacing:
         s += p + ' "Line Spacing" %d\n' % spacing
     if colour:
-        s += p + " Color %s\n" % colour
+        s += p + " Color %s\n" % col(colour)
     if align:
-        # NOT `Alignment`. That property is accepted and ignored on a
-        # TextWidget -- every centred label on the first build came out hard
-        # left. "Text Horizontal Align" is the one the operations board uses
-        # and it is 0 left, 1 centre, 2 right.
-        s += p + ' "Text Horizontal Align" %d\n' % align
+        # THE PROPERTY IS "Horizontal Alignment" AND ITS VALUE IS A WORD.
+        # Two wrong guesses preceded this one: `Alignment 0.5 0` is a
+        # FrameWidgetSlot property (the pivot, and it is ignored outright when
+        # a slot's min and max anchors differ, which is every stretched box
+        # here), and "Text Horizontal Align" does not exist at all -- it
+        # appears nowhere in the engine binary, and an unknown key is dropped
+        # in silence. The operations board has carried that same non-property
+        # for months.
+        s += p + ' "Horizontal Alignment" %s\n' % align
     s += p + "}\n"
     return s
 
@@ -178,11 +211,11 @@ def flatbtn(name, a, ind, icon=None, label=None, icon_px=22, pad_l=10,
     s += p + " components {\n"
     s += p + '  SCR_ButtonTextComponent "%s" {\n' % g()
     s += p + "   m_bCanBeToggled 0\n"
-    s += p + "   m_BackgroundDefault %s\n" % bg
-    s += p + "   m_BackgroundHovered %s\n" % bg_hi
-    s += p + "   m_BackgroundSelected %s\n" % sel
-    s += p + "   m_BackgroundSelectedHovered %s\n" % sel
-    s += p + "   m_BackgroundClicked 1 1 1 0.22\n"
+    s += p + "   m_BackgroundDefault %s\n" % col(bg)
+    s += p + "   m_BackgroundHovered %s\n" % col(bg_hi)
+    s += p + "   m_BackgroundSelected %s\n" % col(sel)
+    s += p + "   m_BackgroundSelectedHovered %s\n" % col(sel)
+    s += p + "   m_BackgroundClicked %s\n" % col("1 1 1 0.22")
     s += p + '   m_sText ""\n'
     s += p + "  }\n"
     s += p + " }\n"
@@ -284,7 +317,7 @@ def scroll(name, a, ind, inner, kind="vertical", size=12, colour=None):
         s += p + '     "Min Font Size" %d\n' % size
         s += p + '     "Line Spacing" %d\n' % (size + 9)
         if colour:
-            s += p + "     Color %s\n" % colour
+            s += p + "     Color %s\n" % col(colour)
         s += p + "    }\n"
     s += p + "   }\n"
     s += p + "  }\n"
@@ -348,7 +381,7 @@ def pane_list(p, ind):
     s += scroll(p + "ReadScroll", (0.412, 0.256, 0.982, 0.980), ind,
                 p + "ReadBody", kind="rich", size=12)
     s += txt(p + "Hint", (0.415, 0.470, 0.980, 0.540), ind, 12, colour=FAINT_INK,
-             align=1)
+             align="Center")
     return s
 
 
@@ -376,7 +409,7 @@ def pane_chat(p, ind):
     s += img(p + "Split", (0.338, 0.112, 0.3395, 0.980), ind, colour=LINE)
     s += img(p + "Avatar", (0.354, 0.118, 0.396, 0.180), ind,
              colour="0.35 0.38 0.42 1", tex="circle")
-    s += txt(p + "Initial", (0.354, 0.130, 0.396, 0.172), ind, 14, align=1)
+    s += txt(p + "Initial", (0.354, 0.130, 0.396, 0.172), ind, 14, align="Center")
     s += txt(p + "Who", (0.408, 0.118, 0.980, 0.158), ind, 14)
     s += txt(p + "When", (0.408, 0.156, 0.980, 0.190), ind, 10, colour=DIM_INK)
     s += img(p + "ChatRule", (0.348, 0.198, 0.980, 0.1995), ind, colour=LINE)
@@ -388,12 +421,12 @@ def pane_contacts(p, ind):
     s = pane_head(p, ind)
     s += scroll(p + "ListScroll", (0.018, 0.112, 0.352, 0.980), ind, p + "EntryList")
     s += img(p + "Split", (0.360, 0.112, 0.3615, 0.980), ind, colour=LINE)
-    s += img(p + "Big", (0.615, 0.150, 0.725, 0.330), ind,
+    s += img(p + "Big", (0.615, 0.150, 0.725, 0.3131), ind,
              colour="0.35 0.38 0.42 1", tex="circle")
-    s += txt(p + "BigText", (0.615, 0.200, 0.725, 0.288), ind, 30, align=1)
-    s += txt(p + "Name", (0.380, 0.352, 0.965, 0.410), ind, 18, align=1)
+    s += txt(p + "BigText", (0.615, 0.188, 0.725, 0.272), ind, 30, align="Center")
+    s += txt(p + "Name", (0.380, 0.352, 0.965, 0.410), ind, 18, align="Center")
     s += txt(p + "Number", (0.380, 0.414, 0.965, 0.456), ind, 12,
-             colour=DIM_INK, align=1)
+             colour=DIM_INK, align="Center")
     s += flatbtn(p + "Call", (0.545, 0.478, 0.795, 0.552), ind,
                  label="CALL", size=12, bg="0.16 0.60 0.27 1",
                  bg_hi="0.22 0.72 0.34 1", tex="tile", label_align="centre")
@@ -415,10 +448,10 @@ def pane_photos(p, ind):
                          bg="1 1 1 0.07", bg_hi="1 1 1 0.18")
             s += img(p + "Shot%d" % i, (c0, r0, c1, r1), ind, colour="1 1 1 1")
             s += txt(p + "Cap%d" % i, (c0 + 0.008, r1 - 0.075, c1 - 0.008, r1 - 0.012),
-                     ind, 10, colour=DIM_INK, align=1)
+                     ind, 10, colour=DIM_INK, align="Center")
             i += 1
     s += txt(p + "GridHint", (0.030, 0.520, 0.969, 0.580), ind, 12,
-             colour=FAINT_INK, align=1)
+             colour=FAINT_INK, align="Center")
     return s
 
 
@@ -473,37 +506,42 @@ def panel(ind):
                  bg="1 1 1 0", bg_hi="1 1 1 0.10")
     b += img("KickRule", (0.1150, 0.14, 0.1160, 0.86), ind + 1, colour=LINE)
 
+    PIN_W, PIN_PITCH = 0.0235, 0.0265
     for i in range(6):
-        x0 = 0.1210 + i * 0.0325
-        b += flatbtn("Pin%d" % i, (x0, 0.10, x0 + 0.0290, 0.90), ind + 1,
-                     icon="apps", icon_px=23, bg="1 1 1 0", bg_hi="1 1 1 0.12")
-        b += img("PinBadge%d" % i, (x0 + 0.0175, 0.02, x0 + 0.0300, 0.40),
+        x0 = 0.1210 + i * PIN_PITCH
+        b += flatbtn("Pin%d" % i, (x0, 0.10, x0 + PIN_W, 0.90), ind + 1,
+                     icon="apps", icon_px=22, bg="1 1 1 0", bg_hi="1 1 1 0.12")
+        b += img("PinBadge%d" % i, (x0 + 0.0125, 0.02, x0 + 0.0245, 0.40),
                  ind + 1, colour=ACCENT, tex="circle", visible=False)
-        b += txt("PinBadgeText%d" % i, (x0 + 0.0175, 0.06, x0 + 0.0300, 0.36),
-                 ind + 1, 9, align=1, visible=False)
-    b += img("PinRule", (0.2110, 0.14, 0.2120, 0.86), ind + 1, colour=LINE)
+        b += txt("PinBadgeText%d" % i, (x0 + 0.0125, 0.06, x0 + 0.0245, 0.36),
+                 ind + 1, 9, align="Center", visible=False)
+    b += img("PinRule", (0.2810, 0.14, 0.2820, 0.86), ind + 1, colour=LINE)
 
+    TASK_W, TASK_PITCH = 0.0505, 0.0530
     for i in range(10):
-        x0 = 0.2170 + i * 0.0515
-        b += flatbtn("Task%d" % i, (x0, 0.13, x0 + 0.0495, 0.87), ind + 1,
-                     icon="apps", icon_px=16, pad_l=7, label="", text_l=27,
-                     size=11, bg="1 1 1 0.06", bg_hi="1 1 1 0.14",
+        x0 = 0.2870 + i * TASK_PITCH
+        b += flatbtn("Task%d" % i, (x0, 0.13, x0 + TASK_W, 0.87), ind + 1,
+                     icon="apps", icon_px=15, pad_l=7, label="", text_l=26,
+                     size=10, bg="1 1 1 0.06", bg_hi="1 1 1 0.14",
                      tex="rounded")
-        b += img("TaskLit%d" % i, (x0, 0.84, x0 + 0.0495, 0.90), ind + 1,
-                 colour=ACCENT, visible=False)
+        # INSIDE the button's own footprint. At 0.84-0.90 it hung below the
+        # button and read as a stray orange line rather than as the mark on
+        # the window you are looking at.
+        b += img("TaskLit%d" % i, (x0 + 0.0045, 0.790, x0 + TASK_W - 0.0045, 0.850),
+                 ind + 1, colour=ACCENT, visible=False)
 
-    b += img("TrayRule", (0.7380, 0.14, 0.7390, 0.86), ind + 1, colour=LINE)
-    b += img("TrayNet", (0.7480, 0.28, 0.7619, 0.72), ind + 1,
+    b += img("TrayRule", (0.8180, 0.14, 0.8190, 0.86), ind + 1, colour=LINE)
+    b += img("TrayNet", (0.8250, 0.30, 0.8389, 0.70), ind + 1,
              colour="0.81 0.84 0.86 1", tex="net")
-    b += img("TrayVol", (0.7690, 0.28, 0.7829, 0.72), ind + 1,
+    b += img("TrayVol", (0.8460, 0.30, 0.8599, 0.70), ind + 1,
              colour="0.81 0.84 0.86 1", tex="vol")
-    b += img("TrayBatt", (0.7900, 0.28, 0.8039, 0.72), ind + 1,
+    b += img("TrayBatt", (0.8670, 0.30, 0.8809, 0.70), ind + 1,
              colour="0.81 0.84 0.86 1", tex="batt")
-    b += txt("TrayPct", (0.8080, 0.28, 0.8560, 0.72), ind + 1, 10, colour=DIM_INK)
-    b += txt("TrayClock", (0.8600, 0.10, 0.9800, 0.55), ind + 1, 13,
-             align=2, text="00:00")
-    b += txt("TrayDate", (0.8600, 0.54, 0.9800, 0.92), ind + 1, 10,
-             colour=DIM_INK, align=2)
+    b += txt("TrayPct", (0.8850, 0.30, 0.9180, 0.70), ind + 1, 10, colour=DIM_INK)
+    b += txt("TrayClock", (0.9230, 0.10, 0.9850, 0.55), ind + 1, 13,
+             align="Right", text="00:00")
+    b += txt("TrayDate", (0.9230, 0.54, 0.9850, 0.92), ind + 1, 10,
+             colour=DIM_INK, align="Right")
     return frame("Panel", (0.0, 0.9440, 1.0, 1.0), ind, b)
 
 
@@ -529,15 +567,17 @@ def launcher(ind):
             b += img("LIcon%d" % i, (c0 + 0.072, r0 + 0.028, c1 - 0.072, r1 - 0.082),
                      ind + 1, colour="1 1 1 1", tex="apps")
             b += txt("LLabel%d" % i, (c0 + 0.010, r1 - 0.078, c1 - 0.010, r1 - 0.020),
-                     ind + 1, 11, colour=DIM_INK, align=1)
+                     ind + 1, 11, colour=DIM_INK, align="Center")
             i += 1
 
     b += img("LFootRule", (0.030, 0.828, 0.970, 0.8295), ind + 1, colour=LINE)
-    b += img("LFace", (0.045, 0.852, 0.108, 0.958), ind + 1, colour=ACCENT,
+    # The launcher is 0.322 of the screen wide and 0.333 of it tall, so a disc
+    # 0.063 wide has to be 0.061 tall, not the 0.106 it was.
+    b += img("LFace", (0.045, 0.850, 0.108, 0.911), ind + 1, colour=ACCENT,
              tex="circle")
-    b += txt("LFaceText", (0.045, 0.878, 0.108, 0.940), ind + 1, 12, align=1)
-    b += txt("LUser", (0.125, 0.876, 0.560, 0.940), ind + 1, 12)
-    b += flatbtn("LLock", (0.620, 0.862, 0.960, 0.952), ind + 1, icon="power",
+    b += txt("LFaceText", (0.045, 0.862, 0.108, 0.902), ind + 1, 12, align="Center")
+    b += txt("LUser", (0.125, 0.862, 0.560, 0.902), ind + 1, 12)
+    b += flatbtn("LLock", (0.620, 0.848, 0.960, 0.916), ind + 1, icon="power",
                  icon_px=15, pad_l=12, label="Lock screen", text_l=36, size=11,
                  bg="1 1 1 0.05", bg_hi="1 1 1 0.14", tex="tile")
     return frame("Launcher", (0.0080, 0.4050, 0.3300, 0.9380), ind, b,
@@ -547,9 +587,9 @@ def launcher(ind):
 # ================================================================ lock screen
 def lockscreen(ind):
     b = img("LockDim", (0.0, 0.0, 1.0, 1.0), ind + 1, colour="0.04 0.05 0.06 0.80")
-    b += txt("LockClock", (0.0, 0.070, 1.0, 0.205), ind + 1, 62, align=1)
+    b += txt("LockClock", (0.0, 0.070, 1.0, 0.205), ind + 1, 62, align="Center")
     b += txt("LockDate", (0.0, 0.212, 1.0, 0.252), ind + 1, 13, colour=DIM_INK,
-             align=1)
+             align="Center")
     for i in range(3):
         y = 0.300 + i * 0.062
         b += img("Note%dCard" % i, (0.375, y, 0.625, y + 0.054), ind + 1,
@@ -561,14 +601,15 @@ def lockscreen(ind):
         b += txt("Note%dWho" % i, (0.418, y + 0.028, 0.560, y + 0.050), ind + 1,
                  10, colour=FAINT_INK, visible=False)
         b += txt("Note%dWhen" % i, (0.560, y + 0.012, 0.612, y + 0.042), ind + 1,
-                 10, colour=FAINT_INK, align=2, visible=False)
-    b += img("LockFace", (0.4590, 0.520, 0.5410, 0.660), ind + 1, colour=ACCENT,
+                 10, colour=FAINT_INK, align="Right", visible=False)
+    # 16:10, so a disc 0.082 wide is 0.1312 tall.
+    b += img("LockFace", (0.4590, 0.520, 0.5410, 0.6512), ind + 1, colour=ACCENT,
              tex="circle")
-    b += txt("LockFaceText", (0.4590, 0.556, 0.5410, 0.632), ind + 1, 34,
-             align=1)
-    b += txt("LockUser", (0.300, 0.676, 0.700, 0.716), ind + 1, 18, align=1)
+    b += txt("LockFaceText", (0.4590, 0.552, 0.5410, 0.620), ind + 1, 34,
+             align="Center")
+    b += txt("LockUser", (0.300, 0.676, 0.700, 0.716), ind + 1, 18, align="Center")
     b += txt("LockHost", (0.300, 0.720, 0.700, 0.752), ind + 1, 11,
-             colour=DIM_INK, align=1)
+             colour=DIM_INK, align="Center")
     b += img("LockFieldBack", (0.3900, 0.782, 0.5750, 0.836), ind + 1,
              colour="1 1 1 0.09", tex="tile")
     b += ('%sEditBoxWidgetClass "%s" {\n' % (" " * (ind + 1), g()) +
@@ -589,7 +630,7 @@ def lockscreen(ind):
                  label=">", size=14, bg=ACCENT, bg_hi="0.90 0.54 0.18 1",
                  tex="tile", label_align="centre")
     b += txt("LockMsg", (0.300, 0.852, 0.700, 0.892), ind + 1, 11,
-             colour=FAINT_INK, align=1)
+             colour=FAINT_INK, align="Center")
     return frame("LockScreen", (0.0, 0.0, 1.0, 1.0), ind, b)
 
 
@@ -636,7 +677,7 @@ for k, (nm, ic, lb) in enumerate(DESK):
     screen += img(nm + "Art", (0.038, y + 0.010, 0.070, y + 0.068), 3,
                   colour="1 1 1 1", tex=ic)
     screen += txt(nm + "Label", (0.006, y + 0.074, 0.102, y + 0.104), 3, 11,
-                  align=1, text=lb)
+                  align="Center", text=lb)
 
 for i, (label, icon, kind, w, h) in enumerate(WINDOWS):
     screen += window(i, label, icon, kind, 3)

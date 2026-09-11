@@ -2851,7 +2851,7 @@ FrameWidgetClass {
       ImageWidgetClass "{6A1C4F0B39E0018D}" {
        Name "W3Big"
        Slot FrameWidgetSlot "{6A1C4F0B39E0018E}" {
-        Anchor 0.6150 0.1500 0.7250 0.3300
+        Anchor 0.6150 0.1500 0.7250 0.3131
         PositionX 0
         OffsetLeft 0
         PositionY 0
@@ -2868,7 +2868,7 @@ FrameWidgetClass {
       TextWidgetClass "{6A1C4F0B39E0018F}" {
        Name "W3BigText"
        Slot FrameWidgetSlot "{6A1C4F0B39E00190}" {
-        Anchor 0.6150 0.2000 0.7250 0.2880
+        Anchor 0.6150 0.1880 0.7250 0.2720
         PositionX 0
         OffsetLeft 0
         PositionY 0
@@ -8342,7 +8342,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E0048B}" {
      Name "Pin0"
      Slot FrameWidgetSlot "{6A1C4F0B39E0048C}" {
-      Anchor 0.1210 0.1000 0.1500 0.9000
+      Anchor 0.1210 0.1000 0.1445 0.9000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8379,7 +8379,7 @@ FrameWidgetClass {
           HorizontalAlign 1
           VerticalAlign 1
          }
-         Size 23 23
+         Size 22 22
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -8390,7 +8390,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00492}" {
      Name "PinBadge0"
      Slot FrameWidgetSlot "{6A1C4F0B39E00493}" {
-      Anchor 0.1385 0.0200 0.1510 0.4000
+      Anchor 0.1335 0.0200 0.1455 0.4000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8408,7 +8408,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E00494}" {
      Name "PinBadgeText0"
      Slot FrameWidgetSlot "{6A1C4F0B39E00495}" {
-      Anchor 0.1385 0.0600 0.1510 0.3600
+      Anchor 0.1335 0.0600 0.1455 0.3600
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8427,7 +8427,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E00496}" {
      Name "Pin1"
      Slot FrameWidgetSlot "{6A1C4F0B39E00497}" {
-      Anchor 0.1535 0.1000 0.1825 0.9000
+      Anchor 0.1475 0.1000 0.1710 0.9000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8464,7 +8464,7 @@ FrameWidgetClass {
           HorizontalAlign 1
           VerticalAlign 1
          }
-         Size 23 23
+         Size 22 22
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -8475,7 +8475,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E0049D}" {
      Name "PinBadge1"
      Slot FrameWidgetSlot "{6A1C4F0B39E0049E}" {
-      Anchor 0.1710 0.0200 0.1835 0.4000
+      Anchor 0.1600 0.0200 0.1720 0.4000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8493,7 +8493,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E0049F}" {
      Name "PinBadgeText1"
      Slot FrameWidgetSlot "{6A1C4F0B39E004A0}" {
-      Anchor 0.1710 0.0600 0.1835 0.3600
+      Anchor 0.1600 0.0600 0.1720 0.3600
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8512,7 +8512,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E004A1}" {
      Name "Pin2"
      Slot FrameWidgetSlot "{6A1C4F0B39E004A2}" {
-      Anchor 0.1860 0.1000 0.2150 0.9000
+      Anchor 0.1740 0.1000 0.1975 0.9000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8549,7 +8549,7 @@ FrameWidgetClass {
           HorizontalAlign 1
           VerticalAlign 1
          }
-         Size 23 23
+         Size 22 22
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -8560,7 +8560,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E004A8}" {
      Name "PinBadge2"
      Slot FrameWidgetSlot "{6A1C4F0B39E004A9}" {
-      Anchor 0.2035 0.0200 0.2160 0.4000
+      Anchor 0.1865 0.0200 0.1985 0.4000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8578,7 +8578,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E004AA}" {
      Name "PinBadgeText2"
      Slot FrameWidgetSlot "{6A1C4F0B39E004AB}" {
-      Anchor 0.2035 0.0600 0.2160 0.3600
+      Anchor 0.1865 0.0600 0.1985 0.3600
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8597,7 +8597,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E004AC}" {
      Name "Pin3"
      Slot FrameWidgetSlot "{6A1C4F0B39E004AD}" {
-      Anchor 0.2185 0.1000 0.2475 0.9000
+      Anchor 0.2005 0.1000 0.2240 0.9000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8634,7 +8634,7 @@ FrameWidgetClass {
           HorizontalAlign 1
           VerticalAlign 1
          }
-         Size 23 23
+         Size 22 22
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -8645,7 +8645,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E004B3}" {
      Name "PinBadge3"
      Slot FrameWidgetSlot "{6A1C4F0B39E004B4}" {
-      Anchor 0.2360 0.0200 0.2485 0.4000
+      Anchor 0.2130 0.0200 0.2250 0.4000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8663,7 +8663,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E004B5}" {
      Name "PinBadgeText3"
      Slot FrameWidgetSlot "{6A1C4F0B39E004B6}" {
-      Anchor 0.2360 0.0600 0.2485 0.3600
+      Anchor 0.2130 0.0600 0.2250 0.3600
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8682,7 +8682,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E004B7}" {
      Name "Pin4"
      Slot FrameWidgetSlot "{6A1C4F0B39E004B8}" {
-      Anchor 0.2510 0.1000 0.2800 0.9000
+      Anchor 0.2270 0.1000 0.2505 0.9000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8719,7 +8719,7 @@ FrameWidgetClass {
           HorizontalAlign 1
           VerticalAlign 1
          }
-         Size 23 23
+         Size 22 22
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -8730,7 +8730,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E004BE}" {
      Name "PinBadge4"
      Slot FrameWidgetSlot "{6A1C4F0B39E004BF}" {
-      Anchor 0.2685 0.0200 0.2810 0.4000
+      Anchor 0.2395 0.0200 0.2515 0.4000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8748,7 +8748,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E004C0}" {
      Name "PinBadgeText4"
      Slot FrameWidgetSlot "{6A1C4F0B39E004C1}" {
-      Anchor 0.2685 0.0600 0.2810 0.3600
+      Anchor 0.2395 0.0600 0.2515 0.3600
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8767,7 +8767,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E004C2}" {
      Name "Pin5"
      Slot FrameWidgetSlot "{6A1C4F0B39E004C3}" {
-      Anchor 0.2835 0.1000 0.3125 0.9000
+      Anchor 0.2535 0.1000 0.2770 0.9000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8804,7 +8804,7 @@ FrameWidgetClass {
           HorizontalAlign 1
           VerticalAlign 1
          }
-         Size 23 23
+         Size 22 22
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -8815,7 +8815,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E004C9}" {
      Name "PinBadge5"
      Slot FrameWidgetSlot "{6A1C4F0B39E004CA}" {
-      Anchor 0.3010 0.0200 0.3135 0.4000
+      Anchor 0.2660 0.0200 0.2780 0.4000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8833,7 +8833,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E004CB}" {
      Name "PinBadgeText5"
      Slot FrameWidgetSlot "{6A1C4F0B39E004CC}" {
-      Anchor 0.3010 0.0600 0.3135 0.3600
+      Anchor 0.2660 0.0600 0.2780 0.3600
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8852,7 +8852,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E004CD}" {
      Name "PinRule"
      Slot FrameWidgetSlot "{6A1C4F0B39E004CE}" {
-      Anchor 0.2110 0.1400 0.2120 0.8600
+      Anchor 0.2810 0.1400 0.2820 0.8600
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8867,7 +8867,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E004CF}" {
      Name "Task0"
      Slot FrameWidgetSlot "{6A1C4F0B39E004D0}" {
-      Anchor 0.2170 0.1300 0.2665 0.8700
+      Anchor 0.2870 0.1300 0.3375 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8914,7 +8914,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -8923,11 +8923,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E004D9}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -8936,7 +8936,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E004DA}" {
      Name "TaskLit0"
      Slot FrameWidgetSlot "{6A1C4F0B39E004DB}" {
-      Anchor 0.2170 0.8400 0.2665 0.9000
+      Anchor 0.2915 0.7900 0.3330 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8952,7 +8952,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E004DC}" {
      Name "Task1"
      Slot FrameWidgetSlot "{6A1C4F0B39E004DD}" {
-      Anchor 0.2685 0.1300 0.3180 0.8700
+      Anchor 0.3400 0.1300 0.3905 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -8999,7 +8999,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9008,11 +9008,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E004E6}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9021,7 +9021,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E004E7}" {
      Name "TaskLit1"
      Slot FrameWidgetSlot "{6A1C4F0B39E004E8}" {
-      Anchor 0.2685 0.8400 0.3180 0.9000
+      Anchor 0.3445 0.7900 0.3860 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9037,7 +9037,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E004E9}" {
      Name "Task2"
      Slot FrameWidgetSlot "{6A1C4F0B39E004EA}" {
-      Anchor 0.3200 0.1300 0.3695 0.8700
+      Anchor 0.3930 0.1300 0.4435 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9084,7 +9084,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9093,11 +9093,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E004F3}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9106,7 +9106,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E004F4}" {
      Name "TaskLit2"
      Slot FrameWidgetSlot "{6A1C4F0B39E004F5}" {
-      Anchor 0.3200 0.8400 0.3695 0.9000
+      Anchor 0.3975 0.7900 0.4390 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9122,7 +9122,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E004F6}" {
      Name "Task3"
      Slot FrameWidgetSlot "{6A1C4F0B39E004F7}" {
-      Anchor 0.3715 0.1300 0.4210 0.8700
+      Anchor 0.4460 0.1300 0.4965 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9169,7 +9169,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9178,11 +9178,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E00500}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9191,7 +9191,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00501}" {
      Name "TaskLit3"
      Slot FrameWidgetSlot "{6A1C4F0B39E00502}" {
-      Anchor 0.3715 0.8400 0.4210 0.9000
+      Anchor 0.4505 0.7900 0.4920 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9207,7 +9207,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E00503}" {
      Name "Task4"
      Slot FrameWidgetSlot "{6A1C4F0B39E00504}" {
-      Anchor 0.4230 0.1300 0.4725 0.8700
+      Anchor 0.4990 0.1300 0.5495 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9254,7 +9254,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9263,11 +9263,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E0050D}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9276,7 +9276,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E0050E}" {
      Name "TaskLit4"
      Slot FrameWidgetSlot "{6A1C4F0B39E0050F}" {
-      Anchor 0.4230 0.8400 0.4725 0.9000
+      Anchor 0.5035 0.7900 0.5450 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9292,7 +9292,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E00510}" {
      Name "Task5"
      Slot FrameWidgetSlot "{6A1C4F0B39E00511}" {
-      Anchor 0.4745 0.1300 0.5240 0.8700
+      Anchor 0.5520 0.1300 0.6025 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9339,7 +9339,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9348,11 +9348,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E0051A}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9361,7 +9361,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E0051B}" {
      Name "TaskLit5"
      Slot FrameWidgetSlot "{6A1C4F0B39E0051C}" {
-      Anchor 0.4745 0.8400 0.5240 0.9000
+      Anchor 0.5565 0.7900 0.5980 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9377,7 +9377,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E0051D}" {
      Name "Task6"
      Slot FrameWidgetSlot "{6A1C4F0B39E0051E}" {
-      Anchor 0.5260 0.1300 0.5755 0.8700
+      Anchor 0.6050 0.1300 0.6555 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9424,7 +9424,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9433,11 +9433,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E00527}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9446,7 +9446,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00528}" {
      Name "TaskLit6"
      Slot FrameWidgetSlot "{6A1C4F0B39E00529}" {
-      Anchor 0.5260 0.8400 0.5755 0.9000
+      Anchor 0.6095 0.7900 0.6510 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9462,7 +9462,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E0052A}" {
      Name "Task7"
      Slot FrameWidgetSlot "{6A1C4F0B39E0052B}" {
-      Anchor 0.5775 0.1300 0.6270 0.8700
+      Anchor 0.6580 0.1300 0.7085 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9509,7 +9509,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9518,11 +9518,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E00534}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9531,7 +9531,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00535}" {
      Name "TaskLit7"
      Slot FrameWidgetSlot "{6A1C4F0B39E00536}" {
-      Anchor 0.5775 0.8400 0.6270 0.9000
+      Anchor 0.6625 0.7900 0.7040 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9547,7 +9547,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E00537}" {
      Name "Task8"
      Slot FrameWidgetSlot "{6A1C4F0B39E00538}" {
-      Anchor 0.6290 0.1300 0.6785 0.8700
+      Anchor 0.7110 0.1300 0.7615 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9594,7 +9594,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9603,11 +9603,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E00541}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9616,7 +9616,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00542}" {
      Name "TaskLit8"
      Slot FrameWidgetSlot "{6A1C4F0B39E00543}" {
-      Anchor 0.6290 0.8400 0.6785 0.9000
+      Anchor 0.7155 0.7900 0.7570 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9632,7 +9632,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E00544}" {
      Name "Task9"
      Slot FrameWidgetSlot "{6A1C4F0B39E00545}" {
-      Anchor 0.6805 0.1300 0.7300 0.8700
+      Anchor 0.7640 0.1300 0.8145 0.8700
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9679,7 +9679,7 @@ FrameWidgetClass {
           VerticalAlign 1
           Padding 7 0 0 0
          }
-         Size 16 16
+         Size 15 15
          Texture "{6A1C4F0B39D3550B}UI/images/MCF_Desktop/icon_apps.edds"
          Image ""
         }
@@ -9688,11 +9688,11 @@ FrameWidgetClass {
          Slot OverlayWidgetSlot "{6A1C4F0B39E0054E}" {
           HorizontalAlign 0
       VerticalAlign 1
-          Padding 27 0 8 0
+          Padding 26 0 8 0
          }
          Text ""
-         "Font Size" 11
-         "Min Font Size" 11
+         "Font Size" 10
+         "Min Font Size" 10
         }
        }
       }
@@ -9701,7 +9701,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E0054F}" {
      Name "TaskLit9"
      Slot FrameWidgetSlot "{6A1C4F0B39E00550}" {
-      Anchor 0.6805 0.8400 0.7300 0.9000
+      Anchor 0.7685 0.7900 0.8100 0.8500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9717,7 +9717,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00551}" {
      Name "TrayRule"
      Slot FrameWidgetSlot "{6A1C4F0B39E00552}" {
-      Anchor 0.7380 0.1400 0.7390 0.8600
+      Anchor 0.8180 0.1400 0.8190 0.8600
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9732,7 +9732,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00553}" {
      Name "TrayNet"
      Slot FrameWidgetSlot "{6A1C4F0B39E00554}" {
-      Anchor 0.7480 0.2800 0.7619 0.7200
+      Anchor 0.8250 0.3000 0.8389 0.7000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9749,7 +9749,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00555}" {
      Name "TrayVol"
      Slot FrameWidgetSlot "{6A1C4F0B39E00556}" {
-      Anchor 0.7690 0.2800 0.7829 0.7200
+      Anchor 0.8460 0.3000 0.8599 0.7000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9766,7 +9766,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00557}" {
      Name "TrayBatt"
      Slot FrameWidgetSlot "{6A1C4F0B39E00558}" {
-      Anchor 0.7900 0.2800 0.8039 0.7200
+      Anchor 0.8670 0.3000 0.8809 0.7000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9783,7 +9783,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E00559}" {
      Name "TrayPct"
      Slot FrameWidgetSlot "{6A1C4F0B39E0055A}" {
-      Anchor 0.8080 0.2800 0.8560 0.7200
+      Anchor 0.8850 0.3000 0.9180 0.7000
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9801,7 +9801,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E0055B}" {
      Name "TrayClock"
      Slot FrameWidgetSlot "{6A1C4F0B39E0055C}" {
-      Anchor 0.8600 0.1000 0.9800 0.5500
+      Anchor 0.9230 0.1000 0.9850 0.5500
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -9819,7 +9819,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E0055D}" {
      Name "TrayDate"
      Slot FrameWidgetSlot "{6A1C4F0B39E0055E}" {
-      Anchor 0.8600 0.5400 0.9800 0.9200
+      Anchor 0.9230 0.5400 0.9850 0.9200
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -10842,7 +10842,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E005D9}" {
      Name "LFace"
      Slot FrameWidgetSlot "{6A1C4F0B39E005DA}" {
-      Anchor 0.0450 0.8520 0.1080 0.9580
+      Anchor 0.0450 0.8500 0.1080 0.9110
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -10859,7 +10859,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E005DB}" {
      Name "LFaceText"
      Slot FrameWidgetSlot "{6A1C4F0B39E005DC}" {
-      Anchor 0.0450 0.8780 0.1080 0.9400
+      Anchor 0.0450 0.8620 0.1080 0.9020
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -10877,7 +10877,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E005DD}" {
      Name "LUser"
      Slot FrameWidgetSlot "{6A1C4F0B39E005DE}" {
-      Anchor 0.1250 0.8760 0.5600 0.9400
+      Anchor 0.1250 0.8620 0.5600 0.9020
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -10894,7 +10894,7 @@ FrameWidgetClass {
     ButtonWidgetClass "{6A1C4F0B39E005DF}" {
      Name "LLock"
      Slot FrameWidgetSlot "{6A1C4F0B39E005E0}" {
-      Anchor 0.6200 0.8620 0.9600 0.9520
+      Anchor 0.6200 0.8480 0.9600 0.9160
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -11348,7 +11348,7 @@ FrameWidgetClass {
     ImageWidgetClass "{6A1C4F0B39E00615}" {
      Name "LockFace"
      Slot FrameWidgetSlot "{6A1C4F0B39E00616}" {
-      Anchor 0.4590 0.5200 0.5410 0.6600
+      Anchor 0.4590 0.5200 0.5410 0.6512
       PositionX 0
       OffsetLeft 0
       PositionY 0
@@ -11365,7 +11365,7 @@ FrameWidgetClass {
     TextWidgetClass "{6A1C4F0B39E00617}" {
      Name "LockFaceText"
      Slot FrameWidgetSlot "{6A1C4F0B39E00618}" {
-      Anchor 0.4590 0.5560 0.5410 0.6320
+      Anchor 0.4590 0.5520 0.5410 0.6200
       PositionX 0
       OffsetLeft 0
       PositionY 0

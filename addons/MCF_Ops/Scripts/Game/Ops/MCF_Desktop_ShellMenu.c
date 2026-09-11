@@ -1043,7 +1043,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 
 			TextWidget label = TextWidget.Cast(root.FindAnyWidget("Task" + used.ToString() + "Text"));
 			if (label)
-				label.SetText(TitleOf(win));
+				label.SetText(MCF_Device_Text.Clip(TitleOf(win), 8));
 
 			// The lit bar under a task button is what says which window the
 			// keyboard and the eye are on. A minimised one keeps its button
