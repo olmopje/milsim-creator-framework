@@ -1471,6 +1471,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			button.m_OnClicked.Insert(OnRowClicked);
 			win.m_aRows.Insert(button);
 
+			button.SetToggled(i == selected, false, false);
 			FillRow(win, row, win.m_aVisible[i], i == selected);
 		}
 	}
@@ -1571,16 +1572,11 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (dot)
 			dot.SetVisible(m_Content.IsUnread(entry));
 
-		Widget back = row.FindAnyWidget("Background");
-		if (back)
-		{
-			ImageWidget fill = ImageWidget.Cast(back);
-			if (fill)
-			{
-				fill.SetVisible(selected);
-				fill.SetColor(Color.FromInt(0x33C26314));
-			}
-		}
+		// The selected row is painted by SetToggled in PaintRows, NOT by
+		// reaching into the row and colouring its Background. That widget
+		// belongs to SCR_ButtonTextComponent -- it is the one thing the
+		// component tints -- and writing to it from outside fights the hover
+		// state for ownership of the same pixel.
 	}
 
 	protected void OnRowClicked(SCR_ButtonTextComponent button)

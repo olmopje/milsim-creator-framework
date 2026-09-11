@@ -18,6 +18,18 @@
 //
 // Everything is placed with OverlayWidgetSlot alignment rather than free
 // coordinates, so nothing can be positioned into a padding field by mistake.
+//
+// AND THE HEIGHT IS DECLARED BY "Sizer", NOT BY THE AVATAR. The row used to
+// take its height from the 40-unit disc, which the shell hides in every app
+// with no faces in it -- notes, files, settings -- and a hidden widget
+// contributes nothing to a layout, so those rows collapsed to one line and the
+// title drew on top of the preview. Making the disc transparent instead of
+// hidden did not help either: `Size` on an OverlayWidget is ignored, and the
+// box was only ever 40 tall because the image inside it was. Sizer is an
+// ImageWidget one unit wide and forty tall, fully transparent, always visible
+// and never touched by script -- `Size` on an ImageWidget does work, which the
+// 9-unit unread dot has been proving all along. A row's height should be
+// declared by something that is always there, not by a decoration.
 ButtonWidgetClass {
  Name "Button"
  Slot LayoutSlot "{6A1C4F0B39D35601}" {
@@ -27,7 +39,7 @@ ButtonWidgetClass {
  Clipping True
  components {
   SCR_ButtonTextComponent "{6A1C4F0B39D35602}" {
-   m_bCanBeToggled 0
+   m_bCanBeToggled 1
    m_BackgroundDefault 1 1 1 0
    m_BackgroundHovered 1 1 1 0.10
    m_BackgroundSelected 1 1 1 0.14
@@ -52,6 +64,15 @@ ButtonWidgetClass {
       HorizontalAlign 3
       VerticalAlign 3
      }
+    }
+    ImageWidgetClass "{6A1C4F0B39D35617}" {
+     Name "Sizer"
+     Slot OverlayWidgetSlot "{6A1C4F0B39D35618}" {
+      HorizontalAlign 0
+      VerticalAlign 1
+     }
+     Size 1 40
+     Color 1 1 1 0
     }
     OverlayWidgetClass "{6A1C4F0B39D35607}" {
      Name "AvatarBox"
