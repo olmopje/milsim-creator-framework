@@ -392,10 +392,13 @@ for i in range(90):
 wp = Image.alpha_composite(wp, haze)
 d = ImageDraw.Draw(wp)
 
-for sx, sy, sw, col, edge in [(0.00, 0.62, 0.28, (31, 42, 51, 255), (58, 76, 90, 255)),
-                              (0.22, 0.70, 0.24, (26, 36, 44, 255), (48, 64, 76, 255)),
-                              (0.44, 0.58, 0.30, (33, 44, 54, 255), (63, 82, 97, 255)),
-                              (0.70, 0.68, 0.34, (27, 37, 45, 255), (50, 66, 79, 255))]:
+# The first pass was so close to the sky that the ridges read as outlines with
+# nothing inside them. Lifted until the shapes are solid without becoming a
+# feature -- a desktop background is scenery, and text sits on top of it.
+for sx, sy, sw, col, edge in [(0.00, 0.62, 0.28, (38, 51, 62, 255), (74, 96, 113, 255)),
+                              (0.22, 0.70, 0.24, (31, 43, 53, 255), (60, 80, 95, 255)),
+                              (0.44, 0.58, 0.30, (42, 56, 68, 255), (82, 106, 124, 255)),
+                              (0.70, 0.68, 0.34, (34, 46, 57, 255), (65, 85, 101, 255))]:
     pts = [(sx * W, H), (sx * W, sy * H), ((sx + sw / 2) * W, (sy - 0.14) * H),
            ((sx + sw) * W, sy * H), ((sx + sw) * W, H)]
     d.polygon(pts, fill=col)

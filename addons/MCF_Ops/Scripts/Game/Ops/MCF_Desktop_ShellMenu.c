@@ -99,6 +99,8 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 	protected float m_fDragFromY;
 
 	protected SCR_ButtonTextComponent m_Kick;
+	protected ref array<SCR_ButtonTextComponent> m_aDeskIcons = {};
+	protected ref array<int> m_aDeskSlots = {};
 	protected bool m_bLauncherOpen;
 	protected ref array<SCR_ButtonTextComponent> m_aPins = {};
 	protected ref array<int> m_aPinSlots = {};
@@ -245,6 +247,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 			if (m_wLockScreen)
 				m_wLockScreen.SetVisible(false);
 
+			ShowDesktopChrome(true);
 			OpenDefaults();
 		}
 
@@ -896,6 +899,25 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 				lit.SetVisible(false);
 		}
 
+		// The three shortcuts on the wallpaper. They are not decoration: a
+		// desktop whose icons do nothing is the tell that the whole screen is
+		// a picture of a desktop.
+		m_aDeskIcons.Clear();
+		m_aDeskSlots.Clear();
+
+		array<string> deskNames = {"DeskHome", "DeskDocs", "DeskFile"};
+		array<int> deskTargets = {0, 0, 5};
+
+		for (int d = 0; d < deskNames.Count(); d++)
+		{
+			SCR_ButtonTextComponent icon = SCR_ButtonTextComponent.GetButtonText(deskNames[d], root);
+			m_aDeskIcons.Insert(icon);
+			m_aDeskSlots.Insert(deskTargets[d]);
+
+			if (icon)
+				icon.m_OnClicked.Insert(OnDeskIconClicked);
+		}
+
 		m_wTrayClock = TextWidget.Cast(root.FindAnyWidget("TrayClock"));
 		m_wTrayDate = TextWidget.Cast(root.FindAnyWidget("TrayDate"));
 		m_wTrayPct = TextWidget.Cast(root.FindAnyWidget("TrayPct"));
@@ -1079,6 +1101,41 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		}
 
 		FocusWindow(slot);
+	}
+
+	protected void OnDeskIconClicked(SCR_ButtonTextComponent button)
+	{
+		int index = m_aDeskIcons.Find(button);
+		if (index < 0 || index >= m_aDeskSlots.Count())
+			return;
+
+		OpenWindow(m_aDeskSlots[index]);
+	}
+
+	//! Everything that belongs to a logged-in session.
+	//!
+	//! NOT LEFT TO Z ORDER. The lock screen is declared above the panel and the
+	//! icons and is given a higher Z than either, and on the first build they
+	//! still drew straight through it -- so the lock screen does not cover the
+	//! desktop, it empties it. That is also what a locked machine actually
+	//! looks like: no taskbar, no shortcuts, nothing but the way in.
+	protected void ShowDesktopChrome(bool on)
+	{
+		Widget root = GetRootWidget();
+		if (!root)
+			return;
+
+		if (m_wPanel)
+			m_wPanel.SetVisible(on);
+
+		array<string> parts = {"DeskHome", "DeskHomeArt", "DeskHomeLabel",
+		                       "DeskDocs", "DeskDocsArt", "DeskDocsLabel",
+		                       "DeskFile", "DeskFileArt", "DeskFileLabel"};
+
+		foreach (string part : parts)
+		{
+			ShowWidget(root, part, on);
+		}
 	}
 
 	protected void OnPinClicked(SCR_ButtonTextComponent button)
@@ -2304,6 +2361,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		}
 
 		CloseLauncher();
+		ShowDesktopChrome(false);
 
 		if (m_wLockScreen)
 			m_wLockScreen.SetVisible(true);
@@ -2428,6 +2486,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (m_wLockScreen)
 			m_wLockScreen.SetVisible(false);
 
+		ShowDesktopChrome(true);
 		BindApps();
 		OpenDefaults();
 	}
@@ -2515,6 +2574,7 @@ class MCF_Desktop_ShellMenu : ChimeraMenuBase
 		if (m_wLockScreen)
 			m_wLockScreen.SetVisible(false);
 
+		ShowDesktopChrome(true);
 		BindApps();
 		OpenDefaults();
 	}

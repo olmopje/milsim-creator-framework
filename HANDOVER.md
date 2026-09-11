@@ -784,3 +784,80 @@ readback that raises if the new string is absent; do that.
 
 When the replace-and-move route fails, `[IO.File]::ReadAllText` /
 `WriteAllText` with a `UTF8Encoding($false)` writes in place and works.
+
+### `Alignment` on a TextWidget is accepted and ignored
+
+The property that centres text is `"Text Horizontal Align"` -- 0 left, 1 centre,
+2 right. `Alignment 0.5 0` parses, survives validation, and does nothing, so
+every centred label on the desktop's first build came out hard left: a 62pt
+clock in the top-left corner over the desktop icons, and a lock screen whose
+name, host and message all started at the same arbitrary x.
+
+It went unnoticed on the handset because `Alignment 0.5 0` is on the app-tile
+labels there, and those boxes are narrow enough that left and centre look the
+same. `MCF_PlanningBoard.layout` has always used the right one.
+
+### A button's fill must be a child called `Background`
+
+`SCR_ButtonTextComponent` tints the widget named `Background` inside its own
+subtree with `m_BackgroundDefault` / `Hovered` / `Selected`. That is the whole
+mechanism -- there is no styling anywhere else. An image under any other name is
+never tinted and paints at full white, which is how every filled button on the
+desktop's first build came out as a white block.
+
+Two consequences worth knowing before drawing one:
+
+- A transparent button (`m_BackgroundDefault 1 1 1 0`) must NOT contain the
+  texture it wants always visible, because the component will tint it away. A
+  window's title-bar gradient therefore sits behind the bar as a sibling, not
+  inside it.
+- Duplicated `Background` names across one layout file are fine. The lookup is
+  relative to the button, and the row layout has done it for months.
+
+### A rounded tile stretched wide becomes an oval
+
+`tile_rounded` is 64 pixels square with a radius to match. Stretched across a
+270-unit password field its corners become half-circles, which is why that
+field came out as a grey pill. `tile_window` is 256 with a proportionally
+smaller radius and survives the same stretch. Rule of thumb: the small tile for
+anything roughly square, the big one for anything wider than about 150 units.
+
+### Dragging a widget: there is no `OnMouseMove`
+
+`ScriptedWidgetEventHandler` offers `OnMouseButtonDown`, `OnMouseButtonUp`,
+`OnClick`, `OnDoubleClick`, the enter/leave pair, `OnMouseWheel` and a per-frame
+`OnUpdate`. There is no per-move callback and no mouse capture --
+`WidgetManager` has `GetWidgetUnderCursor` but nothing that sets it.
+
+The shipped game has the same problem and its map ruler solves it this way,
+which is what MCF_Desktop_ShellMenu copies:
+
+1. The press sets a flag and records where the pointer and the widget were.
+2. A per-frame tick polls `WidgetManager.GetMousePos(x, y)` and moves the widget
+   with `FrameSlot.SetPos`.
+3. The release clears the flag.
+
+Two traps go with it:
+
+- **`GetMousePos` answers in physical pixels; `FrameSlot` wants reference
+  units.** `workspace.DPIUnscale()` sits between them. Same mismatch as the
+  handset's 3D preview, in a place where it instead makes a window fly away
+  from the cursor at anything but 100% DPI.
+- **The release does not come back to the widget that was pressed.** By the
+  time the button comes up the cursor is over whatever the window was dragged
+  across. A transparent full-screen button, shown only for the length of the
+  drag, catches it.
+
+Stacking needs none of this: `Widget.SetZOrder(int)` exists, higher is in front,
+and no re-parenting trick is required.
+
+### `SetZOrder` does not make a screen cover another screen
+
+The desktop's lock screen is declared after the panel and the desktop icons AND
+given a higher Z order than either, and on the first build both still drew
+straight through it. Whatever the ordering rules are between a FrameWidget's
+children, they are not "highest Z wins" in the way a CSS stacking context is.
+
+So a screen that must cover another one hides it rather than covering it. That
+is also the more honest model: a locked machine has no taskbar and no shortcuts,
+it has the way in and nothing else.

@@ -17,7 +17,7 @@ window that can be dragged has no fixed anchor by definition.
 """
 import os
 
-OUT = "/mnt/user-data/outputs/MCF_IntelDesktop.layout"
+OUT = os.environ.get("MCF_LAYOUT_OUT", "UI/layouts/MCF/MCF_IntelDesktop.layout")
 
 # ---------------------------------------------------------------- resources
 A = "UI/images/MCF_Desktop/"
@@ -135,7 +135,11 @@ def txt(name, a, ind, size, colour=None, align=None, text="", rich=False,
     if colour:
         s += p + " Color %s\n" % colour
     if align:
-        s += p + " Alignment %s\n" % align
+        # NOT `Alignment`. That property is accepted and ignored on a
+        # TextWidget -- every centred label on the first build came out hard
+        # left. "Text Horizontal Align" is the one the operations board uses
+        # and it is 0 left, 1 centre, 2 right.
+        s += p + ' "Text Horizontal Align" %d\n' % align
     s += p + "}\n"
     return s
 
@@ -192,7 +196,7 @@ def flatbtn(name, a, ind, icon=None, label=None, icon_px=22, pad_l=10,
     s += p + "   {\n"
     if tex:
         s += p + '    ImageWidgetClass "%s" {\n' % g()
-        s += p + '     Name "%sSkin"\n' % name
+        s += p + '     Name "Background"\n' 
         s += p + '     Slot OverlayWidgetSlot "%s" {\n' % g()
         s += p + "      HorizontalAlign 3\n      VerticalAlign 3\n"
         s += p + "     }\n"
@@ -344,7 +348,7 @@ def pane_list(p, ind):
     s += scroll(p + "ReadScroll", (0.412, 0.256, 0.982, 0.980), ind,
                 p + "ReadBody", kind="rich", size=12)
     s += txt(p + "Hint", (0.415, 0.470, 0.980, 0.540), ind, 12, colour=FAINT_INK,
-             align="0.5 0")
+             align=1)
     return s
 
 
@@ -372,7 +376,7 @@ def pane_chat(p, ind):
     s += img(p + "Split", (0.338, 0.112, 0.3395, 0.980), ind, colour=LINE)
     s += img(p + "Avatar", (0.354, 0.118, 0.396, 0.180), ind,
              colour="0.35 0.38 0.42 1", tex="circle")
-    s += txt(p + "Initial", (0.354, 0.130, 0.396, 0.172), ind, 14, align="0.5 0")
+    s += txt(p + "Initial", (0.354, 0.130, 0.396, 0.172), ind, 14, align=1)
     s += txt(p + "Who", (0.408, 0.118, 0.980, 0.158), ind, 14)
     s += txt(p + "When", (0.408, 0.156, 0.980, 0.190), ind, 10, colour=DIM_INK)
     s += img(p + "ChatRule", (0.348, 0.198, 0.980, 0.1995), ind, colour=LINE)
@@ -386,13 +390,13 @@ def pane_contacts(p, ind):
     s += img(p + "Split", (0.360, 0.112, 0.3615, 0.980), ind, colour=LINE)
     s += img(p + "Big", (0.615, 0.150, 0.725, 0.330), ind,
              colour="0.35 0.38 0.42 1", tex="circle")
-    s += txt(p + "BigText", (0.615, 0.200, 0.725, 0.288), ind, 30, align="0.5 0")
-    s += txt(p + "Name", (0.380, 0.352, 0.965, 0.410), ind, 18, align="0.5 0")
+    s += txt(p + "BigText", (0.615, 0.200, 0.725, 0.288), ind, 30, align=1)
+    s += txt(p + "Name", (0.380, 0.352, 0.965, 0.410), ind, 18, align=1)
     s += txt(p + "Number", (0.380, 0.414, 0.965, 0.456), ind, 12,
-             colour=DIM_INK, align="0.5 0")
+             colour=DIM_INK, align=1)
     s += flatbtn(p + "Call", (0.545, 0.478, 0.795, 0.552), ind,
                  label="CALL", size=12, bg="0.16 0.60 0.27 1",
-                 bg_hi="0.22 0.72 0.34 1", tex="rounded", label_align="centre")
+                 bg_hi="0.22 0.72 0.34 1", tex="tile", label_align="centre")
     s += img(p + "CardRule", (0.400, 0.590, 0.960, 0.5915), ind, colour=LINE)
     s += txt(p + "NoteLabel", (0.400, 0.604, 0.960, 0.646), ind, 9, colour=FAINT_INK)
     s += scroll(p + "NoteScroll", (0.396, 0.652, 0.964, 0.980), ind,
@@ -411,10 +415,10 @@ def pane_photos(p, ind):
                          bg="1 1 1 0.07", bg_hi="1 1 1 0.18")
             s += img(p + "Shot%d" % i, (c0, r0, c1, r1), ind, colour="1 1 1 1")
             s += txt(p + "Cap%d" % i, (c0 + 0.008, r1 - 0.075, c1 - 0.008, r1 - 0.012),
-                     ind, 10, colour=DIM_INK, align="0.5 0")
+                     ind, 10, colour=DIM_INK, align=1)
             i += 1
     s += txt(p + "GridHint", (0.030, 0.520, 0.969, 0.580), ind, 12,
-             colour=FAINT_INK, align="0.5 0")
+             colour=FAINT_INK, align=1)
     return s
 
 
@@ -441,8 +445,10 @@ def window(i, label, icon, kind, ind):
     # The title bar is a BUTTON, not an image: an ImageWidget never receives a
     # click, which is the handset's home-bar lesson, and a drag starts with a
     # click like anything else.
+    b += img(p + "BarSkin", (0.0, 0.0, 1.0, BAR_H), ind + 1,
+             colour="1 1 1 1", tex="bartitle")
     b += flatbtn(p + "Bar", (0.0, 0.0, 1.0, BAR_H), ind + 1,
-                 bg="1 1 1 0", bg_hi="1 1 1 0.04", tex="bartitle")
+                 bg="1 1 1 0", bg_hi="1 1 1 0.06")
     b += img(p + "Icon", (0.012, 0.014, 0.038, 0.058), ind + 1,
              colour="1 1 1 1", tex=icon)
     b += txt(p + "Title", (0.048, 0.012, 0.800, 0.060), ind + 1, 12.5 // 1,
@@ -474,7 +480,7 @@ def panel(ind):
         b += img("PinBadge%d" % i, (x0 + 0.0175, 0.02, x0 + 0.0300, 0.40),
                  ind + 1, colour=ACCENT, tex="circle", visible=False)
         b += txt("PinBadgeText%d" % i, (x0 + 0.0175, 0.06, x0 + 0.0300, 0.36),
-                 ind + 1, 9, align="0.5 0", visible=False)
+                 ind + 1, 9, align=1, visible=False)
     b += img("PinRule", (0.2110, 0.14, 0.2120, 0.86), ind + 1, colour=LINE)
 
     for i in range(10):
@@ -495,9 +501,9 @@ def panel(ind):
              colour="0.81 0.84 0.86 1", tex="batt")
     b += txt("TrayPct", (0.8080, 0.28, 0.8560, 0.72), ind + 1, 10, colour=DIM_INK)
     b += txt("TrayClock", (0.8600, 0.10, 0.9800, 0.55), ind + 1, 13,
-             align="1 0", text="00:00")
+             align=2, text="00:00")
     b += txt("TrayDate", (0.8600, 0.54, 0.9800, 0.92), ind + 1, 10,
-             colour=DIM_INK, align="1 0")
+             colour=DIM_INK, align=2)
     return frame("Panel", (0.0, 0.9440, 1.0, 1.0), ind, b)
 
 
@@ -506,7 +512,7 @@ def launcher(ind):
     b = img("LauncherBack", (0.0, 0.0, 1.0, 1.0), ind + 1,
             colour="0.137 0.157 0.176 0.98", tex="tile")
     b += img("LSearchBack", (0.045, 0.040, 0.955, 0.118), ind + 1,
-             colour="1 1 1 0.07", tex="rounded")
+             colour="1 1 1 0.07", tex="tile")
     b += img("LSearchIcon", (0.065, 0.058, 0.098, 0.100), ind + 1,
              colour="0.55 0.58 0.62 1", tex="search")
     b += txt("LSearchHint", (0.115, 0.055, 0.940, 0.103), ind + 1, 12,
@@ -523,17 +529,17 @@ def launcher(ind):
             b += img("LIcon%d" % i, (c0 + 0.072, r0 + 0.028, c1 - 0.072, r1 - 0.082),
                      ind + 1, colour="1 1 1 1", tex="apps")
             b += txt("LLabel%d" % i, (c0 + 0.010, r1 - 0.078, c1 - 0.010, r1 - 0.020),
-                     ind + 1, 11, colour=DIM_INK, align="0.5 0")
+                     ind + 1, 11, colour=DIM_INK, align=1)
             i += 1
 
     b += img("LFootRule", (0.030, 0.828, 0.970, 0.8295), ind + 1, colour=LINE)
     b += img("LFace", (0.045, 0.852, 0.108, 0.958), ind + 1, colour=ACCENT,
              tex="circle")
-    b += txt("LFaceText", (0.045, 0.878, 0.108, 0.940), ind + 1, 12, align="0.5 0")
+    b += txt("LFaceText", (0.045, 0.878, 0.108, 0.940), ind + 1, 12, align=1)
     b += txt("LUser", (0.125, 0.876, 0.560, 0.940), ind + 1, 12)
     b += flatbtn("LLock", (0.620, 0.862, 0.960, 0.952), ind + 1, icon="power",
                  icon_px=15, pad_l=12, label="Lock screen", text_l=36, size=11,
-                 bg="1 1 1 0.05", bg_hi="1 1 1 0.14", tex="rounded")
+                 bg="1 1 1 0.05", bg_hi="1 1 1 0.14", tex="tile")
     return frame("Launcher", (0.0080, 0.4050, 0.3300, 0.9380), ind, b,
                  visible=False)
 
@@ -541,9 +547,9 @@ def launcher(ind):
 # ================================================================ lock screen
 def lockscreen(ind):
     b = img("LockDim", (0.0, 0.0, 1.0, 1.0), ind + 1, colour="0.04 0.05 0.06 0.80")
-    b += txt("LockClock", (0.0, 0.070, 1.0, 0.205), ind + 1, 62, align="0.5 0")
+    b += txt("LockClock", (0.0, 0.070, 1.0, 0.205), ind + 1, 62, align=1)
     b += txt("LockDate", (0.0, 0.212, 1.0, 0.252), ind + 1, 13, colour=DIM_INK,
-             align="0.5 0")
+             align=1)
     for i in range(3):
         y = 0.300 + i * 0.062
         b += img("Note%dCard" % i, (0.375, y, 0.625, y + 0.054), ind + 1,
@@ -555,16 +561,16 @@ def lockscreen(ind):
         b += txt("Note%dWho" % i, (0.418, y + 0.028, 0.560, y + 0.050), ind + 1,
                  10, colour=FAINT_INK, visible=False)
         b += txt("Note%dWhen" % i, (0.560, y + 0.012, 0.612, y + 0.042), ind + 1,
-                 10, colour=FAINT_INK, align="1 0", visible=False)
+                 10, colour=FAINT_INK, align=2, visible=False)
     b += img("LockFace", (0.4590, 0.520, 0.5410, 0.660), ind + 1, colour=ACCENT,
              tex="circle")
     b += txt("LockFaceText", (0.4590, 0.556, 0.5410, 0.632), ind + 1, 34,
-             align="0.5 0")
-    b += txt("LockUser", (0.300, 0.676, 0.700, 0.716), ind + 1, 18, align="0.5 0")
+             align=1)
+    b += txt("LockUser", (0.300, 0.676, 0.700, 0.716), ind + 1, 18, align=1)
     b += txt("LockHost", (0.300, 0.720, 0.700, 0.752), ind + 1, 11,
-             colour=DIM_INK, align="0.5 0")
+             colour=DIM_INK, align=1)
     b += img("LockFieldBack", (0.3900, 0.782, 0.5750, 0.836), ind + 1,
-             colour="1 1 1 0.09", tex="rounded")
+             colour="1 1 1 0.09", tex="tile")
     b += ('%sEditBoxWidgetClass "%s" {\n' % (" " * (ind + 1), g()) +
           '%s Name "LockField"\n' % (" " * (ind + 1)) +
           slot((0.3990, 0.790, 0.5650, 0.828), ind + 2) +
@@ -581,9 +587,9 @@ def lockscreen(ind):
           "%s}\n" % (" " * (ind + 1)))
     b += flatbtn("LockGo", (0.5830, 0.782, 0.6100, 0.836), ind + 1,
                  label=">", size=14, bg=ACCENT, bg_hi="0.90 0.54 0.18 1",
-                 tex="rounded", label_align="centre")
+                 tex="tile", label_align="centre")
     b += txt("LockMsg", (0.300, 0.852, 0.700, 0.892), ind + 1, 11,
-             colour=FAINT_INK, align="0.5 0")
+             colour=FAINT_INK, align=1)
     return frame("LockScreen", (0.0, 0.0, 1.0, 1.0), ind, b)
 
 
@@ -610,10 +616,10 @@ def editor(ind):
           "%s}\n" % (" " * (ind + 1)))
     b += flatbtn("EditorSave", (0.280, 0.662, 0.492, 0.722), ind + 1,
                  label="SAVE", size=12, bg="1 1 1 0.10", bg_hi="1 1 1 0.22",
-                 tex="rounded", label_align="centre")
+                 tex="tile", label_align="centre")
     b += flatbtn("EditorCancel", (0.508, 0.662, 0.720, 0.722), ind + 1,
                  label="CANCEL", size=12, bg="1 1 1 0.10", bg_hi="1 1 1 0.22",
-                 tex="rounded", label_align="centre")
+                 tex="tile", label_align="centre")
     return frame("EditorPane", (0.0, 0.0, 1.0, 1.0), ind, b, visible=False)
 
 
@@ -625,12 +631,12 @@ DESK = [("DeskHome", "folder", "Home"),
         ("DeskFile", "doc", "readme.txt")]
 for k, (nm, ic, lb) in enumerate(DESK):
     y = 0.020 + k * 0.115
-    screen += flatbtn(nm, (0.012, y, 0.082, y + 0.108), 3,
+    screen += flatbtn(nm, (0.010, y, 0.098, y + 0.112), 3,
                       bg="1 1 1 0", bg_hi="1 1 1 0.09")
-    screen += img(nm + "Art", (0.026, y + 0.012, 0.068, y + 0.076), 3,
+    screen += img(nm + "Art", (0.038, y + 0.010, 0.070, y + 0.068), 3,
                   colour="1 1 1 1", tex=ic)
-    screen += txt(nm + "Label", (0.008, y + 0.080, 0.086, y + 0.104), 3, 11,
-                  align="0.5 0", text=lb)
+    screen += txt(nm + "Label", (0.006, y + 0.074, 0.102, y + 0.104), 3, 11,
+                  align=1, text=lb)
 
 for i, (label, icon, kind, w, h) in enumerate(WINDOWS):
     screen += window(i, label, icon, kind, 3)
