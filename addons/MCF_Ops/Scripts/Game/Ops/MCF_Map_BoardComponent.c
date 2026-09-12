@@ -1044,24 +1044,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		m_bPrimed = true;
 
-		// THE ARITHMETIC, CHECKED AGAINST THE REAL THING. ComputeView works
-		// the same view out from the board's own two numbers; at zoom step 0
-		// with no centre set that is "the whole island, centred", which is
-		// exactly what ZoomOut and CenterMap just did. If these two lines
-		// disagree, the formula is wrong and everything the board does with
-		// zoom and pan from here is wrong with it.
-		float primedZoom = m_fZoomLevel;
-		vector primedPan = m_vPan;
-
 		ComputeView();
-
-		string check = "map board view | primed zoom " + primedZoom.ToString();
-		check = check + " pan " + primedPan.ToString();
-		check = check + " | computed zoom " + m_fZoomLevel.ToString();
-		check = check + " pan " + m_vPan.ToString();
-		check = check + " | layer " + m_iLayer.ToString();
-
-		MCF_Core_Log.Warn(check);
 
 		// A MAP OF THE BOARD'S OWN, built from the same configuration and
 		// handed the numbers the real map just worked out. From here the board

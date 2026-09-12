@@ -1333,3 +1333,60 @@ today, freeform strokes next.
   static instance; read BOTH the static and the disabled arrays. What a
   client holds is already filtered to what that player may see, so the board
   needs no permission code of its own.
+
+### Control map, and what the board draws itself -- 2026-09-12, later
+
+The board is done for now and in use. What it is:
+
+**Control map** is one user action and it opens VANILLA'S MAP WINDOW on the
+board's view. `SCR_MapMenuUI` is thirty lines -- ask the game mode's
+`SCR_MapConfigComponent` for the gadget map config, `SetupMapConfig(...,
+GetRootWidget())`, `OpenMap` -- and the preset points at vanilla's own
+`MapMenu.layout`, so markers, the right-click menu, the ruler and the tools
+are the game's and are not reimplemented. While it is open the driver's view
+is pushed to the board ten times a second, so the room watches the panel
+follow them.
+
+**`ActionContext "MapContext"`, not `MenuContext`.** With MenuContext the
+window opens and draws and only the actions every menu shares work: up and
+down, nothing else. Panning sideways, zooming and the right-click menu are
+all bound in MapContext. The symptom is precise and worth remembering.
+
+**The board draws its own overlay.** A `MapWidget` is a `CanvasWidget`, so
+the board's tree carries an `"Overlay"` canvas between the map and the
+whiteout, and markers are `SetDrawCommands` on it -- read from
+`SCR_MapMarkerManagerComponent`'s static instance, both the static and the
+disabled arrays. This is the machinery the freeform drawing will use.
+
+**Three things about drawing on a board that cost a round trip each:**
+
+- An `ImageDrawCommand` from `CreateCommandFromImageSet` is flagged
+  `STRETCH` only. **Add `WidgetFlags.BLEND` or the icon's transparency is
+  drawn black** in a neat box.
+- A marker is drawn in board pixels and looked at in screen pixels. It has
+  to GROW with the viewer's distance or it is a speck from five metres.
+- Everything on a board needs an outline: the icon again, bigger and black,
+  drawn first; labels written twice, black underneath. A marker is read
+  against grass, sea, road and contours at once.
+
+**Two performance lessons, both paid for:**
+
+- `SetFrame` is the world rectangle the engine PREPARES, and it must be set
+  every frame beside the zoom and pan. Left on the 4 Hz tick, everything
+  drawn from it -- the airfield, roads, descriptors -- slides a quarter of a
+  second behind the terrain.
+- The render target's rate is the main thing a board costs, because its
+  redraw is a top-down render of the world. It is 10 fps at 0.5 scale at
+  rest and only goes to 40 while the view is still moving. Raising the
+  resting rate to 30 at 0.75 broke the Peer Tool -- a local server plus
+  several clients on one machine could not get clients to the spawn screen.
+
+**Tunable per board**, and the Game Master is expected to: marker size near
+and far, marker outline, grid line width, heavy line width, grid font size,
+activation distance and fade band. The grid ones go through
+`MapLayer.GetGridProps()` and are therefore the MAP ENTITY'S -- a thicker
+grid on a board is a thicker grid on everyone's own map too.
+
+Still open: sliders for those in the Control map window (attach a panel to
+the menu root at runtime, the way vanilla attaches its marker dialog), and
+then the freeform drawing.
