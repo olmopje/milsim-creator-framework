@@ -1,0 +1,244 @@
+FrameWidgetClass {
+ Name "MCF_DrawEditRoot"
+ Slot FrameWidgetSlot "{6A1C4F0B39E17001}" {
+  Anchor 0.5 0.5 0.5 0.5
+  OffsetLeft 0
+  OffsetTop 0
+  SizeX 876
+  OffsetRight -876
+  SizeY 320
+  OffsetBottom -320
+  Alignment 0.5 0.5
+  SizeToContent 1
+ }
+ Clipping False
+ {
+  FrameWidgetClass "{6A1C4F0B39E17002}" {
+   Name "SizeFrame"
+   Slot FrameWidgetSlot "{6A1C4F0B39E17003}" {
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 1000
+    OffsetRight -1000
+    SizeY 320
+    OffsetBottom -320
+    SizeToContent 1
+   }
+   {
+    SmartPanelWidgetClass "{6A1C4F0B39E17004}" {
+     Name "Background0"
+     Slot FrameWidgetSlot "{6A1C4F0B39E17005}" {
+      Anchor 0 0 1 1
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX -900
+      OffsetRight 0
+      SizeY -300
+      OffsetBottom 0
+     }
+     Opacity 0.98
+     Color 0.0075 0.0123 0.0144 1
+     style rounded_4px
+    }
+    SizeLayoutWidgetClass "{6A1C4F0B39E17006}" {
+     Name "SizeLayout0"
+     Slot FrameWidgetSlot "{6A1C4F0B39E17007}" {
+      Anchor 0.5 0.5 0.5 0.5
+      OffsetLeft 0
+      OffsetTop 0
+      SizeX 1000
+      OffsetRight -1000
+      SizeY 320
+      OffsetBottom -320
+      Alignment 0.5 0.5
+      SizeToContent 1
+     }
+     AllowWidthOverride 1
+     WidthOverride 880
+     {
+      VerticalLayoutWidgetClass "{6A1C4F0B39E17008}" {
+       Name "MCF_DrawVLayout"
+       Slot AlignableSlot "{6A1C4F0B39E17009}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       {
+        TextWidgetClass "{6A1C4F0B39E1700A}" {
+         Name "MCF_DrawTitle"
+         Slot LayoutSlot "{6A1C4F0B39E1700B}" {
+          HorizontalAlign 0
+          Padding 36 24 36 0
+         }
+         Text "Freehand line"
+         "Font Size" 20
+         "Min Font Size" 20
+         FontProperties FontProperties "{6A1C4F0B39E1700C}" {
+          Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+         }
+        }
+        SizeLayoutWidgetClass "{6A1C4F0B39E1700D}" {
+         Name "ColorSelector"
+         Slot LayoutSlot "{6A1C4F0B39E1700E}" {
+          Padding 36 20 36 0
+         }
+         "Left rule" Wrap
+         "Right rule" Wrap
+         AllowHeightOverride 1
+         HeightOverride 40
+         {
+          OverlayWidgetClass "{6A1C4F0B39E1700F}" {
+           Name "Overlay0"
+           Slot AlignableSlot "{6A1C4F0B39E17010}" {
+            HorizontalAlign 3
+            VerticalAlign 3
+           }
+           {
+            SmartPanelWidgetClass "{6A1C4F0B39E17011}" {
+             Name "Background"
+             Slot OverlayWidgetSlot "{6A1C4F0B39E17012}" {
+              HorizontalAlign 3
+              VerticalAlign 3
+             }
+             Opacity 0.5
+             Color 0.0075 0.0123 0.0144 1
+             style outline_rounded_4px
+            }
+            TextWidgetClass "{6A1C4F0B39E17013}" {
+             Name "Text0"
+             Slot OverlayWidgetSlot "{6A1C4F0B39E17014}" {
+              HorizontalAlign 0
+              Padding 20 0 0 0
+             }
+             Text "Colour"
+             "Font Size" 16
+             "Min Font Size" 16
+             FontProperties FontProperties "{6A1C4F0B39E17015}" {
+              Font "{3E7733BAC8C831F6}UI/Fonts/RobotoCondensed/RobotoCondensed_Regular.fnt"
+             }
+            }
+            HorizontalLayoutWidgetClass "{6A1C4F0B39E17016}" {
+             Name "ColorSelectorHLayout"
+             Slot OverlayWidgetSlot "{6A1C4F0B39E17017}" {
+              HorizontalAlign 3
+              VerticalAlign 3
+              Padding 108 0 4 0
+             }
+             "Fill Origin" Right
+             {
+              HorizontalLayoutWidgetClass "{6A1C4F0B39E17018}" : "{CF8EC7A0D310A8D9}UI/layouts/Map/MapColorSelectorLine.layout" {
+               Name "ColorSelectorLine"
+               Slot LayoutSlot "{5D9E8AF9DD80101B}" {
+                HorizontalAlign 2
+                VerticalAlign 1
+                Padding 40 0 0 0
+                FillWeight 15
+               }
+               "Fill Origin" Right
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+        ButtonWidgetClass "{6A1C4F0B39E17019}" : "{4A41296C0E9A889F}UI/layouts/WidgetLibrary/WLib_Slider.layout" {
+         Name "SliderRoot"
+         Slot LayoutSlot "{6A1C4F0B39E1701A}" {
+          HorizontalAlign 3
+          Padding 36 8 36 0
+         }
+         components {
+          SCR_SliderComponent "{6A1C4F0B39E1701B}" {
+           m_sLabel "Thickness"
+           m_fSizeWithLabel 44
+           m_sLabelLayout "{C5598C929C45420A}UI/layouts/Map/MapMarkerEditBoxLabel.layout"
+           m_fValue 14
+           m_fMinValue 4
+           m_fMaxValue 40
+           m_fStep 2
+          }
+         }
+         {
+          SizeLayoutWidgetClass "{55387AC2CCC7E284}" {
+           Prefab "{55387AC2CCC7E284}"
+           Slot ButtonWidgetSlot "{55387AC2CCC7E2A4}" {
+            VerticalAlign 3
+           }
+           {
+            OverlayWidgetClass "{55367D8E531FD623}" {
+             Prefab "{55367D8E531FD623}"
+             {
+              HorizontalLayoutWidgetClass "{55367D8E4592BC6E}" {
+               Prefab "{55367D8E4592BC6E}"
+               {
+                HorizontalLayoutWidgetClass "{55387AC23D03E651}" {
+                 Prefab "{55387AC23D03E651}"
+                 {
+                  SliderWidgetClass "{55387AC2379477C0}" {
+                   Prefab "{55387AC2379477C0}"
+                   minimum 4
+                   maximum 40
+                   step 2
+                   current 14
+                  }
+                 }
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+        HorizontalLayoutWidgetClass "{6A1C4F0B39E1701C}" {
+         Name "HorizontalLayoutButtons"
+         Slot LayoutSlot "{6A1C4F0B39E1701D}" {
+          Padding 36 30 36 20
+         }
+         {
+          ButtonWidgetClass "{6A1C4F0B39E1701E}" : "{CB8563509DEF3E0E}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButtonSmall.layout" {
+           Name "ButtonCancel"
+           Slot LayoutSlot "{6A1C4F0B39E1701F}" {
+            HorizontalAlign 0
+            VerticalAlign 1
+            SizeMode Fill
+            FillWeight 5
+           }
+           components {
+            SCR_InputButtonComponent "{6A1C4F0B39E17020}" {
+             m_sActionName "MenuBack"
+             m_sLabel "#AR-Keybind_Cancel"
+             m_bOverrideTextSize 1
+            }
+           }
+          }
+          ButtonWidgetClass "{6A1C4F0B39E17021}" : "{CB8563509DEF3E0E}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButtonSmall.layout" {
+           Name "ButtonDraw"
+           Slot LayoutSlot "{6A1C4F0B39E17022}" {
+            HorizontalAlign 2
+            VerticalAlign 1
+            Padding 20 0 0 0
+           }
+           components {
+            SCR_InputButtonComponent "{6A1C4F0B39E17023}" {
+             m_sActionName "MenuSelect"
+             m_sLabel "Draw"
+             m_bOverrideTextSize 1
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

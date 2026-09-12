@@ -13,17 +13,22 @@
 //! the other half: a line you draw with your hand, that everybody sees, on
 //! every map and every board, until somebody rubs it out.
 //!
-//! WHERE THE CONTROLS LIVE. In the map's own right-click menu, as a category
-//! filled in through SCR_MapRadialUI's GetOnMenuInitInvoker. Nothing of ours is
-//! bolted onto the screen: no panel, no extra button, no keybind entry for
-//! something that exists only while a map is open.
+//! WHERE THE CONTROLS LIVE. One entry in the map's own right-click menu, added
+//! through SCR_MapRadialUI's GetOnMenuInitInvoker, which opens a window built
+//! out of the same pieces as the game's marker edit box: vanilla's colour row,
+//! vanilla's slider, vanilla's navigation buttons. Nothing of ours sits on the
+//! screen uninvited, and nothing of ours is a control the player has to learn.
 //!
-//! WHY PICKING A COLOUR IS ALSO WHAT TURNS DRAWING ON. Draw mode sets the
-//! cursor's CS_DRAW state, and CS_DRAW is in STATE_CTXMENU_RESTRICTED -- while
-//! it is on, the right-click menu will not open. So a menu that could only turn
-//! drawing on would be a menu you could never use to turn it off. Six coloured
-//! entries do the whole job in one click, and right-click stops drawing, which
-//! is what a pencil should do anyway.
+//! WHY THE WINDOW AND NOT A RING OF COLOURED ENTRIES. Choosing a colour and a
+//! thickness is setting up a pen, and the game already has a window for that
+//! kind of choice -- the one a player uses to colour a marker. A radial ring
+//! per colour also grows by one entry for every colour the game adds.
+//!
+//! AND WHY THE WINDOW CANNOT BE WHAT TURNS DRAWING OFF. Draw mode sets the
+//! cursor's CS_DRAW, and CS_DRAW is in STATE_CTXMENU_RESTRICTED -- while it is
+//! on, the right-click menu will not open, so nothing reached through that menu
+//! can be the way out. Right-click is: it throws away the stroke in your hand,
+//! and with no stroke in hand it puts the pencil down.
 modded class SCR_MapDrawingUI
 {
 	//! How far the cursor travels before another point is kept, and how many
@@ -37,9 +42,10 @@ modded class SCR_MapDrawingUI
 	protected static const float MCF_STEP_METRES = 8;
 	protected static const int MCF_MAX_POINTS = 160;
 
-	protected static const ref array<string> MCF_COLOUR_NAMES = {
-		"White", "Red", "Blue", "Green", "Yellow", "Black"
-	};
+	//! How close the cursor has to be to a line, in SCREEN pixels, for delete
+	//! to take it. In pixels rather than metres because it is a question about
+	//! aiming with a mouse, and a mouse does not know what a metre is.
+	protected static const float MCF_REACH_PIXELS = 14;
 
 	//! The canvas is already in vanilla's map layout and nothing in the game
 	//! claims it: SCR_MapConstants names a DrawingWidget for exactly this and
@@ -54,9 +60,25 @@ modded class SCR_MapDrawingUI
 	//! comes up; a half-drawn line is nobody else's business.
 	protected ref array<float> m_aMCFStroke = {};
 
+	//! The pen window, and the pieces of the game's own UI it is built from.
+	protected static const ResourceName MCF_BOX_LAYOUT = "{6A1C4F0B39E17000}UI/layouts/MCF/MCF_MapDrawBox.layout";
+	protected static const ResourceName MCF_COLOUR_ENTRY_LAYOUT = "{8A5D43FC8AC6C171}UI/layouts/Map/MapColorSelectorEntry.layout";
+
+	protected Widget m_wMCFBox;
+	protected SCR_SliderComponent m_MCFSlider;
+	protected ref array<SCR_ButtonImageComponent> m_aMCFColourButtons = {};
+
 	protected bool m_bMCFFreehand;
 	protected bool m_bMCFStroking;
 	protected int m_iMCFColour;
+
+	//! Thickness in metres on the ground, straight off the slider.
+	protected int m_iMCFWidth = 14;
+
+	//! The stroke the cursor is over, recomputed every frame while a map is
+	//! open. Drawn brighter so that "delete takes this one" is something you
+	//! can see before you press the key rather than after.
+	protected int m_iMCFHovered = -1;
 
 	protected SCR_MapRadialUI m_MCFRadial;
 
@@ -98,17 +120,13 @@ modded class SCR_MapDrawingUI
 		if (!category)
 			return;
 
-		foreach (int i, string name : MCF_COLOUR_NAMES)
-		{
-			SCR_SelectionMenuEntry entry = m_MCFRadial.AddRadialEntry("Draw: " + name, category);
-			if (!entry)
-				continue;
-
-			// The index travels with the entry rather than in a field, because
-			// one handler for six entries beats six handlers.
-			entry.SetId(i.ToString());
-			entry.GetOnPerform().Insert(MCF_OnColourPerformed);
-		}
+		// ONE ENTRY, NOT A RING OF COLOURS. Picking a colour and a thickness is
+		// setting up a pen, and the game already has a window for exactly that
+		// kind of choice -- the one a player uses to give a marker its colour.
+		// So this opens ours, built from the same pieces.
+		SCR_SelectionMenuEntry draw = m_MCFRadial.AddRadialEntry("Draw a line", category);
+		if (draw)
+			draw.GetOnPerform().Insert(MCF_OnDrawPerformed);
 
 		SCR_SelectionMenuEntry mine = m_MCFRadial.AddRadialEntry("Rub out my drawings", category);
 		if (mine)
@@ -126,21 +144,169 @@ modded class SCR_MapDrawingUI
 	}
 
 	//------------------------------------------------------------------------
-	protected void MCF_OnColourPerformed(SCR_SelectionMenuEntry entry)
+	// THE PEN WINDOW
+	//------------------------------------------------------------------------
+
+	//! Opened a moment later, for the same reason drawing is: the radial is
+	//! still closing and the cursor is still holding CS_CONTEXTUAL_MENU.
+	protected void MCF_OnDrawPerformed(SCR_SelectionMenuEntry entry)
 	{
-		if (!entry)
+		GetGame().GetCallqueue().CallLater(MCF_OpenBox, 150, false);
+	}
+
+	//------------------------------------------------------------------------
+	//! MODELLED ON THE MARKER EDIT BOX, PIECE FOR PIECE. The colour row is
+	//! vanilla's MapColorSelectorLine filled with vanilla's colour buttons,
+	//! the thickness is vanilla's WLib_Slider, and the two buttons are
+	//! vanilla's navigation buttons bound to MenuSelect and MenuBack -- so
+	//! this reads as part of the game rather than as something bolted on.
+	protected void MCF_OpenBox()
+	{
+		if (m_wMCFBox || !m_RootWidget)
 			return;
 
-		m_iMCFColour = entry.GetId().ToInt();
+		m_wMCFBox = GetGame().GetWorkspace().CreateWidgets(MCF_BOX_LAYOUT, m_RootWidget);
+		if (!m_wMCFBox)
+		{
+			MCF_Core_Log.Warn("map drawing: the pen window would not load");
+			return;
+		}
 
-		MCF_Say("colour " + m_iMCFColour + " picked");
+		MCF_BuildColours();
 
-		// NOT THIS FRAME. The radial is still closing, and the cursor keeps
-		// CS_CONTEXTUAL_MENU until it has -- which is one of the states that
-		// makes HandleDraw refuse. Retried rather than assumed, because how
-		// long the close takes is the menu's business, not ours.
+		Widget sliderRoot = m_wMCFBox.FindAnyWidget("SliderRoot");
+		if (sliderRoot)
+		{
+			m_MCFSlider = SCR_SliderComponent.Cast(sliderRoot.FindHandler(SCR_SliderComponent));
+
+			if (m_MCFSlider)
+			{
+				m_MCFSlider.SetValue(m_iMCFWidth);
+				m_MCFSlider.m_OnChanged.Insert(MCF_OnThicknessChanged);
+			}
+		}
+
+		SCR_InputButtonComponent confirm = MCF_BoxButton("ButtonDraw");
+		if (confirm)
+			confirm.m_OnClicked.Insert(MCF_OnBoxConfirmed);
+
+		SCR_InputButtonComponent cancel = MCF_BoxButton("ButtonCancel");
+		if (cancel)
+			cancel.m_OnClicked.Insert(MCF_OnBoxCancelled);
+
+		// The cursor module has to know a dialog is up, or the map goes on
+		// panning and selecting underneath it.
+		if (m_CursorModule)
+			m_CursorModule.HandleDialog(true);
+	}
+
+	//------------------------------------------------------------------------
+	protected SCR_InputButtonComponent MCF_BoxButton(string name)
+	{
+		Widget widget = m_wMCFBox.FindAnyWidget(name);
+		if (!widget)
+			return null;
+
+		return SCR_InputButtonComponent.Cast(widget.FindHandler(SCR_InputButtonComponent));
+	}
+
+	//------------------------------------------------------------------------
+	//! One button per colour the game offers a marker, built the way vanilla
+	//! builds its own: a MapColorSelectorEntry per colour, tinted.
+	protected void MCF_BuildColours()
+	{
+		Widget line = m_wMCFBox.FindAnyWidget("ColorSelectorLine");
+		if (!line)
+			return;
+
+		m_aMCFColourButtons.Clear();
+
+		int colours = MCF_Map_DrawingComponent.ColourCount();
+
+		for (int i = 0; i < colours; i++)
+		{
+			Widget button = GetGame().GetWorkspace().CreateWidgets(MCF_COLOUR_ENTRY_LAYOUT, line);
+			if (!button)
+				continue;
+
+			button.SetName("MCF_ColorEntry" + i.ToString());
+
+			SCR_ButtonImageComponent component = SCR_ButtonImageComponent.Cast(button.FindHandler(SCR_ButtonImageComponent));
+			if (!component)
+				continue;
+
+			component.GetImageWidget().SetColorInt(MCF_Map_DrawingComponent.Colour(i));
+			component.m_OnClicked.Insert(MCF_OnColourClicked);
+
+			m_aMCFColourButtons.Insert(component);
+		}
+
+		MCF_ShowSelectedColour();
+	}
+
+	//------------------------------------------------------------------------
+	protected void MCF_OnColourClicked(SCR_ButtonBaseComponent component)
+	{
+		int index = m_aMCFColourButtons.Find(SCR_ButtonImageComponent.Cast(component));
+
+		if (index >= 0)
+			m_iMCFColour = index;
+
+		MCF_ShowSelectedColour();
+	}
+
+	//------------------------------------------------------------------------
+	//! Which colour is chosen, said in the only way a row of colours can say
+	//! it: the chosen one is full size and lit, the rest are dimmed.
+	protected void MCF_ShowSelectedColour()
+	{
+		foreach (int i, SCR_ButtonImageComponent button : m_aMCFColourButtons)
+		{
+			Widget image = button.GetImageWidget();
+			if (!image)
+				continue;
+
+			if (i == m_iMCFColour)
+				image.SetOpacity(1);
+			else
+				image.SetOpacity(0.45);
+		}
+	}
+
+	//------------------------------------------------------------------------
+	protected void MCF_OnThicknessChanged(SCR_SliderComponent slider, float value)
+	{
+		m_iMCFWidth = Math.Round(value);
+	}
+
+	//------------------------------------------------------------------------
+	protected void MCF_OnBoxConfirmed(SCR_InputButtonComponent button)
+	{
+		MCF_CloseBox();
+
 		m_iMCFStartTries = 0;
 		GetGame().GetCallqueue().CallLater(MCF_StartFreehand, 150, true);
+	}
+
+	//------------------------------------------------------------------------
+	protected void MCF_OnBoxCancelled(SCR_InputButtonComponent button)
+	{
+		MCF_CloseBox();
+	}
+
+	//------------------------------------------------------------------------
+	protected void MCF_CloseBox()
+	{
+		if (!m_wMCFBox)
+			return;
+
+		m_wMCFBox.RemoveFromHierarchy();
+		m_wMCFBox = null;
+		m_MCFSlider = null;
+		m_aMCFColourButtons.Clear();
+
+		if (m_CursorModule)
+			m_CursorModule.HandleDialog(false);
 	}
 
 	//------------------------------------------------------------------------
@@ -283,17 +449,8 @@ modded class SCR_MapDrawingUI
 			if (m_aMCFStroke.Count() >= 4)
 			{
 				MCF_Map_DrawingComponent drawings = MCF_Map_DrawingComponent.GetInstance();
-
-				string state = "component " + (drawings != null).ToString();
-				state = state + ", server " + Replication.IsServer().ToString();
-
 				if (drawings)
-				{
-					drawings.AskAdd(m_aMCFStroke, m_iMCFColour);
-					state = state + ", strokes now " + drawings.GetStrokes().Count().ToString();
-				}
-
-				MCF_Say("sent: " + state);
+					drawings.AskAdd(m_aMCFStroke, m_iMCFColour, m_iMCFWidth);
 			}
 
 			m_aMCFStroke.Clear();
@@ -377,12 +534,20 @@ modded class SCR_MapDrawingUI
 		{
 			foreach (MCF_Map_Stroke stroke : drawings.GetStrokes())
 			{
-				MCF_AddCommand(stroke.m_aPoints, MCF_Map_DrawingComponent.Colour(stroke.m_iColour));
+				int colour = MCF_Map_DrawingComponent.Colour(stroke.m_iColour);
+
+				// The one under the cursor is drawn white, so the answer to
+				// "which line will delete take?" is on the screen before the
+				// key is pressed rather than after.
+				if (stroke.m_iId == m_iMCFHovered)
+					colour = 0xFFFFFFFF;
+
+				MCF_AddCommand(stroke.m_aPoints, colour, stroke.m_iWidth);
 			}
 		}
 
 		if (m_aMCFStroke.Count() >= 4)
-			MCF_AddCommand(m_aMCFStroke, MCF_Map_DrawingComponent.Colour(m_iMCFColour));
+			MCF_AddCommand(m_aMCFStroke, MCF_Map_DrawingComponent.Colour(m_iMCFColour), m_iMCFWidth);
 
 		m_wMCFCanvas.SetDrawCommands(m_aMCFCommands);
 
@@ -423,7 +588,7 @@ modded class SCR_MapDrawingUI
 	//! WorldToScreen is the map's own conversion and it already carries the
 	//! pan, so a stroke stays on the ground while the map moves underneath it.
 	//! That is the whole reason the points are kept in metres.
-	protected void MCF_AddCommand(notnull array<float> points, int colour)
+	protected void MCF_AddCommand(notnull array<float> points, int colour, int widthMetres)
 	{
 		array<float> pixels = {};
 
@@ -450,19 +615,151 @@ modded class SCR_MapDrawingUI
 		// tune a field whose behaviour is a guess, the black goes down first
 		// as a wider line of its own and the colour is laid on top. This is
 		// the same technique the board already uses for marker icons.
+		//
+		// AND THE WIDTH IS METRES TURNED INTO PIXELS, not a fixed number of
+		// pixels. GetCurrentZoom() is pixels per metre -- vanilla's own map
+		// line multiplies a world vector by it to get a length on screen -- so
+		// a stroke thickens as the map is zoomed in, exactly the way its
+		// length does. Clamped, because a line nobody can see when zoomed out
+		// and a line that swallows the island when zoomed in are both useless.
+		float width = widthMetres * m_MapEntity.GetCurrentZoom();
+		width = Math.Clamp(width, 2, 60);
+
 		LineDrawCommand halo = new LineDrawCommand();
 		halo.m_Vertices = pixels;
 		halo.m_iColor = 0xC0000000;
-		halo.m_fWidth = 8;
+		halo.m_fWidth = width + 4;
 
 		m_aMCFCommands.Insert(halo);
 
 		LineDrawCommand line = new LineDrawCommand();
 		line.m_Vertices = pixels;
 		line.m_iColor = colour;
-		line.m_fWidth = 4;
+		line.m_fWidth = width;
 
 		m_aMCFCommands.Insert(line);
+	}
+
+	//------------------------------------------------------------------------
+	// DELETING ONE LINE
+	//------------------------------------------------------------------------
+
+	//! Which stroke the cursor is over, or -1.
+	//!
+	//! WHY OUR OWN HIT TEST AND NOT VANILLA'S. Everything hover-related on the
+	//! map keys off WIDGETS -- GetMapWidgetsUnderCursor, then the marker
+	//! behind the widget. A stroke is not a widget and has no position: it is
+	//! a run of points drawn straight onto a canvas, so there is nothing under
+	//! the cursor to find. The distance from the cursor to the nearest segment
+	//! is the honest equivalent, and it is measured in metres and compared in
+	//! pixels so that the reach is the same flick of the wrist at every zoom.
+	protected int MCF_StrokeUnderCursor()
+	{
+		MCF_Map_DrawingComponent drawings = MCF_Map_DrawingComponent.GetInstance();
+		if (!drawings || !m_MapEntity)
+			return -1;
+
+		float zoom = m_MapEntity.GetCurrentZoom();
+		if (zoom <= 0)
+			return -1;
+
+		float cursorX, cursorZ;
+		m_MapEntity.GetMapCursorWorldPosition(cursorX, cursorZ);
+
+		float reach = MCF_REACH_PIXELS / zoom;
+		float best = reach;
+		int found = -1;
+
+		foreach (MCF_Map_Stroke stroke : drawings.GetStrokes())
+		{
+			// A thick line is easier to hit than a thin one, the way a thick
+			// line is easier to hit with a real pencil.
+			float own = reach + stroke.m_iWidth * 0.5;
+
+			float distance = MCF_DistanceToStroke(stroke, cursorX, cursorZ, own);
+
+			if (distance >= 0 && distance < best)
+			{
+				best = distance;
+				found = stroke.m_iId;
+			}
+		}
+
+		return found;
+	}
+
+	//------------------------------------------------------------------------
+	//! Distance in metres from a point to the nearest segment of a stroke, or
+	//! -1 when it is further away than `limit` from all of them.
+	protected float MCF_DistanceToStroke(notnull MCF_Map_Stroke stroke, float x, float z, float limit)
+	{
+		array<float> points = stroke.m_aPoints;
+		float best = -1;
+
+		for (int i = 0; i + 3 < points.Count(); i += 2)
+		{
+			float distance = MCF_DistanceToSegment(x, z, points[i], points[i + 1], points[i + 2], points[i + 3]);
+
+			if (distance > limit)
+				continue;
+
+			if (best < 0 || distance < best)
+				best = distance;
+		}
+
+		return best;
+	}
+
+	//------------------------------------------------------------------------
+	protected float MCF_DistanceToSegment(float x, float z, float ax, float az, float bx, float bz)
+	{
+		float dx = bx - ax;
+		float dz = bz - az;
+
+		float lengthSq = dx * dx + dz * dz;
+
+		float t = 0;
+
+		if (lengthSq > 0)
+		{
+			t = ((x - ax) * dx + (z - az) * dz) / lengthSq;
+			t = Math.Clamp(t, 0, 1);
+		}
+
+		float nearestX = ax + dx * t;
+		float nearestZ = az + dz * t;
+
+		float offX = x - nearestX;
+		float offZ = z - nearestZ;
+
+		return Math.Sqrt(offX * offX + offZ * offZ);
+	}
+
+	//------------------------------------------------------------------------
+	//! The same key that deletes a marker under the cursor, doing the same
+	//! thing to a line. Nothing new to learn and nothing new to bind.
+	protected void MCF_OnDeletePressed(float value, EActionTrigger reason)
+	{
+		if (m_iMCFHovered < 0)
+			return;
+
+		MCF_Map_DrawingComponent drawings = MCF_Map_DrawingComponent.GetInstance();
+		if (!drawings)
+			return;
+
+		foreach (MCF_Map_Stroke stroke : drawings.GetStrokes())
+		{
+			if (stroke.m_iId != m_iMCFHovered)
+				continue;
+
+			// Asked here as well as checked on the server, so that somebody
+			// else's line simply does not respond rather than appearing to go
+			// and coming back a moment later.
+			if (MCF_Map_DrawingComponent.MayRemove(stroke))
+				drawings.AskRemove(stroke.m_iId);
+
+			return;
+		}
 	}
 
 	//------------------------------------------------------------------------
@@ -496,6 +793,12 @@ modded class SCR_MapDrawingUI
 		else
 			MCF_Core_Log.Warn("map drawing: this map has no radial menu, so there is nowhere to offer freehand drawing");
 
+		// THE SAME KEY THAT DELETES A MARKER. Vanilla registers this exact
+		// action to delete the marker under the cursor; a line under the
+		// cursor now answers to it too, so there is nothing extra to learn.
+		GetGame().GetInputManager().AddActionListener("MapMarkerDelete", EActionTrigger.DOWN, MCF_OnDeletePressed);
+
+		m_iMCFHovered = -1;
 		m_iMCFSaidCommands = -1;
 
 		MCF_Say("map opened, mode " + config.MapEntityMode
@@ -507,8 +810,13 @@ modded class SCR_MapDrawingUI
 	override void OnMapClose(MapConfiguration config)
 	{
 		GetGame().GetCallqueue().Remove(MCF_StartFreehand);
+		GetGame().GetInputManager().RemoveActionListener("MapMarkerDelete", EActionTrigger.DOWN, MCF_OnDeletePressed);
+		GetGame().GetCallqueue().Remove(MCF_OpenBox);
 
+		MCF_CloseBox();
 		MCF_SetFreehand(false);
+
+		m_iMCFHovered = -1;
 
 		if (m_MCFRadial)
 			m_MCFRadial.GetOnMenuInitInvoker().Remove(MCF_FillRadialMenu);
@@ -526,6 +834,14 @@ modded class SCR_MapDrawingUI
 
 		if (m_bMCFFreehand && m_bMCFStroking)
 			MCF_AddPoint();
+
+		// Not while drawing: the line following your hand is always the
+		// nearest one, so highlighting it would make delete look armed the
+		// whole time you are drawing.
+		if (m_bMCFStroking)
+			m_iMCFHovered = -1;
+		else
+			m_iMCFHovered = MCF_StrokeUnderCursor();
 
 		MCF_Redraw();
 

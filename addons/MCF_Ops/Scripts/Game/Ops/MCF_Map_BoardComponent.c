@@ -694,9 +694,10 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (!drawings)
 			return;
 
-		float width = MarkerSize() * 0.14;
-		if (width < 2)
-			width = 2;
+		// WIDTH IS METRES ON THE GROUND, turned into board pixels with the
+		// board's own pixels-per-metre. The same stroke is therefore the same
+		// width relative to the terrain here as it is in somebody's map
+		// window, however far the board is zoomed in or out.
 
 		foreach (MCF_Map_Stroke stroke : drawings.GetStrokes())
 		{
@@ -715,6 +716,9 @@ class MCF_Map_BoardComponent : ScriptComponent
 			if (pixels.Count() < 4)
 				continue;
 
+			float width = stroke.m_iWidth * m_fPPU;
+			width = Math.Clamp(width, 2, 60);
+
 			// BLACK FIRST, WIDER, AS ITS OWN COMMAND. Not m_fOutlineWidth: on a
 			// line those outline fields swallow the colour whole and the
 			// stroke draws black. Measured in the map window, and the same
@@ -722,7 +726,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 			LineDrawCommand halo = new LineDrawCommand();
 			halo.m_Vertices = pixels;
 			halo.m_iColor = 0xC0000000;
-			halo.m_fWidth = width * 1.8;
+			halo.m_fWidth = width + 4;
 
 			m_aCommands.Insert(halo);
 
