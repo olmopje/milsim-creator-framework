@@ -1283,3 +1283,53 @@ log line is still there to check it with.
 4. More frames: paper map on a table, whiteboard, beamer board.
 5. Freeform drawing on the in-game map, then channel permissions.
 6. Unique maps with their own stored information -- a found enemy map.
+
+### The map board, finished enough to build on -- 2026-09-12
+
+Supersedes the parked note above. The board shows the world's real map on a
+panel, with the grid and with the markers players place on their own maps,
+at a zoom and position of its own that everybody at the board shares.
+
+**Four things were learned the hard way and must not be re-litigated:**
+
+1. A board must not hold the map open. One map exists; holding it breaks M.
+2. A second `MapEntity` does not help. It writes into the same native state
+   and `InitializeLayers` on it destroys the real map's layers -- which shows
+   up as the PLAYER'S map losing its terrain.
+3. `CanvasWidgetBase.SetZoom` / `SetOffsetPx` are the canvas transform, NOT
+   what the engine renders the map at. The picture follows the entity through
+   `ZoomChange` and `PosChange`. One entity, one rendered view.
+4. **But the map entity is per client**, and that is what makes the feature
+   work. A player opening their map takes it over on their machine only. The
+   only screen a board can be wrong on is the screen of somebody reading a
+   map instead of looking at the board -- so on that one screen the board
+   goes white until they close it.
+
+**The shape that works:**
+
+- The board opens the map ONCE at birth to have `SCR_MapEntity` do the setup
+  nobody should retype (layers, props, descriptors, `SizeInUnits`, zoom
+  bounds), reads the island's frame off it, and closes it again.
+- Its view is two replicated numbers on its own component -- zoom step and
+  centre -- turned into zoom, pan, layer and frame by `ComputeView` and
+  re-stated four times a second.
+- Nothing is written to the entity while a foreign map is open.
+- **Pan is the map's TOP-LEFT CORNER in the widget**, not the screen position
+  of the point being centred: `pan = half the widget - the centred point in
+  map pixels`. Measured, not guessed.
+
+**The overlay is the important part for everything still to come.** A
+`MapWidget` is a `CanvasWidget`, so the board's tree carries its own
+`"Overlay"` canvas between the map and the whiteout, and everything the
+engine does not draw for us is an array of draw commands on it: markers
+today, freeform strokes next.
+
+- The command array must be a FIELD -- "the callee takes just a pointer".
+- `CreateCommandFromImageSet` returns a command flagged `STRETCH` only, so
+  **add `WidgetFlags.BLEND` or the icon's transparency is drawn black**.
+- `CANVAS_COMMAND_VERTICES_LIMIT` is 400, so a long stroke is several
+  commands.
+- Marker data is readable at any time from `SCR_MapMarkerManagerComponent`'s
+  static instance; read BOTH the static and the disabled arrays. What a
+  client holds is already filtered to what that player may see, so the board
+  needs no permission code of its own.
