@@ -65,6 +65,9 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "28", uiwidget: UIWidgets.EditBox, desc: "How big a marker is drawn on the board, in board pixels. The board is 1024 x 700.", params: "4 200")]
 	protected float m_fMarkerSize;
 
+	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the marker's own icon. Off draws a plain coloured disc instead, which is immune to whatever the icon's transparency does and reads further away.")]
+	protected bool m_bMarkerIcons;
+
 	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the map's grid on the board. The grid belongs to the map entity rather than to this board, so two boards that disagree about it will take turns winning.")]
 	protected bool m_bShowGrid;
 
@@ -585,7 +588,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 			{
 				tint = entry.GetColorEntry(marker.GetColorEntry());
 
-				if (entry.GetIconEntry(marker.GetIconEntry(), imageset, glow, quad))
+				if (m_bMarkerIcons && entry.GetIconEntry(marker.GetIconEntry(), imageset, glow, quad))
 				{
 					ImageDrawCommand icon = m_wOverlay.CreateCommandFromImageSet(imageset, quad, Vector(m_fMarkerSize, m_fMarkerSize, 0));
 					if (icon)
@@ -593,6 +596,16 @@ class MCF_Map_BoardComponent : ScriptComponent
 						icon.m_Position = Vector(at[0] - m_fMarkerSize * 0.5, at[1] - m_fMarkerSize * 0.5, 0);
 						icon.m_iColor = tint.PackToInt();
 						icon.m_fRotation = marker.GetRotation();
+
+						// WITHOUT BLEND THE ICON'S TRANSPARENCY IS NOT
+						// TRANSPARENT. CreateCommandFromImageSet hands back a
+						// command flagged STRETCH and nothing else, so every
+						// pixel the icon meant to leave alone is drawn -- as
+						// black, in a neat box around the marker. BLEND is the
+						// engine's own word for it: "Widget will be
+						// alpha-blended".
+						icon.m_iFlags = WidgetFlags.STRETCH | WidgetFlags.BLEND;
+
 						m_aCommands.Insert(icon);
 						drawn = true;
 					}
@@ -603,15 +616,26 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// A marker type we have no icon for is still a marker somebody placed
 		// and still worth a dot. Silence would read as "there is nothing
 		// there", which is the one thing a map must never say wrongly.
+		//
+		// The disc is drawn with a dark ring around it so it reads on pale
+		// sea and on dark hills alike -- a board is looked at from across a
+		// room, where a bare coloured dot on green is no dot at all.
 		if (!drawn)
 		{
 			array<float> circle = {};
-			m_wOverlay.TessellateCircle(Vector(at[0], at[1], 0), m_fMarkerSize * 0.3, 12, circle);
+			m_wOverlay.TessellateCircle(Vector(at[0], at[1], 0), m_fMarkerSize * 0.3, 16, circle);
 
-			PolygonDrawCommand dot = new PolygonDrawCommand();
-			dot.m_Vertices = circle;
-			dot.m_iColor = tint.PackToInt();
-			m_aCommands.Insert(dot);
+			PolygonDrawCommand disc = new PolygonDrawCommand();
+			disc.m_Vertices = circle;
+			disc.m_iColor = tint.PackToInt();
+			m_aCommands.Insert(disc);
+
+			LineDrawCommand ring = new LineDrawCommand();
+			ring.m_Vertices = circle;
+			ring.m_iColor = ARGB(220, 0, 0, 0);
+			ring.m_fWidth = 2;
+			ring.m_bShouldEnclose = true;
+			m_aCommands.Insert(ring);
 		}
 
 		string label = marker.GetCustomText();
