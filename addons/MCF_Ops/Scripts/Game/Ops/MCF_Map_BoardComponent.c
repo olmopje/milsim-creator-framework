@@ -56,7 +56,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//! resolution scale is counted, and a machine running a local server and
 	//! several test clients at once pays for every one of them on every
 	//! client. Spend it only while somebody is actually driving the board.
-	[Attribute(defvalue: "30", uiwidget: UIWidgets.EditBox, desc: "How often the board redraws while its view is moving -- somebody driving it from Control map. Falls back to the resting rate the moment it arrives.")]
+	[Attribute(defvalue: "40", uiwidget: UIWidgets.EditBox, desc: "How often the board redraws while its view is moving -- somebody driving it from Control map. Falls back to the resting rate the moment it arrives.")]
 	protected int m_iFramesPerSecondMoving;
 
 	//! What the render target was last told, so it is not told again every
@@ -482,6 +482,15 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		ComputeView();
 		ApplyView();
+
+		// THE FRAME HAS TO MOVE WITH THE VIEW, every frame, not four times a
+		// second with the rest of the housekeeping. It is the world rectangle
+		// the engine prepares, so everything drawn from it -- the airfield,
+		// the roads, the descriptors -- arrives a quarter of a second behind
+		// the terrain if it is left to the tick. That reads exactly as it is:
+		// the map slides and its markings slide after it.
+		m_MapEntity.SetFrame(m_vFrameMin, m_vFrameMax);
+
 		DrawOverlay();
 	}
 
