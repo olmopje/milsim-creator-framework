@@ -81,8 +81,20 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "80", uiwidget: UIWidgets.EditBox, desc: "How big a marker is drawn at the activation distance. A board fills less of the screen the further you stand, so a marker that is readable up close is a speck across a room -- it grows to meet you.", params: "4 400")]
 	protected float m_fMarkerSizeFar;
 
+	[Attribute(defvalue: "0.22", uiwidget: UIWidgets.EditBox, desc: "How far a dark outline is drawn behind each marker, as a fraction of its size. Zero draws none. A marker on a map is read against grass, sea, road and contour lines all at once, and an outline is what makes it survive all four.", params: "0 1")]
+	protected float m_fMarkerOutline;
+
 	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the marker's own icon. Off draws a plain coloured disc instead, which is immune to whatever the icon's transparency does and reads further away.")]
 	protected bool m_bMarkerIcons;
+
+	[Attribute(defvalue: "3", uiwidget: UIWidgets.EditBox, desc: "How thick the grid lines are drawn. Zero leaves the map's own value alone. THE GRID BELONGS TO THE MAP ENTITY, not to this board, so a thicker grid here is a thicker grid on your own map too -- the same as the grid switch beside it.", params: "0 20")]
+	protected float m_fGridLineWidth;
+
+	[Attribute(defvalue: "6", uiwidget: UIWidgets.EditBox, desc: "How thick the heavy grid lines are drawn. Zero leaves the map's own value alone.", params: "0 40")]
+	protected float m_fGridMainLineWidth;
+
+	[Attribute(defvalue: "28", uiwidget: UIWidgets.EditBox, desc: "How big the grid's numbers are drawn. Zero leaves the map's own value alone.", params: "0 120")]
+	protected float m_fGridFontSize;
 
 	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the map's grid on the board. The grid belongs to the map entity rather than to this board, so two boards that disagree about it will take turns winning.")]
 	protected bool m_bShowGrid;
@@ -326,6 +338,11 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//! Whether we are the reason visualisation is on.
 	protected bool m_bVisualising;
 
+	//! Whether the grid still carries the board's own weights. Opening a map
+	//! writes the config's values back over them, so this is cleared whenever
+	//! somebody else's map has been up.
+	protected bool m_bGridStyled;
+
 	//! Ticks of drawing still owed for something that is not the map -- the
 	//! fade. The texture keeps whatever was last drawn into it.
 	protected int m_iPaint;
@@ -530,6 +547,11 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// until they close it, and every line below reads this.
 		bool foreign = m_MapEntity.IsOpen() && m_MapEntity.GetMapWidget() != m_wMapWidget;
 
+		// Their map writes the config's own grid weights over ours on the way
+		// in, so ours have to go back on once they are done.
+		if (foreign)
+			m_bGridStyled = false;
+
 		// THE MAP ENTITY IS PER CLIENT, and that is what makes this feature
 		// possible at all. A player opening their own map takes the map over
 		// on THEIR machine only; every other client's board is untouched. So
@@ -618,6 +640,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 			m_MapEntity.SetLayer(m_iLayer);
 
 		m_MapEntity.EnableGrid(m_bShowGrid);
+		StyleGrid();
 		m_MapEntity.SetFrame(m_vFrameMin, m_vFrameMax);
 
 		DrawOverlay();
@@ -710,6 +733,27 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 				if (m_bMarkerIcons && entry.GetIconEntry(marker.GetIconEntry(), imageset, glow, quad))
 				{
+					// THE OUTLINE IS THE SAME ICON, BIGGER AND BLACK, DRAWN
+					// FIRST. A map marker is read against grass, sea, road and
+					// contour lines all at once, and its own colour cannot
+					// survive all four -- the icon's own artwork carries a glow
+					// image for exactly this reason, and this is that idea with
+					// the pieces we have.
+					if (m_fMarkerOutline > 0)
+					{
+						float thick = size * (1 + m_fMarkerOutline);
+						ImageDrawCommand edge = m_wOverlay.CreateCommandFromImageSet(imageset, quad, Vector(thick, thick, 0));
+
+						if (edge)
+						{
+							edge.m_Position = Vector(at[0] - thick * 0.5, at[1] - thick * 0.5, 0);
+							edge.m_iColor = 0xC0000000;
+							edge.m_fRotation = marker.GetRotation();
+							edge.m_iFlags = WidgetFlags.STRETCH | WidgetFlags.BLEND;
+							m_aCommands.Insert(edge);
+						}
+					}
+
 					ImageDrawCommand icon = m_wOverlay.CreateCommandFromImageSet(imageset, quad, Vector(size, size, 0));
 					if (icon)
 					{
@@ -762,12 +806,76 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (label.IsEmpty())
 			return;
 
+		// Written twice: black underneath, the marker's colour on top. A label
+		// over a map has no background to sit on, and one pass of thin text
+		// disappears into contour lines at any distance worth standing at.
+		float textSize = size * 0.7;
+		float textX = at[0] + size * 0.6;
+		float textY = at[1] - size * 0.35;
+
+		TextDrawCommand shadow = new TextDrawCommand();
+		shadow.m_sText = label;
+		shadow.m_Position = Vector(textX + 2, textY + 2, 0);
+		shadow.m_fSize = textSize;
+		shadow.m_iColor = 0xD0000000;
+		m_aCommands.Insert(shadow);
+
 		TextDrawCommand text = new TextDrawCommand();
 		text.m_sText = label;
-		text.m_Position = Vector(at[0] + size * 0.6, at[1] - size * 0.35, 0);
-		text.m_fSize = size * 0.7;
+		text.m_Position = Vector(textX, textY, 0);
+		text.m_fSize = textSize;
 		text.m_iColor = tint.PackToInt();
 		m_aCommands.Insert(text);
+	}
+
+	//------------------------------------------------------------------------
+	//! A grid you can read from across a room.
+	//!
+	//! The map's own grid is drawn for somebody looking at a screen from
+	//! sixty centimetres. On a board it is hairlines and small numbers, and
+	//! the further you stand the less of it survives. MapGridProps is per
+	//! LAYER and carries exactly the three things worth changing: line width,
+	//! heavy line width, and the size of the numbers.
+	//!
+	//! THE GRID IS THE MAP ENTITY'S, NOT THE BOARD'S. Every layer is shared
+	//! with the player's own map, so a thicker grid here is a thicker grid
+	//! there too -- the same trade the grid switch beside it already makes,
+	//! and said in both attributes rather than found out.
+	//!
+	//! Applied once and then only again after somebody's own map has been
+	//! open, because opening a map re-applies the config's own values over
+	//! the top of ours.
+	protected void StyleGrid()
+	{
+		if (m_bGridStyled || !m_MapEntity)
+			return;
+
+		m_bGridStyled = true;
+
+		int layers = m_MapEntity.LayerCount();
+
+		for (int i = 0; i < layers; i++)
+		{
+			MapLayer layer = m_MapEntity.GetLayer(i);
+			if (!layer)
+				continue;
+
+			MapGridProps grid = layer.GetGridProps();
+			if (!grid)
+				continue;
+
+			if (m_fGridLineWidth > 0)
+				grid.SetLineWidth(m_fGridLineWidth);
+
+			if (m_fGridMainLineWidth > 0)
+				grid.SetMainLineWidth(m_fGridMainLineWidth);
+
+			if (m_fGridFontSize > 0)
+			{
+				grid.SetFontsize(m_fGridFontSize);
+				grid.SetTextBold();
+			}
+		}
 	}
 
 	//------------------------------------------------------------------------
