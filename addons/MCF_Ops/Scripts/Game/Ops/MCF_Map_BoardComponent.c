@@ -250,10 +250,9 @@ class MCF_Map_BoardComponent : ScriptComponent
 	}
 
 
-	//! THE BOARD'S OWN VIEW, in the four numbers the map entity keeps rather
-	//! than the widget. Read once, off the fitted map, and put back every
-	//! tick -- which is what makes the board independent of whatever a player
-	//! last did with their own map.
+	//! THE BOARD'S OWN VIEW. Zoom and offset go to the WIDGET (see ApplyView)
+	//! and belong to this board alone; the layer and the frame are the
+	//! entity's, and are therefore shared with whoever else is using the map.
 	protected float m_fZoomLevel;
 	protected vector m_vPan;
 	protected int m_iLayer = -1;
@@ -401,17 +400,10 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// what made the board prime itself over and over, once a second,
 		// forever -- and an open map four times a second is also exactly what
 		// stops M from working.
-		// A BOARD WITH ITS OWN MAP HAS NOTHING TO WAIT FOR. It writes to its
-		// own entity, so a player reading theirs is not in the way and the
-		// board does not have to stop -- which is the entire point of giving
-		// it one, and also the test of whether it worked.
-		if (m_MapEntity.IsOpen() && !m_OwnMap)
-		{
-			if (m_MapEntity.GetMapWidget() != m_wMapWidget)
-				m_bVisualising = false;
-
-			return;
-		}
+		// Somebody else's map is open. Not a reason to stop any more -- see
+		// ApplyView -- but it is a reason not to write to the entity, which
+		// is theirs for as long as they are reading.
+		bool foreign = m_MapEntity.IsOpen() && m_MapEntity.GetMapWidget() != m_wMapWidget;
 
 		// The setup open is ours and has to be left alone to finish.
 		if (m_bPriming)
@@ -419,7 +411,8 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		if (!m_bPrimed)
 		{
-			if (wanted)
+			// The setup open needs the map to itself for its half second.
+			if (wanted && !foreign)
 				Prime();
 
 			return;
@@ -451,29 +444,52 @@ class MCF_Map_BoardComponent : ScriptComponent
 			return;
 		}
 
-		// THE BOARD'S OWN VIEW, RE-STATED. Zoom, pan, layer and grid live on
-		// the map entity rather than on the widget, so a player who closes
-		// their map leaves all four wherever they finished. Rather than
-		// setting the board up again every time that happens -- which is a
-		// second of flicker and a second of the map being open -- the board
-		// remembers its own four numbers and puts them back.
-		//
-		// None of these touches m_bIsOpen, so as far as the rest of the game
-		// is concerned no map is open and M does what it always did.
+		// THE BOARD'S OWN VIEW, ON THE BOARD'S OWN WIDGET.
+		ApplyView();
+		m_bVisualising = true;
+
+		// The rest is the entity's, which means it is shared. While somebody
+		// is reading their own map it is theirs and we write none of it.
+		if (foreign)
+			return;
+
 		m_MapEntity.EnableVisualisation(true);
 
 		if (m_iLayer >= 0 && m_MapEntity.GetLayerIndex() != m_iLayer)
 			m_MapEntity.SetLayer(m_iLayer);
 
 		m_MapEntity.EnableGrid(m_bShowGrid);
+		m_MapEntity.SetFrame(m_vFrameMin, m_vFrameMax);
+	}
+
+	//------------------------------------------------------------------------
+	//! ZOOM AND POSITION BELONG TO THE WIDGET, NOT TO THE MAP, and that is
+	//! the whole reason a board can have a view of its own.
+	//!
+	//! We measured it before we understood it. The first probe put two
+	//! widgets called MapWidget in the tree and opened the map into one:
+	//!
+	//!   A: 640 x 420, PixelPerUnit 0.15625, zoom 2.13333
+	//!   B: 640 x 420, PixelPerUnit 0.625,   zoom 1     <- B untouched
+	//!
+	//! Two widgets, two zooms, the same moment. SCR_MapEntity.SetZoom even
+	//! says so on its way past: it works the ratio out AGAINST the widget --
+	//! ZoomChange(targetPPU / m_MapWidget.PixelPerUnit()) -- and the widget
+	//! the map was opened into is the one that moves.
+	//!
+	//! So ZoomChange and PosChange were never global; they were the entity
+	//! driving whichever widget it had been opened into. Saying it to our own
+	//! widget instead says it to nobody else, and the board stops needing to
+	//! wait for anyone.
+	protected void ApplyView()
+	{
+		if (!m_wMapWidget)
+			return;
 
 		if (m_fZoomLevel > 0)
-			m_MapEntity.ZoomChange(m_fZoomLevel);
+			m_wMapWidget.SetZoom(m_fZoomLevel);
 
-		m_MapEntity.PosChange(m_vPan[0], m_vPan[1]);
-		m_MapEntity.SetFrame(m_vFrameMin, m_vFrameMax);
-
-		m_bVisualising = true;
+		m_wMapWidget.SetOffsetPx(m_vPan);
 	}
 
 	//------------------------------------------------------------------------
