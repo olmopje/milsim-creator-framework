@@ -59,6 +59,12 @@ modded enum ChimeraMenuPreset
 	//! is written down.
 	MCF_MapProbe,
 
+	//! Standing at a map board and taking the map. Vanilla's own map window
+	//! -- its MapFrame inherits UI/layouts/Map/Map.layout, so the markers,
+	//! the right-click menu and the tools are the game's, not ours -- but
+	//! opened on the BOARD'S view, and driving it while it is open.
+	MCF_MapBoardControl,
+
 	//! Talking to somebody: what they say, and what you may say back.
 	//! Opened by the talk action on the person themselves.
 	MCF_Dialogue,

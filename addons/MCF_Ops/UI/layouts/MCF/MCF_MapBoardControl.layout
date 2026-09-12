@@ -1,0 +1,116 @@
+// Standing at a map board and taking the map.
+//
+// THIS IS VANILLA'S OWN MAP MENU, minus the parts a board has no use for.
+// The one line that matters is the MapFrame below: it INHERITS
+// UI/layouts/Map/Map.layout, which is where every widget the map's own UI
+// components look for lives -- the map widget itself, the drawing container,
+// the cursor, the places the marker dialog attaches to.
+//
+// That inheritance is the whole reason this window can do what the M map
+// does. Markers, the right-click menu, the ruler, the tools: none of it is
+// reimplemented here, and none of it can be, because those components find
+// their widgets BY NAME under the root they are handed. Give them vanilla's
+// layout and they work; give them ours and they throw once a frame.
+//
+// What is deliberately not copied from MapMenu.layout: the HUD manager frame
+// with its chat, VON and notification slots. A board is not the player's
+// screen and should not carry their HUD.
+FrameWidgetClass {
+ Name "MCF_MapBoardControl"
+ {
+  FrameWidgetClass "{6A1C4F0B39E14001}" : "{0651202E9F2646DE}UI/layouts/Map/Map.layout" {
+   Name "MapFrame"
+   Slot FrameWidgetSlot "{6A1C4F0B39E14002}" {
+    Anchor 0 0 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX 0
+    OffsetRight 0
+    SizeY 0
+    OffsetBottom 0
+   }
+  }
+  HorizontalLayoutWidgetClass "{6A1C4F0B39E14003}" {
+   Name "ToolMenuContainer"
+   Slot FrameWidgetSlot "{6A1C4F0B39E14004}" {
+    Anchor 0 0 1 1
+    PositionX 0
+    OffsetLeft 20
+    PositionY 0
+    OffsetTop 48
+    SizeX -1820
+    OffsetRight 0
+    SizeY -1050
+    OffsetBottom 0
+    Alignment 0 0
+   }
+   {
+    FrameWidgetClass "{6A1C4F0B39E14005}" : "{2F8AEE78FF5A8104}UI/layouts/Map/ToolMenu.layout" {
+     Name "ToolMenu"
+     Slot LayoutSlot "{6A1C4F0B39E14006}" {
+      HorizontalAlign 0
+      VerticalAlign 0
+     }
+     "Z Order" 0
+    }
+    OverlayWidgetClass "{6A1C4F0B39E14007}" {
+     Name "ToolFramesOverlay"
+     Slot LayoutSlot "{6A1C4F0B39E14008}" {
+      SizeMode Fill
+     }
+     {
+      FrameWidgetClass "{6A1C4F0B39E14009}" {
+       Name "JournalFrame"
+       Slot OverlayWidgetSlot {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+      }
+      FrameWidgetClass "{6A1C4F0B39E1400A}" {
+       Name "MapTaskList"
+       Slot OverlayWidgetSlot {
+        HorizontalAlign 0
+        VerticalAlign 3
+       }
+      }
+      FrameWidgetClass "{6A1C4F0B39E1400B}" {
+       Name "MapSuppliesTransportSystem"
+       Slot OverlayWidgetSlot {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+       "Is Visible" 0
+      }
+      FrameWidgetClass "{6A1C4F0B39E1400C}" {
+       Name "MapWeatherFrame"
+       Slot OverlayWidgetSlot "{6A1C4F0B39E1400D}" {
+        HorizontalAlign 3
+        VerticalAlign 3
+       }
+      }
+     }
+    }
+   }
+  }
+  ImageWidgetClass "{6A1C4F0B39E1400E}" {
+   Name "FadeOut"
+   Slot FrameWidgetSlot "{6A1C4F0B39E1400F}" {
+    Anchor 0 0 1 1
+    PositionX 0
+    OffsetLeft 0
+    PositionY 0
+    OffsetTop 0
+    SizeX -1820
+    OffsetRight 0
+    SizeY -1050
+    OffsetBottom 0
+   }
+   "Z Order" 2
+   "Is Visible" 0
+   Opacity 0
+   Color 0 0 0 1
+  }
+ }
+}

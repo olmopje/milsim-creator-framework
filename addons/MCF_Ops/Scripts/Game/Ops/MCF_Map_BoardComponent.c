@@ -126,8 +126,14 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//!
 	//! Boards do not share this. One board, one view, changed by whoever
 	//! walks up to that board.
+	//! Pixels per metre. Zero means "the whole island, fitted", which is where
+	//! a board starts and what it comes back to.
+	//!
+	//! IT IS A FLOAT AND NOT A STEP COUNT because the board is driven from a
+	//! real map now, and a real map zooms continuously. Steps were right when
+	//! the only control was a prompt on the panel.
 	[RplProp(onRplName: "OnViewReplicated")]
-	protected int m_iZoomStep;
+	protected float m_fViewPPU;
 
 	[RplProp(onRplName: "OnViewReplicated")]
 	protected float m_fCentreX;
@@ -135,67 +141,63 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[RplProp(onRplName: "OnViewReplicated")]
 	protected float m_fCentreZ;
 
-	//! Until somebody centres it, the board looks at the middle of the world.
+	//! Until somebody moves it, the board looks at the middle of the world.
 	//! A zero centre is a real coordinate, so it cannot double as "unset".
 	[RplProp(onRplName: "OnViewReplicated")]
 	protected bool m_bCentreSet;
 
-	//! Four doublings is the whole island down to about a quarter of a grid
-	//! square, which is as far in as a board is worth reading.
-	protected static const int MAX_ZOOM_STEP = 4;
-
 	//------------------------------------------------------------------------
-	int GetZoomStep()
+	float GetViewPPU()
 	{
-		return m_iZoomStep;
+		return m_fViewPPU;
 	}
 
 	//------------------------------------------------------------------------
-	//! Client side: ask for a change. The server owns the answer, because the
+	void GetViewCentre(out float x, out float z)
+	{
+		if (m_bCentreSet)
+		{
+			x = m_fCentreX;
+			z = m_fCentreZ;
+			return;
+		}
+
+		if (!m_MapEntity)
+			return;
+
+		x = m_MapEntity.GetMapSizeX() * 0.5;
+		z = m_MapEntity.GetMapSizeY() * 0.5;
+	}
+
+	//------------------------------------------------------------------------
+	//! Client side: ask for a view. The server owns the answer, because the
 	//! board is a thing in the world that several people are looking at and
 	//! not a setting in one person's client.
-	void AskZoom(int delta)
+	void AskView(float centreX, float centreZ, float ppu)
 	{
-		Rpc(RpcAsk_Zoom, delta);
-	}
-
-	//------------------------------------------------------------------------
-	void AskCentre(vector world)
-	{
-		Rpc(RpcAsk_Centre, world[0], world[2]);
+		Rpc(RpcAsk_View, centreX, centreZ, ppu);
 	}
 
 	//------------------------------------------------------------------------
 	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
-	protected void RpcAsk_Zoom(int delta)
+	protected void RpcAsk_View(float centreX, float centreZ, float ppu)
 	{
-		int step = Math.ClampInt(m_iZoomStep + delta, 0, MAX_ZOOM_STEP);
-		if (step == m_iZoomStep)
+		// Nothing worth a replication for a mouse that moved two metres.
+		if (m_bCentreSet
+			&& Math.AbsFloat(ppu - m_fViewPPU) < 0.0001
+			&& Math.AbsFloat(centreX - m_fCentreX) < 1
+			&& Math.AbsFloat(centreZ - m_fCentreZ) < 1)
 			return;
 
-		m_iZoomStep = step;
-
-		// Zooming all the way out is also "show me everything", so it forgets
-		// where it was looking rather than keeping a centre nobody asked for.
-		if (step == 0)
-			m_bCentreSet = false;
+		m_fViewPPU = ppu;
+		m_fCentreX = centreX;
+		m_fCentreZ = centreZ;
+		m_bCentreSet = true;
 
 		Replication.BumpMe();
 
 		// A listen server is its own client and gets no replication callback
 		// for its own write.
-		OnViewReplicated();
-	}
-
-	//------------------------------------------------------------------------
-	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
-	protected void RpcAsk_Centre(float x, float z)
-	{
-		m_fCentreX = x;
-		m_fCentreZ = z;
-		m_bCentreSet = true;
-
-		Replication.BumpMe();
 		OnViewReplicated();
 	}
 
@@ -229,7 +231,12 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (widgetW <= 0 || widgetH <= 0 || sizeX <= 0 || sizeY <= 0)
 			return;
 
-		float ppu = (widgetH / sizeY) * Math.Pow(2, m_iZoomStep);
+		// Zero means "the whole island", which is where a board starts and
+		// what it comes back to.
+		float ppu = m_fViewPPU;
+		if (ppu <= 0)
+			ppu = widgetH / sizeY;
+
 		m_fPPU = ppu;
 
 		float basePPU = m_wMapWidget.PixelPerUnit();

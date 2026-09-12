@@ -40,42 +40,12 @@ GenericEntity {
       "MCF_MapBoard"
      }
      UIInfo UIInfo "{6A1C4F0B39E12014}" {
-      Name "Use map"
-     }
-     VisibilityRange 3
-    }
-    MCF_Map_BoardZoomAction "{6A1C4F0B39E12015}" {
-     ParentContextList {
-      "MCF_MapBoard"
-     }
-     UIInfo UIInfo "{6A1C4F0B39E12016}" {
-      Name "Zoom in"
-     }
-     VisibilityRange 3
-     m_iDelta 1
-    }
-    MCF_Map_BoardZoomAction "{6A1C4F0B39E12017}" {
-     ParentContextList {
-      "MCF_MapBoard"
-     }
-     UIInfo UIInfo "{6A1C4F0B39E12018}" {
-      Name "Zoom out"
-     }
-     VisibilityRange 3
-     m_iDelta -1
-    }
-    MCF_Map_BoardCentreAction "{6A1C4F0B39E12019}" {
-     ParentContextList {
-      "MCF_MapBoard"
-     }
-     UIInfo UIInfo "{6A1C4F0B39E1201A}" {
-      Name "Centre map here"
+      Name "Control map"
      }
      VisibilityRange 3
     }
    }
   }
-
   SCR_EditableEntityComponent "{6A1C4F0B39E12005}" : "{996046FE206C699A}Prefabs/Editor/Components/Default_SCR_EditableEntityComponent.ct" {
    m_EntityType OBJECT
    m_UIInfo SCR_EditableEntityUIInfo "{6A1C4F0B39E12006}" {
