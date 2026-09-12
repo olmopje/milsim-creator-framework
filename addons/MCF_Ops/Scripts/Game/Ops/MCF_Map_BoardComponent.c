@@ -59,6 +59,12 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "5", uiwidget: UIWidgets.EditBox, desc: "Over how many metres the map fades out to white before the activation distance. 5 means it starts going at 35 m and is white at 40 m.", params: "0 200")]
 	protected float m_fFadeBand;
 
+	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the markers that this viewer's own client can see. Two players on different sides looking at the same board will not see the same markers, which is the only honest answer.")]
+	protected bool m_bShowMarkers;
+
+	[Attribute(defvalue: "28", uiwidget: UIWidgets.EditBox, desc: "How big a marker is drawn on the board, in board pixels. The board is 1024 x 700.", params: "4 200")]
+	protected float m_fMarkerSize;
+
 	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the map's grid on the board. The grid belongs to the map entity rather than to this board, so two boards that disagree about it will take turns winning.")]
 	protected bool m_bShowGrid;
 
@@ -90,6 +96,16 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//! it, so the fade is a panel on top of the map inside the texture.
 	protected Widget m_wWhiteout;
 	protected float m_fWhite = -1;
+
+	//! Our own layer over the map, and the commands drawn into it. THE ARRAY
+	//! IS A FIELD BECAUSE THE ENGINE SAYS SO: "the caller needs to keep the
+	//! array alive - the callee takes just a pointer to it".
+	protected CanvasWidget m_wOverlay;
+	protected ref array<ref CanvasWidgetCommand> m_aCommands = {};
+
+	//! Pixels per metre at the board's current zoom, worked out in ComputeView
+	//! and used again for every marker.
+	protected float m_fPPU;
 
 	protected SCR_MapEntity m_MapEntity;
 	protected bool m_bRaised;
@@ -211,6 +227,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 			return;
 
 		float ppu = (widgetH / sizeY) * Math.Pow(2, m_iZoomStep);
+		m_fPPU = ppu;
 
 		float basePPU = m_wMapWidget.PixelPerUnit();
 		if (basePPU > 0)
@@ -339,6 +356,10 @@ class MCF_Map_BoardComponent : ScriptComponent
 		}
 
 		m_wWhiteout = m_wRoot.FindAnyWidget("Whiteout");
+		m_wOverlay = CanvasWidget.Cast(m_wRoot.FindAnyWidget("Overlay"));
+
+		if (!m_wOverlay)
+			MCF_Core_Log.Warn("map board: the layout carries no Overlay canvas, so nothing will be drawn on the map");
 
 		m_wRenderTarget.SetRenderTarget(owner);
 
@@ -477,6 +498,157 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		m_MapEntity.EnableGrid(m_bShowGrid);
 		m_MapEntity.SetFrame(m_vFrameMin, m_vFrameMax);
+
+		DrawOverlay();
+	}
+
+	//------------------------------------------------------------------------
+	//! Everything on the board that the engine does not draw for us.
+	//!
+	//! WHY WE DRAW MARKERS OURSELVES rather than borrowing the ones on the
+	//! map. Vanilla's markers are widgets parented to the map menu's own
+	//! frame and repositioned by a component that only runs between
+	//! OnMapOpen and OnMapClose -- a board is neither, so it gets none of
+	//! them. But the DATA is a static singleton and readable at any time, and
+	//! a MapWidget is a CanvasWidget, so drawing them is an array of commands.
+	//! That is less code than borrowing would have been, and it is ours: no
+	//! frame, no open map and no other player can take it away.
+	//!
+	//! WHOSE MARKERS. The ones this viewer's own client holds. A marker
+	//! belonging to another faction is dropped by SCR_MapMarkerManagerComponent
+	//! before we ever see it, so two players on different sides looking at the
+	//! same board do not see the same markers -- which is the only honest
+	//! answer, and it means the board needs no permission code of its own.
+	protected void DrawOverlay()
+	{
+		if (!m_wOverlay)
+			return;
+
+		m_aCommands.Clear();
+
+		if (m_bShowMarkers)
+			AddMarkers();
+
+		m_wOverlay.SetDrawCommands(m_aCommands);
+	}
+
+	//------------------------------------------------------------------------
+	protected void AddMarkers()
+	{
+		SCR_MapMarkerManagerComponent markers = SCR_MapMarkerManagerComponent.GetInstance();
+		if (!markers)
+			return;
+
+		SCR_MapMarkerConfig config = markers.GetMarkerConfig();
+
+		// BOTH LISTS. A marker that scrolled out of the open map's frame is
+		// MOVED into the disabled list rather than hidden, so reading only
+		// the first one gives a board that loses markers depending on where
+		// somebody else last left their own map. Vanilla unions them too.
+		array<SCR_MapMarkerBase> placed = markers.GetStaticMarkers();
+
+		foreach (SCR_MapMarkerBase parked : markers.GetDisabledMarkers())
+		{
+			placed.Insert(parked);
+		}
+
+		foreach (SCR_MapMarkerBase marker : placed)
+		{
+			AddMarker(marker, config);
+		}
+	}
+
+	//------------------------------------------------------------------------
+	protected void AddMarker(SCR_MapMarkerBase marker, SCR_MapMarkerConfig config)
+	{
+		if (!marker)
+			return;
+
+		int world[2];
+		marker.GetWorldPos(world);
+
+		vector at;
+		if (!WorldToBoard(world[0], world[1], at))
+			return;
+
+		Color tint = Color.FromInt(Color.WHITE);
+		ResourceName imageset, glow;
+		string quad;
+		bool drawn = false;
+
+		// The icon and the colour are INDICES on the marker, not resources.
+		// They resolve through the config entry for that marker's type.
+		if (config)
+		{
+			SCR_MapMarkerEntryPlaced entry = SCR_MapMarkerEntryPlaced.Cast(config.GetMarkerEntryConfigByType(marker.GetType()));
+			if (entry)
+			{
+				tint = entry.GetColorEntry(marker.GetColorEntry());
+
+				if (entry.GetIconEntry(marker.GetIconEntry(), imageset, glow, quad))
+				{
+					ImageDrawCommand icon = m_wOverlay.CreateCommandFromImageSet(imageset, quad, Vector(m_fMarkerSize, m_fMarkerSize, 0));
+					if (icon)
+					{
+						icon.m_Position = Vector(at[0] - m_fMarkerSize * 0.5, at[1] - m_fMarkerSize * 0.5, 0);
+						icon.m_iColor = tint.PackToInt();
+						icon.m_fRotation = marker.GetRotation();
+						m_aCommands.Insert(icon);
+						drawn = true;
+					}
+				}
+			}
+		}
+
+		// A marker type we have no icon for is still a marker somebody placed
+		// and still worth a dot. Silence would read as "there is nothing
+		// there", which is the one thing a map must never say wrongly.
+		if (!drawn)
+		{
+			array<float> circle = {};
+			m_wOverlay.TessellateCircle(Vector(at[0], at[1], 0), m_fMarkerSize * 0.3, 12, circle);
+
+			PolygonDrawCommand dot = new PolygonDrawCommand();
+			dot.m_Vertices = circle;
+			dot.m_iColor = tint.PackToInt();
+			m_aCommands.Insert(dot);
+		}
+
+		string label = marker.GetCustomText();
+		if (label.IsEmpty())
+			return;
+
+		TextDrawCommand text = new TextDrawCommand();
+		text.m_sText = label;
+		text.m_Position = Vector(at[0] + m_fMarkerSize * 0.6, at[1] - m_fMarkerSize * 0.3, 0);
+		text.m_fSize = 18;
+		text.m_iColor = tint.PackToInt();
+		m_aCommands.Insert(text);
+	}
+
+	//------------------------------------------------------------------------
+	//! A world position, in board pixels.
+	//!
+	//! The same arithmetic the board's own view is built from, run the other
+	//! way: the pan is where the map's top-left corner sits in the widget, so
+	//! a world point is the pan plus its offset in map pixels. The Y flip is
+	//! the map's own -- SCR_MapEntity.WorldToScreen opens with
+	//! worldY = m_iMapSizeY - worldY.
+	protected bool WorldToBoard(float worldX, float worldZ, out vector at)
+	{
+		if (!m_MapEntity || m_fPPU <= 0)
+			return false;
+
+		float sizeY = m_MapEntity.GetMapSizeY();
+		if (sizeY <= 0)
+			return false;
+
+		vector offset = m_MapEntity.Offset();
+
+		at = Vector(m_vPan[0] + (worldX - offset[0]) * m_fPPU,
+			m_vPan[1] + ((sizeY - worldZ) + offset[2]) * m_fPPU, 0);
+
+		return true;
 	}
 
 	//------------------------------------------------------------------------

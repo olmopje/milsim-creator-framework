@@ -65,6 +65,31 @@ FrameWidgetClass {
      Clear 1
      ClearColor 0.173 0.344 0.62 1
     }
+    // EVERYTHING THE ENGINE DOES NOT DRAW FOR US GOES HERE. A MapWidget is a
+    // CanvasWidget, and a CanvasWidget takes draw commands -- lines, images,
+    // text -- so markers, labels and, later, freeform strokes are an array we
+    // hand over rather than a widget per item.
+    //
+    // It sits between the map and the whiteout: over the terrain, under the
+    // fade, so walking away takes the markers with it.
+    //
+    // Ours alone. Nothing outside this board's tree can reach it, which is
+    // exactly why the markers on it are not at the mercy of whatever a player
+    // is doing with their own map.
+    CanvasWidgetClass "{6A1C4F0B39E11020}" {
+     Name "Overlay"
+     Slot FrameWidgetSlot "{6A1C4F0B39E11021}" {
+      PositionX 0
+      OffsetLeft 0
+      PositionY 0
+      OffsetTop 0
+      SizeX 1024
+      OffsetRight -1024
+      SizeY 700
+      OffsetBottom -700
+     }
+     Color 1 1 1 1
+    }
     // THE FADE, AND IT IS A SHEET OF WHITE OVER THE MAP rather than anything
     // done to the map itself. A map has no opacity of its own to turn down,
     // and dimming the board's material would dim the frame with it. This is
