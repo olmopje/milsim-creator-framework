@@ -47,10 +47,23 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "{6A1C4F0B39E11000}UI/layouts/MCF/MCF_MapBoardRender.layout", uiwidget: UIWidgets.ResourceNamePicker, desc: "What gets drawn onto the board.", params: "layout")]
 	protected ResourceName m_sLayout;
 
-	[Attribute(defvalue: "30", uiwidget: UIWidgets.EditBox, desc: "How often the board redraws, in frames per second, while somebody is near enough to see it. Ten was enough for a still map and is visibly a slideshow when somebody is driving it.")]
+	[Attribute(defvalue: "10", uiwidget: UIWidgets.EditBox, desc: "How often the board redraws while nothing about it is changing. A still map needs very little, and this is the main thing a board costs.")]
 	protected int m_iFramesPerSecond;
 
-	[Attribute(defvalue: "0.75", uiwidget: UIWidgets.EditBox, desc: "Render scale, 0.1 to 1. Below 1 the board is drawn smaller and upscaled, which is most of the rest of what it costs.", params: "0.1 1")]
+	//! THE RATE ONLY GOES UP WHILE SOMETHING IS MOVING, and that matters more
+	//! than it sounds. The board's redraw is a top-down render of the world;
+	//! raising it from ten to thirty is roughly six times the pixels once the
+	//! resolution scale is counted, and a machine running a local server and
+	//! several test clients at once pays for every one of them on every
+	//! client. Spend it only while somebody is actually driving the board.
+	[Attribute(defvalue: "30", uiwidget: UIWidgets.EditBox, desc: "How often the board redraws while its view is moving -- somebody driving it from Control map. Falls back to the resting rate the moment it arrives.")]
+	protected int m_iFramesPerSecondMoving;
+
+	//! What the render target was last told, so it is not told again every
+	//! frame.
+	protected int m_iRedraws;
+
+	[Attribute(defvalue: "0.5", uiwidget: UIWidgets.EditBox, desc: "Render scale, 0.1 to 1. Below 1 the board is drawn smaller and upscaled, which is most of the rest of what it costs.", params: "0.1 1")]
 	protected float m_fResolutionScale;
 
 	[Attribute(defvalue: "40", uiwidget: UIWidgets.EditBox, desc: "How close a viewer has to be, in metres, for the map to be drawn at all. Beyond this the board is a blank white board and costs nothing.", params: "0 1000")]
@@ -387,8 +400,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// The two dials the engine hands over for exactly this, and the reason
 		// a board is affordable at all. A map is still; ten frames a second at
 		// half resolution is more than it needs.
-		if (m_iFramesPerSecond > 0)
-			m_wRenderTarget.SetMaxFPS(m_iFramesPerSecond);
+		Redraws(m_iFramesPerSecond);
 
 		if (m_fResolutionScale > 0 && m_fResolutionScale < 1)
 		{
@@ -454,7 +466,15 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// Close enough is arrived. Chasing a target by ever smaller fractions
 		// redraws the board forever for movement nobody can see.
 		if (Math.AbsFloat(ppuGap) < 0.00002 && Math.AbsFloat(xGap) < 0.05 && Math.AbsFloat(zGap) < 0.05)
+		{
+			// Arrived. Back to the resting rate, because a still map does not
+			// need thirty frames a second and a machine running a server and
+			// several clients at once has better things to spend them on.
+			Redraws(m_iFramesPerSecond);
 			return;
+		}
+
+		Redraws(m_iFramesPerSecondMoving);
 
 		m_fShownPPU = m_fShownPPU + ppuGap * chase;
 		m_fShownX = m_fShownX + xGap * chase;
@@ -463,6 +483,16 @@ class MCF_Map_BoardComponent : ScriptComponent
 		ComputeView();
 		ApplyView();
 		DrawOverlay();
+	}
+
+	//------------------------------------------------------------------------
+	protected void Redraws(int fps)
+	{
+		if (fps == m_iRedraws || fps <= 0 || !m_wRenderTarget)
+			return;
+
+		m_iRedraws = fps;
+		m_wRenderTarget.SetMaxFPS(fps);
 	}
 
 	//------------------------------------------------------------------------
@@ -1013,6 +1043,12 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// The fade changed, so the picture has to be drawn again even if the
 		// map is not being drawn at all. Three ticks is enough to land.
 		m_iPaint = 3;
+
+		// A sheet of plain white needs one frame a second, not ten.
+		if (white >= 1)
+			Redraws(1);
+		else
+			Redraws(m_iFramesPerSecond);
 	}
 
 	//------------------------------------------------------------------------
