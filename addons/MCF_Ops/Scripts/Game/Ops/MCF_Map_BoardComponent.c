@@ -386,7 +386,26 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (!m_MapEntity)
 			return;
 
-		Whiten(FadeFor(ViewerDistance(owner)));
+		// Somebody else's map is open on THIS client: the entity is theirs
+		// until they close it, and every line below reads this.
+		bool foreign = m_MapEntity.IsOpen() && m_MapEntity.GetMapWidget() != m_wMapWidget;
+
+		// THE MAP ENTITY IS PER CLIENT, and that is what makes this feature
+		// possible at all. A player opening their own map takes the map over
+		// on THEIR machine only; every other client's board is untouched. So
+		// the board is never wrong for anybody else -- the only screen it can
+		// be wrong on is the screen of the person who is busy reading a map
+		// instead of looking at the board.
+		//
+		// So on that one screen we do not show them a lie. The board goes
+		// white for as long as their map is open, and comes back the moment
+		// they close it. Nobody standing at the board sees anything change.
+		float white = FadeFor(ViewerDistance(owner));
+
+		if (foreign)
+			white = 1;
+
+		Whiten(white);
 
 		// Fully white means there is nothing to see and nothing to pay for.
 		bool wanted = m_fWhite < 1;
@@ -400,11 +419,6 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// what made the board prime itself over and over, once a second,
 		// forever -- and an open map four times a second is also exactly what
 		// stops M from working.
-		// Somebody else's map is open. Not a reason to stop any more -- see
-		// ApplyView -- but it is a reason not to write to the entity, which
-		// is theirs for as long as they are reading.
-		bool foreign = m_MapEntity.IsOpen() && m_MapEntity.GetMapWidget() != m_wMapWidget;
-
 		// The setup open is ours and has to be left alone to finish.
 		if (m_bPriming)
 			return;
@@ -444,14 +458,17 @@ class MCF_Map_BoardComponent : ScriptComponent
 			return;
 		}
 
-		// THE BOARD'S OWN VIEW, ON THE BOARD'S OWN WIDGET.
-		ApplyView();
-		m_bVisualising = true;
-
-		// The rest is the entity's, which means it is shared. While somebody
-		// is reading their own map it is theirs and we write none of it.
+		// Everything from here is the entity's, and on this client the entity
+		// is theirs while their map is open. We write none of it, and the
+		// board is white anyway.
 		if (foreign)
 			return;
+
+		// THE BOARD'S OWN VIEW. Re-stated every tick rather than set once,
+		// because a player's map leaves the entity wherever they finished
+		// and the board has to be able to take it back without ceremony.
+		ApplyView();
+		m_bVisualising = true;
 
 		m_MapEntity.EnableVisualisation(true);
 
@@ -463,33 +480,32 @@ class MCF_Map_BoardComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------
-	//! ZOOM AND POSITION BELONG TO THE WIDGET, NOT TO THE MAP, and that is
-	//! the whole reason a board can have a view of its own.
+	//! THE WIDGET'S ZOOM IS NOT THE MAP'S ZOOM. Measured, in game, and it is
+	//! worth writing down because the API makes the opposite look true.
 	//!
-	//! We measured it before we understood it. The first probe put two
-	//! widgets called MapWidget in the tree and opened the map into one:
+	//! CanvasWidgetBase carries SetZoom and SetOffsetPx per widget, and the
+	//! very first probe measured two MapWidgets holding two different zooms
+	//! at the same moment. All of that is real -- it is the canvas's own
+	//! transform, the space draw commands are placed in.
 	//!
-	//!   A: 640 x 420, PixelPerUnit 0.15625, zoom 2.13333
-	//!   B: 640 x 420, PixelPerUnit 0.625,   zoom 1     <- B untouched
+	//! It is NOT what the engine renders the map at. Setting it moves some
+	//! detail around and leaves the map where it was; the picture follows the
+	//! ENTITY, through ZoomChange and PosChange. One map entity, one rendered
+	//! view. A board cannot hold a different one at the same instant.
 	//!
-	//! Two widgets, two zooms, the same moment. SCR_MapEntity.SetZoom even
-	//! says so on its way past: it works the ratio out AGAINST the widget --
-	//! ZoomChange(targetPPU / m_MapWidget.PixelPerUnit()) -- and the widget
-	//! the map was opened into is the one that moves.
-	//!
-	//! So ZoomChange and PosChange were never global; they were the entity
-	//! driving whichever widget it had been opened into. Saying it to our own
-	//! widget instead says it to nobody else, and the board stops needing to
-	//! wait for anyone.
+	//! Which costs far less than it sounds, because the map entity is per
+	//! client. See Decide: the only screen a board can be wrong on is the
+	//! screen of somebody who has their own map open, and that person is
+	//! looking at their map. They get a blank board for those seconds.
 	protected void ApplyView()
 	{
-		if (!m_wMapWidget)
+		if (!m_MapEntity)
 			return;
 
 		if (m_fZoomLevel > 0)
-			m_wMapWidget.SetZoom(m_fZoomLevel);
+			m_MapEntity.ZoomChange(m_fZoomLevel);
 
-		m_wMapWidget.SetOffsetPx(m_vPan);
+		m_MapEntity.PosChange(m_vPan[0], m_vPan[1]);
 	}
 
 	//------------------------------------------------------------------------

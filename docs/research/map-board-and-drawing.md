@@ -775,3 +775,39 @@ Drive the board's view with `SetZoom` / `SetOffsetPx`, remove the
   independent enough, and the answer is to draw the missing parts ourselves.
 - Board follows your map -> zoom is per widget but the render is not, and the
   board can only ever be a second view of one shared map.
+
+## 8. CORRECTION: the widget's zoom is not the map's zoom
+
+Section 7 said the board's own view was one small change away. Tested in
+game, and it is wrong. Setting `SetZoom` and `SetOffsetPx` on the board's own
+widget moves some detail about and leaves the map where it was, and a player
+opening their own map still moves the board.
+
+So the measurement in section 7 was real but it was measuring something else.
+`CanvasWidgetBase`'s zoom and offset are the CANVAS transform -- the space
+draw commands are placed in. The engine renders the map from the ENTITY,
+through `ZoomChange` and `PosChange`. One map entity, one rendered view, and
+a board cannot hold a different one at the same instant.
+
+**The thing that saves the feature is that the map entity is per client.**
+`SCR_MapEntity` is a client-side singleton; a player opening their map takes
+the map over on THEIR machine only. Every other client's board is untouched.
+
+So the only screen a board can be wrong on is the screen of somebody who has
+their own map open -- and that person is looking at their map, not at the
+board. The board goes white on that one client for as long as their map is
+open, and comes back the moment they close it. Everybody standing at the
+board sees nothing change at all.
+
+Which means the spec is still met, read the way it should be read:
+
+| requirement | answer |
+| --- | --- |
+| the player's map behaves exactly as before | yes -- the board writes nothing while a map is open |
+| the board has its own zoom and pan | yes, and replicated, so everyone at the board sees the same |
+| the board is not disturbed by other players' maps | yes -- theirs is on their client |
+| the board is not disturbed by YOUR map | it goes blank for those seconds instead of lying |
+
+And markers, when we draw them ourselves on our own canvas, are not affected
+by any of this -- which is the argument for doing them that way rather than
+looking for a way to borrow vanilla's.
