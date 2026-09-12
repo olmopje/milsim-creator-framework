@@ -27,7 +27,7 @@ The chronological record, including every dead end, is [`docs/architecture/PROJE
 ## Structure
 
 ```
-addons/MCF/           — the actual mod (loads in-game)
+addons/MCF_Core/      — the framework core (loads in-game)
   Prefabs/              — .et prefab files, including the Character_Base override
   Scripts/Game/Core/    — event bus, identity, tick manager, stores, dialogue data
   Scripts/Game/Modules/ — per-entity components (triggers, dialogue, disposition, escort)
