@@ -57,7 +57,6 @@ modded enum ChimeraMenuPreset
 	//! everything about the map board rests on it, and it cannot be answered
 	//! by reading. DELETE THIS, its menu class and its layout once the answer
 	//! is written down.
-	MCF_MapProbe,
 
 	//! Standing at a map board and taking the map. Vanilla's own map window
 	//! -- its MapFrame inherits UI/layouts/Map/Map.layout, so the markers,
