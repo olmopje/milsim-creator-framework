@@ -441,3 +441,249 @@ At full white the map is closed and the render target drops to 1 FPS, so a
 board nobody is near costs a still frame of white. Distance is measured from
 the **current camera**, not the character, because a Game Master flying around
 has no character where their eyes are.
+
+---
+
+# HOW WE GET THE REST OF THE WAY
+
+Research pass, 2026-09-12, after the board worked but not well. Everything
+below is quoted from the game's own scripts. The headline is one line in a
+generated file that changes the shape of the whole feature.
+
+## 1. The map widget is a CanvasWidget, and a CanvasWidget takes draw commands
+
+```c
+// scripts/Game/generated/UI/MapWidget.c
+sealed class MapWidget: CanvasWidget
+{
+}
+```
+
+```c
+// scripts/Core/generated/UI/CanvasWidget.c
+proto external void SetDrawCommands(array<ref CanvasWidgetCommand> drawCommands);
+proto ref ImageDrawCommand CreateCommandFromImageSet(ResourceName resource, string imageName, vector size);
+proto void TessellateCircle(vector center, float radius, int segmentCount, out notnull array<float> vertices);
+```
+
+and the commands themselves (`scripts/Core/proto/EnWidgets.c`):
+
+```c
+class LineDrawCommand : CanvasWidgetCommand
+{
+    int m_iColor = 0xff000000;
+    ref array<float> m_Vertices;   //!< 2D vertices such as [x0, y0, x1, y1, ... xn, yn]
+    float m_fWidth;
+    float m_fOutlineWidth;
+    int m_iOutlineColor;
+    ref SharedItemRef m_pTexture;
+    vector m_UVScale;
+    bool m_bShouldEnclose;
+}
+class ImageDrawCommand : CanvasWidgetCommand { ... vector m_Position; vector m_Size; float m_fRotation; ... }
+class TextDrawCommand : CanvasWidgetCommand { ... string m_sText; vector m_Position; float m_fSize; ... }
+class PolygonDrawCommand, TriMeshDrawCommand, CompositeDrawCommand
+```
+
+**This is the thing the board has been missing.** Everything we have wanted to
+put on the board that the engine does not draw for us -- markers, labels,
+freeform strokes, a north arrow, a scale bar -- is a draw command on a canvas,
+not a widget per item and not a map entity setting. One array, rebuilt when
+something changes, handed over with `SetDrawCommands`.
+
+Two constraints to design around, both stated by the engine:
+
+- `const int CANVAS_COMMAND_VERTICES_LIMIT = 400;` in `SCR_MapConstants` --
+  "hardcoded in ENF". A long stroke is several commands.
+- "The caller needs to keep the array alive - the callee takes just a pointer
+  to it." So the array is a field, not a local.
+
+And the map layout has a canvas reserved for exactly this that **nothing in
+vanilla claims**:
+
+```c
+const string DRAWING_WIDGET_NAME = "DrawingWidget";   // name of the CanvasWidget for drawing within map layout
+```
+
+## 2. So the board draws its own overlay, in its own tree
+
+The board already owns a widget tree that nothing else touches. Adding a
+`CanvasWidget` over the `MapWidget` inside it -- same size, same slot form --
+gives us a layer the board draws and nobody else can disturb, inside the
+render target, for free.
+
+The world-to-pixel conversion does not have to be hand-rolled either.
+`CanvasWidgetBase` does it, honouring the widget's own zoom and offset:
+
+```c
+// scripts/Core/generated/UI/CanvasWidgetBase.c
+proto external float PixelPerUnit();
+proto external float GetZoom();
+proto external void SetZoom(float zoomLevel);
+proto external vector PosToPixels(vector posUnits);   // <- this
+proto external vector SizeToPixels(vector sizeUnits);
+proto external void ZoomAt(vector posUnits, float zoomLevel);
+proto external vector GetOffsetPx();
+proto external void SetOffsetPx(vector offsetPx);
+proto external vector GetSizeInUnits();
+proto external void SetSizeInUnits(vector newSize);
+```
+
+`SetSizeInUnits` is already set to the terrain size in metres by the map's own
+open, so a world position in metres is a position in units, and `PosToPixels`
+is the whole conversion. Mind the Y flip the map uses everywhere:
+`SCR_MapEntity.WorldToScreen` starts with `worldY = m_iMapSizeY - worldY;`.
+
+## 3. Markers: the data is readable at any time, the widgets are not
+
+`SCR_MapMarkerManagerComponent` sits on the game mode and has a static
+instance:
+
+```c
+protected static SCR_MapMarkerManagerComponent s_Instance;
+static SCR_MapMarkerManagerComponent GetInstance() { return s_Instance; }
+
+array<SCR_MapMarkerBase> GetStaticMarkers()      // returns a copy
+array<SCR_MapMarkerBase> GetDisabledMarkers()    // returns a copy
+array<SCR_MapMarkerEntity> GetDynamicMarkers()   // live array
+SCR_MapMarkerConfig GetMarkerConfig()
+```
+
+**The arrays on a client already contain only what that player may see.** A
+marker of another faction is dropped at insert:
+
+```c
+if (localFaction && !isMyFaction)
+{
+    m_aStaticMarkers.RemoveItem(marker);
+    return;
+}
+```
+
+so the board does not have to reimplement channel permissions to show markers
+honestly -- it shows what its viewer's client was given.
+
+One trap, and vanilla walks into it deliberately: markers outside the open
+map's visible frame are MOVED into `m_aDisabledMarkers`. Read both arrays and
+union them, the way `SCR_MapMarkersUI.CreateStaticMarkers()` does.
+
+A marker carries integers, not objects:
+
+```c
+void GetWorldPos(out int pos[2])   // world X and world Z, no elevation
+int GetIconEntry()                 // index into the config, not an image
+int GetColorEntry()                // index into the config, not a Color
+string GetCustomText()
+int GetRotation()
+SCR_EMapMarkerType GetType()
+```
+
+and the icon and colour resolve through the config:
+
+```c
+bool GetIconEntry(int i, out ResourceName imageset, out ResourceName imagesetGlow, out string imageQuad)
+Color GetColorEntry(int i)
+```
+
+which is exactly what `CanvasWidget.CreateCommandFromImageSet(imageset, quad,
+size)` wants.
+
+**Why we do NOT try to reuse vanilla's marker widgets.** They are created as
+children of the map menu's own frame and die with it:
+
+```c
+Widget mapFrame = mapRoot.FindAnyWidget(SCR_MapConstants.MAP_FRAME_NAME);
+m_wRoot = GetGame().GetWorkspace().CreateWidgets(m_ConfigEntry.GetMarkerLayout(), mapFrame);
+```
+
+and they are repositioned by `SCR_MapMarkerManagerComponent.Update`, which is
+only registered between `OnMapOpen` and `OnMapClose`. A board that is not a
+map menu gets none of it. Reading the data and drawing it ourselves is not a
+workaround; it is the only route, and it is less code than the alternative.
+
+## 4. Independence: drive the WIDGET, not the entity
+
+This is the part that has cost the most and it may have a one-line answer.
+
+Everything the board writes today goes to the map ENTITY -- `ZoomChange`,
+`PosChange`, `SetFrame`, `EnableVisualisation`, `EnableGrid`, `SetLayer` --
+and every one of those is shared with whatever else is using the map.
+
+But zoom and offset also exist ON THE WIDGET, per widget: `SetZoom`,
+`SetOffsetPx`, `SetSizeInUnits` above. And the observed behaviour fits that:
+the board did NOT follow a player panning their own map, which is only
+possible if the view state that matters is the widget's.
+
+**So the test, and it is small: set the board's view with
+`m_wMapWidget.SetZoom()` and `m_wMapWidget.SetOffsetPx()` and stop calling
+`ZoomChange` and `PosChange` at all.** If the board keeps its view while
+somebody drives their own map, the board is genuinely independent and the
+whole "wait while a map is open" dance can go.
+
+What stays shared no matter what, because it is on the entity:
+
+| call                    | scope   |
+| ----------------------- | ------- |
+| `EnableVisualisation`   | global  |
+| `EnableGrid` / `EnableOverlay` / `EnableLegend` | global |
+| `SetLayer`              | global  |
+| `SetFrame`              | global  |
+| `InitializeLayers`      | global -- and destructive, see the verdict above |
+
+`SetFrame` is the one to watch: it is the world rectangle the engine prepares,
+so while a player's map is open theirs wins and the board may be culled to
+their rectangle. If that shows up, the answer is to re-state the union of both
+rather than to fight for it.
+
+Layer PROPERTIES, unlike the layer selection, are per layer and safe to read:
+
+```c
+MapDescriptorProps GetPropsFor(int iFaction, EMapDescriptorType type);
+MapGridProps GetGridProps();  MapContourProps GetContourProps();  MapRoadProps GetRoadProps();
+```
+
+## 5. Freeform drawing: build it, do not copy vanilla's
+
+Vanilla's map drawing is not a model:
+
+```c
+//! Temporary drawing substitute so the protractor can be utilized properly
+[Attribute("9", UIWidgets.EditBox, desc: "Max line count")]
+protected int m_iLineCount;
+```
+
+Nine straight segments, each an `ImageWidget` rotated and stretched between
+two world points, stored in a `protected` array with no getter, destroyed on
+map close, and -- checked for `[RplProp]`, `[RplRpc]`, `RplComponent` -- **not
+replicated at all**. There is nothing to reuse and nothing to mirror onto the
+board.
+
+What we build instead falls straight out of section 1: a stroke is a list of
+world points; drawing it is one `LineDrawCommand` per 200 points (400 floats);
+placing it is `PosToPixels` per point. The same array of strokes drives the
+board's canvas and, later, a canvas in the player's own map -- the map layout
+already has `"DrawingWidget"` sitting unclaimed for it.
+
+Channels then become what they should be: a property of a stroke on the
+server, and a filter when each client builds its command array. Nothing about
+the drawing code needs to know about permissions.
+
+## 6. The order to build it in
+
+1. **Move the board's view onto the widget** (`SetZoom` / `SetOffsetPx`).
+   Smallest change, and it decides whether the board can be independent. Every
+   later item is easier if it is.
+2. **Confirm the corrected pan** from the log line already in place, or delete
+   the pan maths entirely if step 1 replaces it -- `SetOffsetPx` may make it
+   moot.
+3. **A canvas over the map inside the board's tree**, and the world-to-pixel
+   helper on top of `PosToPixels`. Prove it with something trivial: a dot on
+   the board at the viewer's own position.
+4. **Markers**, read from the manager and drawn as image commands. This is the
+   feature the board is missing, and after step 3 it is a loop.
+5. **Strokes**, shared state on the server, drawn with line commands on both
+   the board and the player's map.
+6. **Channels**, as a filter on step 5.
+
+Steps 3 to 6 are all the same machinery, which is the argument for doing 3
+properly.
