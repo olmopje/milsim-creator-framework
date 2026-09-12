@@ -33,9 +33,9 @@ class MCF_Map_BoardControlMenu : ChimeraMenuBase
 	protected MCF_Map_BoardComponent m_Board;
 	protected SCR_MapEntity m_MapEntity;
 
-	//! Ticks before the view is pushed to the board again. The board only
-	//! needs to be roughly live, and every push is an RPC.
-	protected static const float PUSH_SECONDS = 0.25;
+	//! How often the driver's view is pushed to the board. Ten a second is
+	//! enough for the board to look live once it chases between them; every`n	//! push is an RPC, so this is the one number that costs a server.
+	protected static const float PUSH_SECONDS = 0.1;
 	protected float m_fSincePush;
 
 	protected bool m_bOpened;

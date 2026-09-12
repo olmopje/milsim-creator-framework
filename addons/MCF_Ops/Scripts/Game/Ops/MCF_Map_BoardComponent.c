@@ -47,10 +47,10 @@ class MCF_Map_BoardComponent : ScriptComponent
 	[Attribute(defvalue: "{6A1C4F0B39E11000}UI/layouts/MCF/MCF_MapBoardRender.layout", uiwidget: UIWidgets.ResourceNamePicker, desc: "What gets drawn onto the board.", params: "layout")]
 	protected ResourceName m_sLayout;
 
-	[Attribute(defvalue: "10", uiwidget: UIWidgets.EditBox, desc: "How often the board redraws, in frames per second. A map does not move on its own, so this can be low -- it is the main thing a board costs.")]
+	[Attribute(defvalue: "30", uiwidget: UIWidgets.EditBox, desc: "How often the board redraws, in frames per second, while somebody is near enough to see it. Ten was enough for a still map and is visibly a slideshow when somebody is driving it.")]
 	protected int m_iFramesPerSecond;
 
-	[Attribute(defvalue: "0.5", uiwidget: UIWidgets.EditBox, desc: "Render scale, 0.1 to 1. Below 1 the board is drawn smaller and upscaled, which is most of the rest of what it costs.", params: "0.1 1")]
+	[Attribute(defvalue: "0.75", uiwidget: UIWidgets.EditBox, desc: "Render scale, 0.1 to 1. Below 1 the board is drawn smaller and upscaled, which is most of the rest of what it costs.", params: "0.1 1")]
 	protected float m_fResolutionScale;
 
 	[Attribute(defvalue: "40", uiwidget: UIWidgets.EditBox, desc: "How close a viewer has to be, in metres, for the map to be drawn at all. Beyond this the board is a blank white board and costs nothing.", params: "0 1000")]
@@ -64,6 +64,9 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 	[Attribute(defvalue: "28", uiwidget: UIWidgets.EditBox, desc: "How big a marker is drawn on the board, in board pixels. The board is 1024 x 700.", params: "4 200")]
 	protected float m_fMarkerSize;
+
+	[Attribute(defvalue: "80", uiwidget: UIWidgets.EditBox, desc: "How big a marker is drawn at the activation distance. A board fills less of the screen the further you stand, so a marker that is readable up close is a speck across a room -- it grows to meet you.", params: "4 400")]
+	protected float m_fMarkerSizeFar;
 
 	[Attribute(defvalue: "1", uiwidget: UIWidgets.CheckBox, desc: "Draw the marker's own icon. Off draws a plain coloured disc instead, which is immune to whatever the icon's transparency does and reads further away.")]
 	protected bool m_bMarkerIcons;
@@ -109,6 +112,19 @@ class MCF_Map_BoardComponent : ScriptComponent
 	//! Pixels per metre at the board's current zoom, worked out in ComputeView
 	//! and used again for every marker.
 	protected float m_fPPU;
+
+	//! How far the viewer was at the last look, kept so the markers can be
+	//! drawn bigger for somebody standing further back.
+	protected float m_fViewerDistance;
+
+	//! WHAT THE BOARD IS SHOWING, as opposed to what it has been told to show.
+	//! The replicated view arrives in steps -- somebody drags their map and
+	//! ten messages a second follow -- and a board that snapped to each one
+	//! would stutter. These chase the replicated values every frame instead.
+	protected float m_fShownPPU;
+	protected float m_fShownX;
+	protected float m_fShownZ;
+	protected bool m_bShownSet;
 
 	protected SCR_MapEntity m_MapEntity;
 	protected bool m_bRaised;
@@ -231,9 +247,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (widgetW <= 0 || widgetH <= 0 || sizeX <= 0 || sizeY <= 0)
 			return;
 
-		// Zero means "the whole island", which is where a board starts and
-		// what it comes back to.
-		float ppu = m_fViewPPU;
+		float ppu = m_fShownPPU;
 		if (ppu <= 0)
 			ppu = widgetH / sizeY;
 
@@ -243,14 +257,8 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (basePPU > 0)
 			m_fZoomLevel = ppu / basePPU;
 
-		float centreX = sizeX * 0.5;
-		float centreZ = sizeY * 0.5;
-
-		if (m_bCentreSet)
-		{
-			centreX = m_fCentreX;
-			centreZ = m_fCentreZ;
-		}
+		float centreX = m_fShownX;
+		float centreZ = m_fShownZ;
 
 		vector offset = m_MapEntity.Offset();
 
@@ -313,7 +321,10 @@ class MCF_Map_BoardComponent : ScriptComponent
 	override void OnPostInit(IEntity owner)
 	{
 		super.OnPostInit(owner);
-		SetEventMask(owner, EntityEvent.INIT);
+		// FRAME as well as INIT: the board chases its replicated view every
+		// frame rather than four times a second, or following somebody who is
+		// dragging their map looks like one picture a second.
+		SetEventMask(owner, EntityEvent.INIT | EntityEvent.FRAME);
 	}
 
 	//------------------------------------------------------------------------
@@ -396,6 +407,65 @@ class MCF_Map_BoardComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------
+	//! Every frame: chase the view the board has been told to show.
+	//!
+	//! THE REPLICATED VIEW ARRIVES IN STEPS. Somebody drags their map and ten
+	//! messages a second follow; a board that snapped to each one would move
+	//! in visible jumps, which is what "it runs at one frame a second" was.
+	//! So the shown view chases the replicated one and the board is redrawn
+	//! for as long as the two disagree.
+	override void EOnFrame(IEntity owner, float timeSlice)
+	{
+		if (!m_bRaised || !m_bPrimed || m_fWhite >= 1)
+			return;
+
+		if (!m_MapEntity || m_MapEntity.IsOpen())
+			return;
+
+		float wantPPU = m_fViewPPU;
+		if (wantPPU <= 0)
+			wantPPU = m_fShownPPU;
+
+		float wantX = m_fCentreX;
+		float wantZ = m_fCentreZ;
+
+		if (!m_bCentreSet)
+		{
+			wantX = m_MapEntity.GetMapSizeX() * 0.5;
+			wantZ = m_MapEntity.GetMapSizeY() * 0.5;
+		}
+
+		// First frame after priming: be where we are told, do not slide in
+		// from the middle of the island.
+		if (!m_bShownSet)
+		{
+			m_bShownSet = true;
+			m_fShownPPU = wantPPU;
+			m_fShownX = wantX;
+			m_fShownZ = wantZ;
+		}
+
+		float chase = Math.Clamp(timeSlice * 12, 0, 1);
+
+		float ppuGap = wantPPU - m_fShownPPU;
+		float xGap = wantX - m_fShownX;
+		float zGap = wantZ - m_fShownZ;
+
+		// Close enough is arrived. Chasing a target by ever smaller fractions
+		// redraws the board forever for movement nobody can see.
+		if (Math.AbsFloat(ppuGap) < 0.00002 && Math.AbsFloat(xGap) < 0.05 && Math.AbsFloat(zGap) < 0.05)
+			return;
+
+		m_fShownPPU = m_fShownPPU + ppuGap * chase;
+		m_fShownX = m_fShownX + xGap * chase;
+		m_fShownZ = m_fShownZ + zGap * chase;
+
+		ComputeView();
+		ApplyView();
+		DrawOverlay();
+	}
+
+	//------------------------------------------------------------------------
 	protected void Watch()
 	{
 		Decide();
@@ -433,10 +503,12 @@ class MCF_Map_BoardComponent : ScriptComponent
 		// they close it. Nobody standing at the board sees anything change.
 		float white = FadeFor(ViewerDistance(owner));
 
+
 		if (foreign)
 			white = 1;
 
 		Whiten(white);
+		m_fViewerDistance = ViewerDistance(owner);
 
 		// Fully white means there is nothing to see and nothing to pay for.
 		bool wanted = m_fWhite < 1;
@@ -581,6 +653,8 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (!WorldToBoard(world[0], world[1], at))
 			return;
 
+		float size = MarkerSize();
+
 		Color tint = Color.FromInt(Color.WHITE);
 		ResourceName imageset, glow;
 		string quad;
@@ -597,10 +671,10 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 				if (m_bMarkerIcons && entry.GetIconEntry(marker.GetIconEntry(), imageset, glow, quad))
 				{
-					ImageDrawCommand icon = m_wOverlay.CreateCommandFromImageSet(imageset, quad, Vector(m_fMarkerSize, m_fMarkerSize, 0));
+					ImageDrawCommand icon = m_wOverlay.CreateCommandFromImageSet(imageset, quad, Vector(size, size, 0));
 					if (icon)
 					{
-						icon.m_Position = Vector(at[0] - m_fMarkerSize * 0.5, at[1] - m_fMarkerSize * 0.5, 0);
+						icon.m_Position = Vector(at[0] - size * 0.5, at[1] - size * 0.5, 0);
 						icon.m_iColor = tint.PackToInt();
 						icon.m_fRotation = marker.GetRotation();
 
@@ -630,7 +704,7 @@ class MCF_Map_BoardComponent : ScriptComponent
 		if (!drawn)
 		{
 			array<float> circle = {};
-			m_wOverlay.TessellateCircle(Vector(at[0], at[1], 0), m_fMarkerSize * 0.3, 16, circle);
+			m_wOverlay.TessellateCircle(Vector(at[0], at[1], 0), size * 0.3, 16, circle);
 
 			PolygonDrawCommand disc = new PolygonDrawCommand();
 			disc.m_Vertices = circle;
@@ -651,10 +725,33 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		TextDrawCommand text = new TextDrawCommand();
 		text.m_sText = label;
-		text.m_Position = Vector(at[0] + m_fMarkerSize * 0.6, at[1] - m_fMarkerSize * 0.3, 0);
-		text.m_fSize = 18;
+		text.m_Position = Vector(at[0] + size * 0.6, at[1] - size * 0.35, 0);
+		text.m_fSize = size * 0.7;
 		text.m_iColor = tint.PackToInt();
 		m_aCommands.Insert(text);
+	}
+
+	//------------------------------------------------------------------------
+	//! How big a marker is drawn, for somebody standing this far away.
+	//!
+	//! A MARKER IS DRAWN IN BOARD PIXELS AND LOOKED AT IN SCREEN PIXELS, and
+	//! the two part company the moment you step back: twenty-eight pixels of
+	//! a thousand is a fifth of a grid square up close and a speck from
+	//! across a room. So it grows to meet the viewer, reaching the far size
+	//! at the distance the board stops being drawn at all.
+	//!
+	//! Not a fixed screen size, which would need the board's on-screen
+	//! rectangle and would break the moment two people stood at different
+	//! distances -- the board is one texture and they are looking at the same
+	//! one. This is the compromise that costs nothing: it is right for
+	//! whoever is nearest.
+	protected float MarkerSize()
+	{
+		if (m_fActivationDistance <= 0)
+			return m_fMarkerSize;
+
+		float part = Math.Clamp(m_fViewerDistance / m_fActivationDistance, 0, 1);
+		return m_fMarkerSize + (m_fMarkerSizeFar - m_fMarkerSize) * part;
 	}
 
 	//------------------------------------------------------------------------
