@@ -1390,3 +1390,69 @@ grid on a board is a thicker grid on everyone's own map too.
 Still open: sliders for those in the Control map window (attach a panel to
 the menu root at runtime, the way vanilla attaches its marker dialog), and
 then the freeform drawing.
+
+### Freehand drawing lives in the map's own drawing tool -- 2026-09-12, later still
+
+The first attempt put the drawing inside the board's Control map window,
+which meant it worked in the window and did nothing in the player's own M
+map. That is the wrong home twice over: the map already has a drawing
+component, and a drawing belongs to the map, not to whoever opened it.
+
+**`SCR_MapDrawingUI` is vanilla's drawing component**, listed in
+`Configs/Map/MapFullscreen.conf`, which is the config `GetGadgetMapConfig()`
+returns and therefore the config BOTH the player's M map and the board's
+Control map window open with. So MCF's freehand is a `modded class
+SCR_MapDrawingUI` (`MCF_Map_DrawingUI.c`) and it is in both windows without
+a line of wiring, without copying a vanilla config into the mod, and without
+a second component fighting vanilla's for the same mouse button.
+
+What vanilla's gives a player is up to nine STRAIGHT lines, visible only to
+them, forgotten when the mission ends. MCF adds the other half: a line drawn
+with the hand, replicated, on every map and every board, until somebody rubs
+it out.
+
+**`SCR_MapRadialUI` is the right-click menu and it is open to anyone.**
+`GetInstance()` (static), then `GetOnMenuInitInvoker()` -- "used to fill in
+entries after map open" -- fires after `ClearEntries()` every time the menu
+opens, so entries are rebuilt each time and can say what the current state
+is. `AddRadialCategory(name)` and `AddRadialEntry(name, category)` return
+`SCR_SelectionMenuEntry`, which carries `SetId`/`GetId` (a place to hang the
+entry's meaning) and `GetOnPerform()`. **Nothing of MCF's is bolted onto the
+map screen** -- no panel, no extra button, no keybind entry for something
+that only exists while a map is open.
+
+**Why picking a colour is also what turns drawing on.** `HandleDraw(true)`
+sets the cursor's `CS_DRAW`, and `CS_DRAW` is in
+`SCR_MapCursorModule.STATE_CTXMENU_RESTRICTED` -- while draw mode is on, the
+right-click menu WILL NOT OPEN. A menu that could only turn drawing on would
+be a menu you could never use to turn it off. So six coloured entries do the
+whole job in one click, and right-click (`MapContextualMenu` UP, which has
+nothing else to do while drawing) puts the pencil down.
+
+**Ask the cursor module, do not go around it.** `m_CursorModule.HandleDraw(true)`
+returns false when drawing is restricted here, and it is also what puts the
+pencil on the cursor. Calling it is how MCF's drawing obeys exactly the rules
+vanilla's does.
+
+**An Enfusion RPC does not carry who sent it.** `GetGame().GetPlayerController()`
+inside an `RplRcver.Server` RPC gives the SERVER'S controller -- which is
+nobody at all on a dedicated server, so every stroke was owned by -1 and
+"rub out mine" rubbed out everyone's. The client names itself in the call
+instead, the way vanilla's player-addressed RPCs do. A modified client could
+then rub out somebody else's lines; on a briefing map that is a smaller
+problem than the feature not working on a dedicated server.
+
+**The strokes replicate as one string** on `MCF_Map_DrawingComponent`, sitting
+on the game mode beside the marker manager -- so anybody who joins an hour
+later gets the drawing with no push-on-join code. That is why points are
+whole metres, why a stroke is thinned to one point per eight metres as it is
+drawn, and why the oldest stroke is dropped past a 24000-character budget.
+Points are stored in METRES, never screen pixels: `WorldToScreen(..., true)`
+carries the pan, so a line stays on the ground while the map moves under it,
+and the same stroke is the same line on a board of any size.
+
+Still open: sliders for the board's grid and marker sizes in the Control map
+window, and channel permissions on strokes (commander to everyone, squad
+leader to squad plus command, soldier to squad) -- deliberately kept out of
+the drawing code, since it is a property of the stroke and a filter when the
+commands are built.

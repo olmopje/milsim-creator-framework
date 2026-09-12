@@ -130,29 +130,44 @@ class MCF_Map_DrawingComponent : ScriptComponent
 		if (points.Count() < 4)
 			return;
 
-		Rpc(RpcAsk_Add, Pack(points), colour);
+		Rpc(RpcAsk_Add, Pack(points), colour, LocalPlayer());
 	}
 
 	//------------------------------------------------------------------------
 	void AskClearMine()
 	{
-		Rpc(RpcAsk_Clear, false);
+		Rpc(RpcAsk_Clear, false, LocalPlayer());
 	}
 
 	//------------------------------------------------------------------------
 	void AskClearAll()
 	{
-		Rpc(RpcAsk_Clear, true);
+		Rpc(RpcAsk_Clear, true, LocalPlayer());
+	}
+
+	//------------------------------------------------------------------------
+	//! WHY THE CALLER SENDS ITS OWN ID. An Enfusion RPC does not carry who
+	//! sent it, and asking the server for "the" player controller gives the
+	//! server's own -- which is nobody at all on a dedicated server. So the
+	//! client names itself, the way vanilla's own player-addressed RPCs do.
+	//! The cost is that a modified client could rub out somebody else's lines;
+	//! for a drawing on a briefing map that is a smaller problem than the
+	//! feature not working on a dedicated server at all.
+	protected int LocalPlayer()
+	{
+		PlayerController controller = GetGame().GetPlayerController();
+		if (!controller)
+			return -1;
+
+		return controller.GetPlayerId();
 	}
 
 	//------------------------------------------------------------------------
 	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
-	protected void RpcAsk_Add(string packed, int colour)
+	protected void RpcAsk_Add(string packed, int colour, int player)
 	{
 		if (packed.IsEmpty())
 			return;
-
-		int player = GetRpcPlayer();
 
 		string line = colour.ToString() + "|" + player.ToString() + "|" + packed;
 
@@ -167,10 +182,8 @@ class MCF_Map_DrawingComponent : ScriptComponent
 
 	//------------------------------------------------------------------------
 	[RplRpc(RplChannel.Reliable, RplRcver.Server)]
-	protected void RpcAsk_Clear(bool everybody)
+	protected void RpcAsk_Clear(bool everybody, int player)
 	{
-		int player = GetRpcPlayer();
-
 		array<string> lines = {};
 		m_sStrokes.Split(";", lines, true);
 
@@ -200,18 +213,6 @@ class MCF_Map_DrawingComponent : ScriptComponent
 
 		Replication.BumpMe();
 		OnStrokesReplicated();
-	}
-
-	//------------------------------------------------------------------------
-	//! Whose request this was. A drawing has an owner so it can be rubbed out
-	//! by the person who drew it and by nobody else.
-	protected int GetRpcPlayer()
-	{
-		PlayerController controller = GetGame().GetPlayerController();
-		if (!controller)
-			return -1;
-
-		return controller.GetPlayerId();
 	}
 
 	//------------------------------------------------------------------------

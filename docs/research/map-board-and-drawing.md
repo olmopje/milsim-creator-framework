@@ -811,3 +811,63 @@ Which means the spec is still met, read the way it should be read:
 And markers, when we draw them ourselves on our own canvas, are not affected
 by any of this -- which is the argument for doing them that way rather than
 looking for a way to borrow vanilla's.
+
+## 9. CORRECTION to section 5: do not copy vanilla's, but DO live inside it
+
+Section 5 is right that vanilla's map drawing has nothing reusable in it --
+nine straight segments, unreplicated, thrown away on map close. It drew the
+wrong conclusion from that, which was to build the drawing somewhere else.
+
+The right conclusion is that `SCR_MapDrawingUI` is the wrong IMPLEMENTATION
+sitting in exactly the right PLACE, and the place is worth more than the
+implementation.
+
+**Why the place is worth so much.** `SCR_MapDrawingUI` is listed in
+`Configs/Map/MapFullscreen.conf`, and `MapFullscreen.conf` is what
+`SCR_MapConfigComponent.GetGadgetMapConfig()` returns. Both the player's own
+M map (`SCR_MapMenuUI`) and MCF's Control map window open with that config.
+So a `modded class SCR_MapDrawingUI` is:
+
+- in the player's map and in the board's window, from one file;
+- given `OnMapOpen(config)`, `OnMapClose(config)` and `Update(timeSlice)` by
+  the map itself, with `config.RootWidgetRef` handed to it -- no menu has to
+  own it, no menu has to remember to tick it;
+- holding `m_CursorModule` and `m_MapEntity` already;
+- able to turn vanilla's straight-line mode off when freehand starts, by
+  overriding `SetDrawMode` -- the two modes share the left mouse button and
+  one of them has to yield;
+- built WITHOUT copying `MapFullscreen.conf` into the mod, which is the other
+  way to add a component and which freezes MCF's map at today's vanilla.
+
+The first attempt did own it from a menu (a `MCF_Map_Drawer` class started by
+`MCF_Map_BoardControlMenu`, plus a panel layout of our own buttons, plus a
+planned `modded class SCR_MapMenuUI` to start a second one for the player's
+map). All of that is deleted. It was three files and a layout doing what one
+`modded class` does better.
+
+**The controls go in the right-click menu, which is open to anyone.**
+`SCR_MapRadialUI.GetInstance()`, then `GetOnMenuInitInvoker()`, which the
+radial fires after `ClearEntries()` each time it opens. `AddRadialCategory`
+and `AddRadialEntry` return `SCR_SelectionMenuEntry` with `SetId`/`GetId` and
+`GetOnPerform()`. This is the extension point the user asked for by name
+("de standaard map UI (rechtermuisknop in M)") and it needs no vanilla edit.
+
+**The trap in that, which is not obvious until it bites.** `HandleDraw(true)`
+sets `EMapCursorState.CS_DRAW`, and `CS_DRAW` is a member of
+`SCR_MapCursorModule.STATE_CTXMENU_RESTRICTED`. While draw mode is on, the
+right-click menu will not open. A radial entry that only turns drawing ON is
+therefore a door that locks behind you. The shape that works:
+
+- six entries, one per colour; performing one sets the colour AND starts
+  drawing, a frame later (the menu is still closing and the cursor's
+  `CS_CONTEXTUAL_MENU` has to clear before `HandleDraw` will say yes);
+- right-click (`MapContextualMenu` UP) stops drawing, because while drawing
+  the right button has nothing else to do -- and putting the pencil down is
+  what it should mean anyway.
+
+**One more measured fact, about the wire rather than the map.** An Enfusion
+RPC does not carry its sender. Inside an `[RplRpc(..., RplRcver.Server)]`
+handler, `GetGame().GetPlayerController()` is the SERVER'S controller, which
+on a dedicated server is null. Every stroke was therefore owned by player -1
+and "rub out mine" would have rubbed out everybody's. The caller sends its
+own player id as an argument instead.
