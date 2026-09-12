@@ -670,10 +670,60 @@ class MCF_Map_BoardComponent : ScriptComponent
 
 		m_aCommands.Clear();
 
+		AddStrokes();
+
 		if (m_bShowMarkers)
 			AddMarkers();
 
 		m_wOverlay.SetDrawCommands(m_aCommands);
+	}
+
+	//------------------------------------------------------------------------
+	//! What everybody has drawn, under the markers.
+	//!
+	//! The same strokes the map draws, from the same store, converted with
+	//! the board's own arithmetic. Nothing here knows or cares that it is a
+	//! board: a stroke is metres, and metres are the same everywhere.
+	//!
+	//! UNDER the markers deliberately. A line is a gesture about the ground;
+	//! a marker is a thing on it, and a thing should not be hidden by a
+	//! gesture.
+	protected void AddStrokes()
+	{
+		MCF_Map_DrawingComponent drawings = MCF_Map_DrawingComponent.GetInstance();
+		if (!drawings)
+			return;
+
+		float width = MarkerSize() * 0.14;
+		if (width < 2)
+			width = 2;
+
+		foreach (MCF_Map_Stroke stroke : drawings.GetStrokes())
+		{
+			array<float> pixels = {};
+
+			for (int i = 0; i + 1 < stroke.m_aPoints.Count(); i += 2)
+			{
+				vector at;
+				if (!WorldToBoard(stroke.m_aPoints[i], stroke.m_aPoints[i + 1], at))
+					continue;
+
+				pixels.Insert(at[0]);
+				pixels.Insert(at[1]);
+			}
+
+			if (pixels.Count() < 4)
+				continue;
+
+			LineDrawCommand line = new LineDrawCommand();
+			line.m_Vertices = pixels;
+			line.m_iColor = MCF_Map_DrawingComponent.Colour(stroke.m_iColour);
+			line.m_fWidth = width;
+			line.m_fOutlineWidth = width * 0.4;
+			line.m_iOutlineColor = 0xC0000000;
+
+			m_aCommands.Insert(line);
+		}
 	}
 
 	//------------------------------------------------------------------------
