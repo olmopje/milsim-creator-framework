@@ -1533,3 +1533,45 @@ of reading headers could: that the canvas renders, that draw mode was really
 on, and that a canvas draw command is in plain screen pixels (canvas 1335x465
 = screen 1335x465, 1:1, no DPI scaling). It ruled out three suspects at once.
 `MCF_DIAG` in MCF_Map_DrawingUI.c turns it and the logging back on.
+
+### Renaming an addon: the four steps, three of which bite -- 2026-09-12
+
+MCF became MCF_Core and MCF_Ops became MCF_Intelligence. The rename itself was
+cheap because GUIDs carry every reference and the tree contains zero name-based
+`$MCF:` paths -- check that first, because with those present this is a sweep
+instead of a move. Folder, `ID` and `TITLE` change together; dependency lists
+and `{GUID}path` resource refs need no edit at all.
+
+The traps, in the order they appeared:
+
+**1. `git mv` fails with "Permission denied", and closing Workbench does not
+help.** The `enfusion-workbench-mcp` node processes hold the addon directory
+open. Stop them (`Get-CimInstance Win32_Process` filtered on `enfusion`) and the
+move succeeds. Symptom that identifies it: *every* subfolder -- Configs,
+Prefabs, Scripts -- refuses to rename, not one file.
+
+**2. The renamed projects vanish from the Workbench project picker.** The
+launcher remembers projects by PATH in
+`profile/.projectList_app<appid>_user<userid>.conf` and silently drops entries
+whose folder no longer exists. Add the new paths back to that file **while
+Workbench is closed**, or it is rewritten on exit.
+
+**3. Assets go missing in game while scripts compile clean.** The laptop lid
+disappeared. `Script validation successful`, `Module: Game; loaded 5787x files;
+11358x classes`, zero errors -- because scripts are compiled by class name and
+never go through the resource index, while meshes, materials and layouts do.
+**Delete every `resourceDatabase.rdb`** -- one per addon plus the one in
+`profile/` -- and let the Workbench rebuild them. They are caches, `.gitignore`
+already ignores `*.rdb`, and nothing warns you that they are stale.
+
+A false lead worth recording so nobody repeats it: after the rebuild the
+Intelligence `.rdb` still contains the string `MCF_Ops`, which looks like a
+stale addon name and is not one -- it is script PATHS (`Scripts/Game/Ops/
+MCF_Ops_GameModeComponent.c`), because the folder inside the addon and the class
+names still say Ops. The engine takes the addon name from the gproj, and the log
+confirms it: `ResourceDB: loading cache (id=2 name=MCF_Intelligence ...)`.
+
+**Left as cosmetic debt on purpose:** inside MCF_Intelligence the script folder
+is still `Scripts/Game/Ops/` and the classes are still `MCF_Ops_*`. Class names
+and internal folders take no part in addon identity, so this loads correctly; it
+is a separate tidy-up, not something to mix into a rename.
