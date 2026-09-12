@@ -38,11 +38,18 @@ class MCF_Map_Stroke
 //! thinned as it is drawn, and the oldest stroke is dropped once the string
 //! would outgrow its budget.
 [ComponentEditorProps(category: "MCF/Ops", description: "Holds the freeform drawings players make on the map.")]
-class MCF_Map_DrawingComponentClass : ScriptComponentClass
+class MCF_Map_DrawingComponentClass : SCR_BaseGameModeComponentClass
 {
 }
 
-class MCF_Map_DrawingComponent : ScriptComponent
+//! ON THE BASE CLASS. This was a plain ScriptComponent and it never came to
+//! life: GetInstance() returned null on every machine, so every stroke was
+//! collected, sent, and dropped on the floor. Every MCF component that works
+//! on the game mode derives from SCR_BaseGameModeComponent, which is the
+//! supported base for one -- and it also complains loudly in its constructor
+//! if it is ever attached to something that is not a game mode, which is a
+//! better way to learn that than a silently empty drawing.
+class MCF_Map_DrawingComponent : SCR_BaseGameModeComponent
 {
 	//! The palette, by index. Small and fixed, because the index is what
 	//! travels: naming a colour costs one number instead of four floats, and
@@ -70,8 +77,22 @@ class MCF_Map_DrawingComponent : ScriptComponent
 	protected static MCF_Map_DrawingComponent s_Instance;
 
 	//------------------------------------------------------------------------
+	//------------------------------------------------------------------------
+	//! FOUND, NOT REMEMBERED. Registering in an init hook means trusting that
+	//! the hook ran before the first person opened a map; asking the game mode
+	//! for the component is true whenever it is asked. The static is kept as a
+	//! cache, not as the source of truth.
 	static MCF_Map_DrawingComponent GetInstance()
 	{
+		if (s_Instance)
+			return s_Instance;
+
+		BaseGameMode gameMode = GetGame().GetGameMode();
+		if (!gameMode)
+			return null;
+
+		s_Instance = MCF_Map_DrawingComponent.Cast(gameMode.FindComponent(MCF_Map_DrawingComponent));
+
 		return s_Instance;
 	}
 
@@ -91,12 +112,11 @@ class MCF_Map_DrawingComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------
-	override void OnPostInit(IEntity owner)
+	//------------------------------------------------------------------------
+	void MCF_Map_DrawingComponent(IEntityComponentSource src, IEntity ent, IEntity parent)
 	{
-		super.OnPostInit(owner);
 		s_Instance = this;
 	}
-
 	//------------------------------------------------------------------------
 	void ~MCF_Map_DrawingComponent()
 	{
@@ -123,27 +143,53 @@ class MCF_Map_DrawingComponent : ScriptComponent
 	// ASKING
 	//------------------------------------------------------------------------
 
-	//! Client side. The server owns the drawing because everybody is looking
-	//! at the same one.
+	//! Asked from wherever somebody drew; carried out on the server, because
+	//! everybody is looking at the same drawing.
+	//!
+	//! WHY THE SERVER CALLS ITS OWN HANDLER INSTEAD OF SENDING TO ITSELF.
+	//! Rpc(..., RplRcver.Server) sends a message TO the server. On a machine
+	//! that already IS the server -- a listen server, a Game Master hosting,
+	//! and every Workbench play session -- there is nobody to send it to and
+	//! the call quietly does nothing. The symptom is exact and was paid for:
+	//! the line you were drawing vanished on the closing click and nothing
+	//! replaced it, because the stroke was never recorded.
 	void AskAdd(notnull array<float> points, int colour)
 	{
 		if (points.Count() < 4)
 			return;
 
-		Rpc(RpcAsk_Add, Pack(points), colour, LocalPlayer());
+		string packed = Pack(points);
+		int player = LocalPlayer();
+
+		if (Replication.IsServer())
+			RpcAsk_Add(packed, colour, player);
+		else
+			Rpc(RpcAsk_Add, packed, colour, player);
 	}
 
 	//------------------------------------------------------------------------
 	void AskClearMine()
 	{
-		Rpc(RpcAsk_Clear, false, LocalPlayer());
+		AskClear(false);
 	}
 
 	//------------------------------------------------------------------------
 	void AskClearAll()
 	{
-		Rpc(RpcAsk_Clear, true, LocalPlayer());
+		AskClear(true);
 	}
+
+	//------------------------------------------------------------------------
+	protected void AskClear(bool everybody)
+	{
+		int player = LocalPlayer();
+
+		if (Replication.IsServer())
+			RpcAsk_Clear(everybody, player);
+		else
+			Rpc(RpcAsk_Clear, everybody, player);
+	}
+
 
 	//------------------------------------------------------------------------
 	//! WHY THE CALLER SENDS ITS OWN ID. An Enfusion RPC does not carry who

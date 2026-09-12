@@ -51,6 +51,8 @@ SCR_GameModeEditor GameMode_Editor_Full : "{DA3986AF1B5032B7}Prefabs/MP/Modes/Ed
   }
   MCF_Dialogue_GameModeComponent "{6A515757B6739101}" {
   }
+  MCF_Map_DrawingComponent "{6A515757B6739200}" {
+  }
   MCF_Ops_GameModeComponent "{6A515757B6739100}" {
    m_bCreateSampleTask 1
   }

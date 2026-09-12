@@ -1456,3 +1456,80 @@ window, and channel permissions on strokes (commander to everyone, squad
 leader to squad plus command, soldier to squad) -- deliberately kept out of
 the drawing code, since it is a property of the stroke and a filter when the
 commands are built.
+
+### Getting the freehand actually working: six wrong answers -- 2026-09-12, evening
+
+The drawing was written, compiled clean, and did nothing. Every one of these
+looked like the bug and only the first one was.
+
+**1. The component was never there.** `GetInstance()` returned null on every
+machine, so each stroke was collected, packed, sent and dropped. Two reasons
+stacked on top of each other:
+
+- `MCF_Map_DrawingComponent` was a plain `ScriptComponent`. Every MCF
+  component that works on a game mode derives from
+  `SCR_BaseGameModeComponent` -- that is the supported base, and its
+  constructor also complains loudly when it is attached to something that is
+  not a game mode.
+- **The test world does not use `Milsim.et`.** MCFTestworld runs on
+  `GameMode_Editor_Full.et` with the MCF components listed inline in
+  `MCFTestworld_Layers/default.layer`. Adding a component to the Milsim
+  prefab therefore does nothing in the world anybody actually tests in. It
+  has to go in BOTH. This cost three rounds; checking whether the component
+  was on the game mode would have cost one.
+
+Lesson for the next one: when a manager-style component comes back null, ask
+first WHERE it was supposed to be instantiated, not why its init hook did not
+run.
+
+**2. `MapSelect` cannot be held.** The left button on the map is an
+edge-triggered click: DOWN and UP arrive about four milliseconds apart no
+matter how long the button is actually down. Measured twice, by two different
+routes -- action listeners, and polling `GetActionValue("MapSelect")` every
+frame, which never reported more than **1 frame**. There is no drag to read,
+which is exactly why vanilla's own line tool is click-to-start,
+click-to-finish. Freehand works the same way: click, move, click.
+
+**3. `LineDrawCommand`'s outline fields swallow the colour.** A line with
+`m_fOutlineWidth` and `m_iOutlineColor` set draws black whatever `m_iColor`
+says. A line that sets nothing but `m_iColor` is exactly right. So a halo is
+its own wider black command drawn first, the colour laid over it -- the same
+technique the board already uses for marker icons. Fixed in the map window
+and on the board.
+
+**4. `Rpc(..., RplRcver.Server)` is a no-op on the authority.** It sends a
+message TO the server; a listen server, a hosting Game Master and every
+Workbench play session already ARE the server, so there is nobody to send to.
+Guard every ask with `Replication.IsServer()` and call the handler directly
+when it is true. (This was real and is fixed -- but it was not what was
+breaking the drawing, and the log proved it: `server true`.)
+
+**5. `reference` is a reserved word in Enforce.** The compiler only says
+"Broken expression (missing ';'?)" on that line. It was identified by
+inserting lines above it and watching the reported line number move with the
+identifier rather than with the syntax.
+
+**6. THE WORKBENCH MUST BE STARTED FROM ITS OWN INSTALL DIRECTORY.** The Peer
+Tool's clients are launched with `-gproj .../addons/data/ArmaReforger.gproj`
+and resolve the engine's core addon through the RELATIVE path
+`./addons/core/core.gproj`. That only works when the working directory is
+`...\Arma Reforger Tools\Workbench\`. Start Workbench from anywhere else --
+for example with `Start-Process` from a shell sitting in `G:\MCF` -- and the
+peers inherit that directory, `./addons` becomes `G:\MCF\addons`, core is not
+found, and every peer dies at startup with:
+
+```
+Addon 'ArmaReforger' dependency '5614BBCCBB55ED1C' can't be added
+Cannot initialize game project settings!
+```
+
+The command line is byte-for-byte identical in the working and broken cases;
+only line 6 of the log, `Current working directory`, differs. Always pass
+`-WorkingDirectory` when launching the Workbench by hand.
+
+**Diagnostics that earned their keep.** A magenta line drawn at fixed canvas
+coordinates while draw mode was on settled in one screenshot what no amount
+of reading headers could: that the canvas renders, that draw mode was really
+on, and that a canvas draw command is in plain screen pixels (canvas 1335x465
+= screen 1335x465, 1:1, no DPI scaling). It ruled out three suspects at once.
+`MCF_DIAG` in MCF_Map_DrawingUI.c turns it and the logging back on.

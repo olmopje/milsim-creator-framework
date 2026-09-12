@@ -715,12 +715,21 @@ class MCF_Map_BoardComponent : ScriptComponent
 			if (pixels.Count() < 4)
 				continue;
 
+			// BLACK FIRST, WIDER, AS ITS OWN COMMAND. Not m_fOutlineWidth: on a
+			// line those outline fields swallow the colour whole and the
+			// stroke draws black. Measured in the map window, and the same
+			// reason the marker icons here are drawn twice.
+			LineDrawCommand halo = new LineDrawCommand();
+			halo.m_Vertices = pixels;
+			halo.m_iColor = 0xC0000000;
+			halo.m_fWidth = width * 1.8;
+
+			m_aCommands.Insert(halo);
+
 			LineDrawCommand line = new LineDrawCommand();
 			line.m_Vertices = pixels;
 			line.m_iColor = MCF_Map_DrawingComponent.Colour(stroke.m_iColour);
 			line.m_fWidth = width;
-			line.m_fOutlineWidth = width * 0.4;
-			line.m_iOutlineColor = 0xC0000000;
 
 			m_aCommands.Insert(line);
 		}

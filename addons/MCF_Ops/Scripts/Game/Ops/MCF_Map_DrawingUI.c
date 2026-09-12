@@ -55,10 +55,30 @@ modded class SCR_MapDrawingUI
 	protected ref array<float> m_aMCFStroke = {};
 
 	protected bool m_bMCFFreehand;
-	protected bool m_bMCFHeld;
+	protected bool m_bMCFStroking;
 	protected int m_iMCFColour;
 
 	protected SCR_MapRadialUI m_MCFRadial;
+
+	//! DIAGNOSTICS. On until the freehand has been seen working on a board and
+	//! in a player's own map; then this line and every MCF_Say below it go.
+	//! The failure this is here to catch is a silent one -- draw mode refused,
+	//! or points collected and drawn into the wrong coordinate space -- and
+	//! neither shows up as an error.
+	protected static const bool MCF_DIAG = false;
+
+	protected int m_iMCFSaidCommands = -1;
+	protected int m_iMCFStartTries;
+	protected float m_fMCFSaidX;
+	protected float m_fMCFSaidY;
+	protected int m_iMCFHeldFrames;
+
+	//------------------------------------------------------------------------
+	protected void MCF_Say(string message)
+	{
+		if (MCF_DIAG)
+			MCF_Core_Log.Warn("map drawing: " + message);
+	}
 
 	//------------------------------------------------------------------------
 	// THE RIGHT-CLICK MENU
@@ -71,6 +91,8 @@ modded class SCR_MapDrawingUI
 	{
 		if (!m_MCFRadial)
 			return;
+
+		MCF_Say("filling the radial menu");
 
 		SCR_SelectionMenuCategoryEntry category = m_MCFRadial.AddRadialCategory("Freehand drawing");
 		if (!category)
@@ -111,15 +133,28 @@ modded class SCR_MapDrawingUI
 
 		m_iMCFColour = entry.GetId().ToInt();
 
-		// A frame later, because the menu is still closing and the cursor's
-		// contextual-menu state has to be off before draw mode may go on.
-		GetGame().GetCallqueue().CallLater(MCF_StartFreehand, 100, false);
+		MCF_Say("colour " + m_iMCFColour + " picked");
+
+		// NOT THIS FRAME. The radial is still closing, and the cursor keeps
+		// CS_CONTEXTUAL_MENU until it has -- which is one of the states that
+		// makes HandleDraw refuse. Retried rather than assumed, because how
+		// long the close takes is the menu's business, not ours.
+		m_iMCFStartTries = 0;
+		GetGame().GetCallqueue().CallLater(MCF_StartFreehand, 150, true);
 	}
 
 	//------------------------------------------------------------------------
 	protected void MCF_StartFreehand()
 	{
-		MCF_SetFreehand(true);
+		m_iMCFStartTries++;
+
+		if (MCF_SetFreehand(true) || m_iMCFStartTries >= 10)
+		{
+			GetGame().GetCallqueue().Remove(MCF_StartFreehand);
+
+			if (!m_bMCFFreehand)
+				MCF_Say("gave up turning draw mode on after " + m_iMCFStartTries + " tries");
+		}
 	}
 
 	//------------------------------------------------------------------------
@@ -151,29 +186,46 @@ modded class SCR_MapDrawingUI
 	//! IT IS ONLY LISTENED TO WHILE FREEHAND IS ON. The left button means
 	//! "select" on a map, and taking it silently would break the markers the
 	//! map exists to place.
-	protected void MCF_SetFreehand(bool on)
+	protected bool MCF_SetFreehand(bool on)
 	{
 		if (on == m_bMCFFreehand)
-			return;
+			return true;
 
 		InputManager input = GetGame().GetInputManager();
 		if (!input)
-			return;
+			return false;
 
 		if (on)
 		{
-			// The cursor module owns whether drawing is allowed at all here,
-			// and it is also what puts the pencil on the cursor. Asking it is
-			// how our drawing obeys the same rules vanilla's does.
-			if (!m_CursorModule || !m_CursorModule.HandleDraw(true))
-				return;
+			if (!m_CursorModule)
+			{
+				MCF_Say("no cursor module, so draw mode cannot be asked for");
+				return false;
+			}
 
-			// Two drawing modes on one mouse button is one too many.
+			// Two drawing modes on one mouse button is one too many, and
+			// vanilla's has to go first: it holds CS_DRAW itself, and
+			// HandleDraw refuses to hand out a state that is already set.
 			if (m_bIsDrawModeActive)
 				SetDrawMode(false);
 
-			input.AddActionListener("MapSelect", EActionTrigger.DOWN, MCF_OnDown);
-			input.AddActionListener("MapSelect", EActionTrigger.UP, MCF_OnUp);
+			// The cursor module owns whether drawing is allowed at all here,
+			// and it is also what puts the pencil on the cursor. Asking it is
+			// how our drawing obeys the same rules vanilla's does.
+			if (!m_CursorModule.HandleDraw(true))
+			{
+				MCF_Say("draw mode refused, cursor state " + m_CursorModule.GetCursorState());
+				return false;
+			}
+
+			// ONE TRIGGER, NOT TWO. MapSelect is an edge-triggered click: the
+			// engine delivers DOWN and UP four milliseconds apart however long
+			// the button is actually held, so a drag cannot be read from it at
+			// all. Vanilla's own line tool is click-to-start, click-to-finish
+			// for exactly this reason, and freehand works the same way: click
+			// once, move the mouse and the line follows it, click again to let
+			// go. It is also the easier hand on a big map.
+			input.AddActionListener("MapSelect", EActionTrigger.UP, MCF_OnClick);
 
 			// The way out. Draw mode blocks the right-click menu, so the
 			// right button has nothing else to do while drawing -- and
@@ -182,8 +234,7 @@ modded class SCR_MapDrawingUI
 		}
 		else
 		{
-			input.RemoveActionListener("MapSelect", EActionTrigger.DOWN, MCF_OnDown);
-			input.RemoveActionListener("MapSelect", EActionTrigger.UP, MCF_OnUp);
+			input.RemoveActionListener("MapSelect", EActionTrigger.UP, MCF_OnClick);
 			input.RemoveActionListener("MapContextualMenu", EActionTrigger.UP, MCF_OnStopDrawing);
 
 			if (m_CursorModule)
@@ -191,40 +242,71 @@ modded class SCR_MapDrawingUI
 		}
 
 		m_bMCFFreehand = on;
-		m_bMCFHeld = false;
+		m_bMCFStroking = false;
 		m_aMCFStroke.Clear();
+
+		MCF_Say("freehand " + on);
+
+		return true;
 	}
 
 	//------------------------------------------------------------------------
+	//! Right-click throws away the stroke being drawn if there is one, and
+	//! otherwise puts the pencil down. Two meanings on one button, but in the
+	//! order anybody would expect: undo the thing in your hand first.
 	protected void MCF_OnStopDrawing(float value, EActionTrigger reason)
 	{
+		if (m_bMCFStroking)
+		{
+			m_bMCFStroking = false;
+			m_aMCFStroke.Clear();
+
+			MCF_Say("stroke cancelled");
+			return;
+		}
+
 		MCF_SetFreehand(false);
 	}
 
 	//------------------------------------------------------------------------
-	protected void MCF_OnDown()
+	//! One click: begins a stroke, or finishes the one in progress.
+	protected void MCF_OnClick()
 	{
-		m_bMCFHeld = true;
-		m_aMCFStroke.Clear();
-		MCF_AddPoint();
-	}
-
-	//------------------------------------------------------------------------
-	protected void MCF_OnUp()
-	{
-		m_bMCFHeld = false;
-
-		// Two points is a line; one is a click somebody changed their mind
-		// about, and a dot nobody meant is worse than nothing.
-		if (m_aMCFStroke.Count() >= 4)
+		if (m_bMCFStroking)
 		{
-			MCF_Map_DrawingComponent drawings = MCF_Map_DrawingComponent.GetInstance();
-			if (drawings)
-				drawings.AskAdd(m_aMCFStroke, m_iMCFColour);
+			m_bMCFStroking = false;
+
+			MCF_Say("stroke finished with " + (m_aMCFStroke.Count() / 2) + " points");
+
+			// Two points is a line; one is a click somebody changed their mind
+			// about, and a dot nobody meant is worse than nothing.
+			if (m_aMCFStroke.Count() >= 4)
+			{
+				MCF_Map_DrawingComponent drawings = MCF_Map_DrawingComponent.GetInstance();
+
+				string state = "component " + (drawings != null).ToString();
+				state = state + ", server " + Replication.IsServer().ToString();
+
+				if (drawings)
+				{
+					drawings.AskAdd(m_aMCFStroke, m_iMCFColour);
+					state = state + ", strokes now " + drawings.GetStrokes().Count().ToString();
+				}
+
+				MCF_Say("sent: " + state);
+			}
+
+			m_aMCFStroke.Clear();
+			return;
 		}
 
+		m_bMCFStroking = true;
 		m_aMCFStroke.Clear();
+		MCF_AddPoint();
+
+		MCF_Say("stroke started");
 	}
+
 
 	//------------------------------------------------------------------------
 	protected void MCF_AddPoint()
@@ -269,6 +351,26 @@ modded class SCR_MapDrawingUI
 
 		m_aMCFCommands.Clear();
 
+		// A REFERENCE LINE AT KNOWN COORDINATES, while draw mode is on. It
+		// settles in one look what no amount of reading the engine's headers
+		// could: whether this canvas draws at all, and whether a command's
+		// numbers are screen pixels or workspace units. If the magenta line
+		// runs from near the top-left corner to about a quarter across, the
+		// canvas works and the space is units; if it is absent, the canvas is
+		// not the place to draw; if it is somewhere else entirely, the space
+		// is scaled. Goes with the rest of the diagnostics.
+		if (MCF_DIAG && m_bMCFFreehand)
+		{
+			array<float> corner = {100, 100, 400, 400};
+
+			LineDrawCommand probe = new LineDrawCommand();
+			probe.m_Vertices = corner;
+			probe.m_iColor = 0xFFFF00FF;
+			probe.m_fWidth = 6;
+
+			m_aMCFCommands.Insert(probe);
+		}
+
 		MCF_Map_DrawingComponent drawings = MCF_Map_DrawingComponent.GetInstance();
 
 		if (drawings)
@@ -283,6 +385,36 @@ modded class SCR_MapDrawingUI
 			MCF_AddCommand(m_aMCFStroke, MCF_Map_DrawingComponent.Colour(m_iMCFColour));
 
 		m_wMCFCanvas.SetDrawCommands(m_aMCFCommands);
+
+		// Said once per change, not once per frame.
+		if (m_aMCFCommands.Count() != m_iMCFSaidCommands)
+		{
+			m_iMCFSaidCommands = m_aMCFCommands.Count();
+
+			if (m_iMCFSaidCommands > 0)
+			{
+				// THE ONE THING READING THE SOURCE COULD NOT SETTLE: which
+				// space a canvas draw command is in. The canvas is anchored to
+				// the whole map frame but declares SizeInUnits 1024 1024, and
+				// WorldToScreen hands back DPI-SCALED pixels -- vanilla
+				// DPIUnscales them before giving them to a FrameSlot. If a
+				// command is in unscaled units instead, every stroke is drawn
+				// off the side of the screen and looks like nothing happened.
+				float canvasW, canvasH, screenW, screenH;
+				m_wMCFCanvas.GetScreenSize(canvasW, canvasH);
+				GetGame().GetWorkspace().GetScreenSize(screenW, screenH);
+
+				string say = m_iMCFSaidCommands.ToString();
+				say = say + " commands; canvas " + canvasW.ToString();
+				say = say + "x" + canvasH.ToString();
+				say = say + "; screen " + screenW.ToString();
+				say = say + "x" + screenH.ToString();
+				say = say + "; first point " + m_fMCFSaidX.ToString();
+				say = say + "," + m_fMCFSaidY.ToString();
+
+				MCF_Say(say);
+			}
+		}
 	}
 
 	//------------------------------------------------------------------------
@@ -307,12 +439,28 @@ modded class SCR_MapDrawingUI
 		if (pixels.Count() < 4)
 			return;
 
+		m_fMCFSaidX = pixels[0];
+		m_fMCFSaidY = pixels[1];
+
+		// THE HALO IS ITS OWN COMMAND, not m_fOutlineWidth. Setting the outline
+		// fields on a line swallowed the colour whole -- a red stroke drew
+		// black -- while the magenta reference line, which sets nothing but
+		// m_iColor, was exactly the colour asked for. So the outline fields
+		// mean something other than what their names suggest, and rather than
+		// tune a field whose behaviour is a guess, the black goes down first
+		// as a wider line of its own and the colour is laid on top. This is
+		// the same technique the board already uses for marker icons.
+		LineDrawCommand halo = new LineDrawCommand();
+		halo.m_Vertices = pixels;
+		halo.m_iColor = 0xC0000000;
+		halo.m_fWidth = 8;
+
+		m_aMCFCommands.Insert(halo);
+
 		LineDrawCommand line = new LineDrawCommand();
 		line.m_Vertices = pixels;
 		line.m_iColor = colour;
 		line.m_fWidth = 4;
-		line.m_fOutlineWidth = 2;
-		line.m_iOutlineColor = 0xC0000000;
 
 		m_aMCFCommands.Insert(line);
 	}
@@ -347,6 +495,12 @@ modded class SCR_MapDrawingUI
 			m_MCFRadial.GetOnMenuInitInvoker().Insert(MCF_FillRadialMenu);
 		else
 			MCF_Core_Log.Warn("map drawing: this map has no radial menu, so there is nowhere to offer freehand drawing");
+
+		m_iMCFSaidCommands = -1;
+
+		MCF_Say("map opened, mode " + config.MapEntityMode
+			+ ", canvas " + (m_wMCFCanvas != null)
+			+ ", radial " + (m_MCFRadial != null));
 	}
 
 	//------------------------------------------------------------------------
@@ -370,9 +524,32 @@ modded class SCR_MapDrawingUI
 	{
 		super.Update(timeSlice);
 
-		if (m_bMCFFreehand && m_bMCFHeld)
+		if (m_bMCFFreehand && m_bMCFStroking)
 			MCF_AddPoint();
 
 		MCF_Redraw();
+
+		// DOES HOLDING THE BUTTON SHOW UP AT ALL? The listeners only report
+		// DOWN and UP, and those arrived four milliseconds apart every time --
+		// but that is the listener's story, not necessarily the input's. This
+		// asks the action for its raw value every frame instead, and reports
+		// how many frames in a row it stayed pressed. One frame means the
+		// engine really does not expose a held left button on this action and
+		// click-click is the only honest interaction; a long run means it does
+		// and drawing can follow the hand after all.
+		if (MCF_DIAG && m_bMCFFreehand)
+		{
+			InputManager input = GetGame().GetInputManager();
+
+			if (input && input.GetActionValue("MapSelect") > 0)
+			{
+				m_iMCFHeldFrames++;
+			}
+			else if (m_iMCFHeldFrames > 0)
+			{
+				MCF_Say("button was down for " + m_iMCFHeldFrames + " frames");
+				m_iMCFHeldFrames = 0;
+			}
+		}
 	}
 }
