@@ -687,3 +687,91 @@ the drawing code needs to know about permissions.
 
 Steps 3 to 6 are all the same machinery, which is the argument for doing 3
 properly.
+
+## 7. Is the board's own position and zoom actually possible? What is proven, and the one thing that is not
+
+Asked directly, so answered directly.
+
+### Proven, and we measured it ourselves before we knew what it meant
+
+Stage two of the original probe put two hosts in the tree, each holding a
+widget called `MapWidget`, and opened the map into one of them. The numbers
+were written down at the time:
+
+```
+opened into A (PlainHost)
+A: 640 x 420, PixelPerUnit 0.15625, zoom 2.13333
+B: 640 x 420, PixelPerUnit 0.625,   zoom 1        <- B untouched
+```
+
+That `zoom` is `CanvasWidgetBase.GetZoom()` read off each widget. **Two
+widgets, two different zooms, at the same moment.** Zoom is not a property of
+the map -- it is a property of the widget, and opening a map into one widget
+left the other one's alone.
+
+`SCR_MapEntity.SetZoom` confirms the direction of travel: it works out a
+ratio against the widget and hands it to the entity,
+
+```c
+float pixelPerUnit = m_MapWidget.PixelPerUnit();
+ZoomChange(targetPPU / pixelPerUnit);
+```
+
+and the widget the map is open in is the one whose zoom moves. So
+`ZoomChange` and `PosChange` are the entity's way of driving THE WIDGET IT
+WAS OPENED INTO -- not a global view. Which is why the board, driving them
+while no map was open, worked at all.
+
+**So the board's own position and zoom are possible, and the route is to stop
+going through the entity:**
+
+```c
+m_wMapWidget.SetZoom(level);
+m_wMapWidget.SetOffsetPx(offset);
+```
+
+Both are `CanvasWidgetBase`, both are per widget, and neither has anything to
+do with `m_bIsOpen` or with anybody else's map. The board stops needing to
+wait for a player to finish reading, stops needing to re-state anything four
+times a second, and stops being able to disturb anyone.
+
+### Not proven: whether the FRAME culls what the board draws
+
+`SetFrame` is on the entity, so it is one rectangle for everybody, and
+vanilla's own comment in `OpenMap` says what it is for:
+
+```c
+SetFrame(Vector(0, 0, 0), Vector(0, 0, 0)); // Gamecode starts rendering stuff like descriptors straight away
+                                            // instead of waiting a frame - this is a hack to display nothing,
+                                            // avoiding the "blink" of icons
+```
+
+A zero frame displays nothing. So the frame is not a hint, it gates what is
+shown -- at least for descriptors, which is what the comment names.
+
+The open question is how far that reaches: while a player has their map open
+and panned into one corner, the entity's frame is theirs, and we do not know
+whether the board's terrain is culled to it, only its icons, or nothing at
+all. Re-stating our frame does not win that argument -- their map writes it
+every frame and the board four times a second.
+
+**But most of it does not matter, because of section 3.** The board is going
+to draw its markers itself, on its own canvas, from data it reads directly.
+Our overlay is ours and no frame touches it. What is left at risk is the
+engine's own descriptors and, possibly, terrain.
+
+### The test that settles it, and it is one build
+
+Drive the board's view with `SetZoom` / `SetOffsetPx`, remove the
+"wait while a map is open" guard entirely, then in game:
+
+1. Stand at the board, zoom the board in a few steps.
+2. Open your own map with M, pan to the far side of the island, zoom right in.
+3. Look at the board.
+
+- Board unchanged -> fully independent, and the feature is done the moment
+  markers are drawn.
+- Board keeps its view but loses icons or terrain outside your rectangle ->
+  independent enough, and the answer is to draw the missing parts ourselves.
+- Board follows your map -> zoom is per widget but the render is not, and the
+  board can only ever be a second view of one shared map.
