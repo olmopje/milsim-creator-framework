@@ -56,7 +56,7 @@ the base64.
 
 The URL goes in an item's **PICTURE URL** field, either in the Game Master's
 *Edit device* screen or in
-`addons/MCF_Intelligence/Configs/Devices/MCF_DeviceProfiles.conf`:
+`addons/MCF_Ops/Configs/Devices/MCF_DeviceProfiles.conf`:
 
 ```
 https://raw.githubusercontent.com/olmopje/milsim-creator-framework/main/content/images/photo.txt
@@ -67,10 +67,19 @@ the file.
 
 ## Two things to know
 
-**Size.** 5216 base64 characters decode in 7 ms; reckon on about 90 ms for a
-50 kB image. Anything past 120 000 characters is refused, which is roughly 90 kB
-of picture. Resize before encoding: a phone screen is a few hundred pixels
-across and nothing here needs to be larger.
+**Size.** A picture is refused past 160 000 base64 characters, which is about
+120 kB. What limits that is decoding time rather than the download: 5216
+characters decode in 7 ms, and the 99 883 character map in this folder -- 74 912
+bytes of JPEG -- takes under a second. Much larger than that and the pause is
+long enough to be felt in a frame. Resize before encoding anyway: a phone screen
+is a few hundred pixels across and nothing here needs to be bigger.
+
+> **If you made a picture before 26 September 2026 and only ever saw a strip of
+> it, this is why.** Nothing over about 6 kB had ever actually reached disk.
+> `Substring` in Enforce will not return more than 8191 characters and says
+> nothing when it stops, and the decoder was being handed a payload that had
+> been cut off there. The 120 000 this file used to promise had never once been
+> true. Your `.txt` is fine and needs no changes -- update the mod.
 
 **Changing a picture means a new filename.** The cache is keyed by URL, so a
 player who already fetched `photo.txt` keeps the copy they have. Publish
