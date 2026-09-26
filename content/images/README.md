@@ -1,13 +1,35 @@
 # Pictures for devices
 
-Photographs a phone or a laptop can show, and later the ones on a billboard.
+Photographs a phone or a laptop can show.
 
-These are **not** part of the mod. They live here, are served by GitHub, and are
-fetched by each player at runtime. Nothing in `addons/` refers to this folder.
+**The how-to lives in the wiki: [Pictures on a device](https://github.com/olmopje/milsim-creator-framework/wiki/Device-Pictures).**
+Converter, GitHub steps, size, troubleshooting -- all of it, written for
+somebody who has never done this before.
+
+These files are **not** part of the mod. They live here, are served by GitHub,
+and are fetched by each player at runtime. Nothing in `addons/` refers to this
+folder. Two test pictures are here: `locomotive.txt` and `montignac_map.txt`.
 
 ---
 
-## Why the files look like this
+## The short version
+
+```
+MCFIMG
+<one long line of base64>
+MCFIMG
+```
+
+Point an item's picture field at the **raw** address of that file:
+
+```
+https://raw.githubusercontent.com/olmopje/milsim-creator-framework/main/content/images/locomotive.txt
+```
+
+`raw.githubusercontent.com`, not `github.com` -- the second serves a web page
+around the file.
+
+## Why it is text and not an image
 
 The engine will not load an image from a URL. Three routes were tried and
 measured on 2026-09-10, and all three are shut:
@@ -19,72 +41,31 @@ measured on 2026-09-10, and all three are shut:
 - There is no script API to build a texture from bytes.
 
 What does work is fetching the image **as text** and rebuilding it as a file on
-the machine that draws it. So every picture here is stored base64-encoded, in a
-`.txt`, and `MCF_Device_ImageCache` turns it back into a `.png` in the player's
-profile folder.
+the machine that draws it. `MCF_Device_ImageCache` writes it into the player's
+own profile folder, choosing `.png` or `.jpg` from the magic bytes -- the loader
+picks its decoder by file extension, so a jpeg written to a `.png` is refused
+without a word.
 
-## The format
+The `MCFIMG` markers make the payload unambiguous. Without them the whole
+response is decoded, which is fine for a file that is nothing but base64 and
+wrong the moment anything wraps it: the letters in HTML are inside the base64
+alphabet too.
 
-```
-MCFIMG
-<one long line of base64>
-MCFIMG
-```
+## Limits, measured
 
-The `MCFIMG` markers are what make the payload unambiguous. Without them the
-whole response is decoded, which is fine for a file that is nothing but base64
-and wrong the moment anything wraps it -- a host that serves a viewer page
-around the text would otherwise be decoded as though it were the picture,
-because the letters in HTML are inside the base64 alphabet too.
+A picture is refused past **160 000 base64 characters**, about 120 kB. What
+limits it is decoding time, not the download. The 99 883 character map here --
+74 900 bytes of JPEG -- decodes in 27 ms.
 
-The decoder also checks the result: a png starts `137 80 78 71` and a jpeg
-`255 216 255`. Anything else is refused and says so in the log rather than
-writing a file the loader will silently reject.
+Jpeg is not a preference. The same map as a real png is 1 026 576 base64
+characters, ten times the limit.
 
-## Making one
-
-```sh
-{ echo MCFIMG; base64 -w0 photo.jpg; echo; echo MCFIMG; } > photo.txt
-```
-
-On Windows, `certutil -encode` works but wraps lines and adds a header -- the
-decoder skips characters outside the alphabet, so the wrapping is harmless, but
-delete the `-----BEGIN CERTIFICATE-----` lines or put the markers around only
-the base64.
-
-## Using one
-
-The URL goes in an item's **PICTURE URL** field, either in the Game Master's
-*Edit device* screen or in
-`addons/MCF_Ops/Configs/Devices/MCF_DeviceProfiles.conf`:
-
-```
-https://raw.githubusercontent.com/olmopje/milsim-creator-framework/main/content/images/photo.txt
-```
-
-`raw.githubusercontent.com`, not `github.com` -- the second serves a page around
-the file.
-
-## Two things to know
-
-**Size.** A picture is refused past 160 000 base64 characters, which is about
-120 kB. What limits that is decoding time rather than the download: 5216
-characters decode in 7 ms, and the 99 883 character map in this folder -- 74 912
-bytes of JPEG -- takes under a second. Much larger than that and the pause is
-long enough to be felt in a frame. Resize before encoding anyway: a phone screen
-is a few hundred pixels across and nothing here needs to be bigger.
+Each player keeps about twelve megabytes of the pictures they have seen most
+recently; older ones are dropped, so the folder does not grow forever.
 
 > **If you made a picture before 26 September 2026 and only ever saw a strip of
 > it, this is why.** Nothing over about 6 kB had ever actually reached disk.
 > `Substring` in Enforce will not return more than 8191 characters and says
-> nothing when it stops, and the decoder was being handed a payload that had
-> been cut off there. The 120 000 this file used to promise had never once been
-> true. Your `.txt` is fine and needs no changes -- update the mod.
-
-**Changing a picture means a new filename.** The cache is keyed by URL, so a
-player who already fetched `photo.txt` keeps the copy they have. Publish
-`photo_2.txt` and point the item at that instead.
-
-**Each player fetches their own.** A player who cannot reach GitHub sees the
-text without the picture, and that reads as a photograph that has not loaded --
-not as an error, because it is not one.
+> nothing when it stops, and the decoder was being handed a payload cut off
+> there. The 120 000 this file used to promise had never once been true. Your
+> `.txt` is fine and needs no changes -- update the mod.
